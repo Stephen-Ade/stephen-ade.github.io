@@ -272,10 +272,87 @@
       border-radius: 2px; padding: 0.2rem 0.55rem;
     }
 
+    /* ── VALUE PROVIDED ── */
+    #value { background: var(--navy3); }
+    .value-intro {
+      font-size: 1.05rem; color: rgba(255,255,255,0.7);
+      max-width: 700px; line-height: 1.8; margin-bottom: 3rem;
+    }
+    .value-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+    .value-card {
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 2rem;
+      position: relative; overflow: hidden;
+      transition: border-color 0.25s, transform 0.25s;
+    }
+    .value-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--gold));
+      transform: scaleX(0); transform-origin: left;
+      transition: transform 0.3s;
+    }
+    .value-card:hover { border-color: rgba(46,125,247,0.4); transform: translateY(-4px); }
+    .value-card:hover::before { transform: scaleX(1); }
+    .value-icon {
+      font-size: 2rem; margin-bottom: 1rem; display: block;
+    }
+    .value-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem; font-weight: 600;
+      margin-bottom: 0.6rem; color: var(--white);
+    }
+    .value-card p {
+      font-size: 0.87rem; color: var(--muted); line-height: 1.7;
+    }
+    .value-outcome {
+      margin-top: 0.9rem; padding-top: 0.9rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem; font-weight: 600;
+      color: var(--gold2); letter-spacing: 0.04em;
+    }
+    .value-outcome::before { content: '→ '; }
+    .value-banner {
+      background: linear-gradient(135deg, rgba(46,125,247,0.08), rgba(201,168,76,0.06));
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 2rem 2.5rem;
+      display: flex; align-items: center; gap: 2rem;
+      flex-wrap: wrap;
+    }
+    .value-banner-text {
+      flex: 1; min-width: 260px;
+    }
+    .value-banner-text h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem; margin-bottom: 0.5rem;
+    }
+    .value-banner-text p {
+      font-size: 0.9rem; color: var(--muted); line-height: 1.65;
+    }
+    .value-stats {
+      display: flex; gap: 2.5rem; flex-wrap: wrap;
+    }
+    .v-stat { text-align: center; }
+    .v-stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem; font-weight: 700; color: var(--white);
+      display: block; line-height: 1;
+    }
+    .v-stat-num em { color: var(--accent); font-style: normal; }
+    .v-stat-label {
+      font-size: 0.75rem; color: var(--muted); margin-top: 0.3rem;
+    }
+
     /* ── SERVICES ── */
     #services { background: var(--navy); }
     .services-grid {
-      display: grid; grid-template-columns: repeat(2, 1fr);
+      display: grid; grid-template-columns: repeat(3, 1fr);
       gap: 1.5rem;
     }
     .service-card {
@@ -371,6 +448,35 @@
       border-top: 1px solid var(--border);
       text-align: center;
     }
+    /* Knowledge Base */
+    #knowledge-base { background: var(--navy2); }
+    .kb-list { display: flex; flex-direction: column; gap: 1.5rem; margin-top: 2rem; }
+    .kb-item {
+      background: var(--navy);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem 1.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .kb-item:hover { border-color: var(--accent); transform: translateX(4px); }
+    .kb-meta { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .kb-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--white); margin: 0 0 0.4rem 0; }
+    .kb-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.65; margin: 0 0 0.5rem 0; }
+    .kb-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      color: var(--accent2);
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .kb-link:hover { color: var(--white); }
+
     .contact-inner { max-width: 680px; margin: 0 auto; }
     .contact-inner .section-title { margin-bottom: 1rem; }
     .contact-inner .section-desc { margin: 0 auto 2.5rem; }
@@ -481,6 +587,7 @@
     <div class="nav-logo">S<span>.</span>A. Adebowale</div>
     <ul class="nav-links">
       <li><a href="#expertise">Expertise</a></li>
+      <li><a href="#value">Value Provided</a></li>
       <li><a href="#services">Services</a></li>
       <li><a href="#credentials">Credentials</a></li>
       <li><a href="#highlights">Highlights</a></li>
@@ -547,20 +654,250 @@
     </div>
   </section>
 
+  <!-- VALUE PROVIDED -->
+  <section id="value">
+    <div class="section-inner">
+      <div class="section-label">Why Hire Me</div>
+      <h2 class="section-title">The Value I Bring to Your Organisation</h2>
+      <div class="divider"></div>
+      <p class="value-intro">
+        Hiring a Senior Security Architect or vCISO is a significant investment. Here's exactly what that investment delivers —
+        measurable outcomes, reduced risk, and a security programme that actively enables your business rather than slowing it down.
+      </p>
+
+      <div class="value-grid">
+
+        <div class="value-card">
+          <span class="value-icon">🛡️</span>
+          <h3>Risk Reduction You Can Quantify</h3>
+          <p>I translate technical vulnerabilities into business risk language your board and executives understand — then build the controls to close those gaps. No security theatre, no box-ticking: every control traces to a real threat.</p>
+          <div class="value-outcome">Fewer incidents, lower breach costs, defensible audit posture</div>
+        </div>
+
+        <div class="value-card">
+          <span class="value-icon">☁️</span>
+          <h3>Cloud Security That Keeps Pace With Growth</h3>
+          <p>Whether you're migrating to AWS, Azure, or running a hybrid environment, I design security architecture that scales with your infrastructure — not against it. From landing zones to DevSecOps pipelines, security is built in from day one.</p>
+          <div class="value-outcome">Secure cloud adoption without slowing engineering velocity</div>
+        </div>
+
+        <div class="value-card">
+          <span class="value-icon">🤖</span>
+          <h3>AI Security &amp; Governance Before It's a Liability</h3>
+          <p>I help organisations govern their AI and ML workloads responsibly — implementing security controls, federated identity frameworks, and policy structures aligned to emerging regulations before they become mandatory requirements.</p>
+          <div class="value-outcome">AI programmes that are defensible, auditable, and regulator-ready</div>
+        </div>
+
+        <div class="value-card">
+          <span class="value-icon">🔑</span>
+          <h3>Identity as a Security Foundation</h3>
+          <p>Most breaches start with compromised identity. I design and deploy IAM and PAM programmes — using tools like SailPoint and CyberArk — that enforce least privilege, eliminate standing access, and protect your most sensitive systems.</p>
+          <div class="value-outcome">Dramatically reduced blast radius from credential-based attacks</div>
+        </div>
+
+        <div class="value-card">
+          <span class="value-icon">📋</span>
+          <h3>Compliance Without the Pain</h3>
+          <p>I've led organisations through HIPAA, HITRUST, SOC 2, and cloud compliance programmes. I build compliance into the architecture so that audits become straightforward evidence-gathering — not a fire drill.</p>
+          <div class="value-outcome">Audit-ready posture, sustained — not just achieved once</div>
+        </div>
+
+        <div class="value-card">
+          <span class="value-icon">🚀</span>
+          <h3>Security That Enables Revenue</h3>
+          <p>Security doesn't have to be a blocker. I've architected platforms — including a $10M/quarter API security programme — where robust security was itself a commercial differentiator, unlocking enterprise customers and regulated markets.</p>
+          <div class="value-outcome">Security as a competitive advantage, not just overhead</div>
+        </div>
+
+      </div>
+
+      <div class="value-banner">
+        <div class="value-banner-text">
+          <h3>Proven at Enterprise Scale</h3>
+          <p>Over 12 years securing Fortune 500 organisations across financial services, healthcare, and technology — delivering programmes that stick long after the engagement ends.</p>
+        </div>
+        <div class="value-stats">
+          <div class="v-stat">
+            <span class="v-stat-num">12<em>+</em></span>
+            <div class="v-stat-label">Years Experience</div>
+          </div>
+          <div class="v-stat">
+            <span class="v-stat-num">$10<em>M</em></span>
+            <div class="v-stat-label">Revenue Enabled / Qtr</div>
+          </div>
+          <div class="v-stat">
+            <span class="v-stat-num">2<em>k+</em></span>
+            <div class="v-stat-label">Users Secured (SASE)</div>
+          </div>
+          <div class="v-stat">
+            <span class="v-stat-num">F<em>500</em></span>
+            <div class="v-stat-label">Enterprise Background</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
   <!-- SERVICES -->
   <section id="services">
     <div class="section-inner">
       <div class="section-label">What I offer</div>
-      <h2 class="section-title">Services for Startups &amp; Enterprise</h2>
+      <h2 class="section-title">Security Services for Startups, SMBs &amp; Enterprise</h2>
       <div class="divider"></div>
-      <p class="section-desc">Whether you're a fast-moving startup securing your first cloud workload or an enterprise navigating complex AI governance requirements, I tailor engagements to your context.</p>
+      <p class="section-desc">Whether you are a fast-moving startup securing your first cloud workload, an SMB modernizing wireless networks for Point of Sale, or an enterprise navigating complex global regulations, I provide tailored security leadership that scales with your growth.</p>
       <div class="services-grid">
-        <div class="service-card"><div class="service-num">01</div><div class="service-body"><h3>AI Security Assessment</h3><p>End-to-end review of your AI/ML stack — covering data pipelines, model training, inference endpoints, and integration touchpoints. Delivers a risk-ranked remediation roadmap.</p></div></div>
-        <div class="service-card"><div class="service-num">02</div><div class="service-body"><h3>Cloud Security Review</h3><p>AWS and Azure architecture deep-dives covering IAM, network controls, logging, encryption, and compliance posture. Benchmarked against CIS and AWS Well-Architected Security Pillar.</p></div></div>
-        <div class="service-card"><div class="service-num">03</div><div class="service-body"><h3>Threat Intelligence Programme</h3><p>Design or mature your threat intelligence capability — from tooling and source selection to analyst workflows, stakeholder reporting, and integration with your SOC or SIEM.</p></div></div>
-        <div class="service-card"><div class="service-num">04</div><div class="service-body"><h3>Security Strategy &amp; Advisory</h3><p>Fractional CISO or strategic advisor engagements. Board reporting, security roadmap development, vendor evaluation, and translating technical risk into business impact.</p></div></div>
-        <div class="service-card"><div class="service-num">05</div><div class="service-body"><h3>AI Governance &amp; Compliance</h3><p>Preparing your organisation for AI regulation — EU AI Act readiness, internal AI governance frameworks, risk classification, and documentation for audit and procurement.</p></div></div>
-        <div class="service-card"><div class="service-num">06</div><div class="service-body"><h3>Incident Response Retainer</h3><p>On-call IR support for when things go wrong. Includes playbook development, tabletop exercises, and post-incident review to harden against recurrence.</p></div></div>
+
+        <div class="service-card">
+          <div class="service-num">01</div>
+          <div class="service-body">
+            <h3>AI Security Assessment &amp; Implementation</h3>
+            <p>End-to-end security assessments of your AI/ML technology stack in AWS and Azure, utilizing frameworks like OWASP LLM Top 10 and MITRE ATLAS to ensure your innovation remains resilient.</p>
+            <div class="expertise-tags" style="margin-top:1rem;">
+              <span class="tag">Agentic AI &amp; Workflow Security</span>
+              <span class="tag">Shadow AI Discovery</span>
+              <span class="tag">Secure MLOps</span>
+              <span class="tag">Remediation Roadmap</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-num">02</div>
+          <div class="service-body">
+            <h3>AI Governance, Compliance &amp; Ethics</h3>
+            <p>Preparing your organisation to meet the demands of a rapidly shifting regulatory landscape, ensuring your AI initiatives are responsible and defensible.</p>
+            <div class="expertise-tags" style="margin-top:1rem;">
+              <span class="tag">NIST AI RMF</span>
+              <span class="tag">EU AI Act</span>
+              <span class="tag">OWASP AI Exchange</span>
+              <span class="tag">Human-in-the-Loop Design</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-num">03</div>
+          <div class="service-body">
+            <h3>Cloud Security Architecture &amp; Engineering</h3>
+            <p>Deep-dive architectural security reviews for AWS and Azure environments to ensure a "secure by design" posture — from identity and data protection to infrastructure hardening and real-time monitoring.</p>
+            <div class="expertise-tags" style="margin-top:1rem;">
+              <span class="tag">IAM &amp; Zero Trust</span>
+              <span class="tag">DSPM &amp; DLP</span>
+              <span class="tag">CIS Benchmarks</span>
+              <span class="tag">SIEM Integration</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-num">04</div>
+          <div class="service-body">
+            <h3>Threat Intelligence &amp; Defense Operations</h3>
+            <p>Design and mature your threat intelligence capabilities to move from reactive to proactive defense — integrating IaaS/SaaS/on-prem environments with SIEM and SOC workflows for automated event correlation and alerting.</p>
+            <div class="expertise-tags" style="margin-top:1rem;">
+              <span class="tag">SIEM &amp; SOC Integration</span>
+              <span class="tag">Threat Intelligence Platforms</span>
+              <span class="tag">Advanced Threat Modelling</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-num">05</div>
+          <div class="service-body">
+            <h3>Fractional CISO &amp; Strategic Advisory</h3>
+            <p>Executive-level security leadership for enterprises and SMBs — without the overhead of a full-time hire. Covering board reporting, multi-year roadmaps, compliance leadership, Zero Trust architecture, Secure SDLC, and security awareness programmes.</p>
+            <div class="expertise-tags" style="margin-top:1rem;">
+              <span class="tag">Board-Level Reporting</span>
+              <span class="tag">Zero Trust Architecture</span>
+              <span class="tag">Secure SDLC</span>
+              <span class="tag">Security Awareness</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-num">06</div>
+          <div class="service-body">
+            <h3>Security Risk Assessment &amp; Compliance Readiness</h3>
+            <p>Comprehensive security risk assessments and compliance readiness programmes for organisations entering or operating in regulated markets. From gap analysis through to audit preparation, I ensure your controls are evidenced, documented, and defensible.</p>
+            <div class="expertise-tags" style="margin-top:1rem;">
+              <span class="tag">HIPAA / HITRUST</span>
+              <span class="tag">SOC 2</span>
+              <span class="tag">ISO 27001</span>
+              <span class="tag">Gap Analysis &amp; Remediation</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-num">07</div>
+          <div class="service-body">
+            <h3>DevSecOps &amp; Secure SDLC Implementation</h3>
+            <p>Integrating security into every stage of your software development lifecycle — shifting left so vulnerabilities are caught at the source, not in production. From CI/CD pipeline hardening to SAST, DAST, and SCA tooling, I build security into your engineering culture.</p>
+            <div class="expertise-tags" style="margin-top:1rem;">
+              <span class="tag">SAST / DAST / SCA</span>
+              <span class="tag">CI/CD Pipeline Security</span>
+              <span class="tag">Azure DevOps</span>
+              <span class="tag">Shift-Left Security</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-num">08</div>
+          <div class="service-body">
+            <h3>IAM/PAM Programme Delivery</h3>
+            <p>End-to-end design and implementation of Identity and Access Management and Privileged Access Management programmes — enforcing least privilege, eliminating standing access, and reducing your blast radius from credential-based attacks at enterprise scale.</p>
+            <div class="expertise-tags" style="margin-top:1rem;">
+              <span class="tag">SailPoint</span>
+              <span class="tag">CyberArk</span>
+              <span class="tag">Identity Governance (IGA)</span>
+              <span class="tag">Least Privilege Enforcement</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- KNOWLEDGE BASE -->
+  <section id="knowledge-base">
+    <div class="section-inner">
+      <div class="section-label">Technical writing</div>
+      <h2 class="section-title">Knowledge Base</h2>
+      <div class="divider"></div>
+      <p class="section-desc">In-depth technical guides and enterprise architecture references covering identity, cloud security, and modern access management frameworks.</p>
+      <div class="kb-list">
+
+        <div class="kb-item">
+          <div class="kb-meta">
+            <span class="tag">Azure</span>
+            <span class="tag">Entra ID</span>
+            <span class="tag">Identity</span>
+          </div>
+          <div class="kb-body">
+            <h3 class="kb-title">Dynamic Conditional Access Policies with Custom Security Attributes</h3>
+            <p class="kb-desc">A comprehensive enterprise architecture guide covering how to reduce Conditional Access policy sprawl by 70-80% using attribute-based dynamic policies. Covers design patterns, implementation approaches, governance, and compliance frameworks.</p>
+            <a href="/Azure/EntraID/DynamicCAPS" class="kb-link">Read Article →</a>
+          </div>
+        </div>
+
+        <div class="kb-item">
+          <div class="kb-meta">
+            <span class="tag">Azure</span>
+            <span class="tag">Entra ID</span>
+            <span class="tag">Migration</span>
+          </div>
+          <div class="kb-body">
+            <h3 class="kb-title">Legacy Application Migration Framework &amp; Entra ID Integration Guide</h3>
+            <p class="kb-desc">A practical reference guide for migrating legacy applications to the cloud, covering the 6R migration strategies, workload assessment criteria, RASCI roles, and Entra ID integration patterns for each migration approach.</p>
+            <a href="/Azure/EntraID/AppMigration" class="kb-link">Read Article →</a>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
