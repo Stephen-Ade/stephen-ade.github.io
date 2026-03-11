@@ -99,9 +99,10 @@
     }
     .hero h1 {
       font-family: 'Playfair Display', serif;
-      font-size: clamp(2.6rem, 4.5vw, 3.8rem);
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
       font-weight: 700; line-height: 1.15;
       margin-bottom: 1.4rem;
+      white-space: nowrap;
       opacity: 0; animation: fadeUp 0.7s 0.35s forwards;
     }
     .hero h1 em { font-style: normal; color: var(--accent2); }
@@ -577,6 +578,8 @@
       .expertise-grid { grid-template-columns: 1fr; }
       .creds-grid { grid-template-columns: repeat(2, 1fr); }
       section { padding: 4rem 4%; }
+      .hero h1 { white-space: normal; font-size: clamp(1.6rem, 6vw, 2.2rem); }
+      .section-title { white-space: normal !important; }
     }
   </style>
 </head>
@@ -924,7 +927,7 @@
       <div class="about-grid">
         <div class="about-text">
           <div class="section-label">About</div>
-          <h2 class="section-title">Senior Information Security Architect/vCISO<br>Built for the AI Era</h2>
+          <h2 class="section-title" style="white-space:nowrap; font-size:clamp(1.2rem, 2.2vw, 1.9rem);">Senior Information Security Architect/vCISO — Built for the AI Era</h2>
           <div class="divider"></div>
           <p>I'm <strong>Stephen A. Adebowale</strong> — a Senior Information Security Architect and vCISO with over 12 years of experience designing and implementing robust cybersecurity programmes for Fortune 500 enterprises across financial services, healthcare, and technology sectors.</p>
           <p>My work spans AWS and Azure cloud security, AI/ML security governance, identity and access management (IAM/PAM), DevSecOps, and enterprise risk and compliance. I've led cross-functional teams delivering secure, scalable platforms — including a $10M/quarter revenue-generating API security platform — and spearheaded AI governance frameworks aligned to emerging regulatory requirements.</p>
@@ -967,7 +970,7 @@
     <div class="section-inner">
       <div class="contact-inner">
         <div class="section-label">Get in touch</div>
-        <h2 class="section-title">Ready to Strengthen Your Security Posture?</h2>
+        <h2 class="section-title" style="white-space:nowrap; font-size:clamp(1.2rem, 2.5vw, 2rem);">Ready to Strengthen Your Security Posture?</h2>
         <div class="divider" style="margin: 1rem auto 1.5rem;"></div>
         <p class="section-desc">Whether you're looking for an AI security assessment, a cloud security review, or strategic advisory support — I'd love to hear about your challenges.</p>
         <div class="contact-methods">
