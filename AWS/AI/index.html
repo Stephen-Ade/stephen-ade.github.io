@@ -1,0 +1,2313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guide to AWS Amplify Hosting for ML Services Access</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Inter+Tight:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── Design tokens ───────────────────────────────────────────────── */
+:root {
+  --bg:          #f8f9fb;
+  --surface:     #ffffff;
+  --border:      #e4e7ed;
+  --border-soft: #edf0f4;
+
+  --text-primary:   #0f1117;
+  --text-secondary: #4b5566;
+  --text-muted:     #8792a2;
+
+  --aws-navy:    #0f2137;
+  --aws-orange:  #ff9900;
+  --accent:      #1a56db;
+  --accent-soft: #ebf0ff;
+
+  --green:   #15803d;
+  --green-bg:#f0fdf4;
+  --amber:   #b45309;
+  --amber-bg:#fffbeb;
+  --red:     #b91c1c;
+  --red-bg:  #fef2f2;
+  --purple:  #7c3aed;
+  --purple-bg:#f5f3ff;
+
+  --radius-sm: 6px;
+  --radius:    10px;
+  --radius-lg: 16px;
+
+  --sidebar-w: 268px;
+  --header-h:  58px;
+
+  --mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  --sans: 'Inter', system-ui, sans-serif;
+  --display: 'Inter Tight', 'Inter', sans-serif;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.05);
+  --shadow:    0 4px 12px rgba(0,0,0,.08), 0 1px 3px rgba(0,0,0,.06);
+}
+
+/* ─── Reset & base ────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 15px; scroll-behavior: smooth; }
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Top header bar ──────────────────────────────────────────────── */
+#topbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--header-h);
+  background: var(--aws-navy);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 16px;
+  z-index: 200;
+  border-bottom: 2px solid var(--aws-orange);
+  box-shadow: 0 2px 12px rgba(0,0,0,.25);
+}
+#topbar .logo-mark {
+  width: 30px; height: 30px;
+  background: var(--aws-orange);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 13px; color: #fff;
+  font-family: var(--display);
+  flex-shrink: 0;
+}
+#topbar .doc-title {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 14px;
+  color: #fff;
+  opacity: .9;
+  letter-spacing: -.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#topbar .spacer { flex: 1; }
+#topbar .badge {
+  background: rgba(255,153,0,.18);
+  border: 1px solid rgba(255,153,0,.4);
+  color: var(--aws-orange);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ─── Sidebar ─────────────────────────────────────────────────────── */
+#sidebar {
+  position: fixed;
+  top: var(--header-h);
+  left: 0;
+  bottom: 0;
+  width: var(--sidebar-w);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 100;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+#sidebar::-webkit-scrollbar { width: 4px; }
+#sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.nav-section { padding: 20px 0 8px; }
+.nav-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 0 20px 6px;
+}
+.nav-item {
+  display: block;
+  padding: 7px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: all .15s;
+  line-height: 1.4;
+}
+.nav-item:hover {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-left-color: var(--accent);
+}
+.nav-item.active {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-left-color: var(--accent);
+  font-weight: 600;
+}
+.nav-sub {
+  display: block;
+  padding: 5px 20px 5px 32px;
+  font-size: 12.5px;
+  font-weight: 400;
+  color: var(--text-muted);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: all .15s;
+  line-height: 1.4;
+}
+.nav-sub:hover { color: var(--accent); background: var(--accent-soft); }
+.nav-sub.active { color: var(--accent); font-weight: 500; }
+
+/* ─── Main content area ───────────────────────────────────────────── */
+#main {
+  margin-left: var(--sidebar-w);
+  margin-top: var(--header-h);
+  padding: 0;
+  min-height: calc(100vh - var(--header-h));
+}
+
+/* ─── Hero / page header ──────────────────────────────────────────── */
+#hero {
+  background: linear-gradient(135deg, var(--aws-navy) 0%, #1a3a5c 60%, #1e4976 100%);
+  padding: 56px 64px 52px;
+  position: relative;
+  overflow: hidden;
+}
+#hero::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(255,153,0,.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+#hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--aws-orange), transparent);
+}
+.hero-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,153,0,.15);
+  border: 1px solid rgba(255,153,0,.3);
+  color: var(--aws-orange);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+}
+.hero-label::before {
+  content: '';
+  width: 6px; height: 6px;
+  background: var(--aws-orange);
+  border-radius: 50%;
+}
+#hero h1 {
+  font-family: var(--display);
+  font-size: 26px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -.025em;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 14px;
+}
+#hero .subtitle {
+  font-size: 16px;
+  color: rgba(255,255,255,.65);
+  font-weight: 400;
+  margin-bottom: 32px;
+  max-width: 520px;
+  line-height: 1.6;
+}
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.hero-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.hero-meta-item .meta-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.4);
+}
+.hero-meta-item .meta-value {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255,255,255,.85);
+}
+
+/* ─── Content wrapper ─────────────────────────────────────────────── */
+#content {
+  max-width: 900px;
+  padding: 48px 64px 80px;
+}
+
+/* ─── Section blocks ──────────────────────────────────────────────── */
+.doc-section {
+  margin-bottom: 64px;
+  scroll-margin-top: calc(var(--header-h) + 24px);
+}
+.doc-section + .doc-section {
+  border-top: 1px solid var(--border-soft);
+  padding-top: 48px;
+}
+
+/* ─── Headings ────────────────────────────────────────────────────── */
+.section-number {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  width: 22px; height: 22px;
+  border-radius: 5px;
+  text-align: center;
+  line-height: 22px;
+  margin-right: 10px;
+  vertical-align: middle;
+  letter-spacing: 0;
+}
+h2.section-title {
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -.025em;
+  margin-bottom: 32px;
+  line-height: 1.25;
+}
+h3.subsection-title {
+  font-family: var(--display);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -.015em;
+  margin: 36px 0 14px;
+  line-height: 1.3;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-soft);
+}
+h4.block-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 24px 0 10px;
+  letter-spacing: -.01em;
+}
+h5 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 16px 0 8px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+/* ─── Prose ───────────────────────────────────────────────────────── */
+p {
+  margin-bottom: 14px;
+  color: var(--text-secondary);
+  font-size: 14.5px;
+  line-height: 1.7;
+}
+p:last-child { margin-bottom: 0; }
+strong { font-weight: 600; color: var(--text-primary); }
+em { font-style: italic; }
+
+ul, ol {
+  padding-left: 22px;
+  margin-bottom: 14px;
+  color: var(--text-secondary);
+  font-size: 14.5px;
+  line-height: 1.7;
+}
+li { margin-bottom: 5px; }
+li ul, li ol { margin-top: 4px; margin-bottom: 4px; }
+
+/* ─── Callout boxes ───────────────────────────────────────────────── */
+.callout {
+  display: flex;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: var(--radius);
+  margin: 20px 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  border: 1px solid transparent;
+}
+.callout-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.callout-body strong { display: block; margin-bottom: 4px; }
+.callout-body ul { margin: 6px 0 0 0; }
+.callout-body li { margin-bottom: 3px; }
+
+.callout.note   { background: var(--accent-soft); border-color: rgba(26,86,219,.2); color: #1e3a8a; }
+.callout.warning { background: var(--amber-bg); border-color: rgba(180,83,9,.2); color: var(--amber); }
+.callout.success { background: var(--green-bg); border-color: rgba(21,128,61,.2); color: var(--green); }
+.callout.danger  { background: var(--red-bg); border-color: rgba(185,28,28,.2); color: var(--red); }
+
+/* ─── Tables ──────────────────────────────────────────────────────── */
+.table-wrap {
+  overflow-x: auto;
+  margin: 20px 0;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+thead tr {
+  background: var(--aws-navy);
+}
+thead th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: rgba(255,255,255,.85);
+  white-space: nowrap;
+}
+tbody tr {
+  border-bottom: 1px solid var(--border-soft);
+  transition: background .1s;
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--bg); }
+tbody td {
+  padding: 11px 16px;
+  color: var(--text-secondary);
+  vertical-align: top;
+  line-height: 1.55;
+}
+tbody td strong { color: var(--text-primary); }
+
+/* ─── Code blocks ─────────────────────────────────────────────────── */
+.code-wrap {
+  position: relative;
+  margin: 20px 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+.code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #1e2535;
+  padding: 9px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.code-lang {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  color: rgba(255,255,255,.45);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+.code-dots {
+  display: flex;
+  gap: 5px;
+}
+.code-dots span {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.12);
+}
+pre {
+  background: #131824;
+  padding: 20px;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: #c9d1d9;
+  margin: 0;
+}
+pre::-webkit-scrollbar { height: 4px; }
+pre::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 4px; }
+code {
+  font-family: var(--mono);
+  font-size: .875em;
+  background: rgba(26,86,219,.08);
+  color: var(--accent);
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(26,86,219,.12);
+}
+pre code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  border: none;
+  font-size: inherit;
+}
+
+/* Syntax color hints (applied via class) */
+.kw  { color: #ff7b72; }
+.str { color: #a5d6ff; }
+.cmt { color: #8b949e; font-style: italic; }
+.fn  { color: #d2a8ff; }
+.num { color: #79c0ff; }
+
+/* ─── Card grids ──────────────────────────────────────────────────── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.card-icon {
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.card-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -.01em;
+}
+.card ul {
+  font-size: 13px;
+  margin: 0;
+  padding-left: 18px;
+}
+.card li { margin-bottom: 4px; color: var(--text-secondary); }
+
+.card.blue   .card-icon { background: var(--accent-soft); }
+.card.green  .card-icon { background: var(--green-bg); }
+.card.purple .card-icon { background: var(--purple-bg); }
+.card.amber  .card-icon { background: var(--amber-bg); }
+
+/* ─── Architecture diagram boxes ─────────────────────────────────── */
+.arch-diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  margin: 20px 0;
+  box-shadow: var(--shadow-sm);
+}
+.arch-diagram .diagram-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.arch-diagram .flex-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 4px 0;
+  flex-wrap: wrap;
+}
+.arch-diagram .flex-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.arch-diagram .diagram-box {
+  background: var(--accent-soft);
+  border: 1.5px solid rgba(26,86,219,.25);
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--accent);
+  text-align: center;
+  min-width: 120px;
+  line-height: 1.4;
+  font-family: var(--sans);
+  box-shadow: var(--shadow-sm);
+}
+.arch-diagram .diagram-box small {
+  display: block;
+  font-weight: 400;
+  font-size: 11px;
+  opacity: .75;
+  margin-top: 2px;
+}
+/* Override inline bg colors with better palette */
+.arch-diagram .diagram-box[style*="background-color: #ebf8ff"] { background: var(--accent-soft) !important; border-color: rgba(26,86,219,.2) !important; }
+.arch-diagram .diagram-box[style*="background-color: #fff5f5"] { background: var(--red-bg) !important; border-color: rgba(185,28,28,.2) !important; color: var(--red) !important; }
+.arch-diagram .diagram-box[style*="background-color: #f0fff4"] { background: var(--green-bg) !important; border-color: rgba(21,128,61,.2) !important; color: var(--green) !important; }
+.arch-diagram .diagram-box[style*="background-color: #ebf4ff"], 
+.arch-diagram .diagram-box[style*="background-color: #e6fffa"] { background: var(--purple-bg) !important; border-color: rgba(124,58,237,.2) !important; color: var(--purple) !important; }
+/* thick SVG arrows — .arrow-down and .arrow-right are now inline SVG wrappers */
+.arch-diagram .arrow-down {
+  display: flex;
+  justify-content: center;
+  margin: 4px 0;
+  background: none;
+  border: none;
+  width: auto;
+  height: auto;
+}
+.arch-diagram .arrow-down::after {
+  content: '';
+  display: none; /* SVG injected via JS below */
+}
+.arch-diagram .arrow-right {
+  display: flex;
+  align-items: center;
+  margin: 0 2px;
+  background: none;
+  border: none;
+  width: auto;
+  height: auto;
+  flex-shrink: 0;
+}
+.arch-diagram .vpc-box {
+  border: 2px dashed var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  margin: 12px 0;
+  width: 100%;
+}
+.arch-diagram .vpc-box .vpc-label {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+.fig-caption {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 14px;
+  font-style: italic;
+}
+
+/* ─── Layer panels ────────────────────────────────────────────────── */
+.layer-panel {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin: 16px 0;
+  box-shadow: var(--shadow-sm);
+}
+.layer-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: -.01em;
+}
+.layer-panel-body {
+  padding: 18px 20px;
+  background: var(--surface);
+}
+.layer-panel-body ul { margin: 0; }
+.layer-panel-body li { margin-bottom: 6px; font-size: 13.5px; }
+
+.layer-panel.blue .layer-panel-header   { background: var(--accent-soft); color: var(--accent); border-bottom: 1px solid rgba(26,86,219,.15); }
+.layer-panel.red .layer-panel-header    { background: var(--red-bg); color: var(--red); border-bottom: 1px solid rgba(185,28,28,.15); }
+.layer-panel.green .layer-panel-header  { background: var(--green-bg); color: var(--green); border-bottom: 1px solid rgba(21,128,61,.15); }
+.layer-panel.purple .layer-panel-header { background: var(--purple-bg); color: var(--purple); border-bottom: 1px solid rgba(124,58,237,.15); }
+
+/* ─── Step list ───────────────────────────────────────────────────── */
+.step-list {
+  list-style: none;
+  padding: 0;
+  counter-reset: step;
+  margin: 16px 0;
+}
+.step-list li {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: 14px;
+  color: var(--text-secondary);
+  counter-increment: step;
+}
+.step-list li:last-child { border-bottom: none; }
+.step-list li::before {
+  content: counter(step);
+  min-width: 26px; height: 26px;
+  background: var(--aws-navy);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.step-list li strong { color: var(--text-primary); }
+
+/* ─── TOC (in-page, now removed as we have sidebar) ──────────────── */
+section#toc { display: none; }
+
+/* ─── Section divider pill ───────────────────────────────────────── */
+.section-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--aws-navy);
+  color: rgba(255,255,255,.8);
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+}
+
+/* ─── Two-col layout ──────────────────────────────────────────────── */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 16px 0;
+}
+@media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+/* ─── Inline tag ──────────────────────────────────────────────────── */
+.tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 4px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border: 1px solid rgba(26,86,219,.15);
+  white-space: nowrap;
+}
+
+/* ─── Section progress bar ───────────────────────────────────────── */
+#progress {
+  position: fixed;
+  top: var(--header-h);
+  left: var(--sidebar-w);
+  right: 0;
+  height: 2px;
+  background: var(--border);
+  z-index: 99;
+}
+#progress-bar {
+  height: 100%;
+  background: var(--aws-orange);
+  width: 0%;
+  transition: width .1s;
+}
+
+/* ─── Footer ──────────────────────────────────────────────────────── */
+#footer {
+  margin-left: var(--sidebar-w);
+  background: var(--aws-navy);
+  border-top: 1px solid rgba(255,255,255,.08);
+  padding: 28px 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+#footer p { color: rgba(255,255,255,.4); font-size: 12px; margin: 0; }
+
+/* ─── Responsive ──────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  #sidebar { display: none; }
+  #main, #footer { margin-left: 0; }
+  #content { padding: 32px 24px 60px; }
+  #hero { padding: 36px 24px 32px; }
+  #hero h1 { font-size: 24px; }
+  #progress { left: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── Top bar ─────────────────────────────────────────────────────── -->
+<div id="topbar">
+  <a href="https://stephen-ade.github.io/" style="display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0;" title="Back to stephen-ade.github.io">
+    <div class="logo-mark">AWS</div>
+  </a>
+  <a href="https://stephen-ade.github.io/" style="display:flex;align-items:center;gap:6px;text-decoration:none;color:rgba(255,255,255,.5);font-size:12px;font-weight:500;flex-shrink:0;white-space:nowrap;">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><polyline points="9,2 4,7 9,12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    stephen-ade.github.io
+  </a>
+  <div style="width:1px;height:18px;background:rgba(255,255,255,.15);flex-shrink:0;margin:0 6px;"></div>
+  <div class="doc-title">AWS Amplify Hosting for ML/AI Services Guide</div>
+  <div class="spacer"></div>
+  <div class="badge">Technical Guide</div>
+</div>
+
+<!-- ── Reading progress ────────────────────────────────────────────── -->
+<div id="progress"><div id="progress-bar"></div></div>
+
+<!-- ── Sidebar navigation ──────────────────────────────────────────── -->
+<nav id="sidebar">
+  <div class="nav-section">
+    <div class="nav-section-label">Contents</div>
+    <a href="#introduction" class="nav-item">1. Introduction &amp; Overview</a>
+    <a href="#introduction-purpose" class="nav-sub">Purpose and Scope</a>
+    <a href="#introduction-audience" class="nav-sub">Target Audience</a>
+    <a href="#introduction-prerequisites" class="nav-sub">Prerequisites</a>
+    <a href="#introduction-benefits" class="nav-sub">Architecture Benefits</a>
+  </div>
+  <div class="nav-section">
+    <a href="#architecture" class="nav-item">2. Architecture Overview</a>
+    <a href="#architecture-diagrams" class="nav-sub">High-Level Diagrams</a>
+    <a href="#architecture-components" class="nav-sub">Component Descriptions</a>
+    <a href="#architecture-cloudfront" class="nav-sub">CloudFront Architecture</a>
+    <a href="#architecture-apigateway" class="nav-sub">API Gateway &amp; WAF</a>
+    <a href="#architecture-layers" class="nav-sub">Architecture Layers</a>
+  </div>
+  <div class="nav-section">
+    <a href="#auth-flows" class="nav-item">3. Auth &amp; Authorization</a>
+    <a href="#auth-flows-diagrams" class="nav-sub">Authentication Flows</a>
+    <a href="#auth-flows-jwt" class="nav-sub">JWT Token Validation</a>
+  </div>
+  <div class="nav-section">
+    <a href="#data-flow" class="nav-item">4. Data Flow Architecture</a>
+    <a href="#data-flow-end-to-end" class="nav-sub">End-to-End Flow</a>
+    <a href="#data-flow-sagemaker" class="nav-sub">SageMaker Integration</a>
+    <a href="#data-flow-bedrock" class="nav-sub">Bedrock Integration</a>
+  </div>
+  <div class="nav-section">
+    <a href="#security" class="nav-item">5. Security Architecture</a>
+    <a href="#security-model" class="nav-sub">Multi-Layer Security</a>
+    <a href="#security-jwt" class="nav-sub">JWT Security</a>
+    <a href="#security-data" class="nav-sub">Data Protection</a>
+  </div>
+  <div class="nav-section">
+    <a href="#implementation" class="nav-item">6. Implementation Guide</a>
+    <a href="#implementation-amplify" class="nav-sub">Setting Up Amplify</a>
+    <a href="#implementation-cognito" class="nav-sub">Configuring Cognito</a>
+    <a href="#implementation-entra" class="nav-sub">Integrating Entra ID</a>
+    <a href="#implementation-angular" class="nav-sub">Angular SPA Development</a>
+    <a href="#implementation-auth" class="nav-sub">Implementing Auth</a>
+    <a href="#implementation-api" class="nav-sub">API Gateway Config</a>
+    <a href="#implementation-lambda" class="nav-sub">Lambda Authorizer</a>
+    <a href="#implementation-ml" class="nav-sub">ML Services Integration</a>
+  </div>
+  <div style="margin:20px 0 0;padding:14px 16px;border-top:1px solid var(--border-soft);">
+    <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:10px;">Series</div>
+    <div style="font-size:11.5px;font-weight:600;color:var(--text-primary);padding:8px 10px;background:var(--accent-soft);border-radius:6px;border-left:3px solid var(--accent);margin-bottom:6px;line-height:1.35;">
+      Part 1 — You are here<br><span style="font-weight:400;color:var(--text-secondary);font-size:11px;">AWS Amplify Hosting for ML/AI Services Guide</span>
+    </div>
+    <a href="/AWS/AI/integration" style="display:block;font-size:11.5px;font-weight:500;color:var(--text-secondary);padding:8px 10px;border-radius:6px;border:1px solid var(--border);text-decoration:none;line-height:1.35;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)';" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-secondary)';">
+      Part 2 — Next<br><span style="font-size:11px;">AWS Amplify ML Services Integration Guide →</span>
+    </a>
+    <a href="https://stephen-ade.github.io/" style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-muted);text-decoration:none;margin-top:10px;padding:6px 2px;transition:color .15s;" onmouseover="this.style.color='var(--accent)';" onmouseout="this.style.color='var(--text-muted)';">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><polyline points="8,2 3,6 8,10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to Knowledge Base
+    </a>
+  </div>
+</nav>
+
+<!-- ── Main ─────────────────────────────────────────────────────────── -->
+<div id="main">
+
+  <!-- Hero -->
+  <div id="hero">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+      <div class="hero-label" style="margin-bottom:0;">AWS Architecture Guide</div>
+      <span style="color:rgba(255,255,255,.3);font-size:12px;">·</span>
+      <span style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:rgba(255,153,0,.7);">Part 1 of 2</span>
+    </div>
+    <h1>AWS Amplify Hosting for ML/AI Services Guide</h1>
+    <p class="subtitle">Architecture and access patterns for enterprise Angular SPAs accessing AWS ML services with multi-layer security. For CDK stacks, Lambda code, and CI/CD pipelines, see Part 2.</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <span class="meta-label">Version</span>
+        <span class="meta-value">1.1</span>
+      </div>
+      <div class="hero-meta-item">
+        <span class="meta-label">Updated</span>
+        <span class="meta-value">March 2026</span>
+      </div>
+      <div class="hero-meta-item">
+        <span class="meta-label">Audience</span>
+        <span class="meta-value">Solution Architects · Cloud Engineers · DevOps</span>
+      </div>
+      <div class="hero-meta-item">
+        <span class="meta-label">Covers</span>
+        <span class="meta-value">Amplify · Cognito · API GW · SageMaker · Bedrock</span>
+      </div>
+    </div>
+    <!-- Series banner -->
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:14px 18px;margin-top:24px;">
+      <span style="font-size:13px;color:rgba(255,255,255,.7);line-height:1.5;">
+        <strong style="color:#fff;">Two-part series.</strong> This guide covers architecture &amp; access patterns.
+        For the full implementation reference with CDK, Lambda, and CI/CD, see the companion guide.
+      </span>
+      <a href="/AWS/AI/integration" style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:#fff;background:rgba(255,153,0,.2);border:1px solid rgba(255,153,0,.4);padding:8px 16px;border-radius:6px;text-decoration:none;white-space:nowrap;transition:background .15s;" onmouseover="this.style.background='rgba(255,153,0,.35)';" onmouseout="this.style.background='rgba(255,153,0,.2)';">
+        Part 2: ML Services Integration Guide
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><line x1="2" y1="7" x2="11" y2="7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><polyline points="8,3 12,7 8,11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div id="content">
+
+    <!-- ─── §1 Introduction ─────────────────────────────────────── -->
+    <section id="introduction" class="doc-section">
+      <div class="section-pill">Section 1</div>
+      <h2 class="section-title"><span class="section-number">1</span>Introduction and Overview</h2>
+
+      <div id="introduction-purpose">
+        <h3 class="subsection-title">Purpose and Scope</h3>
+        <p>This comprehensive guide provides a detailed roadmap for designing, developing, integrating, and deploying AWS Amplify hosting for Single Page Applications (SPAs) that enable corporate users to access AWS Machine Learning services. The guide focuses on establishing a secure, scalable, and efficient architecture that integrates with enterprise identity systems while leveraging AWS's powerful ML offerings including SageMaker, Bedrock, and Lambda processors for AI capabilities.</p>
+        <p>This guide serves as a blueprint for organizations looking to provide their employees with secure access to advanced AI capabilities while maintaining corporate security standards and governance requirements.</p>
+        <p><strong>The scope encompasses:</strong></p>
+        <ul>
+          <li>Front-end development using the Angular framework</li>
+          <li>Authentication via Entra ID integration through AWS Cognito</li>
+          <li>Secure API access to internal ML endpoints</li>
+          <li>Multi-layered security architecture</li>
+          <li>Implementation and deployment workflows</li>
+          <li>Best practices for corporate environments</li>
+        </ul>
+      </div>
+
+      <div id="introduction-audience">
+        <h3 class="subsection-title">Target Audience</h3>
+        <p>This guide is intended for the following roles. Readers should have intermediate to advanced knowledge of AWS services, authentication mechanisms, and modern web application development practices.</p>
+        <ul>
+          <li><strong>Solution Architects</strong> responsible for designing ML service access solutions</li>
+          <li><strong>Cloud Engineers</strong> implementing AWS services and security controls</li>
+          <li><strong>Full Stack Developers</strong> working on Angular SPAs and AWS integrations</li>
+          <li><strong>DevOps Engineers</strong> managing deployments and CI/CD pipelines</li>
+          <li><strong>Security Engineers</strong> ensuring compliance with corporate security requirements</li>
+          <li><strong>IT Managers</strong> overseeing the implementation of AI capabilities within their organization</li>
+        </ul>
+      </div>
+
+      <div id="introduction-prerequisites">
+        <h3 class="subsection-title">Prerequisites</h3>
+        <p>To successfully implement the solutions described in this guide, the following prerequisites are necessary.</p>
+
+        <h4 class="block-title">Knowledge Prerequisites</h4>
+        <ul>
+          <li>Understanding of Angular framework and SPA development</li>
+          <li>Familiarity with AWS services, particularly Amplify, Cognito, API Gateway, Lambda, SageMaker, and Bedrock</li>
+          <li>Knowledge of authentication protocols (OAuth 2.0, OIDC) and JWT token validation</li>
+          <li>Experience with cloud security best practices</li>
+          <li>Basic understanding of ML/AI service consumption patterns</li>
+        </ul>
+
+        <h4 class="block-title">Technical Prerequisites</h4>
+        <ul>
+          <li>AWS account with appropriate permissions to create and manage required services</li>
+          <li>Entra ID (formerly Azure AD) tenant with administrative access</li>
+          <li>Node.js and Angular development environment</li>
+          <li>AWS CLI and Amplify CLI configured locally</li>
+          <li>Access to internal ML model endpoints and permissions to AWS Bedrock services</li>
+          <li>Git repository for source code management</li>
+        </ul>
+
+        <div class="callout warning">
+          <div class="callout-icon">⚠</div>
+          <div class="callout-body">
+            <strong>Bedrock Model Access Requirement</strong>
+            Amazon Bedrock foundation models are <strong>not enabled by default</strong> in any AWS account. Each model must be explicitly requested and approved before use. Navigate to <em>Amazon Bedrock → Model Access → Manage model access</em> in the AWS Console to request access to the models you need (e.g. Anthropic Claude, Meta Llama, Amazon Nova). Model availability also varies by AWS region. Allow up to 24 hours for approval of third-party models.
+          </div>
+        </div>
+
+        <div class="callout note">
+          <div class="callout-icon">ℹ</div>
+          <div class="callout-body">
+            <strong>Scope Note</strong>
+            This guide assumes that ML models are already developed and deployed to SageMaker endpoints or accessible via Bedrock APIs. The focus is on building the frontend application and the secure access architecture.
+          </div>
+        </div>
+      </div>
+
+      <div id="introduction-benefits">
+        <h3 class="subsection-title">Architecture Benefits</h3>
+        <div class="card-grid">
+          <div class="card blue">
+            <div class="card-header">
+              <div class="card-icon blue">🛡</div>
+              <div class="card-title">Security</div>
+            </div>
+            <ul>
+              <li>Multi-layer defense at each tier</li>
+              <li>Edge protection via WAF + CloudFront</li>
+              <li>Entra ID + Cognito federation</li>
+              <li>Lambda authorizer token validation</li>
+              <li>Fine-grained IAM access control</li>
+              <li>Encrypted data throughout</li>
+            </ul>
+          </div>
+          <div class="card green">
+            <div class="card-header">
+              <div class="card-icon green">⚡</div>
+              <div class="card-title">Performance</div>
+            </div>
+            <ul>
+              <li>Global CloudFront edge delivery</li>
+              <li>Static asset caching</li>
+              <li>Optimized API routing</li>
+              <li>Scalable Amplify hosting</li>
+              <li>Async ML service consumption</li>
+              <li>Serverless Lambda scalability</li>
+            </ul>
+          </div>
+          <div class="card purple">
+            <div class="card-header">
+              <div class="card-icon purple">⚙</div>
+              <div class="card-title">Operational</div>
+            </div>
+            <ul>
+              <li>Built-in CI/CD with Amplify</li>
+              <li>Simplified UAT/PROD deployments</li>
+              <li>Centralized monitoring &amp; logging</li>
+              <li>Automated demand-based scaling</li>
+              <li>Managed service overhead reduction</li>
+            </ul>
+          </div>
+          <div class="card amber">
+            <div class="card-header">
+              <div class="card-icon amber">📈</div>
+              <div class="card-title">Business</div>
+            </div>
+            <ul>
+              <li>Democratized ML/AI access</li>
+              <li>Corporate identity UX consistency</li>
+              <li>Serverless cost optimization</li>
+              <li>Accelerated AI feature delivery</li>
+              <li>Enterprise-grade compliance</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── §2 Architecture ─────────────────────────────────────── -->
+    <section id="architecture" class="doc-section">
+      <div class="section-pill">Section 2</div>
+      <h2 class="section-title"><span class="section-number">2</span>Architecture Overview</h2>
+
+      <div id="architecture-diagrams">
+        <h3 class="subsection-title">High-Level Architecture Diagrams</h3>
+
+        <h4 class="block-title">Overall System Architecture</h4>
+        <div class="arch-diagram">
+          <div class="diagram-container" style="gap:0;">
+
+            <!-- SVG arrow helpers as inline templates -->
+            <!-- Down arrow: used between vertical steps -->
+            <!-- Right arrow: used between horizontal steps -->
+
+            <!-- Row 1: Corporate User -->
+            <div class="flex-row"><div class="diagram-box">Corporate User</div></div>
+            <div style="display:flex;justify-content:center;margin:2px 0;">
+              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+
+            <!-- Row 2: Two parallel paths — App Delivery + Authentication -->
+            <div style="display:flex;justify-content:center;align-items:flex-start;gap:48px;flex-wrap:wrap;margin:0;">
+
+              <!-- Left: App Delivery path -->
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+                <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;margin-bottom:6px;">App Delivery</div>
+                <div class="diagram-box" style="background-color:#ebf8ff;">Amplify Hosted SPA<br><small>Angular — runs in browser</small></div>
+                <div style="display:flex;justify-content:center;margin:2px 0;">
+                  <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">CloudFront + WAF<br><small>Edge delivery &amp; protection</small></div>
+              </div>
+
+              <!-- Right: Authentication path -->
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+                <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;margin-bottom:6px;">Authentication</div>
+                <div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;">AWS Cognito<br><small>User Pool + Federation</small></div>
+                <div style="display:flex;justify-content:center;margin:2px 0;">
+                  <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;">Entra ID<br><small>Corporate IdP (SAML)</small></div>
+              </div>
+            </div>
+
+            <!-- Down to JWT step -->
+            <div style="display:flex;justify-content:center;margin:6px 0 2px;">
+              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+
+            <!-- JWT label row -->
+            <div class="flex-row">
+              <div class="diagram-box" style="background-color:#ebf8ff;font-size:11.5px;padding:8px 16px;">SPA attaches JWT to API request</div>
+            </div>
+            <div style="display:flex;justify-content:center;margin:2px 0;">
+              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+
+            <!-- API Layer -->
+            <div style="border:1.5px dashed var(--border);border-radius:10px;padding:12px 16px;width:100%;box-sizing:border-box;margin:4px 0;">
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);text-align:center;margin-bottom:10px;">API Layer</div>
+              <div class="flex-row" style="gap:6px;">
+                <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">WAF<br><small>API Protection</small></div>
+                <svg width="32" height="18" viewBox="0 0 32 18" fill="none"><line x1="0" y1="9" x2="22" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="19,2 29,9 19,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">Regional API Gateway</div>
+                <svg width="32" height="18" viewBox="0 0 32 18" fill="none"><line x1="0" y1="9" x2="22" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="19,2 29,9 19,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">Lambda Authorizer</div>
+              </div>
+            </div>
+
+            <div style="display:flex;justify-content:center;margin:2px 0;">
+              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+
+            <!-- ML Services Layer -->
+            <div style="border:1.5px dashed var(--border);border-radius:10px;padding:12px 16px;width:100%;box-sizing:border-box;margin:4px 0;">
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);text-align:center;margin-bottom:10px;">ML Services Layer</div>
+              <div class="flex-row" style="gap:12px;">
+                <div class="diagram-box" style="background-color:#ebf4ff;border-color:#667eea;">Lambda Processors<br><small>ML Orchestration</small></div>
+                <svg width="32" height="18" viewBox="0 0 32 18" fill="none"><line x1="0" y1="9" x2="22" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="19,2 29,9 19,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div class="diagram-box" style="background-color:#ebf4ff;border-color:#667eea;">SageMaker Endpoints</div>
+                <div class="diagram-box" style="background-color:#ebf4ff;border-color:#667eea;">Bedrock Models</div>
+              </div>
+            </div>
+
+          </div>
+          <p class="fig-caption">Figure 1: Overall System Architecture</p>
+        </div>
+
+        <h4 class="block-title">Network Security Architecture</h4>
+        <div class="arch-diagram">
+          <div class="diagram-container" style="gap:0;">
+            <div class="flex-row"><div class="diagram-box">Internet</div></div>
+            <div style="display:flex;justify-content:center;margin:2px 0;">
+              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="flex-row"><div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;">WAF (Edge Protection)</div></div>
+            <div style="display:flex;justify-content:center;margin:2px 0;">
+              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="flex-row"><div class="diagram-box">CloudFront<br><small>CDN + SSL Termination</small></div></div>
+            <div style="display:flex;justify-content:center;margin:2px 0;">
+              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="flex-row" style="gap:24px;">
+              <div class="diagram-box">Amplify Hosting (SPA)</div>
+              <div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;">API Gateway WAF<br><small>2nd WAF Layer</small></div>
+            </div>
+            <div style="display:flex;justify-content:center;margin:2px 0;">
+              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="flex-row"><div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">Regional API Gateway</div></div>
+            <div style="display:flex;justify-content:center;margin:2px 0;">
+              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="vpc-box">
+              <div class="vpc-label">Internal AWS Network (VPC)</div>
+              <div class="flex-row" style="gap:8px;">
+                <div class="diagram-box">Lambda</div>
+                <svg width="32" height="18" viewBox="0 0 32 18" fill="none"><line x1="0" y1="9" x2="22" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="19,2 29,9 19,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div class="diagram-box">SageMaker</div>
+                <div class="diagram-box">Bedrock API Access</div>
+              </div>
+            </div>
+          </div>
+          <p class="fig-caption">Figure 2: Network Security Architecture</p>
+        </div>
+      </div>
+
+      <div id="architecture-components">
+        <h3 class="subsection-title">Component Descriptions</h3>
+        <p>The architecture consists of the following key components, each serving a specific purpose in the overall system.</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Component</th><th>Description</th><th>Role in Architecture</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>AWS Amplify Hosting</strong></td><td>Fully managed service for hosting web applications</td><td>Hosts the Angular SPA with built-in CI/CD, global CDN, and HTTPS</td></tr>
+              <tr><td><strong>Angular SPA</strong></td><td>Single Page Application built with Angular framework</td><td>Provides the user interface for accessing ML services</td></tr>
+              <tr><td><strong>Amazon CloudFront</strong></td><td>Content delivery network service</td><td>Distributes application content globally and integrates with WAF</td></tr>
+              <tr><td><strong>AWS WAF</strong></td><td>Web Application Firewall</td><td>Protects against common web exploits at both edge and API levels</td></tr>
+              <tr><td><strong>Entra ID</strong></td><td>Microsoft's cloud identity service (formerly Azure AD)</td><td>Corporate identity provider for user authentication</td></tr>
+              <tr><td><strong>Amazon Cognito</strong></td><td>User authentication and authorization service</td><td>Identity federation with Entra ID and token issuance for AWS services</td></tr>
+              <tr><td><strong>API Gateway</strong></td><td>Managed service for creating, publishing, and securing APIs</td><td>Entry point for backend ML service access with WAF protection</td></tr>
+              <tr><td><strong>Lambda Authorizer</strong></td><td>Custom authorization logic for API Gateway</td><td>Validates JWT tokens and assigns IAM policies for backend access</td></tr>
+              <tr><td><strong>Lambda Processors</strong></td><td>Serverless compute for processing ML requests</td><td>Calls Bedrock Foundational Model APIs and processes responses</td></tr>
+              <tr><td><strong>Amazon SageMaker</strong></td><td>Fully managed ML service</td><td>Hosts custom internal ML models with endpoint access</td></tr>
+              <tr><td><strong>AWS Bedrock</strong></td><td>Fully managed foundation model service</td><td>Provides access to foundation models from Anthropic (Claude), Amazon (Titan, Nova), Meta (Llama), Mistral AI, Cohere, AI21 Labs, Stability AI, and Writer. Note: OpenAI models are not available on Amazon Bedrock.</td></tr>
+              <tr><td><strong>IAM Roles</strong></td><td>Identity and Access Management roles</td><td>Controls permissions for accessing AWS services and resources</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="architecture-cloudfront">
+        <h3 class="subsection-title">AWS Amplify CloudFront Architecture</h3>
+        <p>AWS Amplify Hosting automatically provisions and configures a CloudFront distribution to serve your SPA, providing several integration benefits.</p>
+        <div class="two-col">
+          <div class="layer-panel blue">
+            <div class="layer-panel-header">☁ CloudFront Integration Features</div>
+            <div class="layer-panel-body">
+              <ul>
+                <li>Global content delivery via edge locations</li>
+                <li>Automatic cache management for static assets</li>
+                <li>HTTPS enforcement with managed SSL certificates</li>
+                <li>Edge computing for optimized delivery</li>
+                <li>AWS WAF integration for edge security</li>
+                <li>Customizable cache behaviors and TTL settings</li>
+              </ul>
+            </div>
+          </div>
+          <div class="layer-panel green">
+            <div class="layer-panel-header">🔒 Security Enhancements</div>
+            <div class="layer-panel-body">
+              <ul>
+                <li>WAF Web ACL associations for threat protection</li>
+                <li>Geo-restriction capabilities</li>
+                <li>Field-level encryption for sensitive data</li>
+                <li>Origin access identity for S3 backend protection</li>
+                <li>Custom HTTP security headers</li>
+                <li>DDoS protection via AWS Shield</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <h4 class="block-title">CloudFront Configuration for SPA</h4>
+        <p>The CloudFront distribution configured by Amplify is optimized for Single Page Applications with the following settings.</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">JSON</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+          <pre><code>{
+  "Origin": {
+    "Domain": "amplifyapp.com",
+    "ID": "amplify-hosted-app",
+    "OriginPath": "/prod/[appId]"
+  },
+  "DefaultCacheBehavior": {
+    "ViewerProtocolPolicy": "redirect-to-https",
+    "AllowedMethods": ["GET", "HEAD", "OPTIONS"],
+    "DefaultTTL": 86400,
+    "MaxTTL": 31536000,
+    "FunctionAssociations": [
+      { "EventType": "viewer-request", "FunctionARN": "arn:aws:cloudfront::function:SPA-Router" }
+    ]
+  },
+  "CustomErrorResponses": [
+    { "ErrorCode": 404, "ResponseCode": 200, "ResponsePagePath": "/index.html" }
+  ],
+  "WebACLId": "arn:aws:wafv2:us-east-1:[account]:global/webacl/AmplifyAppProtection/[id]",
+  "Enabled": true,
+  "PriceClass": "PriceClass_All"
+}</code></pre>
+        </div>
+        <ul>
+          <li>SPA routing support via custom 404→200 redirect to <code>index.html</code></li>
+          <li>HTTPS enforcement with <code>redirect-to-https</code> viewer protocol policy</li>
+          <li>Optimized caching strategy for static assets</li>
+          <li>WAF integration through <code>WebACLId</code></li>
+          <li>Global distribution through <code>PriceClass_All</code></li>
+        </ul>
+      </div>
+
+      <div id="architecture-apigateway">
+        <h3 class="subsection-title">API Gateway and WAF Architecture</h3>
+        <p>While the frontend is protected by CloudFront + WAF, the backend ML services require an additional protection layer provided by a dedicated WAF-protected API Gateway with Lambda authorization.</p>
+
+        <div class="arch-diagram">
+          <div class="diagram-container" style="gap:0;">
+            <div class="flex-row"><div class="diagram-box">Angular SPA<br><small>User's Browser</small></div></div>
+            <div style="display:flex;justify-content:center;margin:2px 0;">
+              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="vpc-box">
+              <div class="vpc-label">API Gateway Protection Layer</div>
+              <div class="flex-row" style="gap:6px;">
+                <div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;">WAF Web ACL</div>
+                <svg width="32" height="18" viewBox="0 0 32 18" fill="none"><line x1="0" y1="9" x2="22" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="19,2 29,9 19,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div class="diagram-box">Regional API Gateway</div>
+              </div>
+              <div style="display:flex;justify-content:center;margin:2px 0;">
+                <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <div class="flex-row"><div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">Lambda Authorizer<br><small>JWT Validation</small></div></div>
+            </div>
+            <div style="display:flex;justify-content:center;margin:2px 0;">
+              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="flex-row"><div class="diagram-box" style="background-color:#ebf4ff;border-color:#667eea;">ML Services</div></div>
+          </div>
+          <p class="fig-caption">Figure 3: API Gateway and WAF Architecture</p>
+        </div>
+
+        <div class="two-col">
+          <div>
+            <h4 class="block-title">Private API Gateway</h4>
+            <p>The Private API Gateway is configured to:</p>
+            <ul>
+              <li>Restrict access to internal network and authorized clients only</li>
+              <li>Use resource policies to enforce access control</li>
+              <li>Integrate with Lambda Authorizers for token validation</li>
+              <li>Implement endpoint routing to appropriate ML services</li>
+              <li>Enable detailed API request logging and monitoring</li>
+              <li>Implement request throttling to prevent abuse</li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="block-title">WAF Configuration</h4>
+            <p>The WAF Web ACL for the API Gateway includes:</p>
+            <ul>
+              <li>Rate-based rules to prevent DDoS attacks</li>
+              <li>IP-based access control rules</li>
+              <li>SQL injection protection</li>
+              <li>Cross-site scripting (XSS) protection</li>
+              <li>Geo-matching rules to restrict access by location</li>
+              <li>Custom rules for specific security requirements</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="callout warning">
+          <div class="callout-icon">⚠</div>
+          <div class="callout-body">
+            <strong>Important: Private API Gateway vs. Browser-Based SPA</strong>
+            A <strong>Private</strong> API Gateway endpoint type (<code>"types": ["PRIVATE"]</code>) is accessible <em>only from within a VPC</em> — not from a public browser. An Amplify-hosted Angular SPA runs in the user's browser outside any VPC, so it <strong>cannot</strong> directly call a Private API Gateway endpoint. Choose one of the following patterns to resolve this:
+            <ul>
+              <li><strong>Regional API Gateway (recommended for browser SPAs):</strong> Use a Regional endpoint type protected by WAF, Cognito authorizer, and resource policies.</li>
+              <li><strong>VPC-peered proxy:</strong> Place an NLB or ALB inside a VPC to proxy requests from CloudFront to the Private API Gateway via a VPC Endpoint.</li>
+              <li><strong>AWS PrivateLink + CloudFront Origin:</strong> Route CloudFront to an internal origin using PrivateLink, keeping the API truly private.</li>
+            </ul>
+            Ensure your endpoint type matches your actual network topology before deploying.
+          </div>
+        </div>
+
+        <h4 class="block-title">API Gateway Endpoint Configuration</h4>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">JSON</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+          <pre><code>{
+  "apiId": "abc123def456",
+  "endpointConfiguration": {
+    "types": ["PRIVATE"],
+    "vpcEndpointIds": ["vpce-0abc123def456789"]
+  },
+  "policy": {
+    "Version": "2012-10-17",
+    "Statement": [{
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "execute-api:Invoke",
+      "Resource": "arn:aws:execute-api:region:account-id:api-id/*",
+      "Condition": {
+        "StringEquals": { "aws:SourceVpce": "vpce-0abc123def456789" }
+      }
+    }]
+  }
+}</code></pre>
+        </div>
+      </div>
+
+      <div id="architecture-layers">
+        <h3 class="subsection-title">Architecture Layers</h3>
+        <p>The solution is organized into four distinct layers, promoting separation of concerns, better security, and easier maintenance.</p>
+
+        <div class="layer-panel blue">
+          <div class="layer-panel-header">⬡ Frontend Layer</div>
+          <div class="layer-panel-body">
+            <ul>
+              <li><strong>AWS Amplify Hosting</strong> — Managed hosting with built-in CI/CD capabilities</li>
+              <li><strong>Angular SPA</strong> — User interface for accessing ML services</li>
+              <li><strong>Amplify Libraries</strong> — Client-side auth, API, and AWS service integrations</li>
+              <li><strong>CloudFront Distribution</strong> — Automatically configured for content delivery and edge security</li>
+              <li><strong>SSL/TLS Termination</strong> — HTTPS enforcement with managed certificates</li>
+            </ul>
+            <h5>Key Responsibilities</h5>
+            <ul>
+              <li>User interface presentation and interaction</li>
+              <li>Client-side authentication flow handling</li>
+              <li>Token management and secure storage</li>
+              <li>API requests and response rendering</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="layer-panel red">
+          <div class="layer-panel-header">🔑 Authentication Layer</div>
+          <div class="layer-panel-body">
+            <ul>
+              <li><strong>Azure Entra ID</strong> — Enterprise identity provider, handles user authentication and directory</li>
+              <li><strong>AWS Cognito User Pool</strong> — Identity federation with Entra ID and JWT token issuance</li>
+              <li><strong>Identity Federation</strong> — OIDC-based integration between Entra ID and Cognito</li>
+              <li><strong>IAM Roles</strong> — Authorization and access control for AWS resources</li>
+            </ul>
+            <h5>Key Responsibilities</h5>
+            <ul>
+              <li>User authentication through corporate credentials</li>
+              <li>Identity federation between Entra ID and AWS</li>
+              <li>JWT token issuance, management, and refresh</li>
+              <li>Role-based access control</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="layer-panel green">
+          <div class="layer-panel-header">🌐 API Layer</div>
+          <div class="layer-panel-body">
+            <ul>
+              <li><strong>AWS WAF</strong> — Web Application Firewall at CloudFront and API Gateway levels</li>
+              <li><strong>API Gateway</strong> — Managed API service configured for private access</li>
+              <li><strong>Lambda Authorizers</strong> — Custom JWT validation and IAM permission assignment</li>
+              <li><strong>API Routes</strong> — Endpoint definitions for different ML services</li>
+            </ul>
+            <h5>Key Responsibilities</h5>
+            <ul>
+              <li>Request routing to appropriate backend services</li>
+              <li>Token validation and authorization</li>
+              <li>Rate limiting, throttling, and threat protection</li>
+              <li>Request/response transformation and logging</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="layer-panel purple">
+          <div class="layer-panel-header">🤖 ML Services Layer</div>
+          <div class="layer-panel-body">
+            <ul>
+              <li><strong>SageMaker Endpoints</strong> — Managed hosting for custom internal ML models</li>
+              <li><strong>Bedrock Foundation Models</strong> — Access to models from Anthropic, Amazon, Meta, Mistral, Cohere, and others</li>
+              <li><strong>Lambda Processors</strong> — Serverless functions for Bedrock API requests and business logic</li>
+              <li><strong>Model Monitoring</strong> — Performance and usage tracking for ML models</li>
+            </ul>
+            <h5>Key Responsibilities</h5>
+            <ul>
+              <li>ML model inference and processing</li>
+              <li>Request transformation for model compatibility</li>
+              <li>Response processing and formatting</li>
+              <li>Usage tracking, quota management, and error handling</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── §3 Auth flows ───────────────────────────────────────── -->
+    <section id="auth-flows" class="doc-section">
+      <div class="section-pill">Section 3</div>
+      <h2 class="section-title"><span class="section-number">3</span>Authentication and Authorization Flows</h2>
+
+      <div id="auth-flows-diagrams">
+        <h3 class="subsection-title">Authentication Flow Diagrams</h3>
+
+        <h4 class="block-title">User Authentication Flow</h4>
+        <div class="arch-diagram">
+          <div class="diagram-container" style="gap:0;">
+
+            <!-- Step 1: User hits SPA -->
+            <div class="flex-row" style="gap:8px;">
+              <div class="diagram-box">User</div>
+              <svg width="32" height="18" viewBox="0 0 32 18" fill="none"><line x1="0" y1="9" x2="22" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="19,2 29,9 19,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <div class="diagram-box" style="background-color:#ebf8ff;">Angular SPA<br><small>Amplify Hosted</small></div>
+            </div>
+            <div style="display:flex;justify-content:center;margin:2px 0;">
+              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+
+            <!-- Step 2: Amplify Auth triggers redirect -->
+            <div class="flex-row"><div class="diagram-box">Amplify Auth Library<br><small>signInWithRedirect()</small></div></div>
+            <div style="display:flex;justify-content:center;margin:2px 0;">
+              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+
+            <!-- Step 3: Cognito redirects to Entra ID -->
+            <div class="flex-row" style="gap:8px;">
+              <div class="diagram-box">AWS Cognito<br><small>Hosted UI</small></div>
+              <svg width="32" height="18" viewBox="0 0 32 18" fill="none"><line x1="0" y1="9" x2="22" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="19,2 29,9 19,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;">Entra ID Login Page<br><small>SAML redirect</small></div>
+            </div>
+            <div style="display:flex;justify-content:center;margin:2px 0;">
+              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+
+            <!-- Step 4: User enters credentials, Entra authenticates -->
+            <div class="flex-row" style="gap:8px;">
+              <div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;">Entra ID<br><small>Credential validation</small></div>
+              <svg width="32" height="18" viewBox="0 0 32 18" fill="none"><line x1="0" y1="9" x2="22" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="19,2 29,9 19,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">Cognito<br><small>SAML assertion received</small></div>
+            </div>
+            <div style="display:flex;justify-content:center;margin:2px 0;">
+              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+
+            <!-- Step 5: Cognito issues JWT tokens -->
+            <div class="flex-row"><div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">Cognito Token Issuance<br><small>Access + ID + Refresh tokens</small></div></div>
+            <div style="display:flex;justify-content:center;margin:2px 0;">
+              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+
+            <!-- Step 6: JWT returned to SPA via callback -->
+            <div class="flex-row"><div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">JWT Tokens → SPA<br><small>via /auth/callback redirect</small></div></div>
+            <div style="display:flex;justify-content:center;margin:2px 0;">
+              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+
+            <!-- Step 7: Token stored -->
+            <div class="flex-row"><div class="diagram-box">Token Storage in SPA<br><small>Amplify manages token cache</small></div></div>
+
+          </div>
+          <p class="fig-caption">Figure 4: User Authentication Flow</p>
+        </div>
+
+        <h4 class="block-title">API Authorization Flow</h4>
+        <div class="arch-diagram">
+          <div class="diagram-container" style="gap:0;">
+            <div class="flex-row"><div class="diagram-box" style="background-color:#ebf8ff;">Angular SPA<br><small>Authenticated user</small></div></div>
+            <div style="display:flex;justify-content:center;margin:2px 0;">
+              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="flex-row"><div class="diagram-box">API Request + JWT Token<br><small>Authorization: Bearer &lt;access_token&gt;</small></div></div>
+            <div style="display:flex;justify-content:center;margin:2px 0;">
+              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="flex-row" style="gap:8px;">
+              <div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;">WAF Rules Check<br><small>Block malicious traffic</small></div>
+              <svg width="32" height="18" viewBox="0 0 32 18" fill="none"><line x1="0" y1="9" x2="22" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="19,2 29,9 19,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <div class="diagram-box">Regional API Gateway<br><small>Route to Lambda Authorizer</small></div>
+            </div>
+            <div style="display:flex;justify-content:center;margin:2px 0;">
+              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="flex-row"><div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;">Lambda Authorizer<br><small>Verify RS256 signature · validate claims · check cognito:groups</small></div></div>
+            <div style="display:flex;justify-content:center;margin:2px 0;">
+              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="flex-row" style="gap:8px;">
+              <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">Allow → IAM Policy<br><small>User in Administrators or MLUsers</small></div>
+              <svg width="32" height="18" viewBox="0 0 32 18" fill="none"><line x1="0" y1="9" x2="22" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="19,2 29,9 19,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <div class="diagram-box" style="background-color:#ebf4ff;border-color:#667eea;">ML Service Processing<br><small>Lambda Processor invoked</small></div>
+            </div>
+          </div>
+          <p class="fig-caption">Figure 5: API Authorization Flow</p>
+        </div>
+      </div>
+
+      <div id="auth-flows-jwt">
+        <h3 class="subsection-title">JWT Token Validation Process</h3>
+        <p>The Lambda Authorizer performs a multi-step validation process on every incoming JWT access token before granting access to ML services.</p>
+
+        <ol class="step-list">
+          <li><strong>Extract Token</strong> — Remove the <code>Bearer </code> prefix from the Authorization header</li>
+          <li><strong>Decode Header</strong> — Decode the JWT header without verification to extract the <code>kid</code> (key ID)</li>
+          <li><strong>Fetch Public Key</strong> — Retrieve the matching RSA public key from Cognito's JWKS endpoint</li>
+          <li><strong>Verify Signature</strong> — Verify the token's RS256 signature using the public key</li>
+          <li><strong>Validate Claims</strong> — Check expiration (<code>exp</code>), issue time (<code>iat</code>), issuer (<code>iss</code>). For Cognito access tokens, validate <code>client_id</code> (not <code>aud</code>) and confirm <code>token_use === "access"</code></li>
+          <li><strong>Check Group Membership</strong> — Read group membership from the <code>cognito:groups</code> claim and verify required groups</li>
+          <li><strong>Generate IAM Policy</strong> — Return an Allow or Deny policy to API Gateway with enriched user context</li>
+        </ol>
+
+        <div class="callout note">
+          <div class="callout-icon">ℹ</div>
+          <div class="callout-body">
+            <strong>Cognito Access Token Claims</strong>
+            Cognito <strong>access tokens</strong> use <code>client_id</code> rather than the standard <code>aud</code> claim for audience identification. Group membership is stored under <code>cognito:groups</code> (not <code>groups</code>). Configuring JWT libraries with <code>audience: CLIENT_ID</code> will cause <code>InvalidAudienceError</code> on access tokens — disable audience verification in the library and validate <code>client_id</code> manually.
+          </div>
+        </div>
+
+        <h4 class="block-title">Sample JWT Access Token Payload</h4>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">JSON — Cognito Access Token Payload</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+          <pre><code>{
+  "sub": "user123",
+  "iss": "https://cognito-idp.region.amazonaws.com/us-east-1_example",
+  "client_id": "clientidexample",
+  "token_use": "access",
+  "scope": "openid profile email",
+  "auth_time": 1684858239,
+  "exp": 1684861839,
+  "iat": 1684858239,
+  "username": "<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="80f5f3e5f2c0e5f8e1edf0ece5aee3efed">[email&#160;protected]</a>",
+  "cognito:groups": ["ML_Users", "Data_Scientists"]
+}</code></pre>
+        </div>
+
+        <h4 class="block-title">Lambda Authorizer Implementation</h4>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">JavaScript — Lambda Authorizer</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+          <pre><code>const jwt = require('jsonwebtoken');
+const jwksClient = require('jwks-rsa');
+
+const client = jwksClient({
+  jwksUri: `https://cognito-idp.${process.env.REGION}.amazonaws.com/${process.env.USER_POOL_ID}/.well-known/jwks.json`,
+  cache: true,
+  cacheMaxAge: 600000  // 10 minutes
+});
+
+const getSigningKey = (kid) => new Promise((resolve, reject) => {
+  client.getSigningKey(kid, (err, key) => {
+    if (err) return reject(err);
+    resolve(key.publicKey || key.rsaPublicKey);
+  });
+});
+
+// Generate an IAM policy document for API Gateway
+const generatePolicy = (principalId, effect, resource, context = {}) => ({
+  principalId,
+  policyDocument: {
+    Version: '2012-10-17',
+    Statement: [{ Action: 'execute-api:Invoke', Effect: effect, Resource: resource }]
+  },
+  context
+});
+
+// Return true if user belongs to an allowed group for this method
+const determineAccess = (groups, methodArn) => {
+  const allowedGroups = ['Administrators', 'MLUsers'];
+  return groups.some(g => allowedGroups.includes(g));
+};
+
+exports.handler = async (event) => {
+  try {
+    const token = event.authorizationToken.replace('Bearer ', '');
+    const decoded = jwt.decode(token, { complete: true });
+    if (!decoded) throw new Error('Invalid token format');
+
+    const signingKey = await getSigningKey(decoded.header.kid);
+
+    // Cognito ACCESS tokens use client_id, not aud — omit audience option
+    const verifiedToken = jwt.verify(token, signingKey, {
+      issuer: `https://cognito-idp.${process.env.REGION}.amazonaws.com/${process.env.USER_POOL_ID}`,
+      // audience omitted intentionally — Cognito access tokens use client_id
+    });
+
+    // Manually validate client_id (replaces standard audience check)
+    if (verifiedToken.client_id !== process.env.CLIENT_ID) {
+      throw new Error('Invalid client_id');
+    }
+
+    // Group membership is in cognito:groups — NOT groups
+    const userGroups = verifiedToken['cognito:groups'] || [];
+    const allowed = determineAccess(userGroups, event.methodArn);
+
+    return generatePolicy(
+      verifiedToken.sub,
+      allowed ? 'Allow' : 'Deny',
+      event.methodArn,
+      { username: verifiedToken.username || verifiedToken.sub, groups: userGroups.join(',') }
+    );
+  } catch (error) {
+    console.error('Authorization error:', error);
+    throw new Error('Unauthorized');
+  }
+};</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── §4 Data flow ────────────────────────────────────────── -->
+    <section id="data-flow" class="doc-section">
+      <div class="section-pill">Section 4</div>
+      <h2 class="section-title"><span class="section-number">4</span>Data Flow Architecture</h2>
+
+      <div id="data-flow-end-to-end">
+        <h3 class="subsection-title">End-to-End Data Flow</h3>
+        <p>The end-to-end data flow describes how data travels through the system, from the initial user request to the final ML response. The following steps walk through the complete journey.</p>
+
+        <ol class="step-list">
+          <li><strong>Initial Request</strong> — User accesses the SPA through a web browser</li>
+          <li><strong>Content Delivery</strong> — CloudFront delivers the SPA application files from the nearest edge location</li>
+          <li><strong>Authentication</strong> — User authenticates through Entra ID via Cognito federation and receives JWT tokens</li>
+          <li><strong>Local Interaction</strong> — User interacts with the Angular SPA interface to submit an ML request</li>
+          <li><strong>API Request Preparation</strong> — SPA prepares the request payload and attaches the JWT access token to the Authorization header</li>
+          <li><strong>WAF Filtering</strong> — The API Gateway WAF evaluates the request against rule sets; malicious traffic is rejected</li>
+          <li><strong>Lambda Authorization</strong> — Lambda Authorizer validates the JWT, checks group membership, and generates an IAM policy</li>
+          <li><strong>Backend Routing</strong> — Depending on the request type: either a direct SageMaker endpoint call (custom models) or a Lambda Processor invocation (Bedrock models)</li>
+          <li><strong>Response Processing</strong> — ML service responses are processed, formatted, and returned through API Gateway</li>
+          <li><strong>Result Delivery</strong> — Results are displayed in the Angular SPA for the user</li>
+        </ol>
+
+        <h4 class="block-title">Data Transformation Points</h4>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Transformation Point</th><th>Transformation Type</th><th>Purpose</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Client-side (Angular SPA)</td><td>User input formatting</td><td>Prepare data in format suitable for API requests</td></tr>
+              <tr><td>API Gateway</td><td>Request/response mapping</td><td>Transform between frontend and backend data formats</td></tr>
+              <tr><td>Lambda Processor</td><td>Model-specific formatting</td><td>Transform generic requests into Converse API format for Bedrock</td></tr>
+              <tr><td>SageMaker</td><td>Model inference transformation</td><td>Raw model output processed into structured response</td></tr>
+              <tr><td>Bedrock</td><td>Foundation model response</td><td>Standardized response via Converse API across all model families</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="data-flow-sagemaker">
+        <h3 class="subsection-title">SageMaker Integration Flow</h3>
+        <p>For custom internal ML models, requests are routed directly to SageMaker real-time inference endpoints.</p>
+
+        <div class="arch-diagram">
+          <div class="diagram-container" style="gap:0;">
+            <div class="flex-row"><div class="diagram-box">API Gateway</div></div>
+            <div style="display:flex;justify-content:center;margin:2px 0;"><svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="flex-row"><div class="diagram-box">Lambda Processor</div></div>
+            <div style="display:flex;justify-content:center;margin:2px 0;"><svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="flex-row"><div class="diagram-box" style="background-color:#ebf4ff;border-color:#667eea;">SageMaker Real-Time Endpoint</div></div>
+            <div style="display:flex;justify-content:center;margin:2px 0;"><svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="flex-row"><div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">Model Inference Response</div></div>
+          </div>
+          <p class="fig-caption">Figure 6: SageMaker Integration Flow</p>
+        </div>
+
+        <div class="callout note">
+          <div class="callout-icon">ℹ</div>
+          <div class="callout-body">
+            <strong>Synchronous vs. Asynchronous Invocation</strong>
+            API Gateway enforces a hard <strong>29-second integration timeout</strong> for synchronous calls. Lambda functions can run up to 15 minutes when invoked asynchronously (via SQS, EventBridge, or direct async invocation). For ML inference tasks that may exceed 28 seconds, implement an asynchronous pattern: return a Job ID immediately, then poll for results via a separate status endpoint.
+          </div>
+        </div>
+      </div>
+
+      <div id="data-flow-bedrock">
+        <h3 class="subsection-title">Bedrock Integration Flow</h3>
+        <p>For foundation model access, a Lambda Processor invokes the Bedrock Converse API, which provides a unified interface across all supported model families.</p>
+
+        <div class="arch-diagram">
+          <div class="diagram-container" style="gap:0;">
+            <div class="flex-row"><div class="diagram-box">API Gateway</div></div>
+            <div style="display:flex;justify-content:center;margin:2px 0;"><svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="flex-row"><div class="diagram-box">Lambda Processor</div></div>
+            <div style="display:flex;justify-content:center;margin:2px 0;"><svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="flex-row"><div class="diagram-box" style="background-color:#ebf4ff;border-color:#667eea;">Bedrock Converse API</div></div>
+            <div style="display:flex;justify-content:center;margin:2px 0;"><svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="flex-row" style="gap:16px;">
+              <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">Anthropic Claude</div>
+              <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">Amazon Nova</div>
+              <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">Meta Llama 3</div>
+            </div>
+          </div>
+          <p class="fig-caption">Figure 7: Bedrock Integration Flow</p>
+        </div>
+
+        <h4 class="block-title">Bedrock Lambda Processor</h4>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">JavaScript — Bedrock Converse API</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+          <pre><code>const { BedrockRuntimeClient, ConverseCommand } = require("@aws-sdk/client-bedrock-runtime");
+
+const bedrockClient = new BedrockRuntimeClient({ region: process.env.AWS_REGION || "us-east-1" });
+
+exports.handler = async (event) => {
+  const { prompt, model = "anthropic.claude-3-5-sonnet-20241022-v2:0", maxTokens = 1000, temperature = 0.7, systemPrompt } = JSON.parse(event.body);
+
+  const params = {
+    modelId: model,
+    messages: [{ role: "user", content: [{ text: prompt }] }],
+    inferenceConfig: { maxTokens, temperature, topP: 0.9 }
+  };
+  if (systemPrompt) params.system = [{ text: systemPrompt }];
+
+  const response = await bedrockClient.send(new ConverseCommand(params));
+  const completion = response.output?.message?.content?.[0]?.text || "";
+
+  return {
+    statusCode: 200,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model,
+      completion,
+      stopReason: response.stopReason,
+      usage: {
+        input_tokens:  response.usage?.inputTokens  || 0,
+        output_tokens: response.usage?.outputTokens || 0,
+        total_tokens: (response.usage?.inputTokens  || 0) + (response.usage?.outputTokens || 0)
+      }
+    })
+  };
+};</code></pre>
+        </div>
+
+        <h4 class="block-title">Supported Bedrock Model Families</h4>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Model Family</th><th>Converse API</th><th>Recommended Model ID</th><th>Notes</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Anthropic Claude 3/3.5</strong></td><td><span class="tag">Supported</span></td><td><code>anthropic.claude-3-5-sonnet-20241022-v2:0</code></td><td>Use Converse API. Legacy Human/Assistant format deprecated.</td></tr>
+              <tr><td><strong>Amazon Nova / Titan</strong></td><td><span class="tag">Supported</span></td><td><code>amazon.nova-pro-v1:0</code></td><td>Nova is current-gen; Titan Text is legacy but available.</td></tr>
+              <tr><td><strong>Meta Llama 3</strong></td><td><span class="tag">Supported</span></td><td><code>meta.llama3-70b-instruct-v1:0</code></td><td>Open-weight; Llama 3 replaces Llama 2 on Bedrock.</td></tr>
+              <tr><td><strong>Mistral AI</strong></td><td><span class="tag">Supported</span></td><td><code>mistral.mistral-large-2402-v1:0</code></td><td>Strong multilingual performance.</td></tr>
+              <tr><td><strong>AI21 Jamba</strong></td><td><span class="tag">Supported</span></td><td><code>ai21.jamba-1-5-large-v1:0</code></td><td>Replaces the Jurassic series.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout warning">
+          <div class="callout-icon">⚠</div>
+          <div class="callout-body">
+            <strong>Model Access Must Be Explicitly Enabled</strong>
+            Foundation model access is disabled by default. Go to <em>Amazon Bedrock → Model Access → Manage model access</em> to enable each model you intend to use. Availability varies by region.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── §5 Security ─────────────────────────────────────────── -->
+    <section id="security" class="doc-section">
+      <div class="section-pill">Section 5</div>
+      <h2 class="section-title"><span class="section-number">5</span>Security Architecture</h2>
+
+      <div id="security-model">
+        <h3 class="subsection-title">Multi-Layer Security Model</h3>
+        <p>The architecture implements defense-in-depth with security controls at every layer. No single point of failure can expose the ML services backend.</p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Layer</th><th>Controls</th><th>Threats Mitigated</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Edge (CloudFront + WAF)</strong></td><td>WAF Web ACL, geo-restrictions, rate limiting, DDoS protection</td><td>Bots, DDoS, SQL injection, XSS, geo-based attacks</td></tr>
+              <tr><td><strong>Identity (Cognito + Entra ID)</strong></td><td>OIDC federation, MFA, short-lived JWT tokens, session management</td><td>Credential theft, unauthorized access, account takeover</td></tr>
+              <tr><td><strong>API (API Gateway + Lambda Authorizer)</strong></td><td>JWT validation, IAM policy generation, request throttling, input validation</td><td>Token replay, privilege escalation, API abuse</td></tr>
+              <tr><td><strong>Compute (Lambda)</strong></td><td>Least-privilege IAM roles, VPC isolation, encrypted environment variables</td><td>Lateral movement, data exfiltration, over-privileged access</td></tr>
+              <tr><td><strong>ML Services (SageMaker + Bedrock)</strong></td><td>VPC endpoints, IAM resource policies, CloudWatch monitoring</td><td>Unauthorized model access, data leakage, cost abuse</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="two-col">
+          <div class="layer-panel blue">
+            <div class="layer-panel-header">🛡 WAF Rule Sets</div>
+            <div class="layer-panel-body">
+              <ul>
+                <li>AWS Managed Rules — Core Rule Set (CRS)</li>
+                <li>AWS Managed Rules — Known Bad Inputs</li>
+                <li>Rate-based rules (per IP threshold)</li>
+                <li>Geo-match rules for regional restrictions</li>
+                <li>Custom rules for application-specific patterns</li>
+                <li>IP set allow/deny lists</li>
+              </ul>
+            </div>
+          </div>
+          <div class="layer-panel green">
+            <div class="layer-panel-header">🔐 IAM Least Privilege</div>
+            <div class="layer-panel-body">
+              <ul>
+                <li>Lambda Authorizer: read-only Cognito JWKS access</li>
+                <li>Lambda Processors: specific SageMaker and Bedrock ARN permissions only</li>
+                <li>No wildcard <code>*</code> resource permissions in production</li>
+                <li>Separate execution roles per Lambda function</li>
+                <li>Regular IAM access reviews via Access Analyzer</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="security-jwt">
+        <h3 class="subsection-title">JWT Token Security Implementation</h3>
+
+        <h4 class="block-title">Token Validation in Python (Lambda Authorizer)</h4>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">Python — JWT Validation</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+          <pre><code>import jwt, requests, os
+from functools import lru_cache
+
+REGION     = os.environ['COGNITO_REGION']
+POOL_ID    = os.environ['USER_POOL_ID']
+CLIENT_ID  = os.environ['CLIENT_ID']
+JWKS_URL   = f'https://cognito-idp.{REGION}.amazonaws.com/{POOL_ID}/.well-known/jwks.json'
+
+@lru_cache(maxsize=1)
+def get_jwks():
+    return requests.get(JWKS_URL, timeout=10).json()
+
+def get_public_key(kid):
+    for key in get_jwks()['keys']:
+        if key['kid'] == kid:
+            return jwt.algorithms.RSAAlgorithm.from_jwk(key)
+    raise ValueError(f'Key not found: {kid}')
+
+def validate_token(token):
+    header = jwt.get_unverified_header(token)
+    public_key = get_public_key(header['kid'])
+
+    # Cognito access tokens use client_id not aud — disable audience verification
+    claims = jwt.decode(
+        token, public_key, algorithms=['RS256'],
+        options={'verify_aud': False},
+        issuer=f'https://cognito-idp.{REGION}.amazonaws.com/{POOL_ID}'
+    )
+    if claims.get('client_id') != CLIENT_ID:
+        raise ValueError('Invalid client_id')
+    if claims.get('token_use') != 'access':
+        raise ValueError('Invalid token_use')
+    return claims
+
+def lambda_handler(event, context):
+    token = event.get('authorizationToken', '').replace('Bearer ', '')
+    claims = validate_token(token)
+
+    username = claims.get('username', claims.get('sub'))
+    # Group membership is in cognito:groups (not groups)
+    groups   = claims.get('cognito:groups', [])
+
+    if not any(g in ['Administrators', 'MLUsers'] for g in groups):
+        return generate_policy(username, 'Deny', event['methodArn'])
+
+    return generate_policy(username, 'Allow', event['methodArn'], {
+        'username': username,
+        'email':    claims.get('email', ''),
+        'groups':   ','.join(groups),
+        'sub':      claims.get('sub', '')
+    })</code></pre>
+        </div>
+      </div>
+
+      <div id="security-data">
+        <h3 class="subsection-title">Data Protection and Compliance</h3>
+        <div class="two-col">
+          <div class="layer-panel blue">
+            <div class="layer-panel-header">🔒 Encryption in Transit</div>
+            <div class="layer-panel-body">
+              <ul>
+                <li>TLS 1.2 minimum for all HTTPS connections (CloudFront Security Policy: <code>TLSv1.2_2021</code>)</li>
+                <li>TLS 1.3 negotiated where clients support it</li>
+                <li>Certificate management via AWS Certificate Manager</li>
+                <li>API Gateway SSL termination</li>
+                <li>VPC endpoint encryption for internal traffic</li>
+              </ul>
+            </div>
+          </div>
+          <div class="layer-panel green">
+            <div class="layer-panel-header">🗄 Encryption at Rest</div>
+            <div class="layer-panel-body">
+              <ul>
+                <li>S3 buckets encrypted with AES-256 or SSE-KMS</li>
+                <li>CloudWatch Logs encrypted with KMS CMK</li>
+                <li>Lambda environment variables encrypted at rest</li>
+                <li>AWS KMS with customer-managed keys</li>
+                <li>Automated key rotation policies</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout danger">
+          <div class="callout-icon">🚫</div>
+          <div class="callout-body">
+            <strong>Production API Gateway — Data Tracing</strong>
+            Never enable <code>dataTraceEnabled: true</code> on API Gateway stages in production. This setting logs the full request and response payloads (including ML inputs/outputs) to CloudWatch, creating a significant security and compliance risk. Use structured access logging with <code>accessLogDestination</code> instead.
+          </div>
+        </div>
+
+        <h4 class="block-title">CORS Configuration</h4>
+        <p>In production, always specify explicit allowed origins rather than using the wildcard <code>*</code>. The origins should correspond to your actual Amplify hosting domain and any custom domains in use.</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">TypeScript — CDK API Gateway CORS</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+          <pre><code>defaultCorsPreflightOptions: {
+  // Explicitly list allowed origins — never use Cors.ALL_ORIGINS in production
+  allowOrigins: [
+    'https://your-app.amplifyapp.com',  // Amplify hosted domain
+    'https://your-custom-domain.com'    // Custom domain (if applicable)
+  ],
+  allowMethods: ['GET', 'POST', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization', 'X-Amz-Date', 'X-Api-Key'],
+  allowCredentials: true
+}</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── §6 Implementation ───────────────────────────────────── -->
+    <section id="implementation" class="doc-section">
+      <div class="section-pill">Section 6</div>
+      <h2 class="section-title"><span class="section-number">6</span>Implementation Guide</h2>
+
+      <div id="implementation-amplify">
+        <h3 class="subsection-title">Setting Up AWS Amplify</h3>
+        <p>AWS Amplify Hosting can be connected to your Git repository (GitHub, GitLab, Bitbucket, or AWS CodeCommit) for automated CI/CD deployments on every push to your configured branch.</p>
+
+        <h4 class="block-title">Amplify CLI Initialization</h4>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">Bash</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+          <pre><code># Install and configure Amplify CLI
+npm install -g @aws-amplify/cli
+amplify configure
+
+# Initialize Amplify in your Angular project
+cd your-angular-project
+amplify init
+
+# Add hosting (choose Amplify Console for CI/CD)
+amplify add hosting
+amplify publish</code></pre>
+        </div>
+
+        <h4 class="block-title">Amplify Build Specification</h4>
+        <p>The <code>amplify.yml</code> build spec is for <strong>frontend only</strong>. Infrastructure (CDK/CloudFormation) deployments must run in a separate CI/CD pipeline — not inside Amplify Hosting, which lacks the broad IAM permissions CDK requires.</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">YAML — amplify.yml</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+          <pre><code>version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - cd frontend
+        - npm ci
+    build:
+      commands:
+        - npm run build:prod
+  artifacts:
+    baseDirectory: frontend/dist/ml-app
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - frontend/node_modules/**/*</code></pre>
+        </div>
+      </div>
+
+      <div id="implementation-cognito">
+        <h3 class="subsection-title">Configuring Cognito User Pools</h3>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">TypeScript — CDK Cognito Stack</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+          <pre><code>import * as cognito from 'aws-cdk-lib/aws-cognito';
+
+this.userPool = new cognito.UserPool(this, 'MLAppUserPool', {
+  selfSignUpEnabled: false,
+  signInAliases: { email: true },
+  passwordPolicy: {
+    minLength: 12,
+    requireLowercase: true, requireUppercase: true,
+    requireDigits: true,    requireSymbols: true
+  },
+  mfa: cognito.Mfa.REQUIRED,
+  mfaSecondFactor: { sms: true, otp: true },
+  accountRecovery: cognito.AccountRecovery.EMAIL_ONLY
+});
+
+this.userPoolClient = new cognito.UserPoolClient(this, 'MLAppClient', {
+  userPool: this.userPool,
+  generateSecret: false,
+  authFlows: { userSrp: true },
+  oAuth: {
+    flows: { authorizationCodeGrant: true },
+    scopes: [cognito.OAuthScope.OPENID, cognito.OAuthScope.EMAIL, cognito.OAuthScope.PROFILE],
+    callbackUrls:  ['https://your-app.amplifyapp.com/auth/callback'],
+    logoutUrls:    ['https://your-app.amplifyapp.com/auth/logout']
+  },
+  accessTokenValidity: cdk.Duration.hours(1),
+  idTokenValidity:     cdk.Duration.hours(1),
+  refreshTokenValidity: cdk.Duration.days(30)
+});</code></pre>
+        </div>
+      </div>
+
+      <div id="implementation-entra">
+        <h3 class="subsection-title">Integrating with Entra ID</h3>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">TypeScript — CDK SAML Identity Provider</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+          <pre><code>const samlProvider = new cognito.CfnUserPoolIdentityProvider(this, 'EntraIDProvider', {
+  userPoolId: this.userPool.userPoolId,
+  providerName: 'EntraID',
+  providerType: 'SAML',
+  providerDetails: {
+    MetadataURL: 'https://login.microsoftonline.com/[tenant-id]/federationmetadata/2007-06/federationmetadata.xml',
+    IDPSignout: 'true'
+  },
+  attributeMapping: {
+    email:              'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress',
+    given_name:         'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname',
+    family_name:        'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname',
+    'custom:department': 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/department'
+  }
+});</code></pre>
+        </div>
+      </div>
+
+      <div id="implementation-angular">
+        <h3 class="subsection-title">Angular SPA Development</h3>
+
+        <h4 class="block-title">Environment Configuration</h4>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">TypeScript — environment.ts</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+          <pre><code>export const environment = {
+  production: false,
+  cognito: {
+    userPoolId:         'us-east-1_XXXXXXXXX',
+    userPoolWebClientId: 'XXXXXXXXXXXXXXXXXXXXXXXXXX',
+    // domainPrefix is the Cognito hosted UI prefix — NOT the userPoolId
+    domainPrefix: 'my-company-ml-app-dev',
+    region:       'us-east-1',
+    identityPoolId: 'us-east-1:XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
+  },
+  api: {
+    baseUrl: 'https://api.example.com/dev',
+    region:  'us-east-1'
+  }
+};</code></pre>
+        </div>
+      </div>
+
+      <div id="implementation-auth">
+        <h3 class="subsection-title">Implementing Authentication</h3>
+        <p>Use AWS Amplify v6 modular imports for authentication. The legacy <code>import &#123; Auth &#125; from 'aws-amplify'</code> pattern from Amplify v5 is no longer supported in v6 — use named function imports from <code>aws-amplify/auth</code> instead.</p>
+
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">TypeScript — Amplify v6 Configuration (app.module.ts)</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+          <pre><code>import { Amplify } from 'aws-amplify';
+import { environment } from '../environments/environment';
+
+// Amplify v6 configuration structure
+Amplify.configure({
+  Auth: {
+    Cognito: {
+      userPoolId:       environment.cognito.userPoolId,
+      userPoolClientId: environment.cognito.userPoolWebClientId,
+      identityPoolId:   environment.cognito.identityPoolId,
+      loginWith: {
+        oauth: {
+          // Use domainPrefix — NOT userPoolId — for the OAuth domain
+          domain: `${environment.cognito.domainPrefix}.auth.${environment.cognito.region}.amazoncognito.com`,
+          scopes: ['email', 'openid', 'profile'],
+          redirectSignIn:  [window.location.origin + '/auth/callback'],
+          redirectSignOut: [window.location.origin + '/auth/logout'],
+          responseType: 'code'
+        }
+      }
+    }
+  }
+});</code></pre>
+        </div>
+
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">TypeScript — Auth Service (Amplify v6)</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+          <pre><code>// Amplify v6: modular imports from 'aws-amplify/auth'
+import { signIn, signOut, getCurrentUser, fetchAuthSession, signInWithRedirect } from 'aws-amplify/auth';
+
+@Injectable({ providedIn: 'root' })
+export class AuthService {
+  private currentUserSubject = new BehaviorSubject&lt;User | null&gt;(null);
+
+  async initializeAuth(): Promise&lt;void&gt; {
+    try {
+      const { username, userId } = await getCurrentUser();
+      const session = await fetchAuthSession();
+      const payload = session.tokens?.idToken?.payload;
+      this.currentUserSubject.next({
+        username, userId,
+        email:  payload?.['email'] as string || '',
+        groups: (payload?.['cognito:groups'] as string[]) || []
+      });
+    } catch { /* no active session */ }
+  }
+
+  async signInWithSAML(): Promise&lt;void&gt; {
+    await signInWithRedirect({ provider: { custom: 'EntraID' } });
+  }
+
+  async getAccessToken(): Promise&lt;string&gt; {
+    const session = await fetchAuthSession();
+    return session.tokens?.accessToken?.toString() ?? '';
+  }
+
+  async signOut(): Promise&lt;void&gt; {
+    await signOut();
+    this.currentUserSubject.next(null);
+  }
+}</code></pre>
+        </div>
+      </div>
+
+      <div id="implementation-api">
+        <h3 class="subsection-title">API Gateway Configuration</h3>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">TypeScript — CDK API Gateway Stack</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+          <pre><code>import * as apigateway from 'aws-cdk-lib/aws-apigateway';
+import * as logs from 'aws-cdk-lib/aws-logs';
+
+this.api = new apigateway.RestApi(this, 'MLAppAPI', {
+  restApiName: 'ML App API',
+  endpointConfiguration: { types: [apigateway.EndpointType.REGIONAL] },
+  defaultCorsPreflightOptions: {
+    allowOrigins: ['https://your-app.amplifyapp.com'],
+    allowMethods: ['GET', 'POST', 'OPTIONS'],
+    allowHeaders: ['Content-Type', 'Authorization', 'X-Amz-Date'],
+    allowCredentials: true
+  },
+  deployOptions: {
+    stageName: 'prod',
+    throttlingRateLimit:  1000,
+    throttlingBurstLimit: 2000,
+    loggingLevel: apigateway.MethodLoggingLevel.ERROR,
+    dataTraceEnabled: false,  // Never enable in production
+    metricsEnabled: true,
+    accessLogDestination: new apigateway.LogGroupLogDestination(
+      new logs.LogGroup(this, 'ApiAccessLogs', { retention: logs.RetentionDays.THIRTY_DAYS })
+    ),
+    accessLogFormat: apigateway.AccessLogFormat.jsonWithStandardFields()
+  }
+});</code></pre>
+        </div>
+      </div>
+
+      <div id="implementation-lambda">
+        <h3 class="subsection-title">Lambda Authorizer Implementation</h3>
+        <div class="callout note">
+          <div class="callout-icon">ℹ</div>
+          <div class="callout-body">
+            <strong>Lambda Memory Configuration</strong>
+            Lambda supports memory from 128 MB up to <strong>10,240 MB (10 GB)</strong>. For ML workloads, 1,024–4,096 MB is typical. Memory allocation also scales CPU proportionally.
+          </div>
+        </div>
+        <p>See the complete Python Lambda Authorizer implementation in <a href="#security-jwt">Section 5 — JWT Token Security Implementation</a>.</p>
+      </div>
+
+      <div id="implementation-ml">
+        <h3 class="subsection-title">ML Services Integration</h3>
+        <p>See the complete Bedrock Converse API implementation in <a href="#data-flow-bedrock">Section 4 — Bedrock Integration Flow</a>. For SageMaker integration, invoke real-time endpoints via the AWS SDK using the endpoint name from your deployed SageMaker model.</p>
+
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">Python — SageMaker Endpoint Invocation</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+          <pre><code>import boto3, json
+
+sagemaker_runtime = boto3.client('sagemaker-runtime', region_name=os.environ['AWS_REGION'])
+
+def invoke_sagemaker_endpoint(endpoint_name, payload):
+    response = sagemaker_runtime.invoke_endpoint(
+        EndpointName=endpoint_name,
+        ContentType='application/json',
+        Accept='application/json',
+        Body=json.dumps(payload)
+    )
+    result = json.loads(response['Body'].read().decode())
+    return result</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Series navigation ───────────────────────────────────────── -->
+    <div style="border-top:1px solid var(--border-soft);padding-top:40px;margin-top:48px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:700px;">
+        <a href="https://stephen-ade.github.io/#knowledge-base" style="display:flex;flex-direction:column;gap:6px;padding:18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;text-decoration:none;transition:border-color .15s,transform .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='var(--border)';this.style.transform='translateY(0)';">
+          <span style="display:flex;align-items:center;gap:6px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><polyline points="8,2 3,6 8,10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Back
+          </span>
+          <span style="font-size:13.5px;font-weight:600;color:var(--text-primary);line-height:1.35;">Knowledge Base</span>
+          <span style="font-size:12px;color:var(--text-muted);">stephen-ade.github.io</span>
+        </a>
+        <a href="/AWS/AI/integration" style="display:flex;flex-direction:column;gap:6px;padding:18px;background:var(--accent-soft);border:1px solid rgba(26,86,219,.25);border-radius:10px;text-decoration:none;transition:border-color .15s,transform .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='rgba(26,86,219,.25)';this.style.transform='translateY(0)';">
+          <span style="display:flex;align-items:center;gap:6px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);">
+            Part 2
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><line x1="2" y1="6" x2="10" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><polyline points="7,3 10,6 7,9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span style="font-size:13.5px;font-weight:600;color:var(--accent);line-height:1.35;">AWS Amplify ML Services Integration Guide</span>
+          <span style="font-size:12px;color:var(--text-secondary);">CDK stacks · Lambda code · CI/CD · Deployment</span>
+        </a>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- Footer -->
+<div id="footer">
+  <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+    <a href="https://stephen-ade.github.io/" style="display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.4);font-size:12px;text-decoration:none;transition:color .15s;" onmouseover="this.style.color='rgba(255,255,255,.8)';" onmouseout="this.style.color='rgba(255,255,255,.4)';">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><polyline points="8,2 3,6 8,10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Knowledge Base
+    </a>
+    <span style="color:rgba(255,255,255,.15);font-size:12px;">|</span>
+    <p style="color:rgba(255,255,255,.4);font-size:12px;margin:0;">AWS Amplify Hosting for ML/AI Services Guide &nbsp;·&nbsp; Version 1.1 &nbsp;·&nbsp; March 2026</p>
+  </div>
+  <a href="/AWS/AI/integration" style="display:flex;align-items:center;gap:6px;color:rgba(255,153,0,.7);font-size:12px;font-weight:600;text-decoration:none;transition:color .15s;white-space:nowrap;" onmouseover="this.style.color='rgba(255,153,0,1)';" onmouseout="this.style.color='rgba(255,153,0,.7)';">
+    Part 2: ML Services Integration Guide
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><line x1="2" y1="6" x2="10" y2="6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><polyline points="7,3 10,6 7,9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ── Replace all remaining thin CSS arrow divs with thick SVG arrows ──
+document.querySelectorAll('.arch-diagram .arrow-down').forEach(el => {
+  el.outerHTML = '<div style="display:flex;justify-content:center;margin:2px 0;"><svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
+});
+document.querySelectorAll('.arch-diagram .arrow-right').forEach(el => {
+  el.outerHTML = '<svg width="32" height="18" viewBox="0 0 32 18" fill="none" style="flex-shrink:0;margin:0 2px;"><line x1="0" y1="9" x2="22" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="19,2 29,9 19,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+});
+
+const sections = document.querySelectorAll('.doc-section, .doc-section [id]');
+const navLinks  = document.querySelectorAll('#sidebar .nav-item, #sidebar .nav-sub');
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      navLinks.forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+      });
+    }
+  });
+}, { rootMargin: '-58px 0px -70% 0px', threshold: 0 });
+
+document.querySelectorAll('[id]').forEach(el => {
+  if ([...navLinks].some(l => l.getAttribute('href') === '#' + el.id)) {
+    observer.observe(el);
+  }
+});
+
+// ── Reading progress bar ───────────────────────────────────────────────
+const progressBar = document.getElementById('progress-bar');
+window.addEventListener('scroll', () => {
+  cons
