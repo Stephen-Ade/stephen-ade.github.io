@@ -1,0 +1,2708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete MLOps Blueprint — A Comprehensive Guide for Production ML Systems</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        body {
+            line-height: 1.6;
+            color: #333;
+        }
+        .diagram-box {
+            border: 2px solid #4A90E2;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            background: #f8fafc;
+        }
+        .process-step {
+            background: #E3F2FD;
+            border: 2px solid #2196F3;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .arrow-right {
+            display: inline-block;
+            width: 0;
+            height: 0;
+            border-left: 10px solid #4A90E2;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+            margin: 0 15px;
+        }
+        .code-block {
+            background: #f4f4f4;
+            border-left: 4px solid #4A90E2;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+        .warning-box {
+            background: #FFF3E0;
+            border-left: 4px solid #FF9800;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .success-box {
+            background: #E8F5E8;
+            border-left: 4px solid #4CAF50;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .info-box {
+            background: #E3F2FD;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .ml-lifecycle-diagram {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            padding: 30px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        .lifecycle-step {
+            text-align: center;
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            margin: 0 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        .comparison-table th {
+            background-color: #4A90E2;
+            color: white;
+        }
+        .comparison-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .architecture-diagram {
+            background: #f8fafc;
+            border: 2px solid #4A90E2;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .layer {
+            width: 100%;
+            padding: 15px;
+            margin: 5px 0;
+            text-align: center;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        .layer-1 { background: #FFECB3; border: 2px solid #FFA000; }
+        .layer-2 { background: #C8E6C9; border: 2px solid #4CAF50; }
+        .layer-3 { background: #BBDEFB; border: 2px solid #2196F3; }
+        .layer-4 { background: #F8BBD9; border: 2px solid #E91E63; }
+        .layer-5 { background: #D1C4E9; border: 2px solid #9C27B0; }
+    
+    /* ── Enhanced code blocks ─────────────────────────────── */
+    .code-block {
+      position: relative;
+      background: #1e1e2e !important;
+      border-left: none !important;
+      border-radius: 10px !important;
+      padding: 0 !important;
+      margin: 16px 0 !important;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+      overflow: hidden;
+    }
+    .code-block-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #16162a;
+      padding: 8px 16px;
+      border-bottom: 1px solid #2d2d4a;
+    }
+    .code-block-header .lang-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: #7c85b0;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 500;
+    }
+    .copy-btn {
+      background: #2d3561;
+      border: 1px solid #3d4a7a;
+      color: #a0b4d6;
+      padding: 4px 14px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+    }
+    .copy-btn:hover { background: #3d4a8a; color: #fff; }
+    .copy-btn.copied { background: #1a5c38 !important; color: #6ee7b7 !important; border-color: #2d7a52 !important; }
+    .code-block pre[class*="language-"],
+    .code-block pre {
+      margin: 0 !important;
+      border-radius: 0 !important;
+      font-family: "JetBrains Mono", "Courier New", monospace !important;
+      font-size: 0.83rem !important;
+      line-height: 1.7 !important;
+      padding: 16px 20px !important;
+      background: #1e1e2e !important;
+      max-height: 480px;
+      overflow: auto;
+    }
+    /* Syntax highlight fallback when Prism hasn't run yet */
+    .code-block pre:not([class]) {
+      color: #cdd6f4;
+    }
+    /* Custom scrollbar */
+    .code-block pre::-webkit-scrollbar { width: 6px; height: 6px; }
+    .code-block pre::-webkit-scrollbar-track { background: #1a1a2e; }
+    .code-block pre::-webkit-scrollbar-thumb { background: #4a5280; border-radius: 3px; }
+    /* Inline code */
+    code:not([class]) {
+      background: #edf2f7;
+      color: #c53030;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.84em;
+      border: 1px solid #e2e8f0;
+    }
+    /* ── Sticky nav ────────────────────────────────────────── */
+    .sticky-top-nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid #e2e8f0;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+    }
+    /* ── Section headings ──────────────────────────────────── */
+    h2.section-title {
+      padding-bottom: 10px;
+      border-bottom: 3px solid currentColor;
+      margin-bottom: 28px;
+    }
+    /* ── Cards ─────────────────────────────────────────────── */
+    .enhanced-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+      transition: box-shadow 0.15s;
+    }
+    .enhanced-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+    /* ── Callout boxes ─────────────────────────────────────── */
+    .callout {
+      padding: 14px 18px;
+      border-radius: 8px;
+      margin: 14px 0;
+      font-size: 0.93rem;
+    }
+    .callout-info  { background: #eff6ff; border-left: 4px solid #3b82f6; }
+    .callout-tip   { background: #f0fdf4; border-left: 4px solid #10b981; }
+    .callout-warn  { background: #fffbeb; border-left: 4px solid #f59e0b; }
+    .callout-note  { background: #faf5ff; border-left: 4px solid #8b5cf6; }
+    /* ── Process steps ─────────────────────────────────────── */
+    .process-step {
+      background: #f0f7ff !important;
+      border: 1px solid #bfdbfe !important;
+      border-left: 4px solid #3b82f6 !important;
+      border-radius: 10px !important;
+      padding: 18px !important;
+    }
+    /* ── Tables ─────────────────────────────────────────────── */
+    .comparison-table thead tr th {
+      background: #1e3a5f !important;
+      font-size: 0.9rem;
+      padding: 13px 16px;
+    }
+    .comparison-table td {
+      padding: 11px 16px;
+      font-size: 0.9rem;
+      vertical-align: top;
+    }
+    /* ── ToC links ──────────────────────────────────────────── */
+    nav a.block {
+      transition: all 0.15s;
+      border: 1px solid #e2e8f0;
+    }
+    nav a.block:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      border-color: #93c5fd;
+    }
+    /* ── Warning / info boxes ─────────────────────────────── */
+    .warning-box {
+      border-radius: 8px !important;
+      font-size: 0.93rem;
+    }
+    .info-box {
+      border-radius: 8px !important;
+      font-size: 0.93rem;
+    }
+    /* ── Typography ─────────────────────────────────────────── */
+    p { color: #374151; }
+    li { color: #374151; }
+    .text-lg { font-size: 1.05rem; }
+
+    </style>
+  <!-- Enhanced typography and syntax highlighting -->
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-yaml.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-json.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-docker.min.js" defer></script>
+</head>
+<body class="bg-white">
+  <!-- Sticky section navigation -->
+  <div class="sticky-top-nav">
+    <div class="container mx-auto px-6" style="max-width:1152px;">
+      <div class="flex items-center gap-1 overflow-x-auto py-2" style="scrollbar-width:none;">
+        <!-- Back to home -->
+        <a href="/" class="whitespace-nowrap flex items-center gap-1 px-3 py-2 text-sm font-semibold text-blue-600 hover:text-white hover:bg-blue-600 rounded-lg transition-colors mr-1" style="flex-shrink:0;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Home
+        </a>
+        <!-- Divider -->
+        <span style="width:1px;height:20px;background:#e2e8f0;flex-shrink:0;margin:0 4px;"></span>
+        <a href="#foundations"     class="whitespace-nowrap px-3 py-2 text-sm font-medium text-gray-500 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors">1. Foundations</a>
+        <a href="#lifecycle"       class="whitespace-nowrap px-3 py-2 text-sm font-medium text-gray-500 hover:text-green-600 rounded-lg hover:bg-green-50 transition-colors">2. Lifecycle</a>
+        <a href="#reproducibility" class="whitespace-nowrap px-3 py-2 text-sm font-medium text-gray-500 hover:text-purple-600 rounded-lg hover:bg-purple-50 transition-colors">3. Reproducibility</a>
+        <a href="#data-engineering" class="whitespace-nowrap px-3 py-2 text-sm font-medium text-gray-500 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors">4. Data &amp; Pipelines</a>
+        <a href="#best-practices"  class="whitespace-nowrap px-3 py-2 text-sm font-medium text-gray-500 hover:text-yellow-600 rounded-lg hover:bg-yellow-50 transition-colors">5. Best Practices</a>
+        <a href="#maturity"        class="whitespace-nowrap px-3 py-2 text-sm font-medium text-gray-500 hover:text-teal-600 rounded-lg hover:bg-teal-50 transition-colors">6. Maturity Levels</a>
+        <a href="#llmops"          class="whitespace-nowrap px-3 py-2 text-sm font-medium text-gray-500 hover:text-pink-600 rounded-lg hover:bg-pink-50 transition-colors">7. LLMOps</a>
+        <a href="#implementation"  class="whitespace-nowrap px-3 py-2 text-sm font-medium text-gray-500 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors">8. Implementation</a>
+      </div>
+    </div>
+  </div>
+
+
+        </div>
+
+    <!-- Header -->
+    <header class="bg-blue-600 text-white py-8">
+        <div class="container mx-auto px-6">
+            <!-- Breadcrumb -->
+            <div class="mb-4">
+              <a href="/" style="display:inline-flex;align-items:center;gap:6px;font-size:0.82rem;font-weight:500;color:rgba(255,255,255,0.75);text-decoration:none;transition:color 0.15s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.75)'">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                Stephen A. Adebowale
+              </a>
+              <span style="margin:0 8px;color:rgba(255,255,255,0.4);">/</span>
+              <span style="font-size:0.82rem;font-weight:500;color:rgba(255,255,255,0.5);">Knowledge Base</span>
+              <span style="margin:0 8px;color:rgba(255,255,255,0.4);">/</span>
+              <span style="font-size:0.82rem;font-weight:600;color:#fff;">MLOps Blueprint</span>
+            </div>
+            <h1 class="text-4xl font-bold mb-4">
+                <i class="fas fa-cogs mr-4"></i>Complete MLOps Blueprint
+            </h1>
+            <p class="text-xl text-white">A Comprehensive Guide for Production Machine Learning Systems</p>
+            <p class="text-lg mt-2 text-white opacity-90">Based on the Daily Dose of Data Science MLOps Crash Course</p>
+        </div>
+    </header>
+
+    <!-- Table of Contents -->
+    <nav class="bg-gray-50 py-6">
+        <div class="container mx-auto px-6">
+            <h2 class="text-2xl font-bold mb-4">Table of Contents</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <a href="#foundations" class="block p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+                    <i class="fas fa-foundation mr-2 text-blue-600"></i>
+                    <strong>1. MLOps Foundations</strong>
+                </a>
+                <a href="#lifecycle" class="block p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+                    <i class="fas fa-sync-alt mr-2 text-green-600"></i>
+                    <strong>2. ML System Lifecycle</strong>
+                </a>
+                <a href="#reproducibility" class="block p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+                    <i class="fas fa-copy mr-2 text-purple-600"></i>
+                    <strong>3. Reproducibility &amp; Versioning</strong>
+                </a>
+                <a href="#data-engineering" class="block p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+                    <i class="fas fa-database mr-2 text-red-600"></i>
+                    <strong>4. Data &amp; Pipeline Engineering</strong>
+                </a>
+                <a href="#best-practices" class="block p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+                    <i class="fas fa-star mr-2 text-yellow-600"></i>
+                    <strong>5. Best Practices</strong>
+                </a>
+                <a href="#maturity" class="block p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+                    <i class="fas fa-chart-bar mr-2 text-teal-600"></i>
+                    <strong>6. MLOps Maturity Levels</strong>
+                </a>
+                <a href="#llmops" class="block p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+                    <i class="fas fa-robot mr-2 text-pink-600"></i>
+                    <strong>7. LLMOps</strong>
+                </a>
+                <a href="#implementation" class="block p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+                    <i class="fas fa-code mr-2 text-indigo-600"></i>
+                    <strong>8. Implementation Guide</strong>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-8">
+
+        <!-- Section 1: MLOps Foundations -->
+        <section id="foundations" class="mb-16">
+            <h2 class="text-3xl font-bold mb-8 text-blue-600">
+                <i class="fas fa-foundation mr-3"></i>1. MLOps Foundations and Background
+            </h2>
+
+            <div class="mb-8">
+                <h3 class="text-2xl font-semibold mb-4">What is MLOps?</h3>
+                <p class="text-lg mb-4">
+                    Machine Learning Operations (MLOps) is the discipline of integrating ML models into real-world software systems. It encompasses <strong>Continuous Integration (CI)</strong>, <strong>Continuous Delivery (CD)</strong>, and <strong>Continuous Training (CT)</strong> — combining machine learning, software engineering, DevOps, and data engineering practices. CT is what most distinguishes MLOps from traditional DevOps: models must be periodically retrained as data distributions evolve, not just redeployed.
+                </p>
+                
+                <div class="info-box">
+                    <p><strong>Key Insight:</strong> The ML model itself is only a small part of a production ML system. The vast surrounding infrastructure is much larger and more complex.</p>
+                </div>
+
+                <div class="architecture-diagram">
+                    <h4 class="text-xl font-semibold mb-2">Production ML System Architecture</h4>
+                    <p class="text-sm text-gray-600 mb-4 text-center">(After Sculley et al., 2015 — "Hidden Technical Debt in Machine Learning Systems")<br>The ML model code is a <em>small</em> central component; surrounding infrastructure is vastly larger.</p>
+                    <div class="w-full">
+                        <div class="layer layer-1">User Interface &amp; APIs <span style="font-weight:400;font-size:0.8em;">(top / user-facing)</span></div>
+                        <div class="layer layer-2">Model Serving &amp; Inference</div>
+                        <div class="layer layer-3" style="max-width:55%;margin:5px auto;border-style:dashed;">⬡ ML Model Code <em>(small core)</em></div>
+                        <div class="layer layer-4">Data Processing &amp; Feature Engineering</div>
+                        <div class="layer layer-5">Infrastructure · Monitoring · Security · Configuration <span style="font-weight:400;font-size:0.8em;">(foundation)</span></div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-3 text-center">⬇ Infrastructure is the foundation layer. Each outer ring represents a larger operational surface than the one above it.</p>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-2xl font-semibold mb-4">Why MLOps Matters</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="process-step">
+                        <h4 class="font-semibold mb-2"><i class="fas fa-clock mr-2"></i>Model Decay Over Time</h4>
+                        <p>ML models face changing real-world conditions. Without proper operations, accurate models can quickly become unreliable or harmful.</p>
+                    </div>
+                    <div class="process-step">
+                        <h4 class="font-semibold mb-2"><i class="fas fa-tools mr-2"></i>Manual Processes</h4>
+                        <p>Without MLOps, teams end up with manual, brittle processes that are slow, error-prone, and don't scale.</p>
+                    </div>
+                    <div class="process-step">
+                        <h4 class="font-semibold mb-2"><i class="fas fa-tachometer-alt mr-2"></i>Performance Requirements</h4>
+                        <p>Production systems must handle evolving data and usage patterns while meeting latency, throughput, and quality requirements.</p>
+                    </div>
+                    <div class="process-step">
+                        <h4 class="font-semibold mb-2"><i class="fas fa-shield-alt mr-2"></i>Risk Management</h4>
+                        <p>Inadequate MLOps can lead to stale models making bad predictions that hurt the business and users.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-2xl font-semibold mb-4">MLOps vs DevOps</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Aspect</th>
+                            <th>Traditional DevOps</th>
+                            <th>MLOps</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Development Process</strong></td>
+                            <td>Deterministic, code-focused</td>
+                            <td>Experimental, data-driven</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Testing Complexity</strong></td>
+                            <td>Unit tests, integration tests</td>
+                            <td>+ Data quality tests, model performance tests, drift detection</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Deployment</strong></td>
+                            <td>Code deployment via CI/CD</td>
+                            <td>+ Continuous training (CT), model retraining pipelines</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Versioning</strong></td>
+                            <td>Code versioning</td>
+                            <td>+ Data versioning, model versioning, experiment tracking</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Monitoring</strong></td>
+                            <td>System metrics, logs</td>
+                            <td>+ Model performance, data drift, concept drift</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-2xl font-semibold mb-4">Key MLOps Challenges</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="warning-box">
+                        <h4 class="font-semibold mb-2"><i class="fas fa-exclamation-triangle mr-2"></i>Data Drift</h4>
+                        <p>When the distribution of input data changes over time, model performance can degrade without obvious system failures.</p>
+                    </div>
+                    <div class="warning-box">
+                        <h4 class="font-semibold mb-2"><i class="fas fa-sync mr-2"></i>Training/Serving Skew</h4>
+                        <p>Arises when feature transformation logic in the training pipeline (e.g. Python/pandas) diverges from production serving code (e.g. Java, Go, SQL) — including different rounding, missing value handling, or encoding. Also caused by distribution shifts in the underlying input data over time.</p>
+                    </div>
+                    <div class="warning-box">
+                        <h4 class="font-semibold mb-2"><i class="fas fa-infinity mr-2"></i>Feedback Loops</h4>
+                        <p>ML predictions can influence the data used to train future models, creating complex dependencies.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: ML System Lifecycle -->
+        <section id="lifecycle" class="mb-16">
+            <h2 class="text-3xl font-bold mb-8 text-green-600">
+                <i class="fas fa-cycle mr-3"></i>2. Machine Learning System Lifecycle
+            </h2>
+
+            <div class="ml-lifecycle-diagram">
+                <div class="lifecycle-step">
+                    <i class="fas fa-bullseye text-3xl text-blue-600 mb-3"></i>
+                    <h4 class="font-semibold">1. Scoping</h4>
+                    <p class="text-sm">Define project goals and success metrics</p>
+                </div>
+                <div class="arrow-right"></div>
+                <div class="lifecycle-step">
+                    <i class="fas fa-database text-3xl text-green-600 mb-3"></i>
+                    <h4 class="font-semibold">2. Data</h4>
+                    <p class="text-sm">Collect, clean, and prepare data</p>
+                </div>
+                <div class="arrow-right"></div>
+                <div class="lifecycle-step">
+                    <i class="fas fa-brain text-3xl text-purple-600 mb-3"></i>
+                    <h4 class="font-semibold">3. Modeling</h4>
+                    <p class="text-sm">Train and validate models</p>
+                </div>
+                <div class="arrow-right"></div>
+                <div class="lifecycle-step">
+                    <i class="fas fa-rocket text-3xl text-red-600 mb-3"></i>
+                    <h4 class="font-semibold">4. Deployment</h4>
+                    <p class="text-sm">Deploy to production</p>
+                </div>
+                <div class="arrow-right"></div>
+                <div class="lifecycle-step">
+                    <i class="fas fa-chart-line text-3xl text-yellow-600 mb-3"></i>
+                    <h4 class="font-semibold">5. Monitoring</h4>
+                    <p class="text-sm">Monitor and maintain</p>
+                </div>
+            </div>
+            <div class="info-box mt-0">
+                <p><strong>⟳ This is an iterative cycle, not a linear flow.</strong> Monitoring outcomes feed back into Scoping and Data (drift triggers retraining). Model error analysis drives new data collection. Deployment baselines initialise monitoring thresholds. Real ML systems continuously loop through these stages throughout their lifetime.</p>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-2xl font-semibold mb-4">Data Pipelines</h3>
+                <p class="text-lg mb-4">
+                    In ML, data quality and management are often more important than the specific modeling algorithm. Production ML systems need robust data pipelines for training and inference.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="process-step">
+                        <h4 class="font-semibold mb-2"><i class="fas fa-download mr-2"></i>Data Ingestion</h4>
+                        <ul class="list-disc list-inside text-sm">
+                            <li>Batch processing (periodic imports)</li>
+                            <li>Streaming (real-time events)</li>
+                            <li>API integrations</li>
+                            <li>Database connections</li>
+                        </ul>
+                    </div>
+                    <div class="process-step">
+                        <h4 class="font-semibold mb-2"><i class="fas fa-hdd mr-2"></i>Data Storage</h4>
+                        <ul class="list-disc list-inside text-sm">
+                            <li>Cloud object stores (S3, GCS, ADLS) — preferred for cloud-native workloads</li>
+                            <li>HDFS — on-premises / hybrid environments (legacy)</li>
+                            <li>Data warehouses (BigQuery, Snowflake, Redshift)</li>
+                            <li>Lakehouse table formats: Delta Lake, Apache Iceberg, Apache Hudi</li>
+                            <li>Feature stores (Feast, Tecton, Hopsworks)</li>
+                            <li>Relational databases (PostgreSQL, MySQL)</li>
+                        </ul>
+                    </div>
+                    <div class="process-step">
+                        <h4 class="font-semibold mb-2"><i class="fas fa-cog mr-2"></i>Data Processing (ETL)</h4>
+                        <ul class="list-disc list-inside text-sm">
+                            <li>Cleaning and validation</li>
+                            <li>Feature engineering</li>
+                            <li>Data joining and aggregation</li>
+                            <li>Format standardization</li>
+                        </ul>
+                    </div>
+                    <div class="process-step">
+                        <h4 class="font-semibold mb-2"><i class="fas fa-tags mr-2"></i>Data Labeling</h4>
+                        <ul class="list-disc list-inside text-sm">
+                            <li>Automated labeling</li>
+                            <li>Human annotation</li>
+                            <li>Active learning</li>
+                            <li>Quality control</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-2xl font-semibold mb-4">Model Training and Experimentation</h3>
+                <div class="diagram-box">
+                    <h4 class="text-xl font-semibold mb-4">Training Pipeline Components</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-blue-100 p-4 rounded-lg">
+                            <h5 class="font-semibold mb-2">Experiment Tracking</h5>
+                            <ul class="text-sm list-disc list-inside">
+                                <li>Parameter logging</li>
+                                <li>Metrics recording</li>
+                                <li>Artifact storage</li>
+                                <li>Reproducibility</li>
+                            </ul>
+                        </div>
+                        <div class="bg-green-100 p-4 rounded-lg">
+                            <h5 class="font-semibold mb-2">Model Validation</h5>
+                            <ul class="text-sm list-disc list-inside">
+                                <li>Cross-validation</li>
+                                <li>Hold-out testing</li>
+                                <li>A/B testing</li>
+                                <li>Performance metrics</li>
+                            </ul>
+                        </div>
+                        <div class="bg-purple-100 p-4 rounded-lg">
+                            <h5 class="font-semibold mb-2">Resource Management</h5>
+                            <ul class="text-sm list-disc list-inside">
+                                <li>Compute allocation</li>
+                                <li>GPU scheduling</li>
+                                <li>Memory optimization</li>
+                                <li>Cost monitoring</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-2xl font-semibold mb-4">Deployment and Inference</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="text-xl font-semibold mb-3">Deployment Patterns</h4>
+                        <div class="space-y-3">
+                            <div class="bg-gray-50 p-3 rounded">
+                                <strong>Batch Inference:</strong> Process large datasets offline, suitable for non-real-time predictions
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded">
+                                <strong>Online Inference:</strong> Real-time predictions via REST APIs or streaming
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded">
+                                <strong>Edge Deployment:</strong> Models deployed on edge devices for low-latency inference
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-semibold mb-3">Model Serving</h4>
+                        <div class="space-y-3">
+                            <div class="bg-gray-50 p-3 rounded">
+                                <strong>Model Packaging:</strong> Containerization, serialization, dependency management
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded">
+                                <strong>Load Balancing:</strong> Distribute requests across multiple model instances
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded">
+                                <strong>Auto-scaling:</strong> Dynamic resource allocation based on demand
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-2xl font-semibold mb-4">Monitoring and Observability</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                        <h4 class="font-semibold mb-2">Operational Monitoring</h4>
+                        <ul class="text-sm list-disc list-inside">
+                            <li>System metrics (CPU, memory)</li>
+                            <li>Latency and throughput</li>
+                            <li>Error rates</li>
+                            <li>Service availability</li>
+                        </ul>
+                    </div>
+                    <div class="bg-red-50 border-l-4 border-red-400 p-4">
+                        <h4 class="font-semibold mb-2">Model Performance</h4>
+                        <ul class="text-sm list-disc list-inside">
+                            <li>Accuracy tracking</li>
+                            <li>Prediction quality</li>
+                            <li>Business metrics</li>
+                            <li>A/B test results</li>
+                        </ul>
+                    </div>
+                    <div class="bg-blue-50 border-l-4 border-blue-400 p-4">
+                        <h4 class="font-semibold mb-2">Data Monitoring</h4>
+                        <ul class="text-sm list-disc list-inside">
+                            <li>Data drift detection</li>
+                            <li>Concept drift</li>
+                            <li>Feature distribution</li>
+                            <li>Data quality checks</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Reproducibility and Versioning -->
+        <section id="reproducibility" class="mb-16">
+            <h2 class="text-3xl font-bold mb-8 text-purple-600">
+                <i class="fas fa-copy mr-3"></i>3. Reproducibility and Versioning
+            </h2>
+
+            <div class="mb-8">
+                <h3 class="text-2xl font-semibold mb-4">Why Reproducibility Matters</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="text-xl font-semibold mb-3">Critical Benefits</h4>
+                        <ul class="space-y-3">
+                            <li class="flex items-start">
+                                <i class="fas fa-bug text-red-500 mt-1 mr-3"></i>
+                                <div>
+                                    <strong>Debugging:</strong> Reproduce training to pinpoint performance drops or discrepancies
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-users text-blue-500 mt-1 mr-3"></i>
+                                <div>
+                                    <strong>Collaboration:</strong> Team members can verify and build upon each other's work
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-gavel text-green-500 mt-1 mr-3"></i>
+                                <div>
+                                    <strong>Compliance:</strong> Regulatory requirements in healthcare, finance, autonomous vehicles
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-undo text-purple-500 mt-1 mr-3"></i>
+                                <div>
+                                    <strong>Rollback:</strong> Ability to revert to previous model versions when needed
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="warning-box">
+                        <h4 class="font-semibold mb-2"><i class="fas fa-exclamation-triangle mr-2"></i>Common Challenges</h4>
+                        <ul class="list-disc list-inside space-y-2 text-sm">
+                            <li>Randomness in ML (initial weights, data shuffling)</li>
+                            <li>Complex dependencies (code + data + environment)</li>
+                            <li>Large data versioning challenges</li>
+                            <li>Environment-specific behaviors</li>
+                            <li>Untracked manual experiments</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-2xl font-semibold mb-4">Best Practices for Reproducibility</h3>
+                
+                <div class="space-y-6">
+                    <div class="process-step">
+                        <h4 class="font-semibold mb-3"><i class="fas fa-dice mr-2"></i>1. Ensure Deterministic Processes</h4>
+                        <div class="code-block">
+  <div class="code-block-header">
+    <span class="lang-tag">Python</span>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+  <pre><code class="language-python"># Set random seeds for reproducibility
+import numpy as np
+import random
+import torch
+
+np.random.seed(42)
+random.seed(42)
+torch.manual_seed(42)
+if torch.cuda.is_available():
+    torch.cuda.manual_seed(42)
+    torch.cuda.manual_seed_all(42)
+    # REQUIRED for full CUDA reproducibility — without these, cuDNN
+    # selects non-deterministic convolution algorithms even with seeds set
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False  # disable auto-tuner
+
+# PyTorch &gt;= 1.8: raise errors for ops with no deterministic implementation
+# Use warn_only=True to log warnings instead of raising exceptions
+torch.use_deterministic_algorithms(True, warn_only=True)</code></pre>
+</div>
+                        <p class="text-sm mt-2"><strong>Note:</strong> Setting <code>cudnn.deterministic = True</code> and <code>cudnn.benchmark = False</code> is required for full GPU reproducibility. <code>benchmark=False</code> prevents cuDNN from selecting non-deterministic fast-path algorithms. There may be a small performance cost. Set <code>CUBLAS_WORKSPACE_CONFIG=:4096:8</code> as an environment variable for additional determinism in CUDA 10.2+.</p>
+                    </div>
+
+                    <div class="process-step">
+                        <h4 class="font-semibold mb-3"><i class="fas fa-code-branch mr-2"></i>2. Version Control for Code</h4>
+                        <div class="code-block">
+  <div class="code-block-header">
+    <span class="lang-tag">Python</span>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+  <pre><code class="language-python"># Include Git commit hash in model metadata
+import subprocess
+
+def get_git_hash():
+    return subprocess.check_output(['git', 'rev-parse', 'HEAD']).decode('ascii').strip()
+
+model_metadata = {
+    'git_hash': get_git_hash(),
+    'timestamp': datetime.now().isoformat(),
+    'parameters': hyperparameters
+}</code></pre>
+</div>
+                    </div>
+
+                    <div class="process-step">
+                        <h4 class="font-semibold mb-3"><i class="fas fa-database mr-2"></i>3. Data Versioning</h4>
+                        <p class="mb-3">Use tools like DVC (Data Version Control) to track data alongside code:</p>
+                        <div class="code-block">
+  <div class="code-block-header">
+    <span class="lang-tag">Shell</span>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+  <pre><code class="language-bash"># Initialize DVC in your project
+dvc init
+
+# Add data to DVC tracking
+dvc add data/train_dataset.csv
+
+# Commit both code and data references
+git add data/train_dataset.csv.dvc .gitignore
+git commit -m "Add training dataset v1.0"
+
+# Create version tags
+git tag -a v1.0 -m "Model version 1.0 with dataset v1.0"</code></pre>
+</div>
+                    </div>
+
+                    <div class="process-step">
+                        <h4 class="font-semibold mb-3"><i class="fas fa-flask mr-2"></i>4. Experiment Tracking</h4>
+                        <p class="mb-3">Use MLflow, Weights & Biases, or similar tools:</p>
+                        <div class="code-block">
+  <div class="code-block-header">
+    <span class="lang-tag">Python</span>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+  <pre><code class="language-python">import mlflow
+import mlflow.sklearn
+
+with mlflow.start_run():
+    # Log parameters
+    mlflow.log_param("n_estimators", 100)
+    mlflow.log_param("max_depth", 5)
+    
+    # Train model
+    model = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=42)
+    model.fit(X_train, y_train)
+    
+    # Log metrics
+    accuracy = model.score(X_test, y_test)
+    mlflow.log_metric("accuracy", accuracy)
+    
+    # Log model
+    mlflow.sklearn.log_model(model, "random_forest_model")</code></pre>
+</div>
+                    </div>
+
+                    <div class="process-step">
+                        <h4 class="font-semibold mb-3"><i class="fas fa-archive mr-2"></i>5. Model Versioning</h4>
+                        <p class="mb-3">Register models with versions and stages:</p>
+                        <div class="code-block">
+  <div class="code-block-header">
+    <span class="lang-tag">Python</span>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+  <pre><code class="language-python"># Register model in MLflow Model Registry
+model_name = "customer_churn_predictor"
+mlflow.register_model(
+    f"runs:/{run_id}/random_forest_model",
+    model_name
+)
+
+# (transition_model_version_stage() was deprecated in MLflow 2.9
+#  and removed in MLflow 3.x)
+client = mlflow.MlflowClient()
+
+# Assign a 'staging' alias (any string is valid: staging, production, champion, etc.)
+client.set_registered_model_alias(
+    name=model_name,
+    alias="staging",
+    version=1
+)
+
+# Load model by alias in serving code
+model_uri = f"models:/{model_name}@staging"
+model = mlflow.pyfunc.load_model(model_uri)
+
+# Promote to production alias when validated
+client.set_registered_model_alias(name=model_name, alias="champion", version=1)
+client.delete_registered_model_alias(name=model_name, alias="staging")</code></pre>
+</div>
+                    </div>
+
+                    <div class="process-step">
+                        <h4 class="font-semibold mb-3"><i class="fas fa-docker mr-2"></i>6. Environment Management</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+                            <div>
+                                <h5 class="font-semibold mb-2">Requirements.txt</h5>
+                                <div class="code-block text-xs">
+# ⚠️  Do NOT manually pin versions for production.
+# Use pip-compile (pip-tools) or uv lock to generate
+# a fully-resolved, hash-verified lockfile.
+# Example current stable versions (Q1 2026 — verify before use):
+numpy>=1.26,<2.0
+pandas>=2.1,<3.0
+scikit-learn>=1.4,<2.0
+torch>=2.3,<3.0
+mlflow>=2.12,<3.0
+
+# Generate locked requirements:
+# pip-compile requirements.in --generate-hashes -o requirements.txt
+                                </div>
+                            </div>
+                            <div>
+                                <h5 class="font-semibold mb-2">Dockerfile (multi-stage)</h5>
+                                <div class="code-block text-xs">
+# Stage 1: builder — install deps in isolated layer
+FROM python:3.11-slim AS builder
+WORKDIR /build
+COPY requirements.txt .
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+# Stage 2: runtime — minimal attack surface
+FROM python:3.11-slim
+WORKDIR /app
+# Copy only installed packages, not build tools
+COPY --from=builder /install /usr/local
+COPY src/ ./src/
+COPY params.yaml .
+# NOTE: Do NOT embed model artifacts here.
+# Load model at runtime from a model registry / object store.
+# Inject MODEL_URI via env var at container startup.
+RUN adduser --disabled-password --gecos '' mluser
+USER mluser
+CMD ["python", "src/api/serve.py"]
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-2xl font-semibold mb-4">Tools Comparison</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Tool</th>
+                            <th>Strengths</th>
+                            <th>Best For</th>
+                            <th>Limitations</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>MLflow</strong></td>
+                            <td>Open-source, flexible, self-hosted</td>
+                            <td>Local/enterprise setups, custom infrastructure</td>
+                            <td>Basic UI, requires setup and maintenance</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Weights & Biases</strong></td>
+                            <td>Rich visualizations, team collaboration, managed service</td>
+                            <td>Fast setup, visualization-heavy workflows</td>
+                            <td>Cloud-dependent, subscription costs</td>
+                        </tr>
+                        <tr>
+                            <td><strong>DVC</strong></td>
+                            <td>Git-like data versioning, lightweight</td>
+                            <td>Data versioning, reproducible pipelines</td>
+                            <td>Limited experiment tracking UI</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Kubeflow</strong></td>
+                            <td>Kubernetes-native, scalable pipelines</td>
+                            <td>Large-scale, cloud-native deployments</td>
+                            <td>Complex setup, steep learning curve</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section 4: Data and Pipeline Engineering -->
+        <section id="data-engineering" class="mb-16">
+            <h2 class="text-3xl font-bold mb-8 text-red-600">
+                <i class="fas fa-database mr-3"></i>4. Data and Pipeline Engineering
+            </h2>
+
+            <div class="mb-8">
+                <h3 class="text-2xl font-semibold mb-4">Understanding the Data Landscape</h3>
+                <p class="text-lg mb-4">
+                    In production ML, success depends not just on models but on the data pipelines that feed those models. Data is the raw material, and pipeline choices have profound downstream consequences.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="text-xl font-semibold mb-3">Data Sources</h4>
+                        <div class="space-y-3">
+                            <div class="bg-blue-50 p-3 rounded border-l-4 border-blue-400">
+                                <strong>User Input Data:</strong> Text, images, form submissions - requires heavy validation
+                            </div>
+                            <div class="bg-green-50 p-3 rounded border-l-4 border-green-400">
+                                <strong>System Logs:</strong> Application events, system states, model predictions
+                            </div>
+                            <div class="bg-purple-50 p-3 rounded border-l-4 border-purple-400">
+                                <strong>Internal Databases:</strong> CRM, inventory, financial transactions - highly structured
+                            </div>
+                            <div class="bg-yellow-50 p-3 rounded border-l-4 border-yellow-400">
+                                <strong>Third-party Data:</strong> External APIs, demographic data, social media
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-semibold mb-3">Data Formats</h4>
+                        <div class="space-y-3">
+                            <div class="bg-gray-50 p-3 rounded">
+                                <strong>Text vs Binary:</strong>
+                                <ul class="text-sm list-disc list-inside mt-2">
+                                    <li>JSON/CSV: Human-readable, debugging-friendly, storage-heavy</li>
+                                    <li>Parquet/Avro: Compact, efficient processing, machine-only</li>
+                                </ul>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded">
+                                <strong>Row-major vs Column-major:</strong>
+                                <ul class="text-sm list-disc list-inside mt-2">
+                                    <li>CSV: Row-major, write-heavy workloads</li>
+                                    <li>Parquet: Column-major, analytical queries, ML training</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-2xl font-semibold mb-4">ETL vs ELT Pipelines</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="diagram-box">
+                        <h4 class="text-xl font-semibold mb-4 text-center">ETL (Extract-Transform-Load)</h4>
+                        <div class="space-y-4">
+                            <div class="bg-blue-100 p-3 rounded text-center">
+                                <i class="fas fa-download text-2xl text-blue-600 mb-2"></i>
+                                <div><strong>Extract</strong></div>
+                                <div class="text-sm">Pull data from sources</div>
+                            </div>
+                            <div class="text-center">↓</div>
+                            <div class="bg-green-100 p-3 rounded text-center">
+                                <i class="fas fa-cogs text-2xl text-green-600 mb-2"></i>
+                                <div><strong>Transform</strong></div>
+                                <div class="text-sm">Clean, process, engineer features</div>
+                            </div>
+                            <div class="text-center">↓</div>
+                            <div class="bg-purple-100 p-3 rounded text-center">
+                                <i class="fas fa-upload text-2xl text-purple-600 mb-2"></i>
+                                <div><strong>Load</strong></div>
+                                <div class="text-sm">Store in target system</div>
+                            </div>
+                        </div>
+                        <div class="mt-4 text-sm">
+                            <strong>Best for:</strong> Structured processes, data quality control, smaller datasets
+                        </div>
+                    </div>
+
+                    <div class="diagram-box">
+                        <h4 class="text-xl font-semibold mb-4 text-center">ELT (Extract-Load-Transform)</h4>
+                        <div class="space-y-4">
+                            <div class="bg-blue-100 p-3 rounded text-center">
+                                <i class="fas fa-download text-2xl text-blue-600 mb-2"></i>
+                                <div><strong>Extract</strong></div>
+                                <div class="text-sm">Pull data from sources</div>
+                            </div>
+                            <div class="text-center">↓</div>
+                            <div class="bg-purple-100 p-3 rounded text-center">
+                                <i class="fas fa-upload text-2xl text-purple-600 mb-2"></i>
+                                <div><strong>Load</strong></div>
+                                <div class="text-sm">Store raw data in data lake</div>
+                            </div>
+                            <div class="text-center">↓</div>
+                            <div class="bg-green-100 p-3 rounded text-center">
+                                <i class="fas fa-cogs text-2xl text-green-600 mb-2"></i>
+                                <div><strong>Transform</strong></div>
+                                <div class="text-sm">Process when needed</div>
+                            </div>
+                        </div>
+                        <div class="mt-4 text-sm">
+                            <strong>Best for:</strong> Large datasets, flexible schemas, cloud-native architectures
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-2xl font-semibold mb-4">Pipeline Implementation Patterns</h3>
+                
+                <div class="space-y-6">
+                    <div class="process-step">
+                        <h4 class="font-semibold mb-3"><i class="fas fa-layer-group mr-2"></i>Batch Processing Pipeline</h4>
+                        <div class="code-block">
+  <div class="code-block-header">
+    <span class="lang-tag">Python</span>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+  <pre><code class="language-python"># Example batch processing pipeline with Apache Airflow 2.x / 3.x
+from airflow.decorators import dag, task
+from datetime import datetime, timedelta
+
+default_args = {
+    'owner': 'ml-team',
+    'retries': 2,
+    'retry_delay': timedelta(minutes=5)
+}
+
+@dag(
+    dag_id='ml_data_pipeline',
+    default_args=default_args,
+    schedule='@daily',
+    start_date=datetime(2024, 1, 1),
+    catchup=False,
+    tags=['ml', 'data']
+)
+def ml_data_pipeline():
+
+    @task
+    def extract_data():
+        # Extract data from source systems
+        pass
+
+    @task
+    def transform_data():
+        # Clean and transform data
+        pass
+
+    @task
+    def load_data():
+        # Load into target system
+        pass
+
+    extract_data() &gt;&gt; transform_data() &gt;&gt; load_data()
+
+dag_instance = ml_data_pipeline()</code></pre>
+</div>
+                    </div>
+
+                    <div class="process-step">
+                        <h4 class="font-semibold mb-3"><i class="fas fa-stream mr-2"></i>Streaming Pipeline</h4>
+                        <div class="code-block">
+  <div class="code-block-header">
+    <span class="lang-tag">Python</span>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+  <pre><code class="language-python"># Example streaming pipeline with Apache Kafka and Python
+from kafka import KafkaConsumer, KafkaProducer
+import json
+
+# Consumer for raw events
+consumer = KafkaConsumer(
+    'raw_events',
+    bootstrap_servers=['localhost:9092'],
+    value_deserializer=lambda m: json.loads(m.decode('utf-8'))
+)
+
+# Producer for processed features
+producer = KafkaProducer(
+    bootstrap_servers=['localhost:9092'],
+    value_serializer=lambda v: json.dumps(v).encode('utf-8')
+)
+
+def process_event(event):
+    # Feature engineering logic
+    features = {
+        'user_id': event['user_id'],
+        'timestamp': event['timestamp'],
+        'processed_features': extract_features(event)
+    }
+    return features
+
+for message in consumer:
+    event = message.value
+    processed = process_event(event)
+    producer.send('ml_features', processed)</code></pre>
+</div>
+                    </div>
+
+                    <div class="process-step">
+                        <h4 class="font-semibold mb-3"><i class="fas fa-warehouse mr-2"></i>Feature Store Integration</h4>
+                        <div class="code-block">
+  <div class="code-block-header">
+    <span class="lang-tag">Python</span>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+  <pre><code class="language-python"># feature_store.py (registry — version-controlled with your repo)
+# Define FeatureService here for registration, NOT in serving code
+from feast import FeatureStore, FeatureService
+
+# feature_service is defined in the feature repo and applied via `feast apply`
+user_features_service = FeatureService(
+    name="user_recommendation_features",
+    features=[user_stats_view[["avg_rating", "total_purchases"]],
+               user_demographics_view[["age_group"]]]
+)
+
+# ─────────────────────────────────────────────────────────────────
+# serving_code.py — online inference path (real-time)
+# ─────────────────────────────────────────────────────────────────
+from feast import FeatureStore
+
+fs = FeatureStore(repo_path="feature_repo/")
+
+# (event_timestamp is only for get_historical_features / offline retrieval)
+entity_rows = [
+    {"user_id": 1001},
+    {"user_id": 1002},
+    {"user_id": 1003},
+]
+
+# Pass feature service by name (string) for online retrieval
+features = fs.get_online_features(
+    features="user_recommendation_features",
+    entity_rows=entity_rows,
+).to_df()
+
+# ─────────────────────────────────────────────────────────────────
+# For HISTORICAL / TRAINING retrieval use get_historical_features:
+# ─────────────────────────────────────────────────────────────────
+import pandas as pd
+from datetime import datetime
+
+entity_df = pd.DataFrame({
+    "user_id": [1001, 1002, 1003],
+    "event_timestamp": [datetime.now()] * 3   # required here, not for online
+})
+training_features = fs.get_historical_features(
+    entity_df=entity_df,
+    features="user_recommendation_features",
+).to_df()</code></pre>
+</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-2xl font-semibold mb-4">Data Quality and Validation</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-red-50 border-l-4 border-red-400 p-4">
+                        <h4 class="font-semibold mb-2">Schema Validation</h4>
+                        <ul class="text-sm list-disc list-inside">
+                            <li>Data type validation</li>
+                            <li>Required field checks</li>
+                            <li>Range constraints</li>
+                            <li>Format validation</li>
+                        </ul>
+                    </div>
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                        <h4 class="font-semibold mb-2">Statistical Validation</h4>
+                        <ul class="text-sm list-disc list-inside">
+                            <li>Distribution monitoring</li>
+                            <li>Outlier detection</li>
+                            <li>Missing value rates</li>
+                            <li>Correlation changes</li>
+                        </ul>
+                    </div>
+                    <div class="bg-blue-50 border-l-4 border-blue-400 p-4">
+                        <h4 class="font-semibold mb-2">Business Logic</h4>
+                        <ul class="text-sm list-disc list-inside">
+                            <li>Business rule checks</li>
+                            <li>Referential integrity</li>
+                            <li>Temporal consistency</li>
+                            <li>Cross-field validation</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <h4 class="text-xl font-semibold mb-3">Data Quality Framework</h4>
+                    <div class="code-block">
+  <div class="code-block-header">
+    <span class="lang-tag">Python</span>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+  <pre><code class="language-python">import great_expectations as gx
+
+# Initialize or load a Data Context (file-based or ephemeral)
+context = gx.get_context()
+
+# Define a Pandas Data Source
+datasource = context.sources.add_pandas("my_datasource")
+data_asset = datasource.add_dataframe_asset("raw_data")
+batch_request = data_asset.build_batch_request(dataframe=raw_data)
+
+# Create or update an Expectation Suite
+suite = context.add_or_update_expectation_suite("data_quality_suite")
+
+# Build a Validator
+validator = context.get_validator(
+    batch_request=batch_request,
+    expectation_suite=suite
+)
+
+# Define expectations
+validator.expect_column_to_exist("user_id")
+validator.expect_column_values_to_not_be_null("user_id")
+validator.expect_column_values_to_be_between("age", min_value=0, max_value=120)
+validator.expect_column_values_to_be_in_set("status", ["active", "inactive"])
+validator.save_expectation_suite()
+
+# Run validation via a Checkpoint (CI/CD-friendly)
+checkpoint = context.add_or_update_checkpoint(
+    name="data_quality_checkpoint",
+    validations=[{
+        "batch_request": batch_request,
+        "expectation_suite_name": "data_quality_suite"
+    }]
+)
+result = checkpoint.run()
+
+if not result.success:
+    raise ValueError("Data quality checks failed — pipeline halted.")
+    for validation in result.run_results.values():
+        for r in validation["results"]:
+            if not r["success"]:
+                print(f"FAILED: {r['expectation_config']['expectation_type']}")</code></pre>
+</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Best Practices -->
+        <section id="best-practices" class="mb-16">
+            <h2 class="text-3xl font-bold mb-8 text-yellow-600">
+                <i class="fas fa-star mr-3"></i>5. MLOps Best Practices
+            </h2>
+
+            <div class="mb-8">
+                <h3 class="text-2xl font-semibold mb-4">Development and Testing</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="success-box">
+                        <h4 class="font-semibold mb-3"><i class="fas fa-check-circle mr-2"></i>Code Quality</h4>
+                        <ul class="list-disc list-inside space-y-1 text-sm">
+                            <li>Use version control for all code</li>
+                            <li>Write unit tests for data processing functions</li>
+                            <li>Implement integration tests for pipelines</li>
+                            <li>Use linting and formatting tools (black, flake8)</li>
+                            <li>Document APIs and functions thoroughly</li>
+                            <li>Follow consistent naming conventions</li>
+                        </ul>
+                    </div>
+                    <div class="success-box">
+                        <h4 class="font-semibold mb-3"><i class="fas fa-vial mr-2"></i>ML-Specific Testing</h4>
+                        <ul class="list-disc list-inside space-y-1 text-sm">
+                            <li>Test data preprocessing steps</li>
+                            <li>Validate model inputs and outputs</li>
+                            <li>Check for data leakage</li>
+                            <li>Test model performance thresholds</li>
+                            <li>Validate feature engineering logic</li>
+                            <li>Test training/serving parity</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-2xl font-semibold mb-4">Production Deployment</h3>
+                <div class="space-y-4">
+                    <div class="process-step">
+                        <h4 class="font-semibold mb-3"><i class="fas fa-rocket mr-2"></i>Deployment Strategies</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="bg-blue-50 p-3 rounded">
+                                <strong>Blue-Green Deployment:</strong>
+                                <p class="text-sm mt-1">Run two identical production environments, switch traffic instantly</p>
+                            </div>
+                            <div class="bg-green-50 p-3 rounded">
+                                <strong>Canary Deployment:</strong>
+                                <p class="text-sm mt-1">Gradually roll out to small percentage of users, monitor performance</p>
+                            </div>
+                            <div class="bg-purple-50 p-3 rounded">
+                                <strong>A/B Testing:</strong>
+                                <p class="text-sm mt-1">Compare new model against existing one with split traffic</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="process-step">
+                        <h4 class="font-semibold mb-3"><i class="fas fa-shield-alt mr-2"></i>Safety Measures</h4>
+                        <div class="code-block">
+  <div class="code-block-header">
+    <span class="lang-tag">Python</span>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+  <pre><code class="language-python">import time
+import threading
+
+class ModelCircuitBreaker:
+    def __init__(self, failure_threshold=5, timeout=60):
+        self.failure_threshold = failure_threshold
+        self.timeout = timeout
+        self.failure_count = 0
+        self.last_failure_time = None
+        self.state = 'CLOSED'  # CLOSED, OPEN, HALF_OPEN
+        self._lock = threading.Lock()      
+    def call_model(self, input_data):
+        with self._lock:
+            if self.state == 'OPEN':
+                if (self.last_failure_time and
+                        time.time() - self.last_failure_time &gt; self.timeout):
+                    self.state = 'HALF_OPEN'
+                else:
+                    return self.fallback_response()
+        
+        try:
+            result = model.predict(input_data)
+            with self._lock:
+                if self.state == 'HALF_OPEN':
+                    # Probe succeeded — close the circuit
+                    self.state = 'CLOSED'
+                    self.failure_count = 0
+            return result
+        except Exception as e:
+            with self._lock:
+                self.failure_count += 1
+                self.last_failure_time = time.time()
+                if self.state == 'HALF_OPEN':
+                                        self.state = 'OPEN'
+                elif self.failure_count &gt;= self.failure_threshold:
+                    self.state = 'OPEN'
+            return self.fallback_response()
+    
+    def fallback_response(self):
+        # Return a safe default/cached response when model is unavailable
+        return {"prediction": "default_value", "confidence": 0.0, "fallback": True}</code></pre>
+</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-2xl font-semibold mb-4">Monitoring and Alerting</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="text-xl font-semibold mb-3">Key Metrics to Monitor</h4>
+                        <div class="space-y-3">
+                            <div class="bg-yellow-50 p-3 rounded border-l-4 border-yellow-400">
+                                <strong>System Metrics:</strong>
+                                <ul class="text-sm list-disc list-inside mt-1">
+                                    <li>Response latency (p50, p95, p99)</li>
+                                    <li>Throughput (requests per second)</li>
+                                    <li>Error rates and status codes</li>
+                                    <li>Resource utilization (CPU, memory, GPU)</li>
+                                </ul>
+                            </div>
+                            <div class="bg-blue-50 p-3 rounded border-l-4 border-blue-400">
+                                <strong>Model Metrics:</strong>
+                                <ul class="text-sm list-disc list-inside mt-1">
+                                    <li>Prediction accuracy/performance</li>
+                                    <li>Confidence score distributions</li>
+                                    <li>Feature importance changes</li>
+                                    <li>Model version performance comparison</li>
+                                </ul>
+                            </div>
+                            <div class="bg-red-50 p-3 rounded border-l-4 border-red-400">
+                                <strong>Data Metrics:</strong>
+                                <ul class="text-sm list-disc list-inside mt-1">
+                                    <li>Input data distribution drift</li>
+                                    <li>Missing or null value rates</li>
+                                    <li>Feature correlation changes</li>
+                                    <li>Outlier detection rates</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-semibold mb-3">Alerting Framework</h4>
+                        <div class="code-block">
+  <div class="code-block-header">
+    <span class="lang-tag">Python</span>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+  <pre><code class="language-python"># Example monitoring setup with Prometheus and Grafana
+from prometheus_client import Counter, Histogram, Gauge
+import time
+
+# Define metrics
+prediction_counter = Counter('ml_predictions_total', 'Total predictions made')
+prediction_latency = Histogram('ml_prediction_duration_seconds', 'Prediction latency')
+model_accuracy = Gauge('ml_model_accuracy', 'Current model accuracy')
+data_drift_score = Gauge('ml_data_drift_score', 'Data drift detection score')
+
+def make_prediction(input_data):
+    start_time = time.time()
+    
+    try:
+        prediction = model.predict(input_data)
+        prediction_counter.inc()
+        
+        # Record latency
+        duration = time.time() - start_time
+        prediction_latency.observe(duration)
+        
+        return prediction
+        
+    except Exception as e:
+        # Log error and increment error counter
+        logger.error(f"Prediction failed: {e}")
+        raise
+
+# Update model metrics periodically
+def update_model_metrics():
+    # Calculate current accuracy on validation set
+    current_accuracy = evaluate_model()
+    model_accuracy.set(current_accuracy)
+    
+    # Calculate data drift
+    drift_score = detect_data_drift(recent_data, reference_data)
+    data_drift_score.set(drift_score)</code></pre>
+</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-2xl font-semibold mb-4">Security and Compliance</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="warning-box">
+                        <h4 class="font-semibold mb-2"><i class="fas fa-lock mr-2"></i>Data Security</h4>
+                        <ul class="text-sm list-disc list-inside">
+                            <li>Encrypt data at rest and in transit (TLS 1.3+)</li>
+                            <li>Implement RBAC and least-privilege access controls</li>
+                            <li>Regular security audits and penetration testing</li>
+                            <li>Secure model artifacts: sign and verify checksums</li>
+                        </ul>
+                    </div>
+                    <div class="warning-box">
+                        <h4 class="font-semibold mb-2"><i class="fas fa-balance-scale mr-2"></i>Compliance Frameworks</h4>
+                        <ul class="text-sm list-disc list-inside">
+                            <li>GDPR / UK GDPR — EU personal data</li>
+                            <li>EU AI Act — risk-tier conformity assessments</li>
+                            <li>CCPA — California consumer data</li>
+                            <li>HIPAA — US healthcare data</li>
+                            <li>NIST AI RMF — GOVERN / MAP / MEASURE / MANAGE</li>
+                            <li>Model explainability, audit trails, data retention policies</li>
+                        </ul>
+                    </div>
+                    <div class="warning-box">
+                        <h4 class="font-semibold mb-2"><i class="fas fa-user-shield mr-2"></i>Privacy</h4>
+                        <ul class="text-sm list-disc list-inside">
+                            <li>Data anonymisation and pseudonymisation</li>
+                            <li>Differential privacy techniques</li>
+                            <li>Federated learning for sensitive data</li>
+                            <li>Regular privacy impact assessments (PIAs)</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div class="warning-box">
+                        <h4 class="font-semibold mb-2"><i class="fas fa-shield-virus mr-2"></i>ML Supply Chain Security</h4>
+                        <ul class="text-sm list-disc list-inside">
+                            <li>Verify model weight checksums/signatures before loading</li>
+                            <li>Scan base Docker images with Trivy or Grype for CVEs</li>
+                            <li>Use signed container images (Cosign / Sigstore)</li>
+                            <li>Pin dependencies with hash verification (<code>pip install --require-hashes</code>)</li>
+                            <li>Audit third-party datasets for poisoning or licence issues</li>
+                            <li>Use private model registries — do not pull weights from public sources without verification</li>
+                        </ul>
+                    </div>
+                    <div class="warning-box">
+                        <h4 class="font-semibold mb-2"><i class="fas fa-robot mr-2"></i>Model &amp; Inference Security</h4>
+                        <ul class="text-sm list-disc list-inside">
+                            <li>Input validation and sanitisation before model inference</li>
+                            <li>Rate limiting and authentication on model endpoints</li>
+                            <li>Adversarial input detection / robustness testing</li>
+                            <li>Mitigate model inversion and membership inference attacks</li>
+                            <li>Store secrets in vault (HashiCorp Vault, AWS Secrets Manager) — never in env vars or images</li>
+                            <li>Enforce NetworkPolicy in Kubernetes to restrict model pod egress</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-2xl font-semibold mb-4">Team Organization and Culture</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="info-box">
+                        <h4 class="font-semibold mb-3"><i class="fas fa-users mr-2"></i>Cross-functional Teams</h4>
+                        <ul class="list-disc list-inside space-y-1 text-sm">
+                            <li><strong>Data Scientists:</strong> Model development, experimentation</li>
+                            <li><strong>ML Engineers:</strong> Pipeline development, model deployment</li>
+                            <li><strong>Data Engineers:</strong> Data infrastructure, ETL pipelines</li>
+                            <li><strong>DevOps Engineers:</strong> Infrastructure, monitoring, scaling</li>
+                            <li><strong>Product Managers:</strong> Requirements, business metrics</li>
+                        </ul>
+                    </div>
+                    <div class="info-box">
+                        <h4 class="font-semibold mb-3"><i class="fas fa-graduation-cap mr-2"></i>Best Practices</h4>
+                        <ul class="list-disc list-inside space-y-1 text-sm">
+                            <li>Regular code reviews and pair programming</li>
+                            <li>Knowledge sharing sessions and documentation</li>
+                            <li>Standardized project templates and tooling</li>
+                            <li>Continuous learning and skill development</li>
+                            <li>Post-mortem analysis for production issues</li>
+                            <li>"You build it, you run it" mentality</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6a: MLOps Maturity Levels (Added - E-22) -->
+        <section id="maturity" class="mb-16">
+            <h2 class="text-3xl font-bold mb-8 text-teal-600">
+                <i class="fas fa-chart-bar mr-3"></i>6. MLOps Maturity Levels
+            </h2>
+
+            <div class="info-box mb-6">
+                <p><strong>Why maturity levels matter:</strong> Most teams should NOT start with full pipeline automation. Understanding where you are today — and what the next pragmatic step is — prevents over-engineering and enables incremental, sustainable adoption. This framework is based on Google's MLOps white paper (2021) and Microsoft's MLOps maturity model.</p>
+            </div>
+
+            <div class="space-y-6">
+                <div class="diagram-box">
+                    <h3 class="text-xl font-bold mb-3 text-gray-700">Level 0 — Manual Process <span class="text-sm font-normal text-gray-500">(most teams start here)</span></h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-gray-100 p-4 rounded-lg">
+                            <h5 class="font-semibold mb-2">Characteristics</h5>
+                            <ul class="text-sm list-disc list-inside space-y-1">
+                                <li>Manual, script-driven training</li>
+                                <li>Models deployed as static artefacts</li>
+                                <li>No experiment tracking</li>
+                                <li>Ad-hoc retraining when performance degrades</li>
+                                <li>Jupyter notebooks in production</li>
+                            </ul>
+                        </div>
+                        <div class="bg-gray-100 p-4 rounded-lg">
+                            <h5 class="font-semibold mb-2">Pain Points</h5>
+                            <ul class="text-sm list-disc list-inside space-y-1">
+                                <li>Results not reproducible</li>
+                                <li>No visibility into model drift</li>
+                                <li>Deployment is a manual, risky event</li>
+                                <li>Knowledge siloed in individuals</li>
+                            </ul>
+                        </div>
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h5 class="font-semibold mb-2">Key Actions to Advance</h5>
+                            <ul class="text-sm list-disc list-inside space-y-1">
+                                <li>Add experiment tracking (MLflow/W&amp;B)</li>
+                                <li>Refactor notebooks into Python scripts</li>
+                                <li>Version code in Git</li>
+                                <li>Containerise training and serving</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="diagram-box">
+                    <h3 class="text-xl font-bold mb-3 text-blue-700">Level 1 — ML Pipeline Automation</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h5 class="font-semibold mb-2">Characteristics</h5>
+                            <ul class="text-sm list-disc list-inside space-y-1">
+                                <li>Automated training pipelines</li>
+                                <li>Continuous Training (CT) on new data</li>
+                                <li>Experiment tracking and model registry</li>
+                                <li>Data and model validation gates</li>
+                                <li>Feature store in use</li>
+                            </ul>
+                        </div>
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h5 class="font-semibold mb-2">Tools Typical at This Level</h5>
+                            <ul class="text-sm list-disc list-inside space-y-1">
+                                <li>MLflow / W&amp;B for tracking</li>
+                                <li>DVC or LakeFS for data versioning</li>
+                                <li>Airflow / Prefect for orchestration</li>
+                                <li>Docker + basic K8s for serving</li>
+                            </ul>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <h5 class="font-semibold mb-2">Key Actions to Advance</h5>
+                            <ul class="text-sm list-disc list-inside space-y-1">
+                                <li>Add full CI/CD for pipeline code</li>
+                                <li>Automate model evaluation and promotion</li>
+                                <li>Implement drift monitoring and alerting</li>
+                                <li>Standardise project templates</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="diagram-box">
+                    <h3 class="text-xl font-bold mb-3 text-purple-700">Level 2 — CI/CD Pipeline Automation <span class="text-sm font-normal text-gray-500">(full MLOps)</span></h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-purple-50 p-4 rounded-lg">
+                            <h5 class="font-semibold mb-2">Characteristics</h5>
+                            <ul class="text-sm list-disc list-inside space-y-1">
+                                <li>Automated CI/CD for all pipeline components</li>
+                                <li>Auto-triggered retraining on drift detection</li>
+                                <li>Canary and shadow deployments</li>
+                                <li>Full observability stack</li>
+                                <li>Self-service ML platform for data scientists</li>
+                            </ul>
+                        </div>
+                        <div class="bg-purple-50 p-4 rounded-lg">
+                            <h5 class="font-semibold mb-2">Requirements</h5>
+                            <ul class="text-sm list-disc list-inside space-y-1">
+                                <li>Dedicated ML Platform team</li>
+                                <li>Mature DevOps/SRE culture</li>
+                                <li>Significant infrastructure investment</li>
+                                <li>Strong data governance framework</li>
+                            </ul>
+                        </div>
+                        <div class="bg-yellow-50 p-4 rounded-lg">
+                            <h5 class="font-semibold mb-2">⚠️ Reality Check</h5>
+                            <p class="text-sm">Most organisations operate between Level 0 and Level 1. Level 2 is appropriate for teams with 10+ ML models in production and dedicated platform engineering capacity. Do not attempt to jump directly to Level 2 from Level 0.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6b: LLMOps (Added - E-21) -->
+        <section id="llmops" class="mb-16">
+            <h2 class="text-3xl font-bold mb-8 text-pink-600">
+                <i class="fas fa-robot mr-3"></i>7. LLMOps — Operating Large Language Models
+            </h2>
+
+            <div class="info-box mb-6">
+                <p><strong>LLMOps</strong> extends classical MLOps with patterns specific to large language models (LLMs) and generative AI systems. Key differences include non-deterministic outputs, prompt-based interfaces, RAG architectures, and new evaluation paradigms. If you are deploying GPT-family models, open-source LLMs (Llama, Mistral, Gemma), or embedding-based systems, these patterns apply.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="process-step">
+                    <h4 class="font-semibold mb-3"><i class="fas fa-code mr-2"></i>Prompt Engineering &amp; Versioning</h4>
+                    <ul class="text-sm list-disc list-inside space-y-1">
+                        <li>Store prompts in a prompt registry (version-controlled)</li>
+                        <li>A/B test prompt variants with metrics</li>
+                        <li>Log prompts and completions for auditability</li>
+                        <li>Use structured output enforcement (Pydantic, Instructor)</li>
+                        <li>Tools: LangSmith, PromptLayer, Agenta</li>
+                    </ul>
+                </div>
+                <div class="process-step">
+                    <h4 class="font-semibold mb-3"><i class="fas fa-search mr-2"></i>RAG Pipeline Management</h4>
+                    <ul class="text-sm list-disc list-inside space-y-1">
+                        <li>Version your vector store indices alongside model versions</li>
+                        <li>Monitor retrieval quality (precision@k, recall@k)</li>
+                        <li>Evaluate end-to-end RAG quality with RAGAS framework</li>
+                        <li>Chunk strategy versioning (size, overlap, method)</li>
+                        <li>Re-index on knowledge base updates</li>
+                    </ul>
+                </div>
+                <div class="process-step">
+                    <h4 class="font-semibold mb-3"><i class="fas fa-clipboard-check mr-2"></i>LLM Evaluation</h4>
+                    <ul class="text-sm list-disc list-inside space-y-1">
+                        <li>LLM-as-judge for automated quality scoring</li>
+                        <li>Hallucination detection metrics (FactScore, TruthfulQA style)</li>
+                        <li>Task-specific benchmarks (HumanEval, MMLU, etc.)</li>
+                        <li>Human eval for high-stakes use cases</li>
+                        <li>Tools: DeepEval, RAGAS, Braintrust, Langfuse</li>
+                    </ul>
+                </div>
+                <div class="process-step">
+                    <h4 class="font-semibold mb-3"><i class="fas fa-shield-alt mr-2"></i>LLM Safety &amp; Guardrails</h4>
+                    <ul class="text-sm list-disc list-inside space-y-1">
+                        <li>Input validation: detect prompt injection, jailbreaks</li>
+                        <li>Output filtering: PII redaction, toxicity classifiers</li>
+                        <li>Implement guardrail layers (NeMo Guardrails, Guardrails AI)</li>
+                        <li>Rate limiting per user/session</li>
+                        <li>Log all interactions for compliance audit</li>
+                    </ul>
+                </div>
+                <div class="process-step">
+                    <h4 class="font-semibold mb-3"><i class="fas fa-tachometer-alt mr-2"></i>LLM Inference Optimisation</h4>
+                    <ul class="text-sm list-disc list-inside space-y-1">
+                        <li>Quantisation: INT4/INT8 (AWQ, GPTQ, bitsandbytes)</li>
+                        <li>Speculative decoding for throughput</li>
+                        <li>Continuous batching (vLLM, TGI)</li>
+                        <li>KV cache management for long contexts</li>
+                        <li>Monitor tokens/sec, TTFT (Time To First Token), total latency</li>
+                    </ul>
+                </div>
+                <div class="process-step">
+                    <h4 class="font-semibold mb-3"><i class="fas fa-sliders-h mr-2"></i>Fine-Tuning vs. Prompting</h4>
+                    <ul class="text-sm list-disc list-inside space-y-1">
+                        <li>Start with prompting; fine-tune only when prompting plateaus</li>
+                        <li>Use parameter-efficient methods: LoRA, QLoRA, PEFT</li>
+                        <li>Track fine-tune runs like any ML experiment (MLflow/W&amp;B)</li>
+                        <li>Evaluate fine-tuned models against base model on held-out set</li>
+                        <li>Monitor for catastrophic forgetting</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <h4 class="font-semibold mb-2"><i class="fas fa-exclamation-triangle mr-2"></i>Key Differences from Classical MLOps</h4>
+                <table class="comparison-table mt-3">
+                    <thead>
+                        <tr><th>Aspect</th><th>Classical MLOps</th><th>LLMOps</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>Output</strong></td><td>Deterministic (same input → same output)</td><td>Stochastic (temperature-dependent)</td></tr>
+                        <tr><td><strong>Versioning unit</strong></td><td>Model weights + hyperparams</td><td>Model + prompt + system message + RAG index</td></tr>
+                        <tr><td><strong>Evaluation</strong></td><td>Numerical metrics (accuracy, F1)</td><td>LLM-as-judge, human eval, task-specific benchmarks</td></tr>
+                        <tr><td><strong>Retraining trigger</strong></td><td>Data drift, performance drop</td><td>Knowledge cutoff, prompt degradation, new capabilities</td></tr>
+                        <tr><td><strong>Primary security concern</strong></td><td>Model inversion, data leakage</td><td>Prompt injection, jailbreaks, PII in completions</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section 7: Implementation Guide (renumbered) -->
+        <section id="implementation" class="mb-16">
+            <h2 class="text-3xl font-bold mb-8 text-indigo-600">
+                <i class="fas fa-code mr-3"></i>8. Implementation Guide and Templates
+            </h2>
+
+            <div class="mb-8">
+                <h3 class="text-2xl font-semibold mb-4">Project Structure Template</h3>
+                <div class="code-block">
+  <div class="code-block-header">
+    <span class="lang-tag">Shell</span>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+  <pre><code class="language-bash">ml-project/
+├── README.md
+├── requirements.txt
+├── Dockerfile
+├── .gitignore
+├── .dvcignore
+├── dvc.yaml                    # DVC pipeline definition
+├── params.yaml                 # Hyperparameters and config
+├── data/
+│   ├── raw/                   # Original, immutable data
+│   ├── processed/             # Cleaned and processed data
+│   └── external/              # Third-party datasets
+├── notebooks/
+│   ├── 01-exploratory-analysis.ipynb
+│   ├── 02-feature-engineering.ipynb
+│   └── 03-model-experiments.ipynb
+├── src/
+│   ├── __init__.py
+│   ├── data/
+│   │   ├── __init__.py
+│   │   ├── extract.py         # Data extraction
+│   │   ├── transform.py       # Data transformation
+│   │   └── validate.py        # Data validation
+│   ├── features/
+│   │   ├── __init__.py
+│   │   └── build_features.py  # Feature engineering
+│   ├── models/
+│   │   ├── __init__.py
+│   │   ├── train.py          # Model training
+│   │   ├── predict.py        # Model prediction
+│   │   └── evaluate.py       # Model evaluation
+│   └── utils/
+│       ├── __init__.py
+│       └── helpers.py        # Utility functions
+├── tests/
+│   ├── __init__.py
+│   ├── test_data.py
+│   ├── test_features.py
+│   └── test_models.py
+├── models/                    # Trained model artifacts
+├── reports/                   # Analysis reports and figures
+├── deployment/
+│   ├── docker/
+│   ├── kubernetes/
+│   └── terraform/
+└── mlflow_tracking/          # MLflow tracking server data</code></pre>
+</div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-2xl font-semibold mb-4">Configuration Management</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="text-lg font-semibold mb-3">params.yaml</h4>
+                        <div class="code-block">
+  <div class="code-block-header">
+    <span class="lang-tag">Python</span>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+  <pre><code class="language-python"># Data processing parameters
+data:
+  raw_data_path: "data/raw/dataset.csv"
+  processed_data_path: "data/processed/clean_dataset.csv"
+  test_size: 0.2
+  random_state: 42
+
+# Feature engineering
+features:
+  categorical_features:
+    - "category"
+    - "region" 
+  numerical_features:
+    - "age"
+    - "income"
+  target: "target_variable"
+
+# Model parameters
+model:
+  algorithm: "random_forest"
+  n_estimators: 100
+  max_depth: 10
+  min_samples_split: 5
+  random_state: 42
+
+# Training parameters
+training:
+  validation_split: 0.2
+  cross_validation_folds: 5
+  metrics:
+    - "accuracy"
+    - "precision"
+    - "recall"
+    - "f1"
+
+# MLflow tracking
+mlflow:
+  experiment_name: "customer_churn_prediction"
+  tracking_uri: "http://localhost:5000"</code></pre>
+</div>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold mb-3">Configuration Loader</h4>
+                        <div class="code-block">
+  <div class="code-block-header">
+    <span class="lang-tag">Python</span>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+  <pre><code class="language-python">import yaml
+import os
+from pathlib import Path
+
+class Config:
+    def __init__(self, config_path="params.yaml"):
+        self.config_path = Path(config_path)
+        self.config = self._load_config()
+    
+    def _load_config(self):
+        """Load configuration from YAML file"""
+        with open(self.config_path, 'r') as file:
+            config = yaml.safe_load(file)
+        
+        # Override with environment variables if present
+        self._override_with_env(config)
+        return config
+    
+    def _override_with_env(self, config):
+        """Override config values with environment variables"""
+        # Example: MLFLOW_TRACKING_URI overrides mlflow.tracking_uri
+        if 'MLFLOW_TRACKING_URI' in os.environ:
+            config['mlflow']['tracking_uri'] = os.environ['MLFLOW_TRACKING_URI']
+    
+    def get(self, key_path, default=None):
+        """Get configuration value using dot notation"""
+        keys = key_path.split('.')
+        value = self.config
+        
+        for key in keys:
+            if isinstance(value, dict) and key in value:
+                value = value[key]
+            else:
+                return default
+        
+        return value
+
+# Usage
+config = Config()
+model_params = config.get('model')
+tracking_uri = config.get('mlflow.tracking_uri')</code></pre>
+</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-2xl font-semibold mb-4">Training Pipeline Template</h3>
+                <div class="code-block">
+  <div class="code-block-header">
+    <span class="lang-tag">Python</span>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+  <pre><code class="language-python">import mlflow
+import mlflow.sklearn
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+import pandas as pd
+import joblib
+from datetime import datetime
+import argparse
+
+class ModelTrainer:
+    def __init__(self, config):
+        self.config = config
+        self.model = None
+        self.X_train = None
+        self.X_test = None
+        self.y_train = None
+        self.y_test = None
+    
+    def load_data(self):
+        """Load and split data"""
+        data_path = self.config.get('data.processed_data_path')
+        df = pd.read_csv(data_path)
+        
+        feature_cols = (
+            self.config.get('features.categorical_features', []) + 
+            self.config.get('features.numerical_features', [])
+        )
+        target_col = self.config.get('features.target')
+        
+        X = df[feature_cols]
+        y = df[target_col]
+        
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
+            X, y, 
+            test_size=self.config.get('data.test_size', 0.2),
+            random_state=self.config.get('data.random_state', 42),
+            stratify=y
+        )
+    
+    def train_model(self):
+        """Train the model"""
+        model_params = self.config.get('model')
+        
+        if model_params['algorithm'] == 'random_forest':
+            self.model = RandomForestClassifier(
+                n_estimators=model_params['n_estimators'],
+                max_depth=model_params['max_depth'],
+                min_samples_split=model_params['min_samples_split'],
+                random_state=model_params['random_state']
+            )
+        
+        self.model.fit(self.X_train, self.y_train)
+    
+    def evaluate_model(self):
+        """Evaluate model performance"""
+        y_pred = self.model.predict(self.X_test)
+        
+        metrics = {
+            'accuracy': accuracy_score(self.y_test, y_pred),
+            'precision': precision_score(self.y_test, y_pred, average='weighted'),
+            'recall': recall_score(self.y_test, y_pred, average='weighted'),
+            'f1': f1_score(self.y_test, y_pred, average='weighted')
+        }
+        
+        # Cross-validation
+        cv_scores = cross_val_score(
+            self.model, self.X_train, self.y_train, 
+            cv=self.config.get('training.cross_validation_folds', 5)
+        )
+        metrics['cv_accuracy_mean'] = cv_scores.mean()
+        metrics['cv_accuracy_std'] = cv_scores.std()
+        
+        return metrics
+    
+    def save_model(self, model_path):
+        """Save trained model"""
+        joblib.dump(self.model, model_path)
+    
+    def run_training(self):
+        """Execute complete training pipeline"""
+        mlflow.set_experiment(self.config.get('mlflow.experiment_name'))
+        
+        with mlflow.start_run():
+            # Log parameters
+            mlflow.log_params(self.config.get('model'))
+            mlflow.log_params(self.config.get('data'))
+            
+            # Load data and train
+            self.load_data()
+            self.train_model()
+            
+            # Evaluate
+            metrics = self.evaluate_model()
+            mlflow.log_metrics(metrics)
+            
+            # Save model
+            model_path = f"models/model_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pkl"
+            self.save_model(model_path)
+            mlflow.log_artifact(model_path)
+            
+            # Log model to MLflow Model Registry
+            mlflow.sklearn.log_model(
+                self.model, 
+                "model",
+                registered_model_name=self.config.get('mlflow.experiment_name')
+            )
+            
+            print(f"Training completed. Metrics: {metrics}")
+            return metrics
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--config", default="params.yaml", help="Configuration file path")
+    args = parser.parse_args()
+    
+    config = Config(args.config)
+    trainer = ModelTrainer(config)
+    trainer.run_training()</code></pre>
+</div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-2xl font-semibold mb-4">Model Serving Template</h3>
+                <div class="code-block">
+  <div class="code-block-header">
+    <span class="lang-tag">Python</span>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+  <pre><code class="language-python">from contextlib import asynccontextmanager
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+import joblib
+import pandas as pd
+import numpy as np
+from typing import List, Dict
+import logging
+import time
+import os
+
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+model = None
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: load model from registry / object store — NOT from embedded file
+    global model
+    try:
+        model_uri = os.environ.get("MODEL_URI", "models/production_model.pkl")
+        model = joblib.load(model_uri)
+        logger.info(f"Model loaded successfully from {model_uri}")
+    except Exception as e:
+        logger.error(f"Failed to load model: {e}")
+        raise
+    yield
+    # Shutdown: release resources
+    model = None
+    logger.info("Model unloaded")
+
+# Initialize FastAPI app
+app = FastAPI(
+    title="ML Model API",
+    description="Production ML model serving API",
+    version="1.0.0",
+    lifespan=lifespan
+)
+
+class PredictionRequest(BaseModel):
+    features: Dict[str, float]   # keys must match training column names
+    
+class PredictionResponse(BaseModel):
+    prediction: int
+    probability: List[float]
+    model_version: str
+    processing_time: float
+
+class HealthResponse(BaseModel):
+    status: str
+    model_loaded: bool
+    timestamp: str
+
+# Health check endpoint
+@app.get("/health", response_model=HealthResponse)
+async def health_check():
+    return HealthResponse(
+        status="healthy" if model is not None else "unhealthy",
+        model_loaded=model is not None,
+        timestamp=pd.Timestamp.now().isoformat()
+    )
+
+# Prediction endpoint
+@app.post("/predict", response_model=PredictionResponse)
+async def predict(request: PredictionRequest):
+    if model is None:
+        raise HTTPException(status_code=503, detail="Model not loaded")
+    
+    start_time = time.time()
+    
+    try:
+        # Convert input to DataFrame
+        input_data = pd.DataFrame([request.features])
+        
+        # Make prediction
+        prediction = model.predict(input_data)[0]
+        probability = model.predict_proba(input_data)[0].tolist()
+        
+        processing_time = time.time() - start_time
+        
+        # Log prediction
+        logger.info(f"Prediction made: {prediction}, Processing time: {processing_time:.3f}s")
+        
+        return PredictionResponse(
+            prediction=int(prediction),
+            probability=probability,
+            model_version="1.0.0",
+            processing_time=processing_time
+        )
+        
+    except Exception as e:
+        logger.error(f"Prediction failed: {e}")
+        raise HTTPException(status_code=400, detail=f"Prediction failed: {str(e)}")
+
+# Batch prediction endpoint
+@app.post("/predict/batch")
+async def predict_batch(requests: List[PredictionRequest]):
+    if model is None:
+        raise HTTPException(status_code=503, detail="Model not loaded")
+    
+    try:
+        # Convert all inputs to DataFrame
+        features_list = [req.features for req in requests]
+        input_data = pd.DataFrame(features_list)
+        
+        # Make predictions
+        predictions = model.predict(input_data)
+        probabilities = model.predict_proba(input_data)
+        
+        # Format responses
+        responses = []
+        for i, (pred, prob) in enumerate(zip(predictions, probabilities)):
+            responses.append({
+                "id": i,
+                "prediction": int(pred),
+                "probability": prob.tolist()
+            })
+        
+        return responses
+        
+    except Exception as e:
+        logger.error(f"Batch prediction failed: {e}")
+        raise HTTPException(status_code=400, detail=f"Batch prediction failed: {str(e)}")
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)</code></pre>
+</div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-2xl font-semibold mb-4">Docker and Kubernetes Deployment</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="text-lg font-semibold mb-3">Dockerfile</h4>
+                        <div class="code-block">
+  <div class="code-block-header">
+    <span class="lang-tag">Dockerfile</span>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+  <pre><code class="language-docker">FROM python:3.9-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update &amp;&amp; apt-get install -y \
+    gcc \
+    g++ \
+    &amp;&amp; rm -rf /var/lib/apt/lists/*
+
+# Copy requirements and install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY src/ ./src/
+COPY params.yaml .
+
+# Models should be loaded at runtime from a model registry or object store.
+# Inject MODEL_URI as an environment variable at container startup.
+# This keeps images small, immutable, and free of potentially sensitive weights.
+# Example: docker run -e MODEL_URI=s3://bucket/models/v1.pkl ml-model-api:latest
+
+# Create non-root user
+RUN adduser --disabled-password --gecos '' mluser
+USER mluser
+
+# Expose port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Run application
+CMD ["python", "src/api/serve.py"]</code></pre>
+</div>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold mb-3">Kubernetes Deployment</h4>
+                        <div class="code-block">
+  <div class="code-block-header">
+    <span class="lang-tag">YAML</span>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+  <pre><code class="language-yaml">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ml-model-api
+  labels:
+    app: ml-model-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ml-model-api
+  template:
+    metadata:
+      labels:
+        app: ml-model-api
+    spec:
+            securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: ml-model-api
+        image: ml-model-api:latest
+        imagePullPolicy: Always           ports:
+        - containerPort: 8000
+        env:
+        - name: MODEL_URI
+          valueFrom:
+            configMapKeyRef:
+              name: ml-model-config
+              key: model_uri
+                securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: ["ALL"]
+        resources:
+          requests:
+            memory: "1Gi"                      cpu: "500m"
+          limits:
+            memory: "2Gi"          # profile your model — 512Mi will OOM most models
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ml-model-api-service
+spec:
+  selector:
+    app: ml-model-api
+  ports:
+  - port: 80
+    targetPort: 8000
+    type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ml-model-api-netpol
+spec:
+  podSelector:
+    matchLabels:
+      app: ml-model-api
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - namespaceSelector: {}
+    ports:
+    - port: 443   # allow HTTPS to model registry / object store only</code></pre>
+</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-2xl font-semibold mb-4">CI/CD Pipeline Template</h3>
+                <div class="code-block">
+  <div class="code-block-header">
+    <span class="lang-tag">Python</span>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+  <pre><code class="language-python"># .github/workflows/ml-pipeline.yml
+name: ML Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5         with:
+        python-version: "3.11"
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov flake8
+    
+    - name: Lint with flake8
+      run: |
+        flake8 src/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 src/ --count --max-complexity=10 --max-line-length=100 --statistics
+    
+    - name: Run tests
+      run: |
+        pytest tests/ --cov=src/ --cov-report=xml
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4   
+  train:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Setup DVC
+      uses: iterative/setup-dvc@v2       
+    - name: Pull data with DVC
+      run: dvc pull
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    
+    - name: Train model
+      run: python src/models/train.py
+      env:
+        MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+    
+    - name: Run model tests
+      run: pytest tests/test_models.py
+
+  deploy:
+    needs: [test, train]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Build Docker image
+      run: |
+        docker build -t ml-model-api:${{ github.sha }} .
+        docker tag ml-model-api:${{ github.sha }} ml-model-api:latest
+    
+    - name: Scan image for vulnerabilities
+      run: |
+                docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+          aquasec/trivy:latest image --exit-code 1 --severity CRITICAL \
+          ml-model-api:${{ github.sha }}
+    
+    - name: Deploy to staging
+      run: |
+        # Deploy to staging environment
+        kubectl apply -f deployment/kubernetes/staging/
+    
+    - name: Run integration tests
+      run: |
+        # Run integration tests against staging
+        pytest tests/integration/
+    
+    - name: Deploy to production
+      if: success()
+      run: |
+        # Deploy to production environment
+        kubectl apply -f deployment/kubernetes/production/</code></pre>
+</div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-2xl font-semibold mb-4">Monitoring and Observability Setup</h3>
+                <div class="code-block">
+  <div class="code-block-header">
+    <span class="lang-tag">YAML</span>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+  <pre><code class="language-yaml"># monitoring/prometheus.yml
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'ml-model-api'
+    static_configs:
+      - targets: ['ml-model-api-service:80']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+# monitoring/grafana-dashboard.json
+{
+  "dashboard": {
+    "title": "ML Model Monitoring",
+    "panels": [
+      {
+        "title": "Prediction Rate",
+        "type": "timeseries",
+        "datasource": { "type": "prometheus" },
+        "targets": [
+          {
+            "expr": "rate(ml_predictions_total[5m])",
+            "legendFormat": "Predictions/sec"
+          }
+        ]
+      },
+      {
+        "title": "Prediction Latency",
+        "type": "timeseries",
+        "datasource": { "type": "prometheus" },
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(ml_prediction_duration_seconds_bucket[5m]))",
+            "legendFormat": "p95 latency"
+          },
+          {
+            "expr": "histogram_quantile(0.50, rate(ml_prediction_duration_seconds_bucket[5m]))",
+            "legendFormat": "p50 (median)"
+          }
+        ]
+      },
+      {
+        "title": "Model Accuracy",
+        "type": "stat",
+        "datasource": { "type": "prometheus" },
+        "targets": [
+          {
+            "expr": "ml_model_accuracy",
+            "legendFormat": "Current Accuracy"
+          }
+        ]
+      },
+      {
+        "title": "Data Drift Score",
+        "type": "timeseries",
+        "datasource": { "type": "prometheus" },
+        "targets": [
+          {
+            "expr": "ml_data_drift_score",
+            "legendFormat": "Drift Score"
+          }
+        ]
+      }
+    ]
+  }
+}</code></pre>
+</div>
+            </div>
+        </section>
+
+        <!-- Conclusion -->
+        <section class="mb-16">
+            <h2 class="text-3xl font-bold mb-8 text-gray-800">
+                <i class="fas fa-flag-checkered mr-3"></i>Conclusion and Next Steps
+            </h2>
+            
+            <div class="bg-gradient-to-r from-blue-50 to-purple-50 border-l-4 border-blue-500 p-8 mb-8">
+                <h3 class="text-2xl font-semibold mb-4">Key Takeaways</h3>
+                <ul class="space-y-3 text-lg">
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                        <span>MLOps is not just about models—it's about building reliable, scalable systems that deliver business value</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                        <span>Reproducibility and versioning are fundamental to trustworthy ML systems</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                        <span>Data quality and pipeline engineering are often more important than model sophistication</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                        <span>Monitoring and observability are critical for maintaining model performance over time</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                        <span>Successful MLOps requires both technical excellence and strong team collaboration</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-lg">
+                    <h3 class="text-xl font-semibold mb-4 text-blue-600">
+                        <i class="fas fa-rocket mr-2"></i>Implementation Roadmap
+                    </h3>
+                    <ol class="list-decimal list-inside space-y-2 text-sm">
+                        <li><strong>Phase 1:</strong> Establish version control and experiment tracking</li>
+                        <li><strong>Phase 2:</strong> Build robust data pipelines and validation</li>
+                        <li><strong>Phase 3:</strong> Implement CI/CD for model deployment</li>
+                        <li><strong>Phase 4:</strong> Set up comprehensive monitoring and alerting</li>
+                        <li><strong>Phase 5:</strong> Scale with advanced orchestration and automation</li>
+                    </ol>
+                </div>
+                
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-lg">
+                    <h3 class="text-xl font-semibold mb-4 text-purple-600">
+                        <i class="fas fa-tools mr-2"></i>Recommended Tool Stack
+                    </h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><strong>Experiment Tracking:</strong> MLflow, Weights &amp; Biases, Comet ML</li>
+                        <li><strong>Data Versioning:</strong> DVC, LakeFS (data lake versioning)</li>
+                        <li><strong>Pipeline Orchestration:</strong> Apache Airflow 2.x, Prefect, ZenML</li>
+                        <li><strong>Model Serving:</strong> FastAPI, BentoML, Ray Serve, vLLM (LLMs)</li>
+                        <li><strong>Feature Stores:</strong> Feast, Tecton, Hopsworks</li>
+                        <li><strong>Monitoring:</strong> Prometheus, Grafana, Evidently AI (drift), DataDog</li>
+                        <li><strong>Infrastructure:</strong> Docker, Kubernetes, Terraform, Helm</li>
+                        <li><strong>Security:</strong> Trivy (scanning), OPA/Kyverno (policy), HashiCorp Vault (secrets), Cosign (signing)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mt-8 text-center">
+                <p class="text-lg text-gray-600 mb-4">
+                    This blueprint provides the foundation for building production-ready ML systems. Remember that MLOps is a journey, not a destination—continuously iterate and improve your processes as your team and systems mature.
+                </p>
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-left max-w-2xl mx-auto">
+                    <p class="font-semibold text-yellow-800">
+                        <i class="fas fa-lightbulb mr-2"></i>Pro Tip: Start small, automate incrementally, and always prioritize reliability over complexity.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p class="text-lg mb-2 text-white">Complete MLOps Blueprint </p>
+            <p class="text-sm text-white mt-1">Original source: Daily Dose of Data Science MLOps Crash Course</p>
+            <p class="text-sm text-white mt-2">AI Security Architect (Cloud-Agnostic) — March 2026</p>
+            <p class="text-sm text-white mt-4">A Comprehensive Guide for Production Machine Learning Systems</p>
+        </div>
+    </footer>
+
+<script>
+// ── Copy button ───────────────────────────────────────────────
+function copyCode(btn) {
+  const pre  = btn.closest(".code-block").querySelector("pre");
+  const text = pre.innerText || pre.textContent;
+  navigator.clipboard.writeText(text).then(function() {
+    btn.textContent = "Copied!";
+    btn.classList.add("copied");
+    setTimeout(function() {
+      btn.textContent = "Copy";
+      btn.classList.remove("copied");
+    }, 2000);
+  }).catch(function() {
+    // Fallback for browsers without clipboard API
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    btn.textContent = "Copied!";
+    setTimeout(function() { btn.textContent = "Copy"; }, 2000);
+  });
+}
+
+// ── Smooth scroll ─────────────────────────────────────────────
+document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+  a.addEventListener("click", function(e) {
+    var target = document.querySelector(a.getAttribute("href"));
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  });
+});
+
+// ── Active nav highlight on scroll ────────────────────────────
+var sections = document.querySelectorAll("section[id]");
+var navLinks  = document.querySelectorAll(".sticky-top-nav a");
+if ("IntersectionObserver" in window) {
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        navLinks.forEach(function(link) {
+          var active = link.getAttribute("href") === "#" + entry.target.id;
+          link.style.color      = active ? "#2563eb" : "";
+          link.style.fontWeight = active ? "600"     : "";
+          link.style.background = active ? "#eff6ff" : "";
+        });
+      }
+    });
+  }, { threshold: 0.25 });
+  sections.forEach(function(s) { obs.observe(s); });
+}
+</script>
+
+</body>
+</html>
+    
+    
+        
+        
+    
+    
