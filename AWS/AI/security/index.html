@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AWS MLOps Security Controls — Stephen A. Adebowale</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Inter+Tight:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#f8f9fb; --surface:#ffffff; --border:#e4e7ed; --border-soft:#edf0f4;
+      --text:#0f1117; --muted:#4b5566; --faint:#8792a2;
+      --navy:#0f2137; --orange:#ff9900; --accent:#1a56db; --accent-soft:#ebf0ff;
+      --green:#15803d; --green-bg:#f0fdf4;
+      --amber:#b45309; --amber-bg:#fffbeb;
+      --red:#b91c1c; --red-bg:#fef2f2;
+      --purple:#7c3aed; --purple-bg:#f5f3ff;
+      --teal:#0e7490; --teal-bg:#ecfeff;
+      --header-h:58px; --sidebar-w:260px;
+      --mono:'JetBrains Mono',monospace;
+      --sans:'Inter',system-ui,sans-serif;
+      --display:'Inter Tight','Inter',sans-serif;
+      --shadow-sm:0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.05);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{font-size:15px;scroll-behavior:smooth;}
+    body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:1.65;-webkit-font-smoothing:antialiased;}
+
+    /* ── Topbar ── */
+    #topbar{position:fixed;top:0;left:0;right:0;height:var(--header-h);background:var(--navy);
+      display:flex;align-items:center;padding:0 24px;gap:14px;z-index:200;
+      border-bottom:2px solid var(--orange);box-shadow:0 2px 12px rgba(0,0,0,.25);}
+    .tb-logo{width:30px;height:30px;background:var(--orange);border-radius:6px;
+      display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;
+      color:#fff;font-family:var(--display);flex-shrink:0;}
+    .tb-crumb{display:flex;align-items:center;gap:6px;}
+    .tb-crumb a{color:rgba(255,255,255,.5);font-size:12px;font-weight:500;text-decoration:none;
+      transition:color .15s;white-space:nowrap;display:flex;align-items:center;gap:4px;}
+    .tb-crumb a:hover{color:rgba(255,255,255,.9);}
+    .tb-crumb .sep{color:rgba(255,255,255,.2);font-size:12px;}
+    .tb-crumb .cur{color:rgba(255,255,255,.75);font-size:12px;font-weight:600;white-space:nowrap;}
+    .tb-spacer{flex:1;}
+    .tb-badge{background:rgba(255,153,0,.18);border:1px solid rgba(255,153,0,.4);color:var(--orange);
+      font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;
+      letter-spacing:.03em;text-transform:uppercase;white-space:nowrap;}
+
+    /* ── Progress bar ── */
+    #progress-bar{position:fixed;top:var(--header-h);left:var(--sidebar-w);right:0;height:2px;
+      background:var(--orange);transform-origin:left;transform:scaleX(0);z-index:150;}
+
+    /* ── Sidebar ── */
+    #sidebar{position:fixed;top:var(--header-h);left:0;bottom:0;width:var(--sidebar-w);
+      background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;z-index:100;
+      scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+    #sidebar::-webkit-scrollbar{width:4px;}
+    #sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+    .nav-back{display:flex;align-items:center;gap:8px;padding:14px 18px 10px;font-size:12px;
+      font-weight:600;color:var(--accent);text-decoration:none;
+      border-bottom:1px solid var(--border-soft);transition:background .15s;}
+    .nav-back:hover{background:var(--accent-soft);}
+    .nav-section{padding:14px 0 4px;}
+    .nav-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+      color:var(--faint);padding:0 18px 6px;}
+    .nav-item{display:block;padding:6px 18px;font-size:12.5px;font-weight:500;color:var(--muted);
+      text-decoration:none;border-left:2px solid transparent;transition:all .15s;line-height:1.4;}
+    .nav-item:hover{color:var(--accent);background:var(--accent-soft);border-left-color:var(--accent);}
+    .nav-item.active{color:var(--accent);background:var(--accent-soft);border-left-color:var(--accent);font-weight:600;}
+    .nav-sub{display:block;padding:4px 18px 4px 30px;font-size:12px;color:var(--faint);
+      text-decoration:none;transition:color .15s;}
+    .nav-sub:hover{color:var(--accent);}
+
+    /* ── Main ── */
+    #main{margin-left:var(--sidebar-w);margin-top:var(--header-h);min-height:calc(100vh - var(--header-h));}
+
+    /* ── Hero ── */
+    #hero{background:linear-gradient(135deg,var(--navy) 0%,#1a3a5c 60%,#1e4976 100%);
+      padding:52px 64px 48px;position:relative;overflow:hidden;}
+    #hero::before{content:'';position:absolute;top:-60px;right:-60px;width:300px;height:300px;
+      border-radius:50%;background:radial-gradient(circle,rgba(255,153,0,.12) 0%,transparent 70%);pointer-events:none;}
+    #hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+      background:linear-gradient(90deg,transparent,var(--orange),transparent);}
+    .hero-crumb{display:flex;align-items:center;gap:6px;margin-bottom:18px;}
+    .hero-crumb a{font-size:12px;font-weight:500;color:rgba(255,255,255,.5);text-decoration:none;
+      transition:color .15s;display:flex;align-items:center;gap:4px;}
+    .hero-crumb a:hover{color:rgba(255,255,255,.85);}
+    .hero-crumb .sep{color:rgba(255,255,255,.25);font-size:12px;}
+    .hero-crumb .cur{font-size:12px;font-weight:600;color:rgba(255,255,255,.75);}
+    .hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(255,153,0,.15);
+      border:1px solid rgba(255,153,0,.3);color:var(--orange);font-size:11px;font-weight:700;
+      letter-spacing:.07em;text-transform:uppercase;padding:4px 14px;border-radius:20px;margin-bottom:18px;}
+    .hero-eyebrow::before{content:'';width:6px;height:6px;background:var(--orange);border-radius:50%;}
+    #hero h1{font-family:var(--display);font-size:26px;font-weight:800;color:#fff;
+      letter-spacing:-.025em;line-height:1.2;margin-bottom:12px;}
+    #hero .subtitle{font-size:15px;color:rgba(255,255,255,.6);margin-bottom:28px;max-width:600px;line-height:1.6;}
+    .hero-meta{display:flex;flex-wrap:wrap;gap:20px;}
+    .hero-meta-item{display:flex;flex-direction:column;gap:2px;}
+    .meta-label{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.38);}
+    .meta-value{font-size:13px;font-weight:500;color:rgba(255,255,255,.82);}
+    .hero-ref{display:inline-flex;align-items:center;gap:6px;margin-top:20px;
+      background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+      border-radius:8px;padding:8px 16px;font-size:12px;color:rgba(255,255,255,.65);text-decoration:none;
+      transition:background .15s;}
+    .hero-ref:hover{background:rgba(255,255,255,.12);color:#fff;}
+
+    /* ── Content ── */
+    #content{max-width:1100px;padding:40px 64px 80px;}
+
+    /* ── Phase sections ── */
+    .phase-section{margin-bottom:60px;scroll-margin-top:calc(var(--header-h) + 20px);}
+    .phase-section+.phase-section{border-top:2px solid var(--border-soft);padding-top:48px;}
+    .phase-header{margin-bottom:24px;}
+    .phase-tag{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:700;
+      letter-spacing:.1em;text-transform:uppercase;padding:3px 12px;border-radius:20px;
+      margin-bottom:10px;}
+    .phase-tag.p1{background:#dbeafe;color:#1d4ed8;}
+    .phase-tag.p2{background:#fce7f3;color:#be185d;}
+    .phase-tag.p3{background:#dcfce7;color:#15803d;}
+    .phase-tag.p4{background:#fef3c7;color:#b45309;}
+    .phase-tag.p5{background:#ede9fe;color:#6d28d9;}
+    .phase-tag.p6{background:#ccfbf1;color:#0e7490;}
+    .phase-tag::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;}
+    h2.phase-title{font-family:var(--display);font-size:22px;font-weight:800;color:var(--text);
+      letter-spacing:-.025em;line-height:1.25;margin-bottom:6px;}
+    .phase-desc{font-size:13.5px;color:var(--muted);max-width:720px;line-height:1.65;}
+    h3.service-title{font-family:var(--display);font-size:16px;font-weight:700;color:var(--text);
+      letter-spacing:-.015em;margin:28px 0 10px;padding-bottom:7px;
+      border-bottom:1px solid var(--border-soft);display:flex;align-items:center;gap:8px;}
+    .svc-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;
+      background:var(--accent-soft);color:var(--accent);letter-spacing:.04em;text-transform:uppercase;}
+
+    /* ── Callout ── */
+    .callout{display:flex;gap:14px;padding:14px 18px;border-radius:8px;margin:14px 0;
+      font-size:13.5px;line-height:1.6;border:1px solid transparent;}
+    .callout-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+    .callout-body strong{display:block;margin-bottom:4px;}
+    .callout.note   {background:var(--accent-soft);border-color:rgba(26,86,219,.2);color:#1e3a8a;}
+    .callout.warning{background:var(--amber-bg);border-color:rgba(180,83,9,.2);color:var(--amber);}
+    .callout.danger {background:var(--red-bg);border-color:rgba(185,28,28,.2);color:var(--red);}
+    .callout.new    {background:var(--purple-bg);border-color:rgba(124,58,237,.2);color:var(--purple);}
+    .callout.ref    {background:#f0fdfa;border-color:rgba(14,116,144,.2);color:var(--teal);}
+
+    /* ── Table ── */
+    .table-wrap{overflow-x:auto;margin:12px 0 24px;border-radius:8px;
+      border:1px solid var(--border);box-shadow:var(--shadow-sm);}
+    table{width:100%;border-collapse:collapse;font-size:12.5px;}
+    thead tr{background:var(--navy);}
+    thead th{padding:10px 12px;text-align:left;font-size:10px;font-weight:700;
+      text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.82);white-space:nowrap;}
+    thead th.ciaa-col{color:#fcd34d;text-align:center;}
+    thead th.ref-col{color:#86efac;}
+    tbody tr{border-bottom:1px solid var(--border-soft);transition:background .1s;}
+    tbody tr:last-child{border-bottom:none;}
+    tbody tr:hover{background:#f8faff;}
+    tbody td{padding:9px 12px;color:var(--muted);vertical-align:top;line-height:1.5;}
+    tbody td strong{color:var(--text);}
+    tbody td.phase-col{font-size:11px;font-weight:600;white-space:nowrap;color:var(--faint);}
+
+    /* ── CIAA pills ── */
+    .ciaa-cell{text-align:center;white-space:nowrap;}
+    .ciaa-pill{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.05em;
+      padding:1px 6px;border-radius:10px;margin:1px;text-transform:uppercase;border:1px solid;}
+    .pill-c{background:#dbeafe;color:#1e40af;border-color:#bfdbfe;}   /* Confidentiality — blue */
+    .pill-i{background:#dcfce7;color:#15803d;border-color:#bbf7d0;}   /* Integrity — green */
+    .pill-a{background:#fef3c7;color:#92400e;border-color:#fde68a;}   /* Availability — amber */
+    .pill-aa{background:#fce7f3;color:#be185d;border-color:#fbcfe8;}  /* Authenticity — pink */
+
+    /* ── Reference link ── */
+    .ref-link{display:inline-flex;align-items:center;gap:4px;color:var(--accent);
+      font-size:11.5px;font-weight:500;text-decoration:none;transition:color .15s;
+      white-space:nowrap;}
+    .ref-link:hover{color:#1d4ed8;text-decoration:underline;}
+    .ref-link svg{flex-shrink:0;}
+    .ref-cell{display:flex;flex-direction:column;gap:4px;}
+
+    /* ── Badges ── */
+    .badge-new{display:inline-block;background:var(--purple-bg);color:var(--purple);
+      font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;
+      letter-spacing:.04em;text-transform:uppercase;margin-left:5px;vertical-align:middle;}
+    .badge-upd{display:inline-block;background:var(--green-bg);color:var(--green);
+      font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;
+      letter-spacing:.04em;text-transform:uppercase;margin-left:5px;vertical-align:middle;}
+    code{font-family:var(--mono);font-size:.82em;background:rgba(26,86,219,.08);color:var(--accent);
+      padding:1px 5px;border-radius:4px;border:1px solid rgba(26,86,219,.12);}
+
+    /* ── Legend ── */
+    .legend{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 28px;padding:14px 18px;
+      background:var(--surface);border:1px solid var(--border);border-radius:8px;}
+    .legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);}
+    .legend-label{font-weight:600;color:var(--text);}
+
+    /* ── Footer ── */
+    #footer{background:var(--navy);padding:20px 24px;display:flex;align-items:center;
+      justify-content:space-between;flex-wrap:wrap;gap:12px;
+      border-top:1px solid rgba(255,255,255,.06);margin-left:var(--sidebar-w);}
+    #footer a{color:rgba(255,255,255,.45);font-size:12px;text-decoration:none;
+      display:flex;align-items:center;gap:5px;transition:color .15s;}
+    #footer a:hover{color:rgba(255,255,255,.85);}
+    #footer p{color:rgba(255,255,255,.35);font-size:12px;margin:0;}
+
+    /* ── Series nav ── */
+    .series-nav{border-top:1px solid var(--border-soft);padding-top:36px;margin-top:48px;}
+    .snav-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:680px;}
+    .snav-card{display:flex;flex-direction:column;gap:5px;padding:16px 18px;background:var(--surface);
+      border:1px solid var(--border);border-radius:10px;text-decoration:none;
+      transition:border-color .15s,transform .15s;}
+    .snav-card:hover{border-color:var(--accent);transform:translateY(-2px);}
+    .snav-dir{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
+      color:var(--faint);display:flex;align-items:center;gap:5px;}
+    .snav-title{font-size:13px;font-weight:600;color:var(--text);line-height:1.35;}
+    .snav-sub{font-size:11.5px;color:var(--faint);}
+
+    /* SVG icon shortcut */
+    .icon-ext{display:inline-block;width:10px;height:10px;flex-shrink:0;}
+  </style>
+</head>
+<body>
+
+<!-- ── Topbar ── -->
+<div id="topbar">
+  <div class="tb-logo">AWS</div>
+  <div class="tb-crumb">
+    <a href="/"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M1 5.5L6 1l5 4.5V11H8V8H4v3H1z" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Home</a>
+    <span class="sep">/</span>
+    <a href="/AWS/AI/index.html">AWS / AI Services</a>
+    <span class="sep">/</span>
+    <span class="cur">MLOps Security Controls</span>
+  </div>
+  <div class="tb-spacer"></div>
+  <div class="tb-badge">Security Reference</div>
+</div>
+
+<div id="progress-bar"></div>
+
+<!-- ── Sidebar ── -->
+<div id="sidebar">
+  <a href="/AWS/AI/index.html" class="nav-back">
+    <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="8,2 3,6 8,10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    AWS / AI Services Guide
+  </a>
+  <div class="nav-section">
+    <div class="nav-label">Navigation</div>
+    <a href="/" class="nav-item">🏠 Home</a>
+    <a href="/AWS/AI/index.html" class="nav-item">← AWS / AI Services</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">ML Lifecycle Phases</div>
+    <a href="#phase1" class="nav-item">Phase 1 · Business Goal ID</a>
+    <a href="#phase2" class="nav-item">Phase 2 · ML Problem Framing</a>
+    <a href="#phase3" class="nav-item">Phase 3 · Data Processing</a>
+    <a href="#phase4" class="nav-item">Phase 4 · Model Development</a>
+    <a href="#phase5" class="nav-item">Phase 5 · Model Deployment</a>
+    <a href="#phase6" class="nav-item">Phase 6 · Model Monitoring</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Quick Jump — Services</div>
+    <a href="#phase1" class="nav-sub">IAM / Organizations / SCPs</a>
+    <a href="#phase2" class="nav-sub">SageMaker Studio / Clarify</a>
+    <a href="#phase3" class="nav-sub">S3 · Glue · EMR · Athena · Macie</a>
+    <a href="#phase4" class="nav-sub">SageMaker Training · CodeBuild</a>
+    <a href="#phase4" class="nav-sub">ECR · CodePipeline · Step Functions</a>
+    <a href="#phase5" class="nav-sub">SageMaker Endpoints · ECS · KMS</a>
+    <a href="#phase6" class="nav-sub">Model Monitor · GuardDuty · CW</a>
+    <a href="#phase6" class="nav-sub">Security Hub · Macie · EventBridge</a>
+  </div>
+</div>
+
+<!-- ── Main ── -->
+<div id="main">
+  <div id="hero">
+    <div class="hero-crumb">
+      <a href="/"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M1 5.5L6 1l5 4.5V11H8V8H4v3H1z" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Home</a>
+      <span class="sep">/</span>
+      <a href="/AWS/AI/index.html">AWS / AI Services</a>
+      <span class="sep">/</span>
+      <span class="cur">MLOps Security Controls</span>
+    </div>
+    <div class="hero-eyebrow">Security Reference · March 2026</div>
+    <h1>AWS MLOps Security Controls</h1>
+    <p class="subtitle">Security controls for production ML pipelines on AWS — structured by the 6 phases of the AWS Well-Architected ML Lifecycle, with CIAA security goal mapping and authoritative AWS reference links for each control.</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item"><div class="meta-label">Framework</div><div class="meta-value">AWS Well-Architected ML Lens (Nov 2025)</div></div>
+      <div class="hero-meta-item"><div class="meta-label">Services Covered</div><div class="meta-value">18 AWS Services</div></div>
+      <div class="hero-meta-item"><div class="meta-label">Security Model</div><div class="meta-value">CIAA — Confidentiality · Integrity · Availability · Authenticity</div></div>
+      <div class="hero-meta-item">
+        <div class="meta-label">Export</div>
+        <div class="meta-value" style="display:flex;gap:8px;">
+          <button onclick="exportToCSV()" style="background:rgba(255,153,0,.2);border:1px solid rgba(255,153,0,.4);color:var(--orange);padding:4px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans);">Export CSV</button>
+          <button onclick="window.print()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);padding:4px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans);">Print / PDF</button>
+        </div>
+      </div>
+    </div>
+    <a href="https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/machine-learning-lens.html" target="_blank" class="hero-ref">
+      <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M4 6h4M6 4v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      AWS Well-Architected Machine Learning Lens (Nov 2025) — Authoritative Source
+      <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+  </div>
+
+  <div id="content">
+
+    <!-- CIAA Legend -->
+    <div class="legend">
+      <span class="legend-label">CIAA Key:</span>
+      <span class="legend-item"><span class="ciaa-pill pill-c">C</span> Confidentiality — prevent unauthorised data disclosure</span>
+      <span class="legend-item"><span class="ciaa-pill pill-i">I</span> Integrity — ensure data/model accuracy and trustworthiness</span>
+      <span class="legend-item"><span class="ciaa-pill pill-a">A</span> Availability — maintain access and operational continuity</span>
+      <span class="legend-item"><span class="ciaa-pill pill-aa">Au</span> Authenticity — verify identity, origin, and provenance</span>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         PHASE 1 — BUSINESS GOAL IDENTIFICATION
+    ═══════════════════════════════════════════════════════ -->
+    <div class="phase-section" id="phase1">
+      <div class="phase-header">
+        <div class="phase-tag p1">Phase 1 of 6</div>
+        <h2 class="phase-title">Business Goal Identification</h2>
+        <p class="phase-desc">Identifying and prioritising the business problem, success criteria, and governance requirements before any data or model work begins. Security controls here focus on access governance, policy frameworks, and data classification — establishing the security perimeter for the entire ML project.</p>
+      </div>
+
+      <h3 class="service-title">AWS IAM &amp; AWS Organizations <span class="svc-badge">Governance</span></h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Service</th><th>Category</th><th>Control</th><th>Description</th><th>Implementation Guidance</th><th class="ciaa-col">CIAA</th><th class="ref-col">Reference</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>AWS IAM</strong></td><td>Access Governance</td><td>Least Privilege IAM Roles</td>
+            <td>Establish role-based access boundaries for all ML project participants</td>
+            <td>Define separate IAM roles for data scientists, ML engineers, approvers, and auditors. Apply permission boundaries to prevent privilege escalation from day one</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html" target="_blank" class="ref-link">IAM Best Practices<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>AWS Organizations / SCPs</strong></td><td>Access Governance</td><td>Service Control Policies</td>
+            <td>Enforce organisation-wide guardrails on ML accounts — deny dangerous operations at the root</td>
+            <td>Apply SCPs to deny: creation of public SageMaker endpoints, internet-accessible S3 buckets with ML data, and KMS key deletion without approval. Enforce tagging for all ML resources</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-i">I</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html" target="_blank" class="ref-link">SCP Guide<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>AWS Config</strong></td><td>Compliance</td><td>ML Baseline Config Rules</td>
+            <td>Continuously validate that ML infrastructure meets baseline security requirements</td>
+            <td>Enable AWS Config with conformance pack for ML: enforce S3 Block Public Access, KMS encryption on SageMaker, CloudTrail enabled, and VPC Flow Logs active before ML project begins</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-i">I</span><span class="ciaa-pill pill-a">A</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/config/latest/developerguide/managed-rules-by-aws-config.html" target="_blank" class="ref-link">AWS Config Rules<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         PHASE 2 — ML PROBLEM FRAMING
+    ═══════════════════════════════════════════════════════ -->
+    <div class="phase-section" id="phase2">
+      <div class="phase-header">
+        <div class="phase-tag p2">Phase 2 of 6</div>
+        <h2 class="phase-title">ML Problem Framing</h2>
+        <p class="phase-desc">Translating the business problem into an ML task — defining what is observed, what is predicted, and what success looks like. Security controls focus on the experimentation environment, notebook isolation, and preventing data exfiltration during exploratory analysis.</p>
+      </div>
+
+      <h3 class="service-title">Amazon SageMaker Studio / Domain <span class="svc-badge">Experimentation</span></h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Service</th><th>Category</th><th>Control</th><th>Description</th><th>Implementation Guidance</th><th class="ciaa-col">CIAA</th><th class="ref-col">Reference</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>SageMaker Domain</strong></td><td>Network Isolation</td><td>VPC-Only Domain Access <span class="badge-new">Critical</span></td>
+            <td>Prevent data exfiltration via Studio browser interface</td>
+            <td>Set <code>AppNetworkAccessType: VpcOnly</code> on the SageMaker Domain. Disable <code>EnableDirectInternetAccess</code> on all user profiles. Restrict notebook output sharing via <code>SharingSettings</code></td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-i">I</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/sagemaker/latest/dg/studio-notebooks-and-internet-access.html" target="_blank" class="ref-link">Studio Network Access<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>SageMaker Domain</strong></td><td>Access Management</td><td>IAM Identity Center Integration</td>
+            <td>Federated user identity management for Studio access</td>
+            <td>Use AWS IAM Identity Center (SSO) for user profile provisioning. Align Studio profiles with enterprise identity groups. Apply per-profile resource isolation via execution role permissions</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/sagemaker/latest/dg/domain-user-profile-add-remove.html" target="_blank" class="ref-link">Domain User Profiles<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>SageMaker Clarify</strong></td><td>Governance</td><td>Pre-Training Bias Analysis</td>
+            <td>Detect bias in datasets before model development begins</td>
+            <td>Run SageMaker Clarify pre-training bias analysis on proposed training datasets. Document findings in Model Card. Block training on datasets that fail bias thresholds without compliance sign-off</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/sagemaker/latest/dg/clarify-detect-data-bias.html" target="_blank" class="ref-link">Clarify Bias Detection<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+                      <tr>
+            <td><strong>SageMaker Domain</strong></td><td>Runtime Security</td><td>Lifecycle Configurations <span class="badge-new">New</span></td>
+            <td>Security hardening scripts that run when Studio instances start</td>
+            <td>Implement LCC scripts to: restrict package installations to approved sources, enforce security tooling, configure audit logging at instance start. Apply via Domain or User Profile scope</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span><span class="ciaa-pill pill-a">A</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/sagemaker/latest/dg/studio-lcc.html" target="_blank" class="ref-link">Studio Lifecycle Config<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>SageMaker Domain</strong></td><td>Network Security</td><td>Security Group Restrictions <span class="badge-new">New</span></td>
+            <td>Allow-list based inbound/outbound security group rules for Studio instances</td>
+            <td>Configure security groups with deny-all default; allow only required ports (443 to VPC endpoints, NFS for EFS). Separate security groups for primary and secondary network interfaces</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-a">A</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/sagemaker/latest/dg/studio-notebooks-and-internet-access.html" target="_blank" class="ref-link">Studio Network Security<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <td><strong>AWS CloudTrail</strong></td><td>Monitoring</td><td>Data Access Audit During Exploration</td>
+            <td>Maintain audit trail of all data access during problem framing</td>
+            <td>Enable CloudTrail with S3 data events on exploration data buckets. Log all <code>GetObject</code> and <code>SelectObjectContent</code> API calls to detect inappropriate data access during early ML experimentation</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-i">I</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/awscloudtrail/latest/userguide/logging-data-events-with-cloudtrail.html" target="_blank" class="ref-link">CloudTrail Data Events<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         PHASE 3 — DATA PROCESSING
+    ═══════════════════════════════════════════════════════ -->
+    <div class="phase-section" id="phase3">
+      <div class="phase-header">
+        <div class="phase-tag p3">Phase 3 of 6</div>
+        <h2 class="phase-title">Data Processing</h2>
+        <p class="phase-desc">Collecting, integrating, preparing, and engineering features from data sources. This phase has the largest attack surface: sensitive data is at rest and in motion, pipelines are complex, and PII/PHI exposure risk is highest.</p>
+      </div>
+
+      <h3 class="service-title">Amazon S3 <span class="svc-badge">Data Lake</span></h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Service</th><th>Category</th><th>Control</th><th>Description</th><th>Implementation Guidance</th><th class="ciaa-col">CIAA</th><th class="ref-col">Reference</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Amazon S3</strong></td><td>Access Management</td><td>Bucket Policies (Least Privilege)</td>
+            <td>Restrict access to ML training data to authorised roles only</td>
+            <td>Enforce <code>aws:SecureTransport</code>, <code>aws:SourceVpc</code>, and deny <code>s3:PutObject</code> without SSE-KMS header in bucket policy</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-iam-policies.html" target="_blank" class="ref-link">S3 IAM Policies<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>Amazon S3</strong></td><td>Data Protection</td><td>SSE-KMS Default Encryption</td>
+            <td>Encrypt all ML training data objects at rest</td>
+            <td>Set bucket default encryption to SSE-KMS with customer managed key. Deny uploads without <code>x-amz-server-side-encryption-aws-kms-key-id</code> header</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/serv-side-encryption.html" target="_blank" class="ref-link">S3 Encryption<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>Amazon S3</strong></td><td>Data Protection</td><td>Versioning + MFA Delete <span class="badge-upd">Updated</span></td>
+            <td>Protect dataset lineage; prevent irreversible deletion of training data</td>
+            <td>Enable versioning AND MFA Delete on production ML data buckets. Enable MFA Delete via AWS CLI with root credentials only: <code>aws s3api put-bucket-versioning ... MFADelete=Enabled</code></td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span><span class="ciaa-pill pill-a">A</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html" target="_blank" class="ref-link">S3 Versioning<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>Amazon S3</strong></td><td>Data Protection</td><td>Object Lock (WORM)</td>
+            <td>Immutable retention for regulatory ML datasets</td>
+            <td>Apply Compliance mode Object Lock for regulated datasets. Set retention period matching data lineage requirements. Use Governance mode for standard ML datasets</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span><span class="ciaa-pill pill-a">A</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html" target="_blank" class="ref-link">S3 Object Lock<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>Amazon S3</strong></td><td>Network Security</td><td>VPC Endpoints (Interface for audit) <span class="badge-upd">Updated</span></td>
+            <td>Private access; Interface Endpoint required for VPC Flow Log auditability</td>
+            <td>Gateway Endpoint: standard access, no cost, NOT in VPC Flow Logs. Interface Endpoint (PrivateLink): required for regulated data — appears in Flow Logs, supports cross-account Access Points</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-i">I</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/privatelink-interface-endpoints.html" target="_blank" class="ref-link">S3 PrivateLink<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>Amazon S3</strong></td><td>Network Security</td><td>Block Public Access</td>
+            <td>Prevent accidental public exposure of ML training data</td>
+            <td>Enable all four S3 Block Public Access settings at account and bucket level. Enforce via AWS Config rule <code>s3-bucket-level-public-access-prohibited</code></td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html" target="_blank" class="ref-link">Block Public Access<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+        </tbody>
+      </table></div>
+
+      <h3 class="service-title">Amazon Macie <span class="svc-badge">PII Discovery</span></h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Service</th><th>Category</th><th>Control</th><th>Description</th><th>Implementation Guidance</th><th class="ciaa-col">CIAA</th><th class="ref-col">Reference</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Amazon Macie</strong></td><td>Data Discovery</td><td>Automated Sensitive Data Discovery <span class="badge-new">New</span></td>
+            <td>Continuously discover PII/PHI in ML training datasets</td>
+            <td>Enable Macie with automated sensitive data discovery on all S3 ML data buckets. Schedule daily discovery jobs on data ingestion buckets. Export findings to Security Hub</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/macie/latest/user/what-is-macie.html" target="_blank" class="ref-link">Amazon Macie<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>Amazon Macie</strong></td><td>Data Discovery</td><td>Custom Data Identifiers</td>
+            <td>Domain-specific sensitive data detection for ML datasets</td>
+            <td>Create custom identifiers for employee IDs, patient record numbers, proprietary model identifiers, and API keys. Supplement built-in PII/PHI detectors</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/macie/latest/user/custom-data-identifiers.html" target="_blank" class="ref-link">Custom Identifiers<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+        </tbody>
+      </table></div>
+
+                <tr>
+            <td><strong>Amazon S3</strong></td><td>Data Protection</td><td>TLS 1.2+ + aws:TLSVersion Enforcement <span class="badge-upd">Updated</span></td>
+            <td>Deny HTTP and enforce minimum TLS version via bucket policy</td>
+            <td>Add both conditions in bucket policy: <code>aws:SecureTransport: false</code> (deny HTTP) and <code>aws:TLSVersion</code> &lt; 1.2 (deny old TLS). The TLSVersion condition key was added in 2021 and is separate from SecureTransport</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-i">I</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/security-best-practices.html" target="_blank" class="ref-link">S3 Best Practices<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>Amazon S3</strong></td><td>Access Management</td><td>Object Tagging + ABAC <span class="badge-new">New</span></td>
+            <td>Attribute-based access control for ML data classification using S3 object tags</td>
+            <td>Tag objects with data classification (PII, PHI, Confidential, Public). Use IAM condition <code>s3:ExistingObjectTag</code> to enforce ABAC policies based on tags — separate access tiers for different data sensitivities</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-tagging.html" target="_blank" class="ref-link">S3 Object Tagging<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>Amazon S3</strong></td><td>Data Protection</td><td>Cross-Region Replication with KMS <span class="badge-new">New</span></td>
+            <td>Encrypted CRR for disaster recovery of critical ML artefacts</td>
+            <td>Configure CRR with SSE-KMS using a customer managed key; enable Object Lock replication for immutable backup. Ensure destination bucket policy enforces SSE-KMS</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-a">A</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/replication.html" target="_blank" class="ref-link">S3 Replication<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+
+      <h3 class="service-title">AWS Glue &amp; Amazon Athena <span class="svc-badge">ETL / Query</span></h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Service</th><th>Category</th><th>Control</th><th>Description</th><th>Implementation Guidance</th><th class="ciaa-col">CIAA</th><th class="ref-col">Reference</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>AWS Glue</strong></td><td>Access Management</td><td>IAM Roles (Least Privilege)</td>
+            <td>Scope ETL job permissions to required resources only</td>
+            <td>Create job-specific roles; separate roles for catalogue access, S3 read, and S3 write. Deny wildcard <code>*</code> resource on all Glue job roles</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/glue/latest/dg/glue-iam.html" target="_blank" class="ref-link">Glue IAM<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>AWS Glue</strong></td><td>Access Control</td><td>Lake Formation Column/Row Security <span class="badge-new">New</span></td>
+            <td>Fine-grained access control on ML training data below bucket level</td>
+            <td>Configure Lake Formation column-level permissions for regulated Glue Data Catalog tables accessed by Glue ETL jobs. Use LF-Tags for attribute-based access control. Enable LF audit logging</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/lake-formation/latest/dg/column-level-security.html" target="_blank" class="ref-link">LF Column Security<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>AWS Glue</strong></td><td>Data Protection</td><td>Encryption at Rest (Security Config)</td>
+            <td>Encrypt Data Catalog metadata, job bookmarks, and ETL results</td>
+            <td>Enable KMS encryption via Glue Security Configuration for Data Catalog, CloudWatch Logs, job bookmarks, and S3 data stores</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/glue/latest/dg/encryption-security-configuration.html" target="_blank" class="ref-link">Glue Security Config<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>Amazon Athena</strong></td><td>Access Management</td><td>Workgroup Isolation</td>
+            <td>Isolate query environments per ML team and data sensitivity tier</td>
+            <td>Create separate workgroups for data scientists and ML engineers. Enforce workgroup membership via IAM. Set per-workgroup result encryption and data usage limits</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/athena/latest/ug/manage-queries-control-costs-with-workgroups.html" target="_blank" class="ref-link">Athena Workgroups<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+                  <tr>
+            <td><strong>AWS Glue</strong></td><td>Access Control</td><td>Lake Formation Cell-Level Security (Row Filter)</td>
+            <td>Row-level access control on ML training datasets</td>
+            <td>Configure Lake Formation row-level security filters for Glue Data Catalog tables; create row filter expressions per IAM role — restricts data scientists to rows matching their authorised data scope</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/lake-formation/latest/dg/row-level-security.html" target="_blank" class="ref-link">Row-Level Security</a></div></td>
+          </tr>
+</tbody>
+      </table></div>
+
+      <h3 class="service-title">AWS EMR <span class="svc-badge">Large-Scale Processing</span></h3>
+      <div class="callout warning"><div class="callout-icon">⚠</div><div class="callout-body"><strong>Encryption guidance varies by EMR deployment model.</strong> LUKS applies to EMR on EC2 only. EMR Serverless uses managed KMS encryption. EMR on EKS uses Kubernetes storage class encryption.</div></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Service</th><th>Category</th><th>Control</th><th>Description</th><th>Implementation Guidance</th><th class="ciaa-col">CIAA</th><th class="ref-col">Reference</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>EMR on EC2</strong></td><td>Data Protection</td><td>LUKS + EMRFS KMS Encryption <span class="badge-upd">Updated</span></td>
+            <td>Encrypt local disk and S3 data for EC2-based ML processing clusters</td>
+            <td>Use EMR Security Configuration with LUKS for local disk and SSE-KMS for EMRFS (S3) data. Set <code>EnableAtRestEncryption: true</code> with customer managed key ARN</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-data-encryption-options.html" target="_blank" class="ref-link">EMR Encryption<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>EMR Serverless</strong></td><td>Data Protection</td><td>Customer KMS Key <span class="badge-new">New</span></td>
+            <td>Customer-controlled encryption for Serverless ML jobs</td>
+            <td>Specify customer managed key in <code>CreateApplication</code> <code>encryptionConfiguration</code>. Required for regulated ML workloads on Serverless</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/emr/latest/EMR-Serverless-UserGuide/security.html" target="_blank" class="ref-link">EMR Serverless Security<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>AWS EMR</strong></td><td>Authentication</td><td>Kerberos Authentication</td>
+            <td>Strong multi-principal cluster authentication for EMR on EC2</td>
+            <td>Enable Kerberos with dedicated KDC. Integrate with Active Directory for enterprise user authentication. Required for multi-tenant ML processing clusters</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-kerberos.html" target="_blank" class="ref-link">EMR Kerberos<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>AWS EMR</strong></td><td>Access Control</td><td>Lake Formation Fine-Grained Access <span class="badge-new">New</span></td>
+            <td>Column/row-level security for regulated ML training data via EMR</td>
+            <td>Grant EMR job roles Lake Formation permissions (not direct S3 bucket permissions) for regulated Glue Data Catalog tables. Enable LF audit logging</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/lake-formation/latest/dg/emr-lakeformation.html" target="_blank" class="ref-link">LF + EMR<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         PHASE 4 — MODEL DEVELOPMENT
+    ═══════════════════════════════════════════════════════ -->
+    <div class="phase-section" id="phase4">
+      <div class="phase-header">
+        <div class="phase-tag p4">Phase 4 of 6</div>
+        <h2 class="phase-title">Model Development</h2>
+        <p class="phase-desc">Building, <strong>training</strong>, tuning, and evaluating ML models with CI/CD pipelines and experiment tracking. Security controls focus on training job isolation, container supply chain, CI/CD pipeline integrity, and model artefact provenance.</p>
+      </div>
+
+      <h3 class="service-title">Amazon SageMaker Training <span class="svc-badge">Training</span></h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Service</th><th>Category</th><th>Control</th><th>Description</th><th>Implementation Guidance</th><th class="ciaa-col">CIAA</th><th class="ref-col">Reference</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>SageMaker Training</strong></td><td>Network Security</td><td>VPC Isolation for Training Jobs</td>
+            <td>Prevent training data exfiltration via internet access during training</td>
+            <td>Set <code>EnableNetworkIsolation: true</code> and <code>DisableInternetAccess: true</code> on all training jobs. Route all traffic via VPC endpoints for S3, ECR, and KMS</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-i">I</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/sagemaker/latest/dg/train-vpc.html" target="_blank" class="ref-link">Training VPC Config<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>SageMaker Training</strong></td><td>Data Protection</td><td>Encryption at Rest (KMS)</td>
+            <td>Encrypt training data volumes and model artefacts</td>
+            <td>Specify <code>VolumeKmsKeyId</code> (customer managed key) in <code>CreateTrainingJob</code>. Enable <code>OutputDataConfig.KmsKeyId</code> for model output encryption</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/sagemaker/latest/dg/encryption-at-rest.html" target="_blank" class="ref-link">SageMaker Encryption<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>SageMaker Training</strong></td><td>Data Protection</td><td>Inter-Container Traffic Encryption</td>
+            <td>Encrypt data exchanged between nodes in distributed training</td>
+            <td>Set <code>EnableInterContainerTrafficEncryption: true</code> in <code>CreateTrainingJob</code>. Required for distributed training jobs handling sensitive data across multiple instances</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-i">I</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/sagemaker/latest/dg/train-encrypt.html" target="_blank" class="ref-link">Inter-Container Encryption<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>SageMaker</strong></td><td>Supply Chain</td><td>Private ECR Container Images <span class="badge-new">New</span></td>
+            <td>Prevent use of untrusted public images in training jobs</td>
+            <td>Apply SCP denying <code>sagemaker:CreateTrainingJob</code> with image URIs not from your private ECR registry. Pull and re-tag approved public base images to private ECR before use</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/sagemaker/latest/dg/your-algorithms-containers-inference.html" target="_blank" class="ref-link">Custom Containers<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>SageMaker Experiments</strong></td><td>Governance</td><td>Experiment Tracking &amp; Lineage</td>
+            <td>Maintain auditable record of all training runs and parameters</td>
+            <td>Use SageMaker Experiments to log all training parameters, metrics, and artefact locations. Enable SageMaker ML Lineage Tracking for full data-to-model provenance</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/sagemaker/latest/dg/experiments.html" target="_blank" class="ref-link">SageMaker Experiments<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+        </tbody>
+      </table></div>
+
+                <tr>
+            <td><strong>SageMaker Training</strong></td><td>Data Integrity</td><td>Training Dataset Validation (pre-job) <span class="badge-new">New</span></td>
+            <td>Validate dataset integrity with checksums before training job starts</td>
+            <td>Compute SHA-256 checksums of training datasets at ingestion; re-verify before CreateTrainingJob. Use SageMaker Processing Job for automated pre-training validation pipeline step</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/sagemaker/latest/dg/processing-job.html" target="_blank" class="ref-link">SageMaker Processing<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>SageMaker Training</strong></td><td>Data Integrity</td><td>Model Artefact Checksum Validation <span class="badge-new">New</span></td>
+            <td>Cryptographic validation of model checkpoints and output artefacts</td>
+            <td>Generate and store SHA-256 checksums for all model artefacts at training completion. Verify checksums before model registration and deployment. Store checksums in a separate S3 bucket with Object Lock</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/sagemaker/latest/dg/model-access-training-data.html" target="_blank" class="ref-link">Model Artefacts<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>SageMaker Training</strong></td><td>Resource Control</td><td>Job Timeout — MaxRuntimeInSeconds <span class="badge-new">New</span></td>
+            <td>Prevent runaway training jobs consuming unbounded resources</td>
+            <td>Set <code>MaxRuntimeInSeconds</code> and <code>MaxWaitTimeInSeconds</code> on all <code>CreateTrainingJob</code> calls. Configure CloudWatch billing alarms. SageMaker will stop the job and set status to <code>Stopped</code> on expiry</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-a">A</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/sagemaker/latest/dg/automatic-model-tuning-early-stopping.html" target="_blank" class="ref-link">Early Stopping<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1LVW5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+
+      <h3 class="service-title">Amazon ECR &amp; AWS CodeBuild <span class="svc-badge">CI/CD &amp; Containers</span></h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Service</th><th>Category</th><th>Control</th><th>Description</th><th>Implementation Guidance</th><th class="ciaa-col">CIAA</th><th class="ref-col">Reference</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Amazon ECR</strong></td><td>Image Security</td><td>Enhanced Scanning (Inspector v2) <span class="badge-upd">Updated</span></td>
+            <td>Continuous OS and language package vulnerability scanning on ML container images</td>
+            <td>Enable Enhanced Scanning at registry level (not legacy Basic Scanning). Set scan frequency to CONTINUOUS for production ML repos. Alert and block pipeline on CRITICAL findings. Covers Python, Node, Java packages in ML images</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-scanning-enhanced.html" target="_blank" class="ref-link">ECR Enhanced Scanning<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>Amazon ECR</strong></td><td>Image Integrity</td><td>Tag Immutability</td>
+            <td>Prevent image tag overwriting on production ML container versions</td>
+            <td>Enable tag immutability on all production ML image repositories. Use semantic versioning. Never use <code>latest</code> tag in production training or inference jobs</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-tag-mutability.html" target="_blank" class="ref-link">ECR Tag Immutability<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>Amazon ECR</strong></td><td>Image Integrity</td><td>Image Signing (Notation / AWS Signer) <span class="badge-new">New</span></td>
+            <td>Cryptographic supply chain integrity for ML container images</td>
+            <td>Create AWS Signer signing profile. Sign all production ML images in CodeBuild/CodePipeline using Notation CLI. Configure ECS/EKS admission controller to reject unsigned images</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/signer/latest/developerguide/container-signing.html" target="_blank" class="ref-link">AWS Signer (Notation)<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>AWS CodeBuild</strong></td><td>Build Integrity</td><td>SAST / SCA Scanning</td>
+            <td>Shift-left vulnerability detection in ML code and dependencies</td>
+            <td>Integrate Semgrep (SAST) and Trivy/Syft (SCA) as CodeBuild build phases. Fail build on CRITICAL severity findings before ECR push</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html" target="_blank" class="ref-link">CodeBuild Buildspec<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>AWS CodeBuild</strong></td><td>Build Integrity</td><td>Inspector v2 CodeBuild Integration <span class="badge-new">New</span></td>
+            <td>Container image scanning during build — before ECR push</td>
+            <td>Set <code>INSPECTOR_SBOM_GENERATOR</code> env var; include Inspector scan step in buildspec.yml. Configure build to fail on CRITICAL CVEs. This is shift-left scanning before images reach the registry</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/inspector/latest/user/scanning-cicd.html" target="_blank" class="ref-link">Inspector CI/CD Scanning<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>AWS CodeBuild</strong></td><td>Secret Management</td><td>Secrets Manager / Parameter Store</td>
+            <td>No plaintext secrets in build environment</td>
+            <td>Reference secrets via <code>parameter-store</code> or <code>secrets-manager</code> blocks in buildspec. Never hardcode credentials in buildspec.yml or CodeBuild environment variables</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html#build-spec.env.secrets-manager" target="_blank" class="ref-link">Secrets in Buildspec<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+        </tbody>
+      </table></div>
+
+                <tr>
+            <td><strong>Amazon ECR</strong></td><td>Data Protection</td><td>Encrypted Cross-Region Replication <span class="badge-new">New</span></td>
+            <td>DR replication of ML container images with KMS encryption</td>
+            <td>Configure ECR replication rules with KMS encryption in destination region; ensure destination registry policies match source restrictions on push/pull</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-a">A</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/AmazonECR/latest/userguide/replication.html" target="_blank" class="ref-link">ECR Replication<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>Amazon ECR</strong></td><td>Access Management</td><td>Least-Privilege Cross-Account Access (RAM + STS) <span class="badge-new">New</span></td>
+            <td>Secure cross-account ML image sharing with temporary credentials</td>
+            <td>Use AWS Resource Access Manager for cross-account ECR sharing; scope to specific account IDs via resource policy conditions; use temporary STS credentials — deny permanent cross-account IAM roles for ECR access</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/AmazonECR/latest/userguide/repository-policy-examples.html" target="_blank" class="ref-link">ECR Policy Examples<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+
+      <h3 class="service-title">Source Control Security <span class="svc-badge badge-upd" style="background:var(--green-bg);color:var(--green);">Replaces CodeCommit (EOL)</span></h3>
+      <div class="callout danger"><div class="callout-icon">🚫</div><div class="callout-body"><strong>AWS CodeCommit is End-of-Life.</strong> As of July 25, 2024, CodeCommit is unavailable to new customers. Use AWS CodeConnections to integrate with GitHub, GitLab, or Bitbucket.</div></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Service</th><th>Category</th><th>Control</th><th>Description</th><th>Implementation Guidance</th><th class="ciaa-col">CIAA</th><th class="ref-col">Reference</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>AWS CodeConnections</strong></td><td>Access Management</td><td>CodeConnections IAM Policy</td>
+            <td>Restrict which Git providers and repositories can connect to AWS CI/CD</td>
+            <td>Deny <code>codestar-connections:CreateConnection</code> for unapproved provider types via SCP. Scope connection ARNs in CodePipeline source action IAM policies</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/dtconsole/latest/userguide/security-iam.html" target="_blank" class="ref-link">CodeConnections IAM<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>GitHub / GitLab</strong></td><td>Code Security</td><td>Branch Protection + Signed Commits</td>
+            <td>Prevent unauthorised direct commits to ML model code branches</td>
+            <td>Require PR reviews (minimum 2 for model code), status checks, and GPG/SSH-signed commits on main/release branches. Reject unsigned commits to protected branches</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches" target="_blank" class="ref-link">Branch Protection<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>GitHub / GitLab</strong></td><td>Code Security</td><td>Secret Scanning</td>
+            <td>Detect accidental credential commits in ML code</td>
+            <td>Enable native secret scanning; configure custom patterns for AWS key prefixes (AKIA, ASIA); block pushes containing detected secrets. Block merges with unpatched CRITICAL dependencies</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.github.com/en/code-security/secret-scanning/about-secret-scanning" target="_blank" class="ref-link">Secret Scanning<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>CI/CD</strong></td><td>Authentication</td><td>OIDC-based AWS Authentication</td>
+            <td>Eliminate long-lived AWS credentials from CI/CD pipelines</td>
+            <td>Configure GitHub Actions / GitLab CI with OIDC federation to AWS IAM roles via <code>sts:AssumeRoleWithWebIdentity</code>. Scope <code>sub</code> condition to specific repository and branch</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_oidc.html" target="_blank" class="ref-link">OIDC Identity Provider<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+        </tbody>
+      </table></div>
+
+      <h3 class="service-title">AWS CodePipeline &amp; AWS Step Functions <span class="svc-badge">Orchestration</span></h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Service</th><th>Category</th><th>Control</th><th>Description</th><th>Implementation Guidance</th><th class="ciaa-col">CIAA</th><th class="ref-col">Reference</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>CodePipeline</strong></td><td>Access Management</td><td>Manual Approval Actions</td>
+            <td>Enforce human review of ML model promotions</td>
+            <td>Configure mandatory approval action before production deploy. Restrict <code>codepipeline:PutApprovalResult</code> to designated approver roles only. Set approval expiry</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/codepipeline/latest/userguide/approvals.html" target="_blank" class="ref-link">Pipeline Approvals<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>CodePipeline</strong></td><td>Data Protection</td><td>Artefact Encryption (KMS)</td>
+            <td>Encrypt model artefacts passing between pipeline stages</td>
+            <td>Enable KMS customer managed key on pipeline artefact S3 bucket. Deny artefact bucket access without encryption context via bucket policy</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-i">I</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/codepipeline/latest/userguide/data-protection.html" target="_blank" class="ref-link">CodePipeline Encryption<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>Step Functions</strong></td><td>Data Protection</td><td>Input/Output Filtering</td>
+            <td>Minimise sensitive data exposure between ML workflow states</td>
+            <td>Use <code>InputPath</code>, <code>OutputPath</code>, and <code>ResultSelector</code> to pass only required data between states. Never pass full dataset objects through state machine input/output</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/step-functions/latest/dg/concepts-input-output-filtering.html" target="_blank" class="ref-link">Step Functions I/O<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         PHASE 5 — MODEL DEPLOYMENT
+    ═══════════════════════════════════════════════════════ -->
+    <div class="phase-section" id="phase5">
+      <div class="phase-header">
+        <div class="phase-tag p5">Phase 5 of 6</div>
+        <h2 class="phase-title">Model Deployment</h2>
+        <p class="phase-desc">Deploying trained models into production — real-time endpoints, batch transform, serverless, and edge. Security controls focus on endpoint authentication, network isolation, secrets management, container runtime hardening, and model artefact integrity at deploy time.</p>
+      </div>
+
+      <h3 class="service-title">Amazon SageMaker Endpoints <span class="svc-badge">Inference</span></h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Service</th><th>Category</th><th>Control</th><th>Description</th><th>Implementation Guidance</th><th class="ciaa-col">CIAA</th><th class="ref-col">Reference</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>SageMaker Endpoints</strong></td><td>Network Security</td><td>VPC-Only Endpoints</td>
+            <td>Expose inference endpoints only within VPC — not to public internet</td>
+            <td>Deploy endpoints with VPC configuration specifying private subnets and security groups. Use <code>com.amazonaws.region.sagemaker.runtime</code> Interface Endpoint for internal callers</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-a">A</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/sagemaker/latest/dg/host-vpc.html" target="_blank" class="ref-link">Endpoint VPC Config<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>SageMaker Model Registry</strong></td><td>Governance</td><td>Approval Workflow</td>
+            <td>Gated model promotion from staging to production</td>
+            <td>Require manual approval in Model Registry before production stage. Restrict <code>sagemaker:UpdateModelPackage</code> to approver roles only. Log all approvals via CloudTrail</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/sagemaker/latest/dg/model-registry-approve.html" target="_blank" class="ref-link">Model Registry Approval<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>SageMaker Model Registry</strong></td><td>Governance</td><td>Multi-Party Approval Workflow <span class="badge-new">New</span></td>
+            <td>Require multiple approvers for model version transitions to production</td>
+            <td>Require minimum 2 approvers in Model Registry; restrict <code>sagemaker:UpdateModelPackage</code> to designated approver roles; set approval expiry; log all approval events via CloudTrail</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/sagemaker/latest/dg/model-registry-approve.html" target="_blank" class="ref-link">Model Registry Approval<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>SageMaker Model Registry</strong></td><td>Governance</td><td>Secure Cross-Account Model Sharing (RAM) <span class="badge-new">New</span></td>
+            <td>Controlled cross-account model package sharing via AWS Resource Access Manager</td>
+            <td>Use AWS RAM for cross-account model package sharing; restrict sharing policy to approved account IDs; use SCPs to enforce account-level sharing boundaries; deny permanent cross-account access</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/sagemaker/latest/dg/model-registry-cross-account-groups.html" target="_blank" class="ref-link">Cross-Account Models<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>SageMaker</strong></td><td>Governance</td><td>Model Cards</td>
+            <td>Document model intended use, risk profile, and governance</td>
+            <td>Create Model Cards capturing training data, evaluation results, intended use, limitations, and ethical considerations. Required for regulated ML deployments</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/sagemaker/latest/dg/model-cards.html" target="_blank" class="ref-link">SageMaker Model Cards<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+        </tbody>
+      </table></div>
+
+                <tr>
+            <td><strong>SageMaker Endpoints</strong></td><td>Authentication</td><td>Mutual TLS (mTLS) Service-to-Service <span class="badge-new">New</span></td>
+            <td>Bidirectional certificate authentication for service-to-service endpoint invocations</td>
+            <td>Configure mTLS using ACM Private CA for client certificates. Deploy client cert distribution to authorised services. Validate client certificate in inference container or via API Gateway mTLS fronting the endpoint</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/sagemaker/latest/dg/host-vpc.html" target="_blank" class="ref-link">SageMaker Endpoint VPC<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>SageMaker Endpoints</strong></td><td>Security</td><td>Input Validation + Schema Enforcement <span class="badge-new">New</span></td>
+            <td>Strict schema validation and input sanitisation before model inference</td>
+            <td>Implement input validation in inference container entry point before model.predict() is called. Validate data types, value ranges, and feature counts. Return 400 on validation failure — never pass invalid inputs to the model</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/sagemaker/latest/dg/your-algorithms-inference-code.html" target="_blank" class="ref-link">Inference Container<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>SageMaker Endpoints</strong></td><td>Availability</td><td>AWS Shield Advanced (DDoS Protection) <span class="badge-new">New</span></td>
+            <td>DDoS protection for ML inference endpoints exposed via ALB or API Gateway</td>
+            <td>Enable AWS Shield Advanced for ALB/API Gateway fronting SageMaker endpoints. Configure DDoS Response Team (DRT) access. Enable SRT IAM role for incident response. Monitor Shield metrics in CloudWatch</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-a">A</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/waf/latest/developerguide/shield-chapter.html" target="_blank" class="ref-link">AWS Shield<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+
+      <h3 class="service-title">Amazon ECS, AWS Lambda &amp; AWS KMS <span class="svc-badge">Runtime &amp; Keys</span></h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Service</th><th>Category</th><th>Control</th><th>Description</th><th>Implementation Guidance</th><th class="ciaa-col">CIAA</th><th class="ref-col">Reference</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Amazon ECS</strong></td><td>Container Security</td><td>Read-Only Root Filesystem</td>
+            <td>Prevent container filesystem modification at runtime</td>
+            <td>Set <code>readonlyRootFilesystem: true</code> in task definition. Mount writable volumes only for required temp directories. Use awsvpc network mode</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html#container_definition_security" target="_blank" class="ref-link">ECS Container Security<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>AWS Lambda</strong></td><td>Secret Management</td><td>Secrets Manager Extension <span class="badge-upd">Updated</span></td>
+            <td>Zero-plaintext secrets for ML inference Lambda functions</td>
+            <td>Use AWS Parameters and Secrets Lambda Extension for cached, zero-code secret retrieval from Secrets Manager or SSM. Do NOT use KMS-encrypted environment variables for secrets</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/secretsmanager/latest/userguide/retrieving-secrets_lambda.html" target="_blank" class="ref-link">Lambda Secrets Extension<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>AWS Lambda</strong></td><td>Data Protection</td><td>Code Signing</td>
+            <td>Cryptographic integrity check for deployed Lambda function packages</td>
+            <td>Enable Code Signing with AWS Signer. Set policy to ENFORCE (reject unsigned deployments). Configure signing profile per environment (dev/staging/prod)</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-codesigning.html" target="_blank" class="ref-link">Lambda Code Signing<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>AWS Lambda</strong></td><td>Access Management</td><td>Resource Policy — Confused Deputy Prevention</td>
+            <td>Prevent confused deputy attacks when Lambda is invoked by AWS services</td>
+            <td>Add <code>aws:SourceArn</code> and <code>aws:SourceAccount</code> conditions to Lambda resource policies. Without these, any resource in the account matching the service principal can trigger the function — a confused deputy vulnerability</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/lambda/latest/dg/access-control-resource-based.html" target="_blank" class="ref-link">Lambda Resource Policies</a></div></td>
+          </tr>
+          <tr>
+            <td><strong>AWS KMS</strong></td><td>Key Management</td><td>Automatic Key Rotation <span class="badge-upd">Updated</span></td>
+            <td>Limit impact of key material compromise for ML data keys</td>
+            <td>Enable automatic rotation with configurable period (90–2560 days; default 365 days since 2023). Rotation does not re-encrypt existing data; old versions are retained for decryption</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/kms/latest/developerguide/rotate-keys.html" target="_blank" class="ref-link">KMS Key Rotation<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>AWS KMS</strong></td><td>Key Management</td><td>Key Deletion Protection <span class="badge-upd">Updated</span></td>
+            <td>Prevent irreversible loss of ML data via accidental key deletion</td>
+            <td>Set maximum 30-day waiting period for all ML data keys. Create CloudWatch alarm on <code>ScheduleKeyDeletion</code>. Add deny policy for deletion except from break-glass role. <strong>Deleting a KMS key permanently destroys all encrypted data.</strong></td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-a">A</span><span class="ciaa-pill pill-i">I</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/kms/latest/developerguide/deleting-keys.html" target="_blank" class="ref-link">KMS Key Deletion<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>AWS KMS</strong></td><td>Key Security</td><td>Encryption Context (EncryptionContext Binding)</td>
+            <td>Additional binding between encrypted data and metadata — context must match at decrypt time</td>
+            <td>Include <code>EncryptionContext</code> on all KMS encrypt/decrypt operations (e.g. <code>{"env":"prod","model":"churn-v3"}</code>). Must match at decrypt — prevents ciphertext being decrypted in wrong context. Enforce via <code>kms:EncryptionContextKeys</code> condition in key policy</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#encrypt_context" target="_blank" class="ref-link">Encryption Context</a></div></td>
+          </tr>
+          <tr>
+            <td><strong>AWS KMS</strong></td><td>Monitoring</td><td>Key Usage Anomaly Detection</td>
+            <td>CloudWatch metric filters detecting abnormal KMS usage indicating compromise or exfiltration</td>
+            <td>Create CloudWatch metric filters on CloudTrail KMS events: alert on <code>Decrypt</code> volume spikes &gt;2σ (potential exfiltration), off-hours <code>ScheduleKeyDeletion</code>, and <code>DisableKey</code> from unexpected principals</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-i">I</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/kms/latest/developerguide/monitoring-overview.html" target="_blank" class="ref-link">KMS Monitoring</a></div></td>
+          </tr>
+        </tbody>
+      </table></div>
+    </div>
+
+
+
+    <h3 class="service-title">Amazon API Gateway <span class="svc-badge">Inference Access Layer</span></h3>
+    <div class="callout note"><div class="callout-icon">ℹ</div><div class="callout-body"><strong>API Gateway is the recommended layer for JWT, WAF, mTLS, and rate limiting</strong> in front of SageMaker endpoints. JWT and certificate-based controls do not belong on the SageMaker endpoint directly.</div></div>
+    <div class="table-wrap"><table>
+        <thead><tr><th>Service</th><th>Category</th><th>Control</th><th>Description</th><th>Implementation Guidance</th><th class="ciaa-col">CIAA</th><th class="ref-col">Reference</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>API Gateway</strong></td><td>Authentication</td><td>OAuth 2.0 / OIDC (JWT Authoriser)</td>
+            <td>Validate JWT tokens from Cognito or external OIDC provider on ML API calls</td>
+            <td>Configure API Gateway JWT Authoriser with Cognito User Pools or external OIDC. Validate <code>iss</code>, <code>aud</code>, and custom scope claims per route</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-jwt-authorizer.html" target="_blank" class="ref-link">JWT Authorizers<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>API Gateway</strong></td><td>Authentication</td><td>Mutual TLS (mTLS)</td>
+            <td>Bidirectional certificate authentication for service-to-service ML API calls</td>
+            <td>Configure API Gateway mTLS with truststore in S3; require client certificates from authorised ML service clients using ACM Private CA</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/rest-api-mutual-tls.html" target="_blank" class="ref-link">Mutual TLS<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>API Gateway</strong></td><td>Threat Protection</td><td>AWS WAF (Managed Rules + Custom ML Rules)</td>
+            <td>OWASP Top 10 protection and ML-specific abuse detection at the API layer</td>
+            <td>Attach WAF ACL with AWSManagedRulesCommonRuleSet, Bot Control, and custom rate-based rules for ML endpoint abuse. Block requests with anomalous payload sizes or inference request rates</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span><span class="ciaa-pill pill-a">A</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-control-access-aws-waf.html" target="_blank" class="ref-link">API Gateway WAF<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>API Gateway</strong></td><td>Data Protection</td><td>Field-Level Encryption</td>
+            <td>Encrypt sensitive request fields (PII, credentials) asymmetrically before backend processing</td>
+            <td>Configure API Gateway field-level encryption using asymmetric CMK. Encrypted fields remain encrypted through Lambda and backend; only authorised services with the private key can decrypt</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/field-encryption.html" target="_blank" class="ref-link">Field-Level Encryption<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>API Gateway</strong></td><td>Integrity</td><td>AWS SigV4 Request Signing</td>
+            <td>Enforce SigV4 signing for service-to-service ML API calls</td>
+            <td>Use AWS_IAM authorisation type on API Gateway routes for internal service-to-service calls. Callers sign requests with SigV4 using execution role credentials</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/permissions.html" target="_blank" class="ref-link">API Gateway IAM Auth<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>API Gateway</strong></td><td>Integrity</td><td>OpenAPI Schema Validation</td>
+            <td>Validate all requests against OpenAPI model definitions before backend invocation</td>
+            <td>Enable request validation with OpenAPI model for request body and parameters. Return 400 on schema violation before the request reaches SageMaker — prevents malformed inputs reaching the model</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-request-validation-set-up.html" target="_blank" class="ref-link">Request Validation<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>API Gateway</strong></td><td>Monitoring</td><td>Access Logging with Field Masking</td>
+            <td>Detailed access logs with sensitive field masking for ML API audit</td>
+            <td>Configure access logs with <code>$context</code> variables; mask Authorization header and PII fields in log format string. Route to CloudWatch Logs with KMS encryption and 1-year retention</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html#context-variable-reference" target="_blank" class="ref-link">Access Logging<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+        </tbody>
+      </table></div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         PHASE 6 — MODEL MONITORING
+    ═══════════════════════════════════════════════════════ -->
+    <div class="phase-section" id="phase6">
+      <div class="phase-header">
+        <div class="phase-tag p6">Phase 6 of 6</div>
+        <h2 class="phase-title">Model Monitoring</h2>
+        <p class="phase-desc">Continuously monitoring model performance and detecting drift, threats, and compliance violations in production. Security controls focus on drift detection, threat intelligence, centralised security posture, and automated response.</p>
+      </div>
+
+      <h3 class="service-title">Amazon SageMaker Model Monitor <span class="svc-badge">Model Observability</span></h3>
+      <div class="callout note"><div class="callout-icon">ℹ</div><div class="callout-body"><strong>Model Monitor has 4 distinct monitor types — each requires a separate monitor schedule and baseline job.</strong> Conflating them leads to incomplete monitoring coverage.</div></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Service</th><th>Category</th><th>Control</th><th>Description</th><th>Implementation Guidance</th><th class="ciaa-col">CIAA</th><th class="ref-col">Reference</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>SageMaker Model Monitor</strong></td><td>Model Integrity</td><td>Data Quality Monitor <span class="badge-upd">Updated</span></td>
+            <td>Detect feature distribution drift vs training data baseline</td>
+            <td>Create <code>DataQualityMonitor</code> with baseline job referencing original training dataset. Configure schedule and alert thresholds in CloudWatch. Trigger retraining pipeline on threshold breach</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor-data-quality.html" target="_blank" class="ref-link">Data Quality Monitor<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>SageMaker Model Monitor</strong></td><td>Model Integrity</td><td>Model Quality Monitor <span class="badge-new">New</span></td>
+            <td>Track prediction accuracy over time using ground truth labels</td>
+            <td>Configure <code>ModelQualityMonitor</code> with <code>MonitoringType: ModelQuality</code>. Set up ground truth labelling pipeline to feed actuals back. Alert on accuracy degradation below threshold</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span><span class="ciaa-pill pill-a">A</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor-model-quality.html" target="_blank" class="ref-link">Model Quality Monitor<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>SageMaker Clarify Monitor</strong></td><td>Model Fairness</td><td>Bias Drift Monitor (Clarify) <span class="badge-new">New</span></td>
+            <td>Detect changes in model bias metrics for protected attributes in production</td>
+            <td>Configure <code>ModelBiasMonitor</code>. Define bias metrics (DPL, FPR) and facets. Alert on threshold breach. Required for regulated AI deployments under EU AI Act and NIST AI RMF</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/sagemaker/latest/dg/clarify-model-monitor-bias-drift.html" target="_blank" class="ref-link">Bias Drift Monitor<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>SageMaker Clarify Monitor</strong></td><td>Model Fairness</td><td>Feature Attribution Drift (Clarify) <span class="badge-new">New</span></td>
+            <td>Detect SHAP value distribution changes indicating concept drift</td>
+            <td>Configure <code>ModelExplainabilityMonitor</code>. Compare feature attribution vs baseline. Alert on KL-divergence threshold breach indicating model behaviour change</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/sagemaker/latest/dg/clarify-model-monitor-feature-attribution-drift.html" target="_blank" class="ref-link">Feature Attribution Drift<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+        </tbody>
+      </table></div>
+
+      <h3 class="service-title">Amazon GuardDuty <span class="svc-badge">Threat Detection</span></h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Service</th><th>Category</th><th>Control</th><th>Description</th><th>Implementation Guidance</th><th class="ciaa-col">CIAA</th><th class="ref-col">Reference</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>GuardDuty</strong></td><td>Threat Detection</td><td>Malware Protection for S3 <span class="badge-new">New</span></td>
+            <td>Scan objects uploaded to ML training data buckets for malware</td>
+            <td>Enable Malware Protection for S3 on ML data input buckets. Configure prefix-level scanning. Route findings to EventBridge for automated quarantine of infected objects</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span><span class="ciaa-pill pill-a">A</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/guardduty/latest/ug/gdu-malware-protection-s3.html" target="_blank" class="ref-link">Malware Protection S3<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>GuardDuty</strong></td><td>Threat Detection</td><td>ECS/EKS Runtime Monitoring</td>
+            <td>Detect threats in containerised ML workloads at runtime</td>
+            <td>Enable GuardDuty ECS/EKS Runtime Monitoring. Install GuardDuty security agent on EKS nodes. Detects process injection, cryptomining, and reverse shells in ML inference containers</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-i">I</span><span class="ciaa-pill pill-a">A</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/guardduty/latest/ug/guardduty-eks-runtime-monitoring.html" target="_blank" class="ref-link">EKS Runtime Monitoring<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>GuardDuty</strong></td><td>Threat Detection</td><td>Cryptomining Detection (SageMaker / EC2)</td>
+            <td>Detect abuse of ML compute for cryptomining</td>
+            <td>GuardDuty automatically generates <code>CryptoCurrency:EC2/BitcoinTool.B!DNS</code> findings. Create EventBridge rule to auto-terminate offending SageMaker training instances</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-a">A</span><span class="ciaa-pill pill-i">I</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_finding-types-ec2.html" target="_blank" class="ref-link">GuardDuty EC2 Findings<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>GuardDuty</strong></td><td>Response</td><td>EventBridge Automated Remediation</td>
+            <td>Automated response to GuardDuty ML security findings</td>
+            <td>Create EventBridge rules for HIGH/CRITICAL findings triggering Lambda: isolate instance, revoke IAM session, quarantine S3 objects, notify SOC via SNS</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-a">A</span><span class="ciaa-pill pill-i">I</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_findings_cloudwatch.html" target="_blank" class="ref-link">GuardDuty + EventBridge<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+        </tbody>
+      </table></div>
+
+      <h3 class="service-title">AWS Security Hub &amp; Amazon CloudWatch / EventBridge <span class="svc-badge">Posture &amp; Observability</span></h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Service</th><th>Category</th><th>Control</th><th>Description</th><th>Implementation Guidance</th><th class="ciaa-col">CIAA</th><th class="ref-col">Reference</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>AWS Security Hub</strong></td><td>Compliance</td><td>Enable Standards (FSBP + NIST) <span class="badge-new">New</span></td>
+            <td>Automated compliance checking for ML infrastructure</td>
+            <td>Enable AWS Foundational Security Best Practices, CIS AWS Foundations, and NIST SP 800-53. These cover SageMaker, S3, KMS, IAM, and CloudTrail controls across the ML lifecycle</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-i">I</span><span class="ciaa-pill pill-a">A</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards.html" target="_blank" class="ref-link">Security Hub Standards<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>AWS Security Hub</strong></td><td>Integration</td><td>Centralised Finding Aggregation <span class="badge-new">New</span></td>
+            <td>Unified ML security posture across GuardDuty, Macie, Inspector, Config</td>
+            <td>Enable Security Hub integrations with GuardDuty, Macie, Inspector v2, AWS Config, and IAM Access Analyser. Configure delegated admin via Organizations for multi-account ML environments</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-i">I</span><span class="ciaa-pill pill-a">A</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-partner-providers.html" target="_blank" class="ref-link">Security Hub Integrations<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>Amazon CloudWatch</strong></td><td>Data Protection</td><td>Log Group KMS Encryption</td>
+            <td>Protect log data containing ML inference inputs and outputs</td>
+            <td>Enable KMS encryption on all log groups containing ML data. Deny log group creation without KMS key via SCP. Set retention: 1 year for security logs, 90 days for application logs</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/encrypt-log-data-kms.html" target="_blank" class="ref-link">CloudWatch Log Encryption<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>Amazon CloudWatch</strong></td><td>Monitoring</td><td>Anomaly Detection on Endpoint Metrics <span class="badge-new">New</span></td>
+            <td>ML-powered baseline alarms for SageMaker endpoint performance</td>
+            <td>Enable CloudWatch Anomaly Detection on SageMaker endpoint metrics (Invocations, ModelLatency, OverheadLatency). Use ANOMALY_DETECTION_BAND alarms — no manual threshold required</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-a">A</span><span class="ciaa-pill pill-i">I</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Anomaly_Detection.html" target="_blank" class="ref-link">CW Anomaly Detection<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>Amazon EventBridge</strong></td><td>Response</td><td>EventBridge Rules for ML Pipeline Events <span class="badge-upd">Updated</span></td>
+            <td>Event-driven security response — replaces deprecated CloudWatch Events</td>
+            <td>Use EventBridge (not the legacy CloudWatch Events console) for: CodePipeline failures, SageMaker training failures, GuardDuty HIGH findings, ECR image push events, and Macie PII findings</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-a">A</span><span class="ciaa-pill pill-i">I</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-rules.html" target="_blank" class="ref-link">EventBridge Rules<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>CloudWatch</strong></td><td>Monitoring</td><td>Multi-Channel Alerting (SNS + encryption) <span class="badge-new">New</span></td>
+            <td>Encrypted multi-channel notification for critical ML security alarms</td>
+            <td>Configure KMS-encrypted SNS topics for CloudWatch alarm notifications; subscribe multiple channels (email, Slack via Lambda, PagerDuty, SIEM). Ensure subscriptions use HTTPS endpoints</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-a">A</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html" target="_blank" class="ref-link">CloudWatch Alarms<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>CloudWatch</strong></td><td>Monitoring</td><td>Composite Alarms for ML Security Correlation <span class="badge-new">New</span></td>
+            <td>Correlate multiple ML security indicators to reduce false positives</td>
+            <td>Create composite alarms combining: SageMaker endpoint error rate + KMS Decrypt spike + GuardDuty finding count. A high-fidelity security event requires multiple indicators — reduces alert fatigue</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Create_Composite_Alarm.html" target="_blank" class="ref-link">Composite Alarms<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>CloudWatch</strong></td><td>Data Protection</td><td>Log Data Protection — PII Masking <span class="badge-new">New</span></td>
+            <td>Automated PII/sensitive data masking in CloudWatch log groups</td>
+            <td>Enable CloudWatch Logs Data Protection policy on log groups containing ML inference inputs/outputs. Configure data identifiers for PII patterns. Masked data is replaced with asterisks in log queries while remaining accessible to authorised data protection roles</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/mask-sensitive-log-data.html" target="_blank" class="ref-link">Log Data Protection<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>CloudWatch + SIEM</strong></td><td>Integration</td><td>SIEM Integration</td>
+            <td>Centralise ML security monitoring in enterprise SIEM</td>
+            <td>Export CloudWatch Logs to S3 via Kinesis Data Firehose or stream to Splunk / Microsoft Sentinel via subscription filter. Include GuardDuty, Macie, Security Hub, and CloudTrail findings</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-i">I</span><span class="ciaa-pill pill-a">A</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/SubscriptionFilters.html" target="_blank" class="ref-link">CW Subscription Filters<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+                  <tr>
+            <td><strong>Amazon EventBridge</strong></td><td>Reliability</td><td>Dead Letter Queues (SQS)</td>
+            <td>Capture failed event deliveries for ML pipeline debugging</td>
+            <td>Configure KMS-encrypted SQS DLQ for EventBridge rules targeting ML Lambda/Step Functions; monitor DLQ depth via CloudWatch alarm to detect ML pipeline reliability issues</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-a">A</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-rule-dlq.html" target="_blank" class="ref-link">EventBridge DLQ</a></div></td>
+          </tr>
+          <tr>
+            <td><strong>Amazon EventBridge</strong></td><td>Integrity</td><td>Event Schema Registry Validation</td>
+            <td>Enforce structured event schemas for ML pipeline events</td>
+            <td>Register ML pipeline event schemas in EventBridge Schema Registry; enable schema discovery on custom buses; validate event patterns against registered schemas to prevent malformed ML pipeline events</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-i">I</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-schema-registry.html" target="_blank" class="ref-link">Schema Registry</a></div></td>
+          </tr>
+</tbody>
+      </table></div>
+    </div>
+
+    <!-- ── Authoritative References ── -->
+    <div class="phase-section" id="references" style="border-top:2px solid var(--border-soft);padding-top:40px;margin-top:40px;">
+      <h2 class="phase-title" style="font-size:18px;margin-bottom:16px;">Authoritative References</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;">
+        <a href="https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/machine-learning-lens.html" target="_blank" style="display:flex;flex-direction:column;gap:4px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;text-decoration:none;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+          <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--orange);">Primary Source</span>
+          <span style="font-size:13px;font-weight:600;color:var(--text);">AWS Well-Architected ML Lens (Nov 2025)</span>
+          <span style="font-size:11.5px;color:var(--faint);">docs.aws.amazon.com/wellarchitected</span>
+        </a>
+        <a href="https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/machine-learning-lifecycle.html" target="_blank" style="display:flex;flex-direction:column;gap:4px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;text-decoration:none;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+          <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);">ML Lifecycle</span>
+          <span style="font-size:13px;font-weight:600;color:var(--text);">Well-Architected ML Lifecycle Phases</span>
+          <span style="font-size:11.5px;color:var(--faint);">6 phases with best practices per pillar</span>
+        </a>
+        <a href="https://docs.aws.amazon.com/sagemaker/latest/dg/security.html" target="_blank" style="display:flex;flex-direction:column;gap:4px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;text-decoration:none;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+          <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);">SageMaker</span>
+          <span style="font-size:13px;font-weight:600;color:var(--text);">Amazon SageMaker Security Documentation</span>
+          <span style="font-size:11.5px;color:var(--faint);">docs.aws.amazon.com/sagemaker</span>
+        </a>
+        <a href="https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/best-practices-by-ml-lifecycle-phase.html" target="_blank" style="display:flex;flex-direction:column;gap:4px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;text-decoration:none;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+          <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);">Best Practices</span>
+          <span style="font-size:13px;font-weight:600;color:var(--text);">ML Lens Best Practices by Lifecycle Phase</span>
+          <span style="font-size:11.5px;color:var(--faint);">MLSEC, MLOPS, MLPERF codes</span>
+        </a>
+        <a href="https://aws.amazon.com/blogs/architecture/announcing-the-updated-aws-well-architected-machine-learning-lens/" target="_blank" style="display:flex;flex-direction:column;gap:4px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;text-decoration:none;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+          <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--orange);">AWS Blog</span>
+          <span style="font-size:13px;font-weight:600;color:var(--text);">Updated ML Lens Announcement (Nov 2025)</span>
+          <span style="font-size:11.5px;color:var(--faint);">aws.amazon.com/blogs/architecture</span>
+        </a>
+        <a href="https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html" target="_blank" style="display:flex;flex-direction:column;gap:4px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;text-decoration:none;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+          <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);">Threat Detection</span>
+          <span style="font-size:13px;font-weight:600;color:var(--text);">Amazon GuardDuty Documentation</span>
+          <span style="font-size:11.5px;color:var(--faint);">docs.aws.amazon.com/guardduty</span>
+        </a>
+      </div>
+    </div>
+
+
+
+    <h3 class="service-title">AWS Secrets Manager <span class="svc-badge">Secrets &amp; Credentials</span></h3>
+    <div class="table-wrap"><table>
+        <thead><tr><th>Service</th><th>Category</th><th>Control</th><th>Description</th><th>Implementation Guidance</th><th class="ciaa-col">CIAA</th><th class="ref-col">Reference</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Secrets Manager</strong></td><td>Data Protection</td><td>Envelope Encryption (KMS Customer Managed Key)</td>
+            <td>KMS customer-managed key encryption for all ML pipeline secrets</td>
+            <td>Configure Secrets Manager to use a customer managed key; enables key policy control over who can decrypt secrets; use separate KMS keys per environment (dev/staging/prod)</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/secretsmanager/latest/userguide/security-encryption.html" target="_blank" class="ref-link">Secrets Encryption<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>Secrets Manager</strong></td><td>Credential Management</td><td>Automatic Secret Rotation</td>
+            <td>Automated rotation for all ML pipeline credentials without downtime</td>
+            <td>Enable automatic rotation for all secrets with Lambda rotation functions; validate rotation in staging before enabling for production; set rotation window to ≤30 days for privileged credentials</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-i">I</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotating-secrets.html" target="_blank" class="ref-link">Secret Rotation<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>Secrets Manager</strong></td><td>Network Security</td><td>VPC Endpoint Isolation</td>
+            <td>Private access to Secrets Manager without internet traversal</td>
+            <td>Configure Interface Endpoint for <code>com.amazonaws.region.secretsmanager</code>; restrict endpoint policy to deny access from outside your VPC CIDR; required for VPC-isolated SageMaker and Lambda functions</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/secretsmanager/latest/userguide/vpc-endpoint-overview.html" target="_blank" class="ref-link">VPC Endpoint<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>Secrets Manager</strong></td><td>Access Management</td><td>Resource-Based Policies (Least Privilege)</td>
+            <td>Scope secret access to specific IAM roles and accounts</td>
+            <td>Apply resource-based policy on each secret restricting access to authorised roles; use <code>secretsmanager:VersionId</code> conditions; deny <code>secretsmanager:*</code> by default except for approved principals</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/secretsmanager/latest/userguide/auth-and-access_resource-based-policies.html" target="_blank" class="ref-link">Resource Policies<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><strong>Secrets Manager</strong></td><td>Access Management</td><td>Secret Tagging + ABAC</td>
+            <td>Attribute-based access control using secret tags for environment isolation</td>
+            <td>Tag all secrets with <code>Environment</code> (dev/staging/prod), <code>Team</code>, and <code>DataClass</code> labels. Use IAM tag conditions to prevent cross-environment secret access. Enforce via SCPs requiring tags on secret creation</td>
+            <td class="ciaa-cell"><span class="ciaa-pill pill-c">C</span><span class="ciaa-pill pill-aa">Au</span></td>
+            <td><div class="ref-cell"><a href="https://docs.aws.amazon.com/secretsmanager/latest/userguide/auth-and-access_examples.html" target="_blank" class="ref-link">Secrets ABAC<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></td>
+          </tr>
+        </tbody>
+      </table></div>
+
+    <!-- ── Series nav ── -->
+    <div class="series-nav">
+      <div class="snav-grid">
+        <a href="/AWS/AI/index.html" class="snav-card">
+          <span class="snav-dir"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><polyline points="8,2 3,6 8,10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Back</span>
+          <span class="snav-title">AWS Amplify Hosting for ML/AI Services Guide</span>
+          <span class="snav-sub">Architecture · Security · Implementation</span>
+        </a>
+        <a href="/" class="snav-card">
+          <span class="snav-dir"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M1 5.5L6 1l5 4.5V11H8V8H4v3H1z" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Home</span>
+          <span class="snav-title">Knowledge Base — Stephen A. Adebowale</span>
+          <span class="snav-sub">AI &amp; Cloud Security Articles</span>
+        </a>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- ── Footer ── -->
+<div id="footer">
+  <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+    <a href="/"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><polyline points="8,2 3,6 8,10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Knowledge Base</a>
+    <span style="color:rgba(255,255,255,.12);font-size:12px;">|</span>
+    <a href="/AWS/AI/index.html">AWS / AI Services Guide</a>
+    <span style="color:rgba(255,255,255,.12);font-size:12px;">|</span>
+    <p>AWS MLOps Security Controls · v3.0 · March 2026 · Aligned to AWS Well-Architected ML Lens (Nov 2025)</p>
+  </div>
+  <a href="https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/machine-learning-lens.html" target="_blank" style="display:flex;align-items:center;gap:5px;color:rgba(255,153,0,.7);font-size:12px;font-weight:600;text-decoration:none;transition:color .15s;white-space:nowrap;" onmouseover="this.style.color='rgba(255,153,0,1)'" onmouseout="this.style.color='rgba(255,153,0,.7)'">
+    AWS Well-Architected ML Lens
+    <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+</div>
+
+<script>
+// Progress bar
+const bar = document.getElementById('progress-bar');
+window.addEventListener('scroll', () => {
+  const total = document.documentElement.scrollHeight - window.innerHeight;
+  bar.style.transform = `scaleX(${window.scrollY / total})`;
+});
+
+// Active nav
+const sections = document.querySelectorAll('.phase-section[id]');
+const navItems  = document.querySelectorAll('#sidebar .nav-item');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navItems.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + e.target.id));
+    }
+  });
+}, { rootMargin: '-58px 0px -55% 0px', threshold: 0 });
+sections.forEach(s => obs.observe(s));
+
+// CSV Export
+function exportToCSV() {
+  const rows = document.querySelectorAll('tbody tr');
+  let csv = 'ML Lifecycle Phase,Service,Category,Control,Description,Implementation Guidance,CIAA Goals,Reference URL\n';
+  rows.forEach(row => {
+    const phase = row.closest('.phase-section')?.querySelector('.phase-title')?.textContent?.trim().replace(/\s+/g,' ') || '';
+    const cells = row.querySelectorAll('td');
+    if (!cells.length) return;
+    const ciaa = [...cells[5]?.querySelectorAll('.ciaa-pill') || []].map(p => p.textContent.trim()).join(' | ');
+    const refs = [...cells[6]?.querySelectorAll('a') || []].map(a => a.href).join(' | ');
+    const vals = [phase, ...Array.from(cells).slice(0,5).map(c => {
+      let t = c.textContent.trim().replace(/\s+/g,' ');
+      return (t.includes(',') || t.includes('"')) ? '"' + t.replace(/"/g,'""') + '"' : t;
+    }), ciaa, refs];
+    csv += vals.join(',') + '\n';
+  });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8;'}));
+  a.download = 'aws_mlops_security_controls_v2.csv';
+  a.click();
+}
+</script>
+</body>
+</html>
