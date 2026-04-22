@@ -75,8 +75,8 @@
       color:#fff;font-size:14px;font-weight:800;
       box-shadow:0 8px 20px rgba(78,164,255,.28);
     }
-    .nav-links{display:flex;gap:16px;flex-wrap:wrap}
-    .nav-links a{color:var(--muted);font-size:14px}
+    .nav-links{display:flex;gap:12px;flex-wrap:nowrap;align-items:center}
+    .nav-links a{color:var(--muted);font-size:13px}
     .hero{
       color:var(--text);
       padding:64px 0 54px;
@@ -99,7 +99,6 @@
     }
     .sub{
       font-size:18px;color:var(--muted);max-width:930px;margin-bottom:24px;
-      white-space:nowrap;
     }
     .hero-grid{
       display:grid;grid-template-columns:1.4fr .9fr;gap:22px;align-items:start;
@@ -139,7 +138,7 @@
       box-shadow:0 6px 20px rgba(12,28,45,.04);
     }
     .card.full{grid-column:1/-1}
-    .card.third{grid-column:span 4}
+    .card.third{grid-column:span 3}
     .card h3{margin:0 0 8px;font-size:18px;color:var(--text-dark);letter-spacing:-.02em;white-space:nowrap}
     .card p{margin:10px 0;color:var(--muted-dark)}
     .card ul{margin:10px 0 0 20px;padding:0;color:var(--muted-dark)}
@@ -252,9 +251,6 @@
   <!-- BACK BAR -->
   <div class="back-bar">
     <a href="https://stephen-ade.github.io">&#8592; Back to Home</a>
-    <div class="breadcrumb">
-      <span>stephen-ade.github.io</span> / AI / CAZT_AI_Agents
-    </div>
   </div>
 
   <nav>
@@ -279,7 +275,7 @@
       <div class="eyebrow">Version 1.0 · Architect Reference</div>
       <h1>Conditional Access and Zero Trust for AI Agents</h1>
       <div class="sub">
-        A practical security architecture for enterprise AI agents built on current Azure and AWS capabilities.
+        A practical security architecture for enterprise AI agents built on current Azure and AWS capabilities.<br>
         This framework separates what organizations can deploy now from what remains preview, emerging, or design-pattern guidance.
       </div>
       <div class="hero-grid">
