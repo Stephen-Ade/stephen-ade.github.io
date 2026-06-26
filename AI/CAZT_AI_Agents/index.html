@@ -47,22 +47,23 @@
       border-bottom:1px solid rgba(255,255,255,.08);
     }
     .nav-inner{
-      display:flex;justify-content:space-between;align-items:center;gap:16px;
-      min-height:64px;
+      display:flex;justify-content:space-between;align-items:center;gap:12px;
+      min-height:56px;
     }
     .brand{
-      color:#fff;font-weight:800;letter-spacing:-.02em;font-size:16px;
-      display:flex;align-items:center;gap:10px;white-space:nowrap;
+      color:#fff;font-weight:800;letter-spacing:-.02em;font-size:14px;
+      display:flex;align-items:center;gap:8px;white-space:nowrap;flex-shrink:0;
     }
     .brand-mark{
-      width:32px;height:32px;border-radius:10px;
+      width:28px;height:28px;border-radius:8px;
       background:linear-gradient(135deg,var(--accent),#276dff);
       display:flex;align-items:center;justify-content:center;
-      color:#fff;font-size:14px;font-weight:800;
+      color:#fff;font-size:12px;font-weight:800;
       box-shadow:0 8px 20px rgba(78,164,255,.28);
     }
-    .nav-links{display:flex;gap:12px;flex-wrap:nowrap;align-items:center}
-    .nav-links a{color:var(--muted);font-size:13px}
+    .nav-links{display:flex;gap:10px;flex-wrap:nowrap;align-items:center;overflow-x:auto;scrollbar-width:none}
+    .nav-links::-webkit-scrollbar{display:none}
+    .nav-links a{color:var(--muted);font-size:12px;white-space:nowrap;flex-shrink:0}
     .hero{
       color:var(--text);
       padding:64px 0 54px;
@@ -104,7 +105,7 @@
       border-radius:999px;padding:8px 12px;font-size:13px;color:var(--muted);
       background:rgba(255,255,255,.03);white-space:nowrap;display:inline-block;
     }
-    main{padding:0 0 48px}
+    main{padding:0 0 48px;background:var(--surface)}
     section{padding:34px 0}
     .section-title{
       font-size:27px;letter-spacing:-.03em;margin:0 0 10px;color:var(--text-dark);
@@ -213,14 +214,16 @@
       h1{font-size:40px}
     }
     @media(max-width:640px){
-      .nav-links{display:none}
+      .nav-links{display:flex;overflow-x:auto;scrollbar-width:none}
+      .nav-links::-webkit-scrollbar{display:none}
+      .brand{font-size:11px}
+      .brand-mark{width:24px;height:24px;font-size:10px}
       body{background:linear-gradient(180deg,var(--bg) 0%, #081321 14%, var(--surface) 14%, var(--surface) 100%)}
       h1{font-size:24px;white-space:nowrap}
       .section-title{font-size:20px}
       .card h3{font-size:15px}
       .hero-card h3{font-size:15px;white-space:nowrap}
       .decision h4{font-size:13px}
-      .brand{font-size:13px}
       .wrap{padding:0 18px}
     }
     @media print{
@@ -241,9 +244,8 @@
 <body>
   <nav>
     <div class="wrap nav-inner">
-      <div class="brand"><div class="brand-mark">AI</div>Conditional Access and Zero Trust for AI Agents</div>
+      <div class="brand"><div class="brand-mark">AI</div>CAZT for AI Agents</div>
       <div class="nav-links">
-        <a href="https://stephen-ade.github.io" style="color:#56a0fa;font-weight:600;">&#8592; Home</a>
         <a href="#overview">Overview</a>
         <a href="#identity">Identity</a>
         <a href="#semantic">Semantic</a>
@@ -296,10 +298,10 @@
   </header>
 
   <main>
-    <section>
+    <section style="background:var(--bg);color:var(--text);">
       <div class="wrap">
         <h2 class="section-title white-title">Four security layers for enterprise AI agents</h2>
-        <p class="section-sub">A useful agent security model separates the problem into four layers. Each one solves a different class of failure.</p>
+        <p class="section-sub" style="color:var(--muted);">A useful agent security model separates the problem into four layers. Each one solves a different class of failure.</p>
         <div class="grid">
           <div class="card third">
             <div class="layer-title">Layer 1</div>
