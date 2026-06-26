@@ -196,6 +196,35 @@
     .answer-item .a{color:var(--text-dark);font-weight:600;font-size:13px;line-height:1.35}
     @media(max-width:640px){ .answers-list{grid-template-columns:1fr} }
     .export-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+
+    /* === Mismatch warning (Option C) === */
+    .mismatch-warning{
+      margin-top:14px;padding:14px 16px;
+      background:#fff7ea;border:1px solid #f4d39c;border-left:4px solid var(--warn);
+      border-radius:10px;
+    }
+    .mismatch-warning .mw-head strong{
+      font-size:14px;color:var(--text-dark);display:block;
+    }
+    .mismatch-warning .mw-head p{
+      margin:4px 0 0;font-size:12px;color:var(--muted-dark);line-height:1.5;
+    }
+    .mismatch-warning .mw-list{
+      margin:10px 0 0;padding:0;list-style:none;
+    }
+    .mismatch-warning .mw-list li{
+      padding:8px 0;border-bottom:1px dashed rgba(212,138,22,.22);
+      display:flex;flex-direction:column;gap:3px;
+    }
+    .mismatch-warning .mw-list li:last-child{border-bottom:0}
+    .mismatch-warning .mw-q{
+      font-size:12px;font-weight:600;color:var(--text-dark);
+    }
+    .mismatch-warning .mw-answers{
+      display:flex;gap:14px;font-size:11px;flex-wrap:wrap;
+    }
+    .mismatch-warning .mw-user{color:var(--bad);font-weight:600}
+    .mismatch-warning .mw-expected{color:var(--good);font-weight:600}
     .export-btn{
       appearance:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;
       padding:8px 14px;border-radius:8px;border:1px solid var(--line-light);
@@ -1327,6 +1356,55 @@
       }
     ];
 
+    /* --- Expected answers per outcome (for mismatch reporting) ---
+       Used by Option C: when the winning outcome scores < 70%, surface a
+       warning listing the answers that don't match the recommended profile.
+       Each key is a forkId; value is an array of acceptable answer values.
+       Forks not listed are not constrained by that outcome.
+    */
+    var EXPECTED = {
+      A: {
+        highrisk:     ['no'],
+        autonomy:     ['semi'],
+        observe:      ['yes'],
+        identitytype: ['workload'],
+        mcp:          ['no'],
+        datatier:     ['public'],
+        latency:      ['poll'],
+        crossorg:     ['sameorg'],
+        regulatory:   ['none', 'nist']
+      },
+      B: {
+        autonomy:     ['semi'],
+        observe:      ['yes', 'partial'],
+        identitytype: ['delegated'],
+        mcp:          ['yes'],
+        datatier:     ['pii'],
+        latency:      ['ping'],
+        crossorg:     ['sameorg'],
+        regulatory:   ['gdpr', 'euai']
+      },
+      C: {
+        highrisk:     ['yes'],
+        autonomy:     ['broad'],
+        observe:      ['yes'],
+        identitytype: ['workload'],
+        mcp:          ['yes'],
+        datatier:     ['secret'],
+        latency:      ['push'],
+        crossorg:     ['sameorg'],
+        regulatory:   ['euai']
+      },
+      D: {
+        crossdata:    ['yes'],
+        identitytype: ['workload'],
+        mcp:          ['yes'],
+        crossorg:     ['crossorg'],
+        latency:      ['poll', 'ping']
+      }
+      // E is hard-stop; no expected-answers table
+    };
+
     /* --- State --- */
     var state = {
       step: 0,                 // 0..FORKS.length-1, or FORKS.length when on result
@@ -1480,6 +1558,14 @@
         html += '<p><strong>When:</strong> ' + top.o.when + '</p></div>';
         html += '</div>';
         html += unionBlock(top.o.controls, 'Controls to apply');
+
+        // Option C: mismatch warning when fit is moderate (< 70%)
+        if (top.score < 0.70){
+          var mismatches = computeMismatches(top.o.key, state.answers);
+          if (mismatches.length > 0){
+            html += mismatchWarningBlock(top.o, top.score, mismatches);
+          }
+        }
       }
 
       // Answers summary
@@ -1534,6 +1620,70 @@
       return html;
     }
 
+    /* --- Option C: mismatch reporting ---
+       Compares the user's answers against the expected answers for the winning
+       outcome. Returns a list of mismatches with the question text, the user's
+       label, and the acceptable expected labels.
+    */
+    function computeMismatches(outcomeKey, answers){
+      var expected = EXPECTED[outcomeKey];
+      if (!expected) return [];
+      var mismatches = [];
+      for (var i = 0; i < FORKS.length; i++){
+        var f = FORKS[i];
+        if (!expected[f.id]) continue;          // fork not constrained by this outcome
+        var userVal = answers[f.id];
+        if (userVal === undefined) continue;    // unanswered — don't flag
+        var acceptable = expected[f.id];
+        if (acceptable.indexOf(userVal) === -1){
+          // Resolve user's label
+          var userLabel = '(not answered)';
+          for (var j = 0; j < f.options.length; j++){
+            if (f.options[j].value === userVal){ userLabel = f.options[j].label; break; }
+          }
+          // Resolve expected labels
+          var expectedLabels = acceptable.map(function(v){
+            for (var k = 0; k < f.options.length; k++){
+              if (f.options[k].value === v) return f.options[k].label;
+            }
+            return v;
+          });
+          mismatches.push({
+            forkId: f.id,
+            forkIndex: i,
+            question: f.title.replace(/\?$/, ''),
+            userLabel: userLabel,
+            expectedLabels: expectedLabels
+          });
+        }
+      }
+      return mismatches;
+    }
+
+    function mismatchWarningBlock(outcome, score, mismatches){
+      var pct = Math.round(score * 100);
+      var html = '<div class="mismatch-warning">';
+      html += '<div class="mw-head">';
+      html += '<strong>Moderate fit &mdash; review mismatches</strong>';
+      html += '<p>Outcome ' + outcome.key + ' scored ' + pct + '% match. ';
+      html += 'The following answers don\'t align with this profile &mdash; consider revisiting them or weighing a different outcome.</p>';
+      html += '</div>';
+      html += '<ul class="mw-list">';
+      for (var i = 0; i < mismatches.length; i++){
+        var m = mismatches[i];
+        html += '<li>';
+        html += '<span class="mw-q">Q' + (m.forkIndex + 1) + '. ' + m.question + '</span>';
+        html += '<span class="mw-answers">';
+        html += '<span class="mw-user">Your answer: ' + m.userLabel + '</span>';
+        html += '<span class="mw-expected">Expected: ' + m.expectedLabels.join(' or ') + '</span>';
+        html += '</span>';
+        html += '</li>';
+      }
+      html += '</ul>';
+      html += '</div>';
+      return html;
+    }
+
     /* --- Export --- */
     function buildResultText(){
       var lines = [];
@@ -1566,6 +1716,21 @@
         for (var k = 0; k < top.o.controls.length; k++){
           lines.push('    - ' + top.o.controls[k]);
         }
+
+        // Option C: mismatch warning in text export
+        if (top.score < 0.70){
+          var mismatches = computeMismatches(top.o.key, state.answers);
+          if (mismatches.length > 0){
+            lines.push('');
+            lines.push('  MODERATE FIT — MISMATCHES TO REVIEW:');
+            for (var mi = 0; mi < mismatches.length; mi++){
+              var m = mismatches[mi];
+              lines.push('    Q' + (m.forkIndex + 1) + '. ' + m.question);
+              lines.push('      Your answer: ' + m.userLabel);
+              lines.push('      Expected:    ' + m.expectedLabels.join(' or '));
+            }
+          }
+        }
       } else {
         lines.push('  (No outcome matched.)');
       }
@@ -1577,8 +1742,8 @@
         var v = state.answers[f.id];
         var label = '(not answered)';
         if (v !== undefined){
-          for (var m = 0; m < f.options.length; m++){
-            if (f.options[m].value === v){ label = f.options[m].label; break; }
+          for (var m2 = 0; m2 < f.options.length; m2++){
+            if (f.options[m2].value === v){ label = f.options[m2].label; break; }
           }
         }
         lines.push('  ' + (n + 1) + '. ' + f.title);
@@ -1647,6 +1812,18 @@
         +   '.answer-item .q{color:#51667e;font-size:10px;margin-bottom:1px;}'
         +   '.answer-item .q .num{color:#4ea4ff;font-weight:700;}'
         +   '.answer-item .a{color:#1a2332;font-weight:600;font-size:11px;}'
+        +   '.mismatch-warning{margin-top:14px;padding:12px 14px;background:#fff7ea;'
+        +     'border:1px solid #f4d39c;border-left:4px solid #d48a16;border-radius:8px;}'
+        +   '.mismatch-warning .mw-head strong{font-size:13px;color:#1a2332;display:block;}'
+        +   '.mismatch-warning .mw-head p{margin:4px 0 0;font-size:11px;color:#51667e;}'
+        +   '.mismatch-warning .mw-list{margin:8px 0 0;padding:0;list-style:none;}'
+        +   '.mismatch-warning .mw-list li{padding:5px 0;border-bottom:1px dashed rgba(212,138,22,.22);'
+        +     'display:flex;flex-direction:column;gap:2px;}'
+        +   '.mismatch-warning .mw-list li:last-child{border-bottom:0}'
+        +   '.mismatch-warning .mw-q{font-size:11px;font-weight:600;color:#1a2332;}'
+        +   '.mismatch-warning .mw-answers{display:flex;gap:14px;font-size:10px;flex-wrap:wrap;}'
+        +   '.mismatch-warning .mw-user{color:#dc4c64;font-weight:600;}'
+        +   '.mismatch-warning .mw-expected{color:#1B7D46;font-weight:600;}'
         +   '.footer-note{margin-top:24px;padding-top:12px;border-top:1px solid #e9e9e8;'
         +     'font-size:10px;color:#8C8A84;}'
         +   '@media print{@page{size:letter;margin:0.75in}body{padding:0;}}'
