@@ -39,21 +39,7 @@
     }
     a{color:#1663d6;text-decoration:none}
     a:hover{text-decoration:underline}
-    h1,h2,h3,h4,h5,h6{white-space:nowrap}
     .wrap{max-width:1160px;margin:0 auto;padding:0 28px}
-    .back-bar{
-      background:#0a1628;
-      padding:10px 28px;
-      display:flex;align-items:center;justify-content:space-between;
-      border-bottom:1px solid rgba(78,164,255,.15);
-    }
-    .back-bar a{
-      color:#56a0fa;text-decoration:none;font-size:13px;font-weight:600;
-      display:flex;align-items:center;gap:6px;transition:color .2s;
-    }
-    .back-bar a:hover{color:#fff;text-decoration:none}
-    .back-bar .breadcrumb{font-size:12px;color:#8a9bbf}
-    .back-bar .breadcrumb span{color:#56a0fa}
     nav{
       position:sticky;top:0;z-index:30;
       background:rgba(7,17,31,.92);
@@ -121,12 +107,11 @@
     main{padding:0 0 48px}
     section{padding:34px 0}
     .section-title{
-      font-size:27px;letter-spacing:-.03em;margin:0 0 10px;color:var(--text-dark);white-space:nowrap;
+      font-size:27px;letter-spacing:-.03em;margin:0 0 10px;color:var(--text-dark);
     }
-.section-title.white-title{color:#ffffff}
-
+    .section-title.white-title{color:#ffffff}
     .section-sub{
-      color:var(--muted-dark);margin:0 0 24px;max-width:920px;white-space:nowrap;
+      color:var(--muted-dark);margin:0 0 24px;max-width:920px;
     }
     .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}
     .card{
@@ -139,7 +124,7 @@
     }
     .card.full{grid-column:1/-1}
     .card.third{grid-column:span 3}
-    .card h3{margin:0 0 8px;font-size:18px;color:var(--text-dark);letter-spacing:-.02em;white-space:nowrap}
+    .card h3{margin:0 0 8px;font-size:18px;color:var(--text-dark);letter-spacing:-.02em}
     .card p{margin:10px 0;color:var(--muted-dark)}
     .card ul{margin:10px 0 0 20px;padding:0;color:var(--muted-dark)}
     .card li{margin:8px 0}
@@ -206,12 +191,18 @@
     .decision{
       border:1px solid var(--line-light);border-radius:16px;padding:18px;background:#fff;
     }
-    .decision h4{margin:0 0 8px;font-size:15px;white-space:nowrap}
+    .decision h4{margin:0 0 8px;font-size:15px}
     footer{
       background:#091423;color:#9cb0ca;padding:24px 0 36px;margin-top:16px;
       border-top:1px solid rgba(255,255,255,.08);
     }
     .footer-links{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px}
+    .footer-author{
+      margin-top:18px;padding-top:14px;
+      border-top:1px solid rgba(255,255,255,.06);
+      font-size:11px;color:#6f849f;line-height:1.7;
+    }
+    .footer-author a{color:#7f95b3;font-weight:500}
     code, pre {font-family:'Inter',system-ui,sans-serif}
     @media(max-width:980px){
       .hero-grid{grid-template-columns:1fr}
@@ -225,10 +216,10 @@
       .nav-links{display:none}
       body{background:linear-gradient(180deg,var(--bg) 0%, #081321 14%, var(--surface) 14%, var(--surface) 100%)}
       h1{font-size:24px;white-space:nowrap}
-      .section-title{font-size:20px;white-space:nowrap}
-      .card h3{font-size:15px;white-space:nowrap}
+      .section-title{font-size:20px}
+      .card h3{font-size:15px}
       .hero-card h3{font-size:15px;white-space:nowrap}
-      .decision h4{font-size:13px;white-space:nowrap}
+      .decision h4{font-size:13px}
       .brand{font-size:13px}
       .wrap{padding:0 18px}
     }
@@ -248,11 +239,6 @@
   </style>
 </head>
 <body>
-  <!-- BACK BAR -->
-  <div class="back-bar">
-    <a href="https://stephen-ade.github.io">&#8592; Back to Home</a>
-  </div>
-
   <nav>
     <div class="wrap nav-inner">
       <div class="brand"><div class="brand-mark">AI</div>Conditional Access and Zero Trust for AI Agents</div>
@@ -266,13 +252,14 @@
         <a href="#cross-cloud">Cross-Cloud</a>
         <a href="#comparison">Comparison</a>
         <a href="#decision-tree">Decision Tree</a>
+        <a href="#compliance">Compliance</a>
       </div>
     </div>
   </nav>
 
   <header class="hero" id="overview">
     <div class="wrap">
-      <div class="eyebrow">Version 1.0 · Architect Reference</div>
+      <div class="eyebrow">Version 1.0 &middot; Last reviewed <span id="rev-date"></span></div>
       <h1>Conditional Access and Zero Trust for AI Agents</h1>
       <div class="sub">
         A practical security architecture for enterprise AI agents built on current Azure and AWS capabilities.<br>
@@ -337,11 +324,11 @@
           <div class="card full">
             <div class="flow">
               <div class="box">Identity<br/>Who is acting?</div>
-              <div class="arrow">→</div>
+              <div class="arrow">&rarr;</div>
               <div class="box">Semantic<br/>What is the agent being asked to do?</div>
-              <div class="arrow">→</div>
+              <div class="arrow">&rarr;</div>
               <div class="box">Execution<br/>What can it actually invoke?</div>
-              <div class="arrow">→</div>
+              <div class="arrow">&rarr;</div>
               <div class="box">Governance<br/>Should this proceed without human approval?</div>
             </div>
           </div>
@@ -370,9 +357,10 @@
             <span class="pill warn">Position carefully</span>
             <h3>Agent-specific identity capabilities</h3>
             <ul>
-              <li><strong>Microsoft Entra Agent ID</strong> is a real Microsoft capability for governing and securing agent identities.</li>
-              <li>It should be described as an <strong>emerging Microsoft control plane</strong>, not the universal identity baseline for all enterprise AI agents today.</li>
-              <li>Conditional Access for Agent ID should be treated as <strong>preview</strong> capability, not as a mature cross-platform norm.</li>
+              <li><strong>Microsoft Entra Agent ID</strong> reached general availability at Ignite 2025 (November 2025) and is a real Microsoft capability for governing and securing agent identities.</li>
+              <li>It is <strong>Microsoft-specific</strong> and <strong>license-gated</strong> &mdash; not the universal identity baseline for all enterprise AI agents across platforms.</li>
+              <li>Conditional Access for agent identities is currently limited to <strong>Block Access only</strong>. MFA, authentication strength, device compliance, and session controls are <strong>not supported</strong> for agent identities.</li>
+              <li>Agent Risk detection in Conditional Access remains in <strong>preview</strong>.</li>
               <li>Managed identities remain strong runtime identities, but they are <strong>not covered by Conditional Access for workload identities</strong>.</li>
             </ul>
           </div>
@@ -446,11 +434,11 @@
             <h3>Semantic validation flow</h3>
             <div class="flow">
               <div class="box">Prompt or Retrieved Content</div>
-              <div class="arrow">→</div>
+              <div class="arrow">&rarr;</div>
               <div class="box">Safety / Injection Inspection</div>
-              <div class="arrow">→</div>
-              <div class="box">Policy Decision<br/>Allow · Challenge · Block</div>
-              <div class="arrow">→</div>
+              <div class="arrow">&rarr;</div>
+              <div class="box">Policy Decision<br/>Allow &middot; Challenge &middot; Block</div>
+              <div class="arrow">&rarr;</div>
               <div class="box">Tool Invocation or Response Generation</div>
             </div>
             <div class="warnbox">The semantic layer should be treated as <strong>risk reduction</strong>, not as proof that the agent is now safe. It must be paired with execution constraints.</div>
@@ -481,9 +469,10 @@
             <ul>
               <li>Task-scoped permissions are a valid <strong>architectural target</strong>.</li>
               <li>In practice they are usually built through orchestration logic, policy engines, ephemeral credentials, and approval workflows.</li>
-              <li>They should not be presented as though a single cloud-native “TBAC” feature already exists universally across platforms.</li>
+              <li>They should not be presented as though a single cloud-native &ldquo;TBAC&rdquo; feature already exists universally across platforms.</li>
               <li>Use them as a design pattern: scope identity, tool access, transaction range, and time window to the active task.</li>
             </ul>
+            <div class="note"><strong>TBAC (Task-Based Authorization Controls)</strong> originates from Sandhu &amp; Thomas, IFIP WG11.3, 1997 &mdash; it is an academic access-control model, not a NIST/ISO standard or productized cloud feature. Note: &ldquo;TBAC&rdquo; is also used in industry for &ldquo;Time-Based Access Control&rdquo; (JIT, time-boxed grants) &mdash; a distinct concept sharing the acronym.</div>
           </div>
           <div class="card full">
             <h3>Execution authorization envelope</h3>
@@ -517,6 +506,31 @@
             </div>
             <div class="note">Execution security is where Zero Trust becomes operational: <strong>never assume the agent should retain standing access once the current task step is complete.</strong></div>
           </div>
+          <div class="card">
+            <span class="pill blue">Cloud-native</span>
+            <h3>AWS STS &mdash; ephemeral task-scoped credentials</h3>
+            <p>AWS STS <code>AssumeRoleWithWebIdentity</code> vends temporary credentials with a minimum duration of <strong>900 seconds (15 minutes)</strong>. Session policies (inline <code>Policy</code> parameter or managed <code>PolicyArns</code>) can further restrict the assumed role&rsquo;s permissions to only what the current task requires &mdash; session policies can only reduce, not grant.</p>
+            <p>This is the primary cloud-native mechanism for ephemeral, task-scoped agent access in AWS.</p>
+          </div>
+          <div class="card">
+            <span class="pill warn">Emerging standard</span>
+            <h3>Model Context Protocol (MCP)</h3>
+            <p>The Model Context Protocol (MCP, donated to the Linux Foundation&rsquo;s AAIF in December 2025) is emerging as the standard for exposing Tools, Resources, and Prompts to AI models.</p>
+            <p>Every MCP tool invocation is an <strong>authorization decision point</strong> &mdash; the execution layer should enforce per-tool allow-lists, argument validation, and policy-engine authorization before any tool executes.</p>
+            <p>MCP security uses <strong>OAuth 2.1</strong> (IETF draft) with mandatory PKCE; Dynamic Client Registration and Protected Resource Metadata are defined in the specification.</p>
+          </div>
+          <div class="card full">
+            <span class="pill good">Tooling</span>
+            <h3>Policy-as-Code authorization engines</h3>
+            <p>Policy-as-Code tools for agent authorization include:</p>
+            <ul>
+              <li><strong>Cerbos</strong> &mdash; YAML policies with CEL expressions.</li>
+              <li><strong>OPA / Rego</strong> &mdash; general-purpose policy engine widely adopted in Kubernetes and service-mesh deployments.</li>
+              <li><strong>Cedar</strong> &mdash; Amazon Verified Permissions, AWS-native.</li>
+              <li><strong>Polar</strong> &mdash; Oso&rsquo;s logic-based policy language.</li>
+            </ul>
+            <p>These tools evaluate authorization requests in real-time against declarative policies that encode <strong>ABAC</strong>, <strong>ReBAC</strong>, and <strong>TBAC</strong> rules.</p>
+          </div>
         </div>
       </div>
     </section>
@@ -525,7 +539,7 @@
       <div class="wrap">
         <h2 class="section-title">Governance layer</h2>
         <p class="section-sub">
-          High-impact agent actions should not be described as if there is a single turnkey “step-up token” feature for every case. Governance is usually implemented as a composed workflow.
+          High-impact agent actions should not be described as if there is a single turnkey &ldquo;step-up token&rdquo; feature for every case. Governance is usually implemented as a composed workflow.
         </p>
         <div class="grid">
           <div class="card">
@@ -546,16 +560,19 @@
               <li>Preserve strong evidence: who approved, what context was reviewed, what changed, and for how long.</li>
               <li>Ensure approval grants are time-bound and tied to a narrow action set.</li>
             </ul>
+            <div class="dangerbox">
+              <strong>Important caveat:</strong> authentication context, PIM-style elevation, and MFA-based step-up apply to <strong>USER identities</strong>, not to agent/workload identities. Service principals cannot satisfy interactive authentication challenges. For agents, governance is implemented through conditional access policies scoped to service principals (Block Access only), custom approval workflows in orchestration logic, time-bound scoped credential issuance via STS, and policy-engine-driven authorization gates.
+            </div>
           </div>
           <div class="card full">
             <h3>High-risk action approval flow</h3>
             <div class="flow">
               <div class="box">Agent Requests Sensitive Action</div>
-              <div class="arrow">→</div>
+              <div class="arrow">&rarr;</div>
               <div class="box">Policy / Risk Check</div>
-              <div class="arrow">→</div>
+              <div class="arrow">&rarr;</div>
               <div class="box">Human Approval or Denial</div>
-              <div class="arrow">→</div>
+              <div class="arrow">&rarr;</div>
               <div class="box">Time-Bound, Scoped Execution</div>
             </div>
             <div class="dangerbox">Do not imply that every governance flow is natively cryptographic and automatic. In many enterprises, the secure implementation is a <strong>composite of IAM, approval workflow, orchestration logic, and logging</strong>.</div>
@@ -595,6 +612,17 @@
               Keep the trust relationship explicit and minimal. Treat the agent as an external workload from the perspective of the target cloud unless it is natively hosted there.
             </p>
             <div class="note">The correct architectural emphasis is <strong>federation + temporary credentials + least privilege + auditability</strong>, not custom identity translation logic.</div>
+          </div>
+          <div class="card full">
+            <span class="pill warn">Emerging patterns</span>
+            <h3>Decentralized identity for cross-organizational agents</h3>
+            <p>For future cross-organizational agent scenarios where centralized identity providers are insufficient, emerging patterns include:</p>
+            <ul>
+              <li><strong>W3C Decentralized Identifiers (DIDs v1.0)</strong> &mdash; self-sovereign identifiers decoupled from any single provider.</li>
+              <li><strong>Verifiable Credentials (VC Data Model v2.0)</strong> &mdash; cryptographically signed claims exchangeable across trust boundaries.</li>
+              <li><strong>Zero-Knowledge Proofs</strong> (BBS+ cryptosuite) &mdash; selective disclosure of attributes without revealing the underlying claim set.</li>
+            </ul>
+            <div class="warnbox">These are <strong>research-stage as of 2025</strong> and not production-ready alternatives to federation. They may, however, become relevant for decentralized agent ecosystems where bilateral federation is impractical or where no single trust anchor is acceptable to all parties.</div>
           </div>
         </div>
       </div>
@@ -651,9 +679,9 @@
             <h4>1. Where does the agent run?</h4>
             <p>Azure-native, AWS-native, or external / SaaS-hosted?</p>
             <ul>
-              <li>Azure-native → managed identity first</li>
-              <li>AWS-native → IAM role first</li>
-              <li>External → service principal or federation</li>
+              <li>Azure-native &rarr; managed identity first</li>
+              <li>AWS-native &rarr; IAM role first</li>
+              <li>External &rarr; service principal or federation</li>
             </ul>
           </div>
           <div class="decision">
@@ -679,8 +707,8 @@
             <h4>4. Is the agent fully autonomous?</h4>
             <p>If autonomy increases, so must mediation, kill switches, and containment.</p>
             <ul>
-              <li>Semi-autonomous → scoped approvals</li>
-              <li>Broad autonomy → strong runtime containment</li>
+              <li>Semi-autonomous &rarr; scoped approvals</li>
+              <li>Broad autonomy &rarr; strong runtime containment</li>
             </ul>
           </div>
           <div class="decision">
@@ -702,6 +730,47 @@
         </div>
       </div>
     </section>
+
+    <section id="compliance">
+      <div class="wrap">
+        <h2 class="section-title">Compliance &amp; regulatory considerations</h2>
+        <p class="section-sub">
+          Agent architectures operate inside an emerging and uneven regulatory landscape. The frameworks below are the most commonly cited; treat them as design inputs, not as product checklists.
+        </p>
+        <div class="grid">
+          <div class="card">
+            <span class="pill bad">Binding &middot; phased</span>
+            <h3>EU AI Act</h3>
+            <ul>
+              <li>Risk-tiered framework: <strong>Unacceptable</strong> (prohibited), <strong>High</strong> (strict obligations), <strong>Limited</strong> (transparency), <strong>Minimal</strong> (voluntary).</li>
+              <li><strong>Article 50</strong> imposes transparency obligations for AI systems, including disclosure when users interact with AI and labelling of deepfakes and AI-generated content.</li>
+              <li>Phased application through <strong>August 2027</strong>, with earlier milestones for prohibited practices and GPAI obligations.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <span class="pill warn">Binding &middot; data</span>
+            <h3>GDPR &mdash; data minimisation</h3>
+            <ul>
+              <li><strong>Article 5(1)(c)</strong> requires personal data to be adequate, relevant, and limited to what is necessary for the purposes for which it is processed.</li>
+              <li>Directly constrains agent retrieval scope, context retention, and tool argument forwarding.</li>
+              <li>Pairs with purpose-limitation (Art. 5(1)(b)) and storage-limitation (Art. 5(1)(e)) principles.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <span class="pill blue">Voluntary</span>
+            <h3>NIST AI RMF</h3>
+            <ul>
+              <li>Voluntary risk-management framework from the U.S. National Institute of Standards and Technology.</li>
+              <li>Four core functions: <strong>GOVERN</strong>, <strong>MAP</strong>, <strong>MEASURE</strong>, <strong>MANAGE</strong>.</li>
+              <li>Useful for structuring internal policy even where regulation is not yet binding.</li>
+            </ul>
+          </div>
+          <div class="card full">
+            <div class="dangerbox"><strong>Not legal advice.</strong> This section summarizes publicly known regulatory frameworks for architectural awareness only. Compliance posture depends on jurisdiction, sector, data processed, and deployment specifics &mdash; engage qualified legal counsel for binding determinations.</div>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <footer>
@@ -712,13 +781,22 @@
         <span>Semantic safety and execution containment</span>
         <span>Governance for high-risk actions</span>
       </div>
+      <div class="footer-author">
+        Maintained by Stephen A. Adebowale &mdash; Senior Information Security Architect / vCISO &nbsp;&middot;&nbsp;
+        <a href="https://www.linkedin.com/in/stephen-ade-0ba27110" target="_blank">LinkedIn</a> &nbsp;&middot;&nbsp;
+        <a href="https://x.com/SteveInfosec" target="_blank">X @SteveInfosec</a> &nbsp;&middot;&nbsp;
+        &copy; 2025 Stephen A. Adebowale.
+      </div>
     </div>
   </footer>
-  <div style="background:#0a1628;padding:20px 28px;text-align:center;border-top:1px solid rgba(78,164,255,.15);font-size:12px;color:#8a9bbf;">
-    Published by <a href="https://stephen-ade.github.io" style="color:#56a0fa;font-weight:600;text-decoration:none;">Stephen A. Adebowale</a> &mdash; Senior Information Security Architect/vCISO &nbsp;|&nbsp;
-    <a href="https://www.linkedin.com/in/stephen-ade-0ba27110" target="_blank" style="color:#56a0fa;text-decoration:none;">LinkedIn</a> &nbsp;|&nbsp;
-    <a href="https://x.com/SteveInfosec" target="_blank" style="color:#56a0fa;text-decoration:none;">X @SteveInfosec</a><br>
-    <span style="margin-top:6px;display:inline-block;">&copy; 2025 Stephen A. Adebowale. All rights reserved.</span>
-  </div>
+
+  <script>
+    (function(){
+      var d = new Date();
+      var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      var el = document.getElementById('rev-date');
+      if(el){ el.textContent = months[d.getMonth()] + ' ' + d.getFullYear(); }
+    })();
+  </script>
 </body>
 </html>
