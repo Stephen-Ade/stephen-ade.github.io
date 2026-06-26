@@ -69,6 +69,125 @@
       border-right:1px solid rgba(255,255,255,.12);margin-right:4px;
     }
     .footer-links a.home-link{color:var(--accent2);font-weight:600}
+
+    /* === Decision tree tabs === */
+    .dt-tabs{display:flex;gap:4px;margin:1.5rem 0 0;padding:0;border-bottom:1px solid var(--line-light)}
+    .dt-tab{
+      appearance:none;border:0;background:transparent;cursor:pointer;
+      font-family:inherit;font-size:13px;font-weight:600;color:var(--muted-dark);
+      padding:10px 18px;border-radius:8px 8px 0 0;border:1px solid transparent;border-bottom:0;
+      transition:background .15s,color .15s;
+    }
+    .dt-tab:hover{background:rgba(78,164,255,.08);color:var(--text-dark)}
+    .dt-tab.active{
+      background:#fff;color:var(--text-dark);
+      border-color:var(--line-light);
+      box-shadow:0 -2px 4px rgba(0,0,0,.02);
+    }
+    .dt-tab + .dt-tab{margin-left:2px}
+    .dt-panel{display:none;padding:1.5rem 0 0}
+    .dt-panel.active{display:block}
+
+    /* === Wizard === */
+    .wizard{
+      background:#fff;border:1px solid var(--line-light);border-radius:18px;
+      padding:28px 28px 22px;box-shadow:0 4px 14px rgba(20,40,80,.04);
+    }
+    .wizard-progress{
+      display:flex;align-items:center;gap:6px;margin-bottom:22px;
+      font-size:12px;color:var(--muted-dark);
+    }
+    .wizard-bar{
+      flex:1;height:6px;background:#eef2f7;border-radius:99px;overflow:hidden;
+    }
+    .wizard-bar > span{
+      display:block;height:100%;background:linear-gradient(90deg,var(--accent),#276dff);
+      width:0%;transition:width .25s ease;
+    }
+    .wizard-q-num{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:4px}
+    .wizard-q-title{font-size:19px;color:var(--text-dark);letter-spacing:-.02em;margin:0 0 6px;font-weight:700}
+    .wizard-q-desc{color:var(--muted-dark);margin:0 0 18px;font-size:14px}
+    .wizard-options{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:22px}
+    .wizard-opt{
+      display:flex;align-items:flex-start;gap:10px;cursor:pointer;
+      border:1px solid var(--line-light);border-radius:12px;padding:12px 14px;
+      transition:border-color .15s,background .15s,box-shadow .15s;
+    }
+    .wizard-opt:hover{border-color:rgba(78,164,255,.4);background:rgba(78,164,255,.04)}
+    .wizard-opt input{position:absolute;opacity:0;pointer-events:none}
+    .wizard-opt .dot{
+      flex-shrink:0;width:18px;height:18px;border-radius:50%;
+      border:2px solid #c5d2e2;background:#fff;position:relative;margin-top:1px;
+    }
+    .wizard-opt input:checked + .dot{border-color:var(--accent)}
+    .wizard-opt input:checked + .dot::after{
+      content:'';position:absolute;inset:3px;border-radius:50%;background:var(--accent);
+    }
+    .wizard-opt input:checked ~ .opt-text{color:var(--text-dark)}
+    .wizard-opt input:checked ~ .opt-text .opt-title{font-weight:700}
+    .wizard-opt:has(input:checked){border-color:var(--accent);background:rgba(78,164,255,.06);box-shadow:0 0 0 1px rgba(78,164,255,.2)}
+    .opt-text{flex:1;font-size:14px;color:var(--muted-dark);line-height:1.5}
+    .opt-title{display:block;font-weight:600;color:var(--text-dark);margin-bottom:2px}
+    .opt-detail{font-size:12px;color:var(--muted-dark)}
+    .wizard-nav{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+    .wizard-btn{
+      appearance:none;border:0;cursor:pointer;font-family:inherit;font-weight:600;font-size:13px;
+      padding:9px 18px;border-radius:8px;transition:background .15s,box-shadow .15s,opacity .15s;
+    }
+    .wizard-btn:disabled{opacity:.45;cursor:not-allowed}
+    .wb-back{background:#eef2f7;color:var(--text-dark)}
+    .wb-back:hover:not(:disabled){background:#e2e8f0}
+    .wb-next{background:linear-gradient(135deg,var(--accent),#276dff);color:#fff;box-shadow:0 4px 12px rgba(78,164,255,.3)}
+    .wb-next:hover:not(:disabled){box-shadow:0 6px 16px rgba(78,164,255,.4)}
+    .wb-restart{background:#eef2f7;color:var(--muted-dark);font-size:12px;padding:7px 12px}
+    .wb-restart:hover{background:#e2e8f0;color:var(--text-dark)}
+
+    /* === Results === */
+    .wizard-result{display:none;margin-top:22px;padding-top:22px;border-top:1px solid var(--line-light)}
+    .wizard-result.shown{display:block}
+    .result-head{margin-bottom:18px}
+    .result-head h3{margin:0 0 4px;font-size:18px;color:var(--text-dark);letter-spacing:-.02em}
+    .result-head p{margin:0;color:var(--muted-dark);font-size:13px}
+    .outcome-rank{
+      display:flex;align-items:center;gap:14px;padding:14px 16px;margin-bottom:10px;
+      border:1px solid var(--line-light);border-radius:12px;background:#fff;
+    }
+    .outcome-rank .pct{
+      flex-shrink:0;width:64px;text-align:center;
+      font-size:18px;font-weight:800;color:var(--accent);letter-spacing:-.03em;
+    }
+    .outcome-rank .pct small{display:block;font-size:10px;font-weight:600;color:var(--muted-dark);letter-spacing:.04em;margin-top:2px}
+    .outcome-rank .body{flex:1}
+    .outcome-rank .body h4{margin:0 0 3px;font-size:15px;color:var(--text-dark)}
+    .outcome-rank .body p{margin:0;font-size:13px;color:var(--muted-dark);line-height:1.45}
+    .outcome-rank.primary{border-color:var(--accent);box-shadow:0 0 0 1px rgba(78,164,255,.2)}
+    .outcome-rank.primary .pct{color:var(--accent)}
+    .outcome-rank.hard-stop{border-color:var(--bad);box-shadow:0 0 0 1px rgba(220,76,100,.2)}
+    .outcome-rank.hard-stop .pct{color:var(--bad)}
+    .union-controls{
+      margin-top:14px;padding:14px 16px;background:#f8fbff;border:1px solid #d9e7ff;border-radius:12px;
+    }
+    .union-controls h4{margin:0 0 8px;font-size:14px;color:var(--text-dark)}
+    .union-controls ul{margin:0;padding-left:18px;color:var(--text-dark);font-size:13px;line-height:1.7}
+    .export-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+    .export-btn{
+      appearance:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;
+      padding:8px 14px;border-radius:8px;border:1px solid var(--line-light);
+      background:#fff;color:var(--text-dark);transition:background .15s,border-color .15s;
+    }
+    .export-btn:hover{background:#f5f8fc;border-color:var(--accent)}
+    .export-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .export-btn.primary:hover{background:#276dff}
+
+    @media print{
+      .dt-tabs,.dt-tab{display:none}
+      .dt-panel{display:block !important;padding:0}
+      .wizard{box-shadow:none;border:0;padding:0}
+      .wizard-nav,.export-row{display:none}
+      .wizard-options{display:none}
+      .wizard-result{display:block !important;border-top:0;padding-top:0}
+      .outcome-rank{break-inside:avoid}
+    }
     .hero{
       color:var(--text);
       padding:64px 0 54px;
@@ -682,8 +801,36 @@
     <section id="decision-tree">
       <div class="wrap">
         <h2 class="section-title">Decision tree</h2>
-        <p class="section-sub">Use this decision tree to choose the right control emphasis for an agent deployment. Walk forks 1&ndash;12 in order; the answers converge on one of five terminal outcomes below. Where answers span multiple outcomes, take the <strong>union</strong> of controls &mdash; never the intersection.</p>
+        <p class="section-sub">Use this decision tree to choose the right control emphasis for an agent deployment. Walk forks 1&ndash;12 in order; the answers converge on one of five terminal outcomes. Where answers span multiple outcomes, take the <strong>union</strong> of controls &mdash; never the intersection.</p>
 
+        <div class="dt-tabs" role="tablist">
+          <button class="dt-tab active" role="tab" data-target="dt-interactive">Interactive</button>
+          <button class="dt-tab" role="tab" data-target="dt-reference">Reference</button>
+        </div>
+
+        <!-- Interactive tab -->
+        <div class="dt-panel active" id="dt-interactive" role="tabpanel">
+          <div class="wizard" id="wizard">
+            <div class="wizard-progress">
+              <span id="wiz-step-label">Question 1 of 12</span>
+              <div class="wizard-bar"><span id="wiz-bar-fill"></span></div>
+              <button class="wb-restart" id="wiz-restart" type="button" title="Start over">Restart</button>
+            </div>
+            <div id="wiz-question">
+              <!-- Question content injected by JS -->
+            </div>
+            <div class="wizard-nav">
+              <button class="wizard-btn wb-back" id="wiz-back" type="button" disabled>&larr; Back</button>
+              <button class="wizard-btn wb-next" id="wiz-next" type="button" disabled>Next &rarr;</button>
+            </div>
+            <div class="wizard-result" id="wiz-result">
+              <!-- Result content injected by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Reference tab -->
+        <div class="dt-panel" id="dt-reference" role="tabpanel">
         <h3 style="margin:2.5rem 0 1rem;font-size:20px;color:var(--text-dark);letter-spacing:-.02em;">Decision forks</h3>
         <div class="decision-grid">
           <div class="decision">
@@ -860,6 +1007,7 @@
         <div class="warnbox" style="margin-top:1.5rem;">
           <strong>How to use this tree:</strong> Walk forks 1&ndash;12 in order. The answers converge on one of outcomes A&ndash;E. Where answers span multiple outcomes, take the <strong>union</strong> of controls &mdash; never the intersection. Treat Outcome E as a hard stop: if any of its conditions are true, do not promote the agent to production.
         </div>
+        </div><!-- /dt-reference -->
       </div>
     </section>
 
@@ -930,6 +1078,628 @@
       var el = document.getElementById('rev-date');
       if(el){ el.textContent = months[d.getMonth()] + ' ' + d.getFullYear(); }
     })();
+  </script>
+
+  <script>
+  /* ============================================================
+     Decision Tree — Interactive Wizard
+     ============================================================ */
+  (function(){
+    'use strict';
+
+    /* --- Fork definitions ---
+       Each fork: id, title, desc, options[]
+       Each option: label (short), detail (longer hint), value (key used by scoring)
+       value 'none' means N/A or skip (no scoring contribution).
+    */
+    var FORKS = [
+      {
+        id: 'hosting', title: 'Where does the agent run?',
+        desc: 'Hosting determines the native identity primitive available.',
+        options: [
+          { label: 'Azure-native', detail: 'Use managed identity first', value: 'azure' },
+          { label: 'AWS-native', detail: 'Use IAM role first', value: 'aws' },
+          { label: 'External / SaaS', detail: 'Service principal or federation', value: 'external' }
+        ]
+      },
+      {
+        id: 'highrisk', title: 'Does the agent perform high-risk actions?',
+        desc: 'Financial transfer, privilege grant, destructive change, bulk export, policy modification.',
+        options: [
+          { label: 'Yes — high-risk actions', detail: 'Add approval workflows and evidence collection', value: 'yes' },
+          { label: 'No — routine actions only', detail: 'Baseline governance is sufficient', value: 'no' }
+        ]
+      },
+      {
+        id: 'crossdata', title: 'Does it access cross-boundary data?',
+        desc: 'RAG over sensitive data, partner data, or cross-cloud APIs.',
+        options: [
+          { label: 'Yes — cross-boundary', detail: 'Retrieval-time authz, segmentation, federation hygiene', value: 'yes' },
+          { label: 'No — single-boundary', detail: 'Standard data-plane controls suffice', value: 'no' }
+        ]
+      },
+      {
+        id: 'autonomy', title: 'Is the agent fully autonomous?',
+        desc: 'Higher autonomy demands stronger mediation and containment.',
+        options: [
+          { label: 'Semi-autonomous', detail: 'Human in the loop; scoped approvals', value: 'semi' },
+          { label: 'Broadly autonomous', detail: 'Strong runtime containment + kill switch', value: 'broad' }
+        ]
+      },
+      {
+        id: 'preview', title: 'Are preview capabilities acceptable?',
+        desc: 'If not, avoid building core security dependencies on preview-only features.',
+        options: [
+          { label: 'GA only', detail: 'Use GA IAM baselines; treat preview as additive', value: 'ga' },
+          { label: 'Preview acceptable', detail: 'May design around preview features with fallback', value: 'preview' }
+        ]
+      },
+      {
+        id: 'observe', title: 'Can you observe and stop the agent quickly?',
+        desc: 'Logs, alerts, kill switch, rollback, clear ownership, incident playbooks.',
+        options: [
+          { label: 'Yes — full observability + kill switch', detail: 'Ready for production autonomy', value: 'yes' },
+          { label: 'Partial — logs only, no kill switch', detail: 'Limited; constrain autonomy', value: 'partial' },
+          { label: 'No — gaps in observability or stop', detail: 'Not ready for broad production autonomy', value: 'no' }
+        ]
+      },
+      {
+        id: 'identitytype', title: 'Identity type — delegated or workload?',
+        desc: 'Is the agent acting on behalf of a user, or as an autonomous workload? Bigger fork than hosting location.',
+        options: [
+          { label: 'Delegated (user-bound)', detail: 'User tokens; auth-context step-up available', value: 'delegated' },
+          { label: 'Workload (autonomous)', detail: 'Managed identity / IAM role / federation; no interactive MFA', value: 'workload' }
+        ]
+      },
+      {
+        id: 'mcp', title: 'Does the agent invoke external tools or MCP servers?',
+        desc: 'Every MCP tool invocation is an authorization decision point.',
+        options: [
+          { label: 'Yes — external tools / MCP', detail: 'Per-tool allow-list, OAuth 2.1 PKCE, policy-engine gate', value: 'yes' },
+          { label: 'No — internal only', detail: 'Standard tool mediation; no external authz surface', value: 'no' }
+        ]
+      },
+      {
+        id: 'datatier', title: 'What data sensitivity tier does it touch?',
+        desc: 'Tier drives the governance burden by an order of magnitude.',
+        options: [
+          { label: 'Public / internal', detail: 'Baseline RBAC + light semantic screening', value: 'public' },
+          { label: 'PII / PHI', detail: 'DLP, retrieval-time authz, redaction, audit trail', value: 'pii' },
+          { label: 'Secret / regulated', detail: 'Tightest containment, JIT elevation, biometric re-auth', value: 'secret' }
+        ]
+      },
+      {
+        id: 'latency', title: 'What is the approval latency profile?',
+        desc: 'Choose the CIBA delivery mode that matches the workflow cadence.',
+        options: [
+          { label: 'Background / batch', detail: 'CIBA Poll — async, non-blocking', value: 'poll' },
+          { label: 'Interactive', detail: 'CIBA Ping — callback on decision', value: 'ping' },
+          { label: 'Real-time / high-velocity', detail: 'CIBA Push + biometric step-up', value: 'push' }
+        ]
+      },
+      {
+        id: 'crossorg', title: 'Does the agent cross organizational trust boundaries?',
+        desc: 'Cross-org agents need federation hygiene distinct from cross-cloud.',
+        options: [
+          { label: 'Same org, multi-cloud', detail: 'Federation + STS in each cloud', value: 'sameorg' },
+          { label: 'Cross-org', detail: 'Bilateral federation; consider DIDs / VCs', value: 'crossorg' },
+          { label: 'Unknown / dynamic trust', detail: 'Defer; not production-ready', value: 'unknown' }
+        ]
+      },
+      {
+        id: 'regulatory', title: 'What regulatory tier applies?',
+        desc: 'Regulation shifts minimum obligations, not just best practice.',
+        options: [
+          { label: 'EU AI Act high-risk', detail: 'Strict obligations, evidence retention', value: 'euai' },
+          { label: 'GDPR-scope personal data', detail: 'Data minimisation, purpose limitation', value: 'gdpr' },
+          { label: 'NIST AI RMF voluntary', detail: 'Governance scaffolding, no binding force', value: 'nist' },
+          { label: 'None / not yet classified', detail: 'Apply baseline best practices', value: 'none' }
+        ]
+      }
+    ];
+
+    /* --- Outcome definitions ---
+       match(answers) returns 0..1 score; hardStop flag overrides ranking.
+    */
+    var OUTCOMES = [
+      {
+        key: 'A', name: 'Lightweight internal agent',
+        when: 'workload identity, no MCP, internal data, async, single-org, minimal-risk.',
+        controls: [
+          'Cloud-native managed identity or IAM role',
+          'Scoped RBAC, short-lived credentials',
+          'Light semantic screening (Prompt Shields or Bedrock Guardrails)',
+          'Standard logging; no human-in-loop required'
+        ],
+        match: function(a){
+          var s = 0;
+          if (a.identitytype === 'workload') s += 0.25;
+          if (a.mcp === 'no') s += 0.25;
+          if (a.datatier === 'public') s += 0.25;
+          if (a.highrisk === 'no' && a.crossdata === 'no' && a.crossorg === 'sameorg' && a.regulatory === 'none') s += 0.25;
+          return s;
+        }
+      },
+      {
+        key: 'B', name: 'Interactive delegated agent',
+        when: 'delegated identity, MCP tools, internal + PII, interactive Ping, single-org, GDPR-scope.',
+        controls: [
+          'User-bound tokens with authentication-context step-up',
+          'Per-tool allow-list + OAuth 2.1 PKCE for MCP',
+          'DLP + retrieval-time authz + redaction',
+          'CIBA Ping callback for human consent',
+          'Conditional Access (Block Access) on the workload identity'
+        ],
+        match: function(a){
+          var s = 0;
+          if (a.identitytype === 'delegated') s += 0.25;
+          if (a.mcp === 'yes') s += 0.2;
+          if (a.datatier === 'pii') s += 0.2;
+          if (a.latency === 'ping') s += 0.2;
+          if (a.crossorg === 'sameorg' && (a.regulatory === 'gdpr' || a.regulatory === 'euai')) s += 0.15;
+          return s;
+        }
+      },
+      {
+        key: 'C', name: 'High-risk autonomous agent',
+        when: 'workload, MCP, PHI / secret, real-time Push, single-org, EU AI Act high-risk.',
+        controls: [
+          'Workload identity + PIM-style elevation for sensitive actions',
+          'Per-tool policy-engine gate (OPA / Cedar)',
+          'Strict containment: ephemeral compute, egress control, read-only FS',
+          'CIBA Push + biometric re-auth for high-velocity actions',
+          'Evidence retention per EU AI Act; kill switch + rollback'
+        ],
+        match: function(a){
+          var s = 0;
+          if (a.highrisk === 'yes') s += 0.25;
+          if (a.datatier === 'secret') s += 0.25;
+          if (a.latency === 'push') s += 0.2;
+          if (a.autonomy === 'broad') s += 0.15;
+          if (a.regulatory === 'euai') s += 0.15;
+          return s;
+        }
+      },
+      {
+        key: 'D', name: 'Cross-org federated agent',
+        when: 'workload, MCP, partner data, async or interactive, cross-org, mixed regulatory.',
+        controls: [
+          'Bilateral federation + STS in each cloud',
+          'Confused-deputy protection (aws:SourceArn / SourceAccount)',
+          'Per-tool allow-list scoped to partner resources',
+          'DIDs / Verifiable Credentials if no central trust anchor',
+          'Cross-cloud audit (CloudTrail + Azure Monitor)'
+        ],
+        match: function(a){
+          var s = 0;
+          if (a.crossorg === 'crossorg') s += 0.4;
+          if (a.crossdata === 'yes') s += 0.2;
+          if (a.mcp === 'yes') s += 0.2;
+          if (a.identitytype === 'workload') s += 0.2;
+          return s;
+        }
+      },
+      {
+        key: 'E', name: 'Not production-ready',
+        when: 'fully autonomous + high-risk + no observability + no kill switch + cross-org with no trust anchor.',
+        controls: [
+          'Do not deploy to production',
+          'Pilot only in sandbox with synthetic data',
+          'Re-architect: add containment, kill switch, audit, governance',
+          'Re-evaluate against forks 1–12 before promotion'
+        ],
+        hardStop: true,
+        match: function(a){
+          var triggers = 0;
+          if (a.observe === 'no') triggers++;
+          if (a.crossorg === 'unknown') triggers++;
+          if (a.autonomy === 'broad' && a.highrisk === 'yes' && a.observe !== 'yes') triggers++;
+          if (a.datatier === 'secret' && a.observe === 'no') triggers++;
+          // Hard-stop fires when 2+ red flags present
+          return triggers >= 2 ? 1 : 0;
+        }
+      }
+    ];
+
+    /* --- State --- */
+    var state = {
+      step: 0,                 // 0..FORKS.length-1, or FORKS.length when on result
+      answers: {},             // {forkId: value}
+      finished: false
+    };
+
+    /* --- DOM refs --- */
+    var $step   = document.getElementById('wiz-step-label');
+    var $bar    = document.getElementById('wiz-bar-fill');
+    var $q      = document.getElementById('wiz-question');
+    var $back   = document.getElementById('wiz-back');
+    var $next   = document.getElementById('wiz-next');
+    var $restart= document.getElementById('wiz-restart');
+    var $result = document.getElementById('wiz-result');
+
+    /* --- URL persistence ---
+       Format: #decision-tree?a=ABCD... where each char is the option index (0-based)
+       or '-' for skipped. Kept short so links are shareable.
+    */
+    var PARAM = 'a';
+
+    function answersToCode(){
+      var code = '';
+      for (var i = 0; i < FORKS.length; i++){
+        var f = FORKS[i];
+        var v = state.answers[f.id];
+        if (v === undefined){ code += '-'; continue; }
+        var idx = -1;
+        for (var j = 0; j < f.options.length; j++){
+          if (f.options[j].value === v){ idx = j; break; }
+        }
+        code += (idx >= 0) ? String(idx) : '-';
+      }
+      return code;
+    }
+
+    function codeToAnswers(code){
+      var a = {};
+      if (!code) return a;
+      for (var i = 0; i < FORKS.length && i < code.length; i++){
+        var ch = code.charAt(i);
+        if (ch === '-' || ch === '?') continue;
+        var idx = parseInt(ch, 10);
+        if (isNaN(idx) || idx < 0 || idx >= FORKS[i].options.length) continue;
+        a[FORKS[i].id] = FORKS[i].options[idx].value;
+      }
+      return a;
+    }
+
+    function writeURL(){
+      var code = answersToCode();
+      var hash = '#decision-tree?a=' + code;
+      if (history.replaceState){
+        history.replaceState(null, '', hash);
+      } else {
+        window.location.hash = hash;
+      }
+    }
+
+    function readURL(){
+      var hash = window.location.hash || '';
+      var m = hash.match(new RegExp('[?&]' + PARAM + '=([^&]+)'));
+      if (!m) return null;
+      return decodeURIComponent(m[1]);
+    }
+
+    /* --- Rendering --- */
+    function renderQuestion(){
+      var f = FORKS[state.step];
+      var html = '';
+      html += '<div class="wizard-q-num">Question ' + (state.step + 1) + ' of ' + FORKS.length + '</div>';
+      html += '<h3 class="wizard-q-title">' + f.title + '</h3>';
+      html += '<p class="wizard-q-desc">' + f.desc + '</p>';
+      html += '<div class="wizard-options" role="radiogroup">';
+      for (var i = 0; i < f.options.length; i++){
+        var opt = f.options[i];
+        var checked = (state.answers[f.id] === opt.value) ? 'checked' : '';
+        html += '<label class="wizard-opt">';
+        html += '<input type="radio" name="fork-' + f.id + '" value="' + opt.value + '" ' + checked + '>';
+        html += '<span class="dot"></span>';
+        html += '<span class="opt-text"><span class="opt-title">' + opt.label + '</span>';
+        html += '<span class="opt-detail">' + opt.detail + '</span></span>';
+        html += '</label>';
+      }
+      html += '</div>';
+      $q.innerHTML = html;
+
+      // Wire change handler
+      var radios = $q.querySelectorAll('input[type="radio"]');
+      for (var k = 0; k < radios.length; k++){
+        radios[k].addEventListener('change', function(){
+          state.answers[f.id] = this.value;
+          writeURL();
+          $next.disabled = false;
+        });
+      }
+
+      // Progress UI
+      $step.textContent = 'Question ' + (state.step + 1) + ' of ' + FORKS.length;
+      var pct = (state.step / FORKS.length) * 100;
+      $bar.style.width = pct + '%';
+
+      // Button states
+      $back.disabled = (state.step === 0);
+      $next.disabled = (state.answers[f.id] === undefined);
+      $next.textContent = (state.step === FORKS.length - 1) ? 'See result →' : 'Next →';
+    }
+
+    function renderResult(){
+      // Hide question area, show result
+      $q.innerHTML = '';
+      $step.textContent = 'Result';
+      $bar.style.width = '100%';
+      $back.disabled = false;
+      $next.style.display = 'none';
+
+      // Score outcomes
+      var scored = OUTCOMES.map(function(o){
+        return { o: o, score: o.match(state.answers) };
+      });
+      // Separate hard-stop from ranked
+      var hardStop = scored.filter(function(s){ return s.o.hardStop && s.score >= 1; });
+      var ranked = scored.filter(function(s){ return !s.o.hardStop; })
+                         .filter(function(s){ return s.score > 0; })
+                         .sort(function(a, b){ return b.score - a.score; });
+
+      var html = '';
+      html += '<div class="result-head">';
+      html += '<h3>Recommended control emphasis</h3>';
+      html += '<p>Based on your answers, the following outcomes apply. Take the <strong>union</strong> of controls across all listed outcomes.</p>';
+      html += '</div>';
+
+      if (hardStop.length > 0){
+        var hs = hardStop[0].o;
+        html += '<div class="outcome-rank hard-stop">';
+        html += '<div class="pct">STOP<small>HARD STOP</small></div>';
+        html += '<div class="body"><h4>Outcome ' + hs.key + ' — ' + hs.name + '</h4>';
+        html += '<p><strong>When:</strong> ' + hs.when + '</p></div>';
+        html += '</div>';
+        html += unionBlock(hs.controls, 'Immediate actions');
+      } else {
+        for (var i = 0; i < ranked.length; i++){
+          var s = ranked[i];
+          var pct = Math.round(s.score * 100);
+          var cls = (i === 0) ? ' primary' : '';
+          html += '<div class="outcome-rank' + cls + '">';
+          html += '<div class="pct">' + pct + '%<small>MATCH</small></div>';
+          html += '<div class="body"><h4>Outcome ' + s.o.key + ' — ' + s.o.name + '</h4>';
+          html += '<p><strong>When:</strong> ' + s.o.when + '</p></div>';
+          html += '</div>';
+        }
+        // Union of controls
+        var allControls = [];
+        for (var j = 0; j < ranked.length; j++){
+          var c = ranked[j].o.controls;
+          for (var k = 0; k < c.length; k++){
+            if (allControls.indexOf(c[k]) === -1) allControls.push(c[k]);
+          }
+        }
+        if (allControls.length > 0){
+          html += unionBlock(allControls, 'Union of controls to apply');
+        }
+      }
+
+      // Export buttons
+      html += '<div class="export-row">';
+      html += '<button class="export-btn primary" id="export-copy" type="button">Copy result</button>';
+      html += '<button class="export-btn" id="export-share" type="button">Copy share link</button>';
+      html += '<button class="export-btn" id="export-print" type="button">Print result</button>';
+      html += '</div>';
+
+      $result.innerHTML = html;
+      $result.classList.add('shown');
+
+      // Wire export buttons
+      var btnCopy = document.getElementById('export-copy');
+      var btnShare = document.getElementById('export-share');
+      var btnPrint = document.getElementById('export-print');
+      if (btnCopy) btnCopy.addEventListener('click', exportText);
+      if (btnShare) btnShare.addEventListener('click', exportShareLink);
+      if (btnPrint) btnPrint.addEventListener('click', function(){
+        // Switch to reference tab is NOT needed; just trigger print
+        window.print();
+      });
+    }
+
+    function unionBlock(items, title){
+      var html = '<div class="union-controls"><h4>' + title + '</h4><ul>';
+      for (var i = 0; i < items.length; i++){
+        html += '<li>' + items[i] + '</li>';
+      }
+      html += '</ul></div>';
+      return html;
+    }
+
+    /* --- Export --- */
+    function buildResultText(){
+      var lines = [];
+      lines.push('CAZT Decision Tree — Result');
+      lines.push('Generated: ' + new Date().toISOString());
+      lines.push('');
+      lines.push('ANSWERS:');
+      for (var i = 0; i < FORKS.length; i++){
+        var f = FORKS[i];
+        var v = state.answers[f.id];
+        var label = '(not answered)';
+        if (v !== undefined){
+          for (var j = 0; j < f.options.length; j++){
+            if (f.options[j].value === v){ label = f.options[j].label; break; }
+          }
+        }
+        lines.push((i + 1) + '. ' + f.title);
+        lines.push('   → ' + label);
+      }
+      lines.push('');
+      lines.push('RECOMMENDED OUTCOMES:');
+      // Recompute (cheap)
+      var scored = OUTCOMES.map(function(o){ return { o: o, score: o.match(state.answers) }; });
+      var hardStop = scored.filter(function(s){ return s.o.hardStop && s.score >= 1; });
+      var ranked = scored.filter(function(s){ return !s.o.hardStop && s.score > 0; })
+                         .sort(function(a, b){ return b.score - a.score; });
+      if (hardStop.length > 0){
+        var hs = hardStop[0].o;
+        lines.push('  STOP — Outcome ' + hs.key + ': ' + hs.name);
+        lines.push('  ' + hs.controls.join('\n  '));
+      } else {
+        for (var k = 0; k < ranked.length; k++){
+          var s = ranked[k];
+          lines.push('  Outcome ' + s.o.key + ' — ' + s.o.name + ' (' + Math.round(s.score * 100) + '% match)');
+        }
+        lines.push('');
+        lines.push('UNION OF CONTROLS:');
+        var seen = {};
+        for (var m = 0; m < ranked.length; m++){
+          for (var n = 0; n < ranked[m].o.controls.length; n++){
+            var c = ranked[m].o.controls[n];
+            if (!seen[c]){ seen[c] = true; lines.push('  - ' + c); }
+          }
+        }
+      }
+      lines.push('');
+      lines.push('Source: https://stephen-ade.github.io/');
+      return lines.join('\n');
+    }
+
+    function exportText(){
+      var text = buildResultText();
+      if (navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(function(){
+          flashButton('export-copy', 'Copied!');
+        }).catch(function(){ fallbackCopy(text, 'export-copy'); });
+      } else {
+        fallbackCopy(text, 'export-copy');
+      }
+    }
+
+    function exportShareLink(){
+      var url = window.location.origin + window.location.pathname + window.location.hash;
+      if (navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(url).then(function(){
+          flashButton('export-share', 'Link copied!');
+        }).catch(function(){ fallbackCopy(url, 'export-share'); });
+      } else {
+        fallbackCopy(url, 'export-share');
+      }
+    }
+
+    function fallbackCopy(text, btnId){
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); flashButton(btnId, 'Copied!'); }
+      catch(e){ /* noop */ }
+      document.body.removeChild(ta);
+    }
+
+    function flashButton(btnId, msg){
+      var btn = document.getElementById(btnId);
+      if (!btn) return;
+      var orig = btn.textContent;
+      btn.textContent = msg;
+      setTimeout(function(){ btn.textContent = orig; }, 1800);
+    }
+
+    /* --- Navigation --- */
+    function next(){
+      if (state.step < FORKS.length - 1){
+        state.step++;
+        renderQuestion();
+      } else {
+        state.finished = true;
+        renderResult();
+      }
+    }
+
+    function back(){
+      if (state.finished){
+        state.finished = false;
+        $next.style.display = '';
+        $result.classList.remove('shown');
+        $result.innerHTML = '';
+        renderQuestion();
+        return;
+      }
+      if (state.step > 0){
+        state.step--;
+        renderQuestion();
+      }
+    }
+
+    function restart(){
+      state.step = 0;
+      state.answers = {};
+      state.finished = false;
+      $next.style.display = '';
+      $result.classList.remove('shown');
+      $result.innerHTML = '';
+      writeURL();
+      renderQuestion();
+    }
+
+    /* --- Tab switching --- */
+    function initTabs(){
+      var tabs = document.querySelectorAll('.dt-tab');
+      for (var i = 0; i < tabs.length; i++){
+        tabs[i].addEventListener('click', function(){
+          var target = this.getAttribute('data-target');
+          for (var j = 0; j < tabs.length; j++){
+            tabs[j].classList.toggle('active', tabs[j] === this);
+          }
+          var panels = document.querySelectorAll('.dt-panel');
+          for (var k = 0; k < panels.length; k++){
+            panels[k].classList.toggle('active', panels[k].id === target);
+          }
+        });
+      }
+    }
+
+    /* --- Init --- */
+    function init(){
+      initTabs();
+
+      // Restore from URL
+      var code = readURL();
+      if (code){
+        state.answers = codeToAnswers(code);
+        // Count answered
+        var answered = 0;
+        for (var i = 0; i < FORKS.length; i++){
+          if (state.answers[FORKS[i].id] !== undefined) answered++;
+        }
+        if (answered === FORKS.length){
+          // Jump to result
+          state.step = FORKS.length - 1;
+          state.finished = true;
+          renderResult();
+        } else {
+          // Resume at first unanswered
+          for (var j = 0; j < FORKS.length; j++){
+            if (state.answers[FORKS[j].id] === undefined){ state.step = j; break; }
+          }
+          renderQuestion();
+        }
+      } else {
+        renderQuestion();
+      }
+
+      $next.addEventListener('click', next);
+      $back.addEventListener('click', back);
+      $restart.addEventListener('click', restart);
+
+      // Keyboard nav (Enter = next, Esc = back)
+      document.addEventListener('keydown', function(e){
+        // Only when wizard is in viewport
+        var wizard = document.getElementById('wizard');
+        if (!wizard) return;
+        var rect = wizard.getBoundingClientRect();
+        var inView = rect.top < window.innerHeight && rect.bottom > 0;
+        if (!inView) return;
+        if (e.key === 'Enter' && !$next.disabled && !$next.style.display.endsWith('none')){
+          next();
+          e.preventDefault();
+        } else if (e.key === 'Backspace' && !$back.disabled && document.activeElement.tagName !== 'INPUT'){
+          back();
+          e.preventDefault();
+        }
+      });
+    }
+
+    if (document.readyState === 'loading'){
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
   </script>
 </body>
 </html>
