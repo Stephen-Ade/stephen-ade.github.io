@@ -1469,7 +1469,6 @@
       // Export buttons
       html += '<div class="export-row">';
       html += '<button class="export-btn primary" id="export-copy" type="button">Copy result</button>';
-      html += '<button class="export-btn" id="export-share" type="button">Copy share link</button>';
       html += '<button class="export-btn" id="export-print" type="button">Print result</button>';
       html += '</div>';
 
@@ -1478,14 +1477,9 @@
 
       // Wire export buttons
       var btnCopy = document.getElementById('export-copy');
-      var btnShare = document.getElementById('export-share');
       var btnPrint = document.getElementById('export-print');
       if (btnCopy) btnCopy.addEventListener('click', exportText);
-      if (btnShare) btnShare.addEventListener('click', exportShareLink);
-      if (btnPrint) btnPrint.addEventListener('click', function(){
-        // Switch to reference tab is NOT needed; just trigger print
-        window.print();
-      });
+      if (btnPrint) btnPrint.addEventListener('click', exportPrint);
     }
 
     function unionBlock(items, title){
@@ -1559,14 +1553,78 @@
     }
 
     function exportShareLink(){
-      var url = window.location.origin + window.location.pathname + window.location.hash;
-      if (navigator.clipboard && navigator.clipboard.writeText){
-        navigator.clipboard.writeText(url).then(function(){
-          flashButton('export-share', 'Link copied!');
-        }).catch(function(){ fallbackCopy(url, 'export-share'); });
-      } else {
-        fallbackCopy(url, 'export-share');
+      // Removed: "Copy share link" button was removed per request.
+      // Answers still persist in the URL hash, so the URL itself remains shareable.
+    }
+
+    /* Print only the result panel — opens a new window with just the result
+       HTML + minimal styling, then triggers print. This avoids printing the
+       entire SPA. */
+    function exportPrint(){
+      var resultEl = document.getElementById('wiz-result');
+      if (!resultEl) return;
+
+      // Build a clean printable document
+      var printHTML = ''
+        + '<!DOCTYPE html>'
+        + '<html lang="en"><head><meta charset="UTF-8">'
+        + '<title>CAZT Decision Tree — Result</title>'
+        + '<style>'
+        +   'body{font-family:Inter,system-ui,-apple-system,sans-serif;color:#1a2332;'
+        +     'background:#fff;margin:0;padding:32px;line-height:1.5;}'
+        +   'h3{font-size:18px;margin:0 0 6px;color:#1B2A4A;}'
+        +   '.result-head{margin-bottom:16px;}'
+        +   '.result-head p{margin:0;color:#51667e;font-size:13px;}'
+        +   '.outcome-rank{display:flex;align-items:flex-start;gap:14px;padding:12px 14px;'
+        +     'margin-bottom:8px;border:1px solid #d9e3ef;border-radius:10px;background:#fff;}'
+        +   '.outcome-rank.primary{border-color:#4ea4ff;background:#f5f9ff;}'
+        +   '.outcome-rank.hard-stop{border-color:#dc4c64;background:#fff1f4;}'
+        +   '.pct{flex-shrink:0;width:60px;text-align:center;font-size:18px;font-weight:800;'
+        +     'color:#4ea4ff;letter-spacing:-.03em;}'
+        +   '.pct small{display:block;font-size:9px;font-weight:600;color:#51667e;'
+        +     'letter-spacing:.04em;margin-top:2px;}'
+        +   '.outcome-rank.hard-stop .pct{color:#dc4c64;}'
+        +   '.body{flex:1;}'
+        +   '.body h4{margin:0 0 3px;font-size:14px;color:#1a2332;}'
+        +   '.body p{margin:0;font-size:12px;color:#51667e;}'
+        +   '.union-controls{margin-top:12px;padding:12px 14px;background:#f8fbff;'
+        +     'border:1px solid #d9e7ff;border-radius:10px;}'
+        +   '.union-controls h4{margin:0 0 6px;font-size:13px;color:#1a2332;}'
+        +   '.union-controls ul{margin:0;padding-left:18px;color:#1a2332;font-size:12px;line-height:1.7;}'
+        +   '.footer-note{margin-top:24px;padding-top:12px;border-top:1px solid #e9e9e8;'
+        +     'font-size:10px;color:#8C8A84;}'
+        +   '@media print{@page{size:letter;margin:0.75in}body{padding:0;}}'
+        + '</style></head><body>';
+      printHTML += '<h3>CAZT Decision Tree — Result</h3>';
+      printHTML += '<div class="result-meta" style="font-size:11px;color:#8C8A84;margin-bottom:14px;">'
+        + 'Generated ' + new Date().toLocaleString() + ' &middot; '
+        + 'Source: https://stephen-ade.github.io/'
+        + '</div>';
+      // Strip the export-row buttons from the cloned content
+      var clone = resultEl.cloneNode(true);
+      var btns = clone.querySelectorAll('.export-row');
+      for (var i = 0; i < btns.length; i++){ btns[i].parentNode.removeChild(btns[i]); }
+      printHTML += clone.innerHTML;
+      printHTML += '</body></html>';
+
+      // Open a new window and write the printable document
+      var win = window.open('', '_blank', 'width=800,height=900');
+      if (!win){
+        // Popup blocked — fall back to printing current page
+        alert('Pop-up blocked. Please allow pop-ups for this site to print the result.');
+        return;
       }
+      win.document.open();
+      win.document.write(printHTML);
+      win.document.close();
+      // Give the new window a tick to render before printing
+      win.focus();
+      setTimeout(function(){
+        win.print();
+        // Close the window after print dialog closes (most browsers do this automatically
+        // when the user clicks Cancel or after printing; we add a small delay as a fallback)
+        setTimeout(function(){ win.close(); }, 300);
+      }, 250);
     }
 
     function fallbackCopy(text, btnId){
