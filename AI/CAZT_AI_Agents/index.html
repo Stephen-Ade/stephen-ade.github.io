@@ -675,7 +675,9 @@
     <section id="decision-tree">
       <div class="wrap">
         <h2 class="section-title">Decision tree</h2>
-        <p class="section-sub">Use this simple decision tree to choose the right control emphasis for an agent deployment.</p>
+        <p class="section-sub">Use this decision tree to choose the right control emphasis for an agent deployment. Walk forks 1&ndash;12 in order; the answers converge on one of five terminal outcomes below. Where answers span multiple outcomes, take the <strong>union</strong> of controls &mdash; never the intersection.</p>
+
+        <h3 style="margin:2.5rem 0 1rem;font-size:20px;color:var(--text-dark);letter-spacing:-.02em;">Decision forks</h3>
         <div class="decision-grid">
           <div class="decision">
             <h4>1. Where does the agent run?</h4>
@@ -694,6 +696,7 @@
               <li>Privilege grant</li>
               <li>Destructive change</li>
               <li>Bulk export</li>
+              <li>Security or network policy modification</li>
             </ul>
           </div>
           <div class="decision">
@@ -729,6 +732,126 @@
               <li>Need clear ownership and incident playbooks</li>
             </ul>
           </div>
+          <div class="decision">
+            <h4>7. Identity type &mdash; delegated or workload?</h4>
+            <p>Is the agent acting on behalf of a user, or as an autonomous workload? This is a bigger fork than hosting location.</p>
+            <ul>
+              <li>Delegated &rarr; user-bound tokens, authentication-context step-up available</li>
+              <li>Workload &rarr; managed identity / IAM role / federation; no interactive MFA</li>
+            </ul>
+          </div>
+          <div class="decision">
+            <h4>8. Does the agent invoke external tools or MCP servers?</h4>
+            <p>Every MCP tool invocation is an authorization decision point.</p>
+            <ul>
+              <li>Per-tool allow-list + argument validation</li>
+              <li>OAuth 2.1 + PKCE for MCP servers</li>
+              <li>Policy-engine gate (OPA / Cedar / Cerbos) before each call</li>
+            </ul>
+          </div>
+          <div class="decision">
+            <h4>9. What data sensitivity tier does it touch?</h4>
+            <p>Tier drives the governance burden by an order of magnitude.</p>
+            <ul>
+              <li>Public / internal &rarr; baseline RBAC + light semantic screening</li>
+              <li>PII / PHI &rarr; DLP, retrieval-time authz, redaction, audit trail</li>
+              <li>Secret / regulated &rarr; tightest containment, JIT elevation, biometric re-auth</li>
+            </ul>
+          </div>
+          <div class="decision">
+            <h4>10. What is the approval latency profile?</h4>
+            <p>Choose the CIBA delivery mode that matches the workflow cadence.</p>
+            <ul>
+              <li>Background / batch &rarr; CIBA Poll (async, non-blocking)</li>
+              <li>Interactive &rarr; CIBA Ping (callback on decision)</li>
+              <li>Real-time / high-velocity &rarr; CIBA Push + biometric step-up</li>
+            </ul>
+          </div>
+          <div class="decision">
+            <h4>11. Does the agent cross organizational trust boundaries?</h4>
+            <p>Cross-org agents need federation hygiene distinct from cross-cloud.</p>
+            <ul>
+              <li>Same org, multi-cloud &rarr; federation + STS in each cloud</li>
+              <li>Cross-org &rarr; bilateral federation; consider DIDs / Verifiable Credentials</li>
+              <li>Unknown / dynamic trust &rarr; defer; not production-ready</li>
+            </ul>
+          </div>
+          <div class="decision">
+            <h4>12. What regulatory tier applies?</h4>
+            <p>Regulation shifts minimum obligations, not just best practice.</p>
+            <ul>
+              <li>EU AI Act high-risk &rarr; strict obligations, evidence retention</li>
+              <li>GDPR-scope personal data &rarr; data minimisation, purpose limitation</li>
+              <li>NIST AI RMF voluntary &rarr; governance scaffolding, no binding force</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3 style="margin:2.5rem 0 1rem;font-size:20px;color:var(--text-dark);letter-spacing:-.02em;">Terminal outcomes</h3>
+        <p class="section-sub" style="margin-bottom:1.5rem;">Compose controls from the forks above. The five canonical outcomes below cover the most common combinations.</p>
+        <div class="grid">
+          <div class="card">
+            <span class="pill good">Outcome A</span>
+            <h3>Lightweight internal agent</h3>
+            <p><strong>When:</strong> workload identity, no MCP, internal data, async, single-org, minimal-risk.</p>
+            <ul>
+              <li>Cloud-native managed identity or IAM role</li>
+              <li>Scoped RBAC, short-lived credentials</li>
+              <li>Light semantic screening (Prompt Shields or Bedrock Guardrails)</li>
+              <li>Standard logging; no human-in-loop required</li>
+            </ul>
+          </div>
+          <div class="card">
+            <span class="pill blue">Outcome B</span>
+            <h3>Interactive delegated agent</h3>
+            <p><strong>When:</strong> delegated identity, MCP tools, internal + PII, interactive Ping, single-org, GDPR-scope.</p>
+            <ul>
+              <li>User-bound tokens with authentication-context step-up</li>
+              <li>Per-tool allow-list + OAuth 2.1 PKCE for MCP</li>
+              <li>DLP + retrieval-time authz + redaction</li>
+              <li>CIBA Ping callback for human consent</li>
+              <li>Conditional Access (Block Access) on the workload identity</li>
+            </ul>
+          </div>
+          <div class="card">
+            <span class="pill warn">Outcome C</span>
+            <h3>High-risk autonomous agent</h3>
+            <p><strong>When:</strong> workload, MCP, PHI / secret, real-time Push, single-org, EU AI Act high-risk.</p>
+            <ul>
+              <li>Workload identity + PIM-style elevation for sensitive actions</li>
+              <li>Per-tool policy-engine gate (OPA / Cedar)</li>
+              <li>Strict containment: ephemeral compute, egress control, read-only FS</li>
+              <li>CIBA Push + biometric re-auth for high-velocity actions</li>
+              <li>Evidence retention per EU AI Act; kill switch + rollback</li>
+            </ul>
+          </div>
+          <div class="card">
+            <span class="pill warn">Outcome D</span>
+            <h3>Cross-org federated agent</h3>
+            <p><strong>When:</strong> workload, MCP, partner data, async or interactive, cross-org, mixed regulatory.</p>
+            <ul>
+              <li>Bilateral federation + STS in each cloud</li>
+              <li>Confused-deputy protection (aws:SourceArn / SourceAccount)</li>
+              <li>Per-tool allow-list scoped to partner resources</li>
+              <li>DIDs / Verifiable Credentials if no central trust anchor</li>
+              <li>Cross-cloud audit (CloudTrail + Azure Monitor)</li>
+            </ul>
+          </div>
+          <div class="card full">
+            <span class="pill bad">Outcome E</span>
+            <h3>Not production-ready</h3>
+            <p><strong>When:</strong> fully autonomous + high-risk + no observability + no kill switch + cross-org with no trust anchor.</p>
+            <ul>
+              <li>Do not deploy to production</li>
+              <li>Pilot only in sandbox with synthetic data</li>
+              <li>Re-architect: add containment, kill switch, audit, governance</li>
+              <li>Re-evaluate against forks 1&ndash;12 before promotion</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="warnbox" style="margin-top:1.5rem;">
+          <strong>How to use this tree:</strong> Walk forks 1&ndash;12 in order. The answers converge on one of outcomes A&ndash;E. Where answers span multiple outcomes, take the <strong>union</strong> of controls &mdash; never the intersection. Treat Outcome E as a hard stop: if any of its conditions are true, do not promote the agent to production.
         </div>
       </div>
     </section>
