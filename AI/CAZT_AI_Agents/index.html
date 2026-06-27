@@ -225,6 +225,34 @@
     }
     .mismatch-warning .mw-user{color:var(--bad);font-weight:600}
     .mismatch-warning .mw-expected{color:var(--good);font-weight:600}
+
+    /* === Augmented controls (Option 3) === */
+    .augmented-controls{
+      margin-top:14px;padding:14px 16px;
+      background:#f0fbf4;border:1px solid #c8e8d4;border-left:4px solid var(--good);
+      border-radius:10px;
+    }
+    .augmented-controls h4{
+      margin:0 0 8px;font-size:14px;color:var(--text-dark);letter-spacing:-.01em;
+      display:flex;align-items:center;gap:8px;
+    }
+    .augmented-controls h4::before{
+      content:'+';display:inline-flex;align-items:center;justify-content:center;
+      width:18px;height:18px;border-radius:50%;background:var(--good);color:#fff;
+      font-size:13px;font-weight:800;line-height:1;flex-shrink:0;
+    }
+    .augmented-controls ul{margin:0;padding:0;list-style:none}
+    .augmented-controls li{
+      padding:8px 0;border-bottom:1px dashed rgba(24,182,122,.18);
+      display:flex;flex-direction:column;gap:2px;
+    }
+    .augmented-controls li:last-child{border-bottom:0}
+    .augmented-controls .aug-control{
+      font-size:13px;font-weight:600;color:var(--text-dark);line-height:1.4;
+    }
+    .augmented-controls .aug-reason{
+      font-size:11px;color:var(--muted-dark);font-style:italic;
+    }
     .export-btn{
       appearance:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;
       padding:8px 14px;border-radius:8px;border:1px solid var(--line-light);
@@ -856,7 +884,7 @@
     <section id="decision-tree">
       <div class="wrap">
         <h2 class="section-title">Decision tree</h2>
-        <p class="section-sub">Use this decision tree to choose the right control emphasis for an agent deployment. Walk forks 1&ndash;12 in order; the answers converge on one of five terminal outcomes. Where answers span multiple outcomes, take the <strong>union</strong> of controls &mdash; never the intersection.</p>
+        <p class="section-sub">Use this decision tree to choose the right control emphasis for an agent deployment. Walk forks 1&ndash;12 in order; the answers converge on one of six terminal outcomes. The recommended outcome provides a baseline control set, which the wizard then augments with additional controls based on your specific answers.</p>
 
         <div class="dt-tabs" role="tablist">
           <button class="dt-tab active" role="tab" data-target="dt-interactive">Interactive</button>
@@ -997,7 +1025,7 @@
         </div>
 
         <h3 style="margin:2.5rem 0 1rem;font-size:20px;color:var(--text-dark);letter-spacing:-.02em;">Terminal outcomes</h3>
-        <p class="section-sub" style="margin-bottom:1.5rem;">Compose controls from the forks above. The five canonical outcomes below cover the most common combinations.</p>
+        <p class="section-sub" style="margin-bottom:1.5rem;">Compose controls from the forks above. The six canonical outcomes below cover the most common combinations. The wizard augments each baseline with controls based on your specific answers.</p>
         <div class="grid">
           <div class="card">
             <span class="pill good">Outcome A</span>
@@ -1046,6 +1074,18 @@
               <li>Cross-cloud audit (CloudTrail + Azure Monitor)</li>
             </ul>
           </div>
+          <div class="card">
+            <span class="pill good">Outcome F</span>
+            <h3>Hardened internal agent</h3>
+            <p><strong>When:</strong> workload identity, no MCP, no high-risk, same-org &mdash; but with sensitive data, broader autonomy, partial observability, or interactive latency that requires hardening beyond the lightweight baseline.</p>
+            <ul>
+              <li>Cloud-native managed identity or IAM role</li>
+              <li>Scoped RBAC, short-lived credentials</li>
+              <li>Light semantic screening (Prompt Shields or Bedrock Guardrails)</li>
+              <li>Standard logging + audit trail</li>
+            </ul>
+            <p style="font-size:12px;color:var(--muted-dark);margin-top:8px;"><em>Baseline only. The wizard augments with additional controls (DLP, kill switch, CIBA mode, containment) based on your specific answers.</em></p>
+          </div>
           <div class="card full">
             <span class="pill bad">Outcome E</span>
             <h3>Not production-ready</h3>
@@ -1060,7 +1100,7 @@
         </div>
 
         <div class="warnbox" style="margin-top:1.5rem;">
-          <strong>How to use this tree:</strong> Walk forks 1&ndash;12 in order. The answers converge on one of outcomes A&ndash;E. Where answers span multiple outcomes, take the <strong>union</strong> of controls &mdash; never the intersection. Treat Outcome E as a hard stop: if any of its conditions are true, do not promote the agent to production.
+          <strong>How to use this tree:</strong> Walk forks 1&ndash;12 in order. The answers converge on one of outcomes A&ndash;F. The recommended outcome provides a baseline control set; the wizard then augments with additional controls based on your specific answers (e.g., DLP for PII data, kill switch for partial observability). Treat Outcome E as a hard stop: if any of its conditions are true, do not promote the agent to production.
         </div>
         </div><!-- /dt-reference -->
       </div>
@@ -1335,6 +1375,31 @@
         }
       },
       {
+        key: 'F', name: 'Hardened internal agent',
+        when: 'workload identity, no MCP, no high-risk, same-org — but with sensitive data, broader autonomy, partial observability, or interactive latency that requires hardening beyond the lightweight baseline.',
+        controls: [
+          'Cloud-native managed identity or IAM role',
+          'Scoped RBAC, short-lived credentials',
+          'Light semantic screening (Prompt Shields or Bedrock Guardrails)',
+          'Standard logging + audit trail'
+        ],
+        match: function(a){
+          // Must meet the defining constraints of an internal workload agent
+          if (a.identitytype !== 'workload') return 0;
+          if (a.mcp === 'yes') return 0;
+          if (a.highrisk === 'yes') return 0;
+          if (a.crossorg !== 'sameorg') return 0;
+          // Base score for meeting the defining constraints
+          var s = 0.5;
+          // Hardening triggers — each indicates F is more appropriate than A
+          if (a.datatier === 'pii' || a.datatier === 'secret') s += 0.15;
+          if (a.autonomy === 'broad') s += 0.15;
+          if (a.observe === 'partial' || a.observe === 'no') s += 0.15;
+          if (a.latency === 'ping' || a.latency === 'push') s += 0.15;
+          return Math.min(s, 1);
+        }
+      },
+      {
         key: 'E', name: 'Not production-ready',
         when: 'fully autonomous + high-risk + no observability + no kill switch + cross-org with no trust anchor.',
         controls: [
@@ -1357,53 +1422,106 @@
     ];
 
     /* --- Expected answers per outcome (for mismatch reporting) ---
-       Used by Option C: when the winning outcome scores < 70%, surface a
-       warning listing the answers that don't match the recommended profile.
-       Each key is a forkId; value is an array of acceptable answer values.
-       Forks not listed are not constrained by that outcome.
+       Design principle: only list answers that ACTIVELY DISQUALIFY from this
+       outcome (the defining constraints). Answers not listed are flexible —
+       they drive additional controls but don't disqualify the outcome.
+
+       This way, mismatches fire only when the user's answer is fundamentally
+       incompatible with the recommended outcome, not when it merely suggests
+       extra controls are needed.
     */
     var EXPECTED = {
       A: {
-        highrisk:     ['no'],
-        autonomy:     ['semi'],
-        observe:      ['yes'],
-        identitytype: ['workload'],
-        mcp:          ['no'],
-        datatier:     ['public'],
-        latency:      ['poll'],
-        crossorg:     ['sameorg'],
-        regulatory:   ['none', 'nist']
+        // Lightweight internal agent — defining constraints:
+        identitytype: ['workload'],  // delegated → routes to B
+        mcp:          ['no'],         // external tools → routes to B/C
+        highrisk:     ['no'],         // high-risk → routes to C
+        crossorg:     ['sameorg']     // cross-org → routes to D
+        // Flexible: autonomy, observe, datatier, latency, regulatory, hosting, preview, crossdata
       },
       B: {
-        autonomy:     ['semi'],
-        observe:      ['yes', 'partial'],
+        // Interactive delegated agent — defining constraints:
         identitytype: ['delegated'],
         mcp:          ['yes'],
-        datatier:     ['pii'],
-        latency:      ['ping'],
-        crossorg:     ['sameorg'],
-        regulatory:   ['gdpr', 'euai']
+        latency:      ['ping']
       },
       C: {
+        // High-risk autonomous agent — defining constraints:
         highrisk:     ['yes'],
-        autonomy:     ['broad'],
-        observe:      ['yes'],
-        identitytype: ['workload'],
-        mcp:          ['yes'],
-        datatier:     ['secret'],
-        latency:      ['push'],
-        crossorg:     ['sameorg'],
-        regulatory:   ['euai']
+        autonomy:     ['broad']
       },
       D: {
-        crossdata:    ['yes'],
+        // Cross-org federated agent — defining constraints:
+        crossorg:     ['crossorg']
+      },
+      F: {
+        // Hardened internal agent — same defining constraints as A:
         identitytype: ['workload'],
-        mcp:          ['yes'],
-        crossorg:     ['crossorg'],
-        latency:      ['poll', 'ping']
+        mcp:          ['no'],
+        highrisk:     ['no'],
+        crossorg:     ['sameorg']
       }
       // E is hard-stop; no expected-answers table
     };
+
+    /* --- Augmentation rules (Option 3) ---
+       Each rule fires when the user's answer to a specific fork matches one
+       of the listed values. The rule adds a control to the recommendation,
+       with a human-readable reason explaining which answer triggered it.
+
+       This is compositional: rules fire independently, so any combination
+       of answers produces the right union of augmented controls without
+       needing an outcome for every possible profile.
+
+       Rules whose control text already appears in the winning outcome's
+       baseline controls list are skipped (no redundancy).
+    */
+    var AUGMENTATIONS = [
+      // Data sensitivity
+      { forkId: 'datatier', values: ['pii'],
+        control: 'DLP + retrieval-time authz + redaction',
+        reason: 'PII / PHI data' },
+      { forkId: 'datatier', values: ['secret'],
+        control: 'Tightest containment + JIT elevation + biometric re-auth',
+        reason: 'Secret / regulated data' },
+      // Autonomy
+      { forkId: 'autonomy', values: ['broad'],
+        control: 'Strict containment: ephemeral compute, egress control, read-only FS',
+        reason: 'Broadly autonomous' },
+      // Observability gaps
+      { forkId: 'observe', values: ['partial'],
+        control: 'Add kill switch before production deployment',
+        reason: 'Partial observability — no kill switch' },
+      { forkId: 'observe', values: ['no'],
+        control: 'Re-architect observability + add kill switch before production',
+        reason: 'No observability gaps closed' },
+      // Latency / CIBA mode
+      { forkId: 'latency', values: ['ping'],
+        control: 'CIBA Ping callback for human consent',
+        reason: 'Interactive latency profile' },
+      { forkId: 'latency', values: ['push'],
+        control: 'CIBA Push + biometric re-auth',
+        reason: 'Real-time / high-velocity latency' },
+      // MCP / external tools
+      { forkId: 'mcp', values: ['yes'],
+        control: 'Per-tool allow-list + OAuth 2.1 PKCE for MCP servers',
+        reason: 'External tools / MCP servers' },
+      // Cross-boundary data
+      { forkId: 'crossdata', values: ['yes'],
+        control: 'Retrieval-time authorization + data segmentation',
+        reason: 'Cross-boundary data access' },
+      // Cross-org
+      { forkId: 'crossorg', values: ['crossorg'],
+        control: 'Bilateral federation + STS in each cloud',
+        reason: 'Cross-org trust boundary' },
+      // Regulatory
+      { forkId: 'regulatory', values: ['euai'],
+        control: 'EU AI Act evidence retention + audit trail',
+        reason: 'EU AI Act high-risk classification' },
+      { forkId: 'regulatory', values: ['gdpr'],
+        control: 'Data minimisation + purpose limitation',
+        reason: 'GDPR-scope personal data' }
+    ];
 
     /* --- State --- */
     var state = {
@@ -1536,7 +1654,7 @@
       if (hardStop.length > 0){
         html += '<p>Based on your answers, this deployment is <strong>not production-ready</strong>. Address the immediate actions below before promoting the agent.</p>';
       } else if (ranked.length > 0){
-        html += '<p>Based on your answers, the recommended control emphasis is the single outcome below. Apply all listed controls.</p>';
+        html += '<p>Based on your answers, the recommended control emphasis is the single outcome below. Apply the baseline controls, plus any additional controls called out by your specific answers.</p>';
       } else {
         html += '<p>Your answers did not match any defined outcome. Review the Reference tab or revisit your answers.</p>';
       }
@@ -1557,14 +1675,17 @@
         html += '<div class="body"><h4>Outcome ' + top.o.key + ' &mdash; ' + top.o.name + '</h4>';
         html += '<p><strong>When:</strong> ' + top.o.when + '</p></div>';
         html += '</div>';
-        html += unionBlock(top.o.controls, 'Controls to apply');
-
-        // Option C: mismatch warning when fit is moderate (< 70%)
-        if (top.score < 0.70){
-          var mismatches = computeMismatches(top.o.key, state.answers);
-          if (mismatches.length > 0){
-            html += mismatchWarningBlock(top.o, top.score, mismatches);
-          }
+        // Baseline controls
+        html += unionBlock(top.o.controls, 'Baseline controls');
+        // Augmented controls (Option 3) — based on individual answers
+        var augmentations = computeAugmentations(state.answers, top.o.controls);
+        if (augmentations.length > 0){
+          html += augmentedControlsBlock(augmentations);
+        }
+        // Option C: mismatch warning fires only when there are actual mismatches
+        var mismatches = computeMismatches(top.o.key, state.answers);
+        if (mismatches.length > 0){
+          html += mismatchWarningBlock(top.o, top.score, mismatches);
         }
       }
 
@@ -1664,9 +1785,9 @@
       var pct = Math.round(score * 100);
       var html = '<div class="mismatch-warning">';
       html += '<div class="mw-head">';
-      html += '<strong>Moderate fit &mdash; review mismatches</strong>';
-      html += '<p>Outcome ' + outcome.key + ' scored ' + pct + '% match. ';
-      html += 'The following answers don\'t align with this profile &mdash; consider revisiting them or weighing a different outcome.</p>';
+      html += '<strong>Answers that conflict with this outcome</strong>';
+      html += '<p>The following answers are fundamentally incompatible with Outcome ' + outcome.key + ' (' + pct + '% match). ';
+      html += 'Consider revisiting them, or weighing a different outcome.</p>';
       html += '</div>';
       html += '<ul class="mw-list">';
       for (var i = 0; i < mismatches.length; i++){
@@ -1676,6 +1797,55 @@
         html += '<span class="mw-answers">';
         html += '<span class="mw-user">Your answer: ' + m.userLabel + '</span>';
         html += '<span class="mw-expected">Expected: ' + m.expectedLabels.join(' or ') + '</span>';
+        html += '</span>';
+        html += '</li>';
+      }
+      html += '</ul>';
+      html += '</div>';
+      return html;
+    }
+
+    /* --- Augmentation (Option 3) ---
+       Computes the list of augmented controls based on the user's answers.
+       Skips any control whose text already appears in the outcome's baseline
+       controls list (no redundancy).
+    */
+    function computeAugmentations(answers, outcomeControls){
+      var result = [];
+      for (var i = 0; i < AUGMENTATIONS.length; i++){
+        var aug = AUGMENTATIONS[i];
+        var v = answers[aug.forkId];
+        if (v === undefined) continue;
+        if (aug.values.indexOf(v) === -1) continue;
+        // Skip if already in baseline
+        if (outcomeControls && outcomeControls.indexOf(aug.control) !== -1) continue;
+        // Find fork index for the "because Qn" display
+        var forkIndex = -1;
+        for (var j = 0; j < FORKS.length; j++){
+          if (FORKS[j].id === aug.forkId){ forkIndex = j; break; }
+        }
+        result.push({
+          control: aug.control,
+          reason: aug.reason,
+          forkId: aug.forkId,
+          forkIndex: forkIndex
+        });
+      }
+      return result;
+    }
+
+    function augmentedControlsBlock(augmentations){
+      if (augmentations.length === 0) return '';
+      var html = '<div class="augmented-controls">';
+      html += '<h4>Additional controls based on your answers</h4>';
+      html += '<ul>';
+      for (var i = 0; i < augmentations.length; i++){
+        var aug = augmentations[i];
+        var qLabel = aug.forkIndex >= 0 ? 'Q' + (aug.forkIndex + 1) : '';
+        html += '<li>';
+        html += '<span class="aug-control">' + aug.control + '</span>';
+        html += '<span class="aug-reason">&mdash; because ' + aug.reason;
+        if (qLabel) html += ' (' + qLabel + ')';
         html += '</span>';
         html += '</li>';
       }
@@ -1712,23 +1882,33 @@
         lines.push('  Outcome ' + top.o.key + ' — ' + top.o.name + ' (' + Math.round(top.score * 100) + '% match)');
         lines.push('  When: ' + top.o.when);
         lines.push('');
-        lines.push('  Controls to apply:');
+        lines.push('  Baseline controls:');
         for (var k = 0; k < top.o.controls.length; k++){
           lines.push('    - ' + top.o.controls[k]);
         }
 
-        // Option C: mismatch warning in text export
-        if (top.score < 0.70){
-          var mismatches = computeMismatches(top.o.key, state.answers);
-          if (mismatches.length > 0){
-            lines.push('');
-            lines.push('  MODERATE FIT — MISMATCHES TO REVIEW:');
-            for (var mi = 0; mi < mismatches.length; mi++){
-              var m = mismatches[mi];
-              lines.push('    Q' + (m.forkIndex + 1) + '. ' + m.question);
-              lines.push('      Your answer: ' + m.userLabel);
-              lines.push('      Expected:    ' + m.expectedLabels.join(' or '));
-            }
+        // Augmented controls (Option 3)
+        var augmentations = computeAugmentations(state.answers, top.o.controls);
+        if (augmentations.length > 0){
+          lines.push('');
+          lines.push('  ADDITIONAL CONTROLS BASED ON YOUR ANSWERS:');
+          for (var ai = 0; ai < augmentations.length; ai++){
+            var aug = augmentations[ai];
+            var qLabel = aug.forkIndex >= 0 ? ' (Q' + (aug.forkIndex + 1) + ')' : '';
+            lines.push('    - ' + aug.control + '  — because ' + aug.reason + qLabel);
+          }
+        }
+
+        // Option C: mismatch warning in text export (fires only when mismatches exist)
+        var mismatches = computeMismatches(top.o.key, state.answers);
+        if (mismatches.length > 0){
+          lines.push('');
+          lines.push('  ANSWERS THAT CONFLICT WITH THIS OUTCOME:');
+          for (var mi = 0; mi < mismatches.length; mi++){
+            var m = mismatches[mi];
+            lines.push('    Q' + (m.forkIndex + 1) + '. ' + m.question);
+            lines.push('      Your answer: ' + m.userLabel);
+            lines.push('      Expected:    ' + m.expectedLabels.join(' or '));
           }
         }
       } else {
@@ -1824,6 +2004,15 @@
         +   '.mismatch-warning .mw-answers{display:flex;gap:14px;font-size:10px;flex-wrap:wrap;}'
         +   '.mismatch-warning .mw-user{color:#dc4c64;font-weight:600;}'
         +   '.mismatch-warning .mw-expected{color:#1B7D46;font-weight:600;}'
+        +   '.augmented-controls{margin-top:14px;padding:12px 14px;background:#f0fbf4;'
+        +     'border:1px solid #c8e8d4;border-left:4px solid #18b67a;border-radius:8px;}'
+        +   '.augmented-controls h4{margin:0 0 6px;font-size:13px;color:#1a2332;}'
+        +   '.augmented-controls ul{margin:0;padding:0;list-style:none;}'
+        +   '.augmented-controls li{padding:5px 0;border-bottom:1px dashed rgba(24,182,122,.18);'
+        +     'display:flex;flex-direction:column;gap:2px;}'
+        +   '.augmented-controls li:last-child{border-bottom:0}'
+        +   '.augmented-controls .aug-control{font-size:12px;font-weight:600;color:#1a2332;}'
+        +   '.augmented-controls .aug-reason{font-size:10px;color:#51667e;font-style:italic;}'
         +   '.footer-note{margin-top:24px;padding-top:12px;border-top:1px solid #e9e9e8;'
         +     'font-size:10px;color:#8C8A84;}'
         +   '@media print{@page{size:letter;margin:0.75in}body{padding:0;}}'
