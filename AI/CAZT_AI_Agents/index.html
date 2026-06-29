@@ -884,7 +884,7 @@
     <section id="decision-tree">
       <div class="wrap">
         <h2 class="section-title">Decision tree</h2>
-        <p class="section-sub">Use this decision tree to choose the right control emphasis for an agent deployment. Walk forks 1&ndash;12 in order; the answers converge on one of six terminal outcomes. The recommended outcome provides a baseline control set, which the wizard then augments with additional controls based on your specific answers.</p>
+        <p class="section-sub">Use this decision tree to choose the right control emphasis for an agent deployment. Walk forks 1&ndash;12 in order; the answers converge on one of nine terminal outcomes. The recommended outcome provides a baseline control set, which the wizard then augments with additional controls based on your specific answers.</p>
 
         <div class="dt-tabs" role="tablist">
           <button class="dt-tab active" role="tab" data-target="dt-interactive">Interactive</button>
@@ -991,7 +991,7 @@
             <p>Tier drives the governance burden by an order of magnitude.</p>
             <ul>
               <li>Public / internal &rarr; baseline RBAC + light semantic screening</li>
-              <li>PII / PHI &rarr; DLP, retrieval-time authz, redaction, audit trail</li>
+              <li>PII / PHI &rarr; DLP, retrieval-time authorization, redaction, audit trail</li>
               <li>Secret / regulated &rarr; tightest containment, JIT elevation, biometric re-auth</li>
             </ul>
           </div>
@@ -1025,7 +1025,7 @@
         </div>
 
         <h3 style="margin:2.5rem 0 1rem;font-size:20px;color:var(--text-dark);letter-spacing:-.02em;">Terminal outcomes</h3>
-        <p class="section-sub" style="margin-bottom:1.5rem;">Compose controls from the forks above. The six canonical outcomes below cover the most common combinations. The wizard augments each baseline with controls based on your specific answers.</p>
+        <p class="section-sub" style="margin-bottom:1.5rem;">Compose controls from the forks above. The nine canonical outcomes below cover the most common combinations. The wizard augments each baseline with controls based on your specific answers.</p>
         <div class="grid">
           <div class="card">
             <span class="pill good">Outcome A</span>
@@ -1045,7 +1045,7 @@
             <ul>
               <li>User-bound tokens with authentication-context step-up</li>
               <li>Per-tool allow-list + OAuth 2.1 PKCE for MCP</li>
-              <li>DLP + retrieval-time authz + redaction</li>
+              <li>DLP + retrieval-time authorization + redaction</li>
               <li>CIBA Ping callback for human consent</li>
               <li>Conditional Access (Block Access) on the workload identity</li>
             </ul>
@@ -1086,6 +1086,42 @@
             </ul>
             <p style="font-size:12px;color:var(--muted-dark);margin-top:8px;"><em>Baseline only. The wizard augments with additional controls (DLP, kill switch, CIBA mode, containment) based on your specific answers.</em></p>
           </div>
+          <div class="card">
+            <span class="pill blue">Outcome G</span>
+            <h3>Delegated lightweight agent</h3>
+            <p><strong>When:</strong> delegated identity, no MCP, no high-risk, same-org &mdash; a user-bound agent that drafts content, summarizes, or fills forms without invoking external tools or performing sensitive actions.</p>
+            <ul>
+              <li>User-bound tokens with Conditional Access (Block Access) on auth context</li>
+              <li>Light semantic screening (Prompt Shields or Bedrock Guardrails)</li>
+              <li>Standard logging + user activity audit trail</li>
+              <li>No human-in-loop required for routine actions</li>
+            </ul>
+            <p style="font-size:12px;color:var(--muted-dark);margin-top:8px;"><em>Baseline only. The wizard augments with additional controls based on your specific answers.</em></p>
+          </div>
+          <div class="card">
+            <span class="pill blue">Outcome J</span>
+            <h3>Workload integration agent</h3>
+            <p><strong>When:</strong> workload identity, MCP tools, no high-risk, same-org &mdash; a workload bot that calls SaaS APIs (Salesforce, ServiceNow, Jira) for data enrichment without performing sensitive actions.</p>
+            <ul>
+              <li>Cloud-native managed identity or IAM role</li>
+              <li>Per-tool allow-list + OAuth 2.1 PKCE for MCP servers</li>
+              <li>Light semantic screening (Prompt Shields or Bedrock Guardrails)</li>
+              <li>Standard logging + per-tool invocation audit</li>
+            </ul>
+            <p style="font-size:12px;color:var(--muted-dark);margin-top:8px;"><em>Baseline only. The wizard augments with additional controls based on your specific answers.</em></p>
+          </div>
+          <div class="card">
+            <span class="pill warn">Outcome K</span>
+            <h3>Assisted high-risk agent</h3>
+            <p><strong>When:</strong> high-risk actions, semi-autonomous &mdash; a co-pilot that drafts financial transfers, privilege grants, or destructive changes but waits for explicit human approval before executing.</p>
+            <ul>
+              <li>Workload identity + PIM-style elevation for sensitive actions</li>
+              <li>Per-action human approval workflow (CIBA Ping)</li>
+              <li>Evidence collection: who approved, what context, what changed, for how long</li>
+              <li>Per-action audit trail + kill switch + rollback</li>
+            </ul>
+            <p style="font-size:12px;color:var(--muted-dark);margin-top:8px;"><em>Baseline only. The wizard augments with additional controls based on your specific answers.</em></p>
+          </div>
           <div class="card full">
             <span class="pill bad">Outcome E</span>
             <h3>Not production-ready</h3>
@@ -1100,7 +1136,7 @@
         </div>
 
         <div class="warnbox" style="margin-top:1.5rem;">
-          <strong>How to use this tree:</strong> Walk forks 1&ndash;12 in order. The answers converge on one of outcomes A&ndash;F. The recommended outcome provides a baseline control set; the wizard then augments with additional controls based on your specific answers (e.g., DLP for PII data, kill switch for partial observability). Treat Outcome E as a hard stop: if any of its conditions are true, do not promote the agent to production.
+          <strong>How to use this tree:</strong> Walk forks 1&ndash;12 in order. The answers converge on one of outcomes A&ndash;K (excluding I). The recommended outcome provides a baseline control set; the wizard then augments with additional controls based on your specific answers (e.g., DLP for PII data, kill switch for partial observability). Treat Outcome E as a hard stop: if any of its conditions are true, do not promote the agent to production.
         </div>
         </div><!-- /dt-reference -->
       </div>
@@ -1209,7 +1245,7 @@
         id: 'crossdata', title: 'Does it access cross-boundary data?',
         desc: 'RAG over sensitive data, partner data, or cross-cloud APIs.',
         options: [
-          { label: 'Yes — cross-boundary', detail: 'Retrieval-time authz, segmentation, federation hygiene', value: 'yes' },
+          { label: 'Yes — cross-boundary', detail: 'Retrieval-time authorization, segmentation, federation hygiene', value: 'yes' },
           { label: 'No — single-boundary', detail: 'Standard data-plane controls suffice', value: 'no' }
         ]
       },
@@ -1251,7 +1287,7 @@
         desc: 'Every MCP tool invocation is an authorization decision point.',
         options: [
           { label: 'Yes — external tools / MCP', detail: 'Per-tool allow-list, OAuth 2.1 PKCE, policy-engine gate', value: 'yes' },
-          { label: 'No — internal only', detail: 'Standard tool mediation; no external authz surface', value: 'no' }
+          { label: 'No — internal only', detail: 'Standard tool mediation; no external authorization surface', value: 'no' }
         ]
       },
       {
@@ -1259,7 +1295,7 @@
         desc: 'Tier drives the governance burden by an order of magnitude.',
         options: [
           { label: 'Public / internal', detail: 'Baseline RBAC + light semantic screening', value: 'public' },
-          { label: 'PII / PHI', detail: 'DLP, retrieval-time authz, redaction, audit trail', value: 'pii' },
+          { label: 'PII / PHI', detail: 'DLP, retrieval-time authorization, redaction, audit trail', value: 'pii' },
           { label: 'Secret / regulated', detail: 'Tightest containment, JIT elevation, biometric re-auth', value: 'secret' }
         ]
       },
@@ -1321,7 +1357,7 @@
         controls: [
           'User-bound tokens with authentication-context step-up',
           'Per-tool allow-list + OAuth 2.1 PKCE for MCP',
-          'DLP + retrieval-time authz + redaction',
+          'DLP + retrieval-time authorization + redaction',
           'CIBA Ping callback for human consent',
           'Conditional Access (Block Access) on the workload identity'
         ],
@@ -1372,6 +1408,73 @@
           if (a.mcp === 'yes') s += 0.2;
           if (a.identitytype === 'workload') s += 0.2;
           return s;
+        }
+      },
+      {
+        key: 'G', name: 'Delegated lightweight agent',
+        when: 'delegated identity, no MCP, no high-risk, same-org — a user-bound agent that drafts content, summarizes, or fills forms without invoking external tools or performing sensitive actions.',
+        controls: [
+          'User-bound tokens with Conditional Access (Block Access) on auth context',
+          'Light semantic screening (Prompt Shields or Bedrock Guardrails)',
+          'Standard logging + user activity audit trail',
+          'No human-in-loop required for routine actions'
+        ],
+        match: function(a){
+          // Defining constraints
+          if (a.identitytype !== 'delegated') return 0;
+          if (a.mcp === 'yes') return 0;
+          if (a.highrisk === 'yes') return 0;
+          if (a.crossorg !== 'sameorg') return 0;
+          // Base score for meeting the defining constraints
+          var s = 0.7;
+          // Higher fit when truly lightweight
+          if (a.datatier === 'public') s += 0.15;
+          if (a.autonomy === 'semi') s += 0.15;
+          return Math.min(s, 1);
+        }
+      },
+      {
+        key: 'J', name: 'Workload integration agent',
+        when: 'workload identity, MCP tools, no high-risk, same-org — a workload bot that calls SaaS APIs (Salesforce, ServiceNow, Jira) for data enrichment without performing sensitive actions.',
+        controls: [
+          'Cloud-native managed identity or IAM role',
+          'Per-tool allow-list + OAuth 2.1 PKCE for MCP servers',
+          'Light semantic screening (Prompt Shields or Bedrock Guardrails)',
+          'Standard logging + per-tool invocation audit'
+        ],
+        match: function(a){
+          // Defining constraints
+          if (a.identitytype !== 'workload') return 0;
+          if (a.mcp !== 'yes') return 0;
+          if (a.highrisk === 'yes') return 0;
+          if (a.crossorg !== 'sameorg') return 0;
+          // Base score for meeting the defining constraints
+          var s = 0.7;
+          // Higher fit when routine operations
+          if (a.datatier === 'public' || a.datatier === 'pii') s += 0.15;
+          if (a.autonomy === 'semi') s += 0.15;
+          return Math.min(s, 1);
+        }
+      },
+      {
+        key: 'K', name: 'Assisted high-risk agent',
+        when: 'high-risk actions, semi-autonomous — a co-pilot that drafts financial transfers, privilege grants, or destructive changes but waits for explicit human approval before executing.',
+        controls: [
+          'Workload identity + PIM-style elevation for sensitive actions',
+          'Per-action human approval workflow (CIBA Ping)',
+          'Evidence collection: who approved, what context, what changed, for how long',
+          'Per-action audit trail + kill switch + rollback'
+        ],
+        match: function(a){
+          // Defining constraints
+          if (a.highrisk !== 'yes') return 0;
+          if (a.autonomy !== 'semi') return 0;
+          // Base score for meeting the defining constraints
+          var s = 0.7;
+          // Higher fit with specific high-risk signals
+          if (a.datatier === 'secret' || a.datatier === 'pii') s += 0.15;
+          if (a.latency === 'ping') s += 0.15;
+          return Math.min(s, 1);
         }
       },
       {
@@ -1454,6 +1557,25 @@
         // Cross-org federated agent — defining constraints:
         crossorg:     ['crossorg']
       },
+      G: {
+        // Delegated lightweight agent — defining constraints:
+        identitytype: ['delegated'],
+        mcp:          ['no'],
+        highrisk:     ['no'],
+        crossorg:     ['sameorg']
+      },
+      J: {
+        // Workload integration agent — defining constraints:
+        identitytype: ['workload'],
+        mcp:          ['yes'],
+        highrisk:     ['no'],
+        crossorg:     ['sameorg']
+      },
+      K: {
+        // Assisted high-risk agent — defining constraints:
+        highrisk:     ['yes'],
+        autonomy:     ['semi']
+      },
       F: {
         // Hardened internal agent — same defining constraints as A:
         identitytype: ['workload'],
@@ -1479,7 +1601,7 @@
     var AUGMENTATIONS = [
       // Data sensitivity
       { forkId: 'datatier', values: ['pii'],
-        control: 'DLP + retrieval-time authz + redaction',
+        control: 'DLP + retrieval-time authorization + redaction',
         reason: 'PII / PHI data' },
       { forkId: 'datatier', values: ['secret'],
         control: 'Tightest containment + JIT elevation + biometric re-auth',
