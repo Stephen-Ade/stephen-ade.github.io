@@ -129,6 +129,37 @@
     .opt-text{flex:1;font-size:14px;color:var(--muted-dark);line-height:1.5}
     .opt-title{display:block;font-weight:600;color:var(--text-dark);margin-bottom:2px}
     .opt-detail{font-size:12px;color:var(--muted-dark)}
+
+    /* Disabled/restricted options */
+    .wizard-opt.disabled{
+      opacity:.45;cursor:not-allowed;border-style:dashed;
+      background:repeating-linear-gradient(135deg,#fafbfc,#fafbfc 6px,#f3f5f8 6px,#f3f5f8 12px);
+    }
+    .wizard-opt.disabled:hover{border-color:var(--line-light);background:repeating-linear-gradient(135deg,#fafbfc,#fafbfc 6px,#f3f5f8 6px,#f3f5f8 12px)}
+    .wizard-opt.disabled .dot{border-color:#c5d2e2;background:#f3f5f8}
+    .wizard-opt.disabled .opt-title{color:var(--muted-dark);text-decoration:line-through;text-decoration-color:rgba(0,0,0,.2)}
+    .opt-restricted{
+      flex-shrink:0;align-self:center;font-size:10px;font-weight:700;
+      color:var(--warn);background:rgba(212,138,22,.1);
+      padding:3px 8px;border-radius:99px;border:1px solid rgba(212,138,22,.25);
+      letter-spacing:.04em;text-transform:uppercase;
+    }
+
+    /* Constraint notice banner */
+    .constraint-notice{
+      margin-bottom:14px;padding:10px 14px;
+      background:#fff7ea;border:1px solid #f4d39c;border-left:4px solid var(--warn);
+      border-radius:8px;font-size:12px;color:var(--text-dark);line-height:1.5;
+    }
+    .constraint-notice strong{color:var(--text-dark)}
+
+    /* Override toggle */
+    .override-toggle{
+      display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted-dark);
+      cursor:pointer;user-select:none;
+    }
+    .override-toggle input{margin:0;cursor:pointer}
+    .override-toggle:hover{color:var(--text-dark)}
     .wizard-nav{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
     .wizard-btn{
       appearance:none;border:0;cursor:pointer;font-family:inherit;font-weight:600;font-size:13px;
@@ -903,8 +934,13 @@
               <!-- Question content injected by JS -->
             </div>
             <div class="wizard-nav">
-              <button class="wizard-btn wb-back" id="wiz-back" type="button" disabled>&larr; Back</button>
-              <button class="wizard-btn wb-next" id="wiz-next" type="button" disabled>Next &rarr;</button>
+              <label class="override-toggle" title="Disable answer restrictions so you can pick any combination. The wizard will still score outcomes, but inconsistent combinations may produce low match percentages.">
+                <input type="checkbox" id="wiz-override"> Allow unusual combinations
+              </label>
+              <div style="display:flex;gap:10px;">
+                <button class="wizard-btn wb-back" id="wiz-back" type="button" disabled>&larr; Back</button>
+                <button class="wizard-btn wb-next" id="wiz-next" type="button" disabled>Next &rarr;</button>
+              </div>
             </div>
             <div class="wizard-result" id="wiz-result">
               <!-- Result content injected by JS -->
@@ -1122,6 +1158,19 @@
             </ul>
             <p style="font-size:12px;color:var(--muted-dark);margin-top:8px;"><em>Baseline only. The wizard augments with additional controls based on your specific answers.</em></p>
           </div>
+          <div class="card">
+            <span class="pill warn">Outcome L</span>
+            <h3>High-risk workload agent</h3>
+            <p><strong>When:</strong> high-risk actions, broadly autonomous, workload identity, same-org &mdash; a workload agent that performs sensitive actions autonomously (e.g., cloud resource scalers, credential rotators, batch financial processors) without the extreme-C characteristics (secret data, real-time biometric re-auth, EU AI Act).</p>
+            <ul>
+              <li>Workload identity + PIM-style elevation for sensitive actions</li>
+              <li>Per-tool policy-engine gate (OPA / Cedar) when MCP is invoked</li>
+              <li>Standard containment: ephemeral compute, egress control</li>
+              <li>Kill switch + rollback</li>
+              <li>Standard audit trail + evidence collection</li>
+            </ul>
+            <p style="font-size:12px;color:var(--muted-dark);margin-top:8px;"><em>Baseline only. The wizard augments with additional controls based on your specific answers.</em></p>
+          </div>
           <div class="card full">
             <span class="pill bad">Outcome E</span>
             <h3>Not production-ready</h3>
@@ -1133,6 +1182,52 @@
               <li>Re-evaluate against forks 1&ndash;12 before promotion</li>
             </ul>
           </div>
+        </div>
+
+        <h3 style="margin:2.5rem 0 1rem;font-size:20px;color:var(--text-dark);letter-spacing:-.02em;">Constraint matrix</h3>
+        <p class="section-sub" style="margin-bottom:1.5rem;">
+          To keep recommendations decisive, the wizard restricts later answers based on earlier ones.
+          When a constraint applies, the unavailable options appear grayed out with a tooltip explaining why.
+          If you have an unusual combination that the constraints disallow, toggle <strong>"Allow unusual combinations"</strong>
+          at the bottom of the wizard to lift all restrictions.
+        </p>
+        <div class="table-wrap" style="margin-bottom:1.5rem;">
+          <table>
+            <thead>
+              <tr>
+                <th>If you answer&hellip;</th>
+                <th>Then these options become restricted&hellip;</th>
+                <th>Why</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Q4 autonomy = <strong>Broadly autonomous</strong></td>
+                <td>Q10 latency: <em>Ping</em> unavailable &middot; Q6 observe: <em>Partial</em> and <em>No</em> unavailable</td>
+                <td>Broad autonomy requires full observability + kill switch (no per-action human oversight), and cannot use Ping (which requires human callback).</td>
+              </tr>
+              <tr>
+                <td>Q4 autonomy = <strong>Semi-autonomous</strong></td>
+                <td>Q10 latency: <em>Push</em> unavailable &middot; Q6 observe: <em>No</em> unavailable</td>
+                <td>Human-in-the-loop provides oversight, so some observability is required; Push (biometric re-auth) is only relevant without a human in the loop.</td>
+              </tr>
+              <tr>
+                <td>Q2 high-risk = <strong>Yes</strong></td>
+                <td>Q9 data tier: <em>Public / internal</em> unavailable</td>
+                <td>High-risk actions imply sensitive impact &mdash; public data with high-risk actions is contradictory.</td>
+              </tr>
+              <tr>
+                <td>Q7 identity type = <strong>Delegated</strong></td>
+                <td>Q1 hosting: <em>AWS-native</em> unavailable</td>
+                <td>Delegated identity requires Entra auth context &mdash; AWS-native hosting does not support this natively.</td>
+              </tr>
+              <tr>
+                <td>Q11 cross-org = <strong>Cross-org</strong></td>
+                <td>Q1 hosting: <em>AWS-native</em> unavailable</td>
+                <td>Cross-org agents should be externally hosted or Azure-native for federation hygiene.</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <div class="warnbox" style="margin-top:1.5rem;">
@@ -1478,6 +1573,31 @@
         }
       },
       {
+        key: 'L', name: 'High-risk workload agent',
+        when: 'high-risk actions, broadly autonomous, workload identity, same-org — a workload agent that performs sensitive actions autonomously (e.g., cloud resource scalers, credential rotators, batch financial processors) without the extreme-C characteristics (secret data, real-time biometric re-auth, EU AI Act).',
+        controls: [
+          'Workload identity + PIM-style elevation for sensitive actions',
+          'Per-tool policy-engine gate (OPA / Cedar) when MCP is invoked',
+          'Standard containment: ephemeral compute, egress control',
+          'Kill switch + rollback',
+          'Standard audit trail + evidence collection'
+        ],
+        match: function(a){
+          // Defining constraints — all four must be met
+          if (a.highrisk !== 'yes') return 0;
+          if (a.autonomy !== 'broad') return 0;
+          if (a.identitytype !== 'workload') return 0;
+          if (a.crossorg !== 'sameorg') return 0;
+          // Base score for meeting the defining constraints
+          var s = 0.7;
+          // Higher fit with specific high-risk signals (but NOT requiring them —
+          // L is for the moderate case, C is for the extreme case)
+          if (a.datatier === 'pii') s += 0.15;
+          if (a.observe === 'yes') s += 0.15;
+          return Math.min(s, 1);
+        }
+      },
+      {
         key: 'F', name: 'Hardened internal agent',
         when: 'workload identity, no MCP, no high-risk, same-org — but with sensitive data, broader autonomy, partial observability, or interactive latency that requires hardening beyond the lightweight baseline.',
         controls: [
@@ -1576,6 +1696,13 @@
         highrisk:     ['yes'],
         autonomy:     ['semi']
       },
+      L: {
+        // High-risk workload agent — defining constraints:
+        highrisk:     ['yes'],
+        autonomy:     ['broad'],
+        identitytype: ['workload'],
+        crossorg:     ['sameorg']
+      },
       F: {
         // Hardened internal agent — same defining constraints as A:
         identitytype: ['workload'],
@@ -1645,11 +1772,53 @@
         reason: 'GDPR-scope personal data' }
     ];
 
+    /* --- Constraint rules (cascading restrictions) ---
+       Each rule: when triggerFork=triggerValue, the targetFork can only accept
+       the listed allowedValues. Other options become disabled in the UI.
+
+       This makes the wizard a true decision tree — answers are structurally
+       consistent by construction, so users land on one outcome at 90-100%
+       instead of straddling several at 40-50%.
+    */
+    var CONSTRAINTS = [
+      // Autonomy → Latency
+      { triggerFork: 'autonomy', triggerValue: 'broad',
+        targetFork: 'latency', allowedValues: ['poll', 'push'],
+        reason: 'Broadly autonomous agents cannot use CIBA Ping — Ping requires per-action human callback, which contradicts broad autonomy.' },
+      { triggerFork: 'autonomy', triggerValue: 'semi',
+        targetFork: 'latency', allowedValues: ['ping', 'poll'],
+        reason: 'Semi-autonomous agents cannot use CIBA Push — Push is for real-time biometric re-auth, only relevant when no human is in the loop.' },
+
+      // Autonomy → Observability
+      { triggerFork: 'autonomy', triggerValue: 'broad',
+        targetFork: 'observe', allowedValues: ['yes'],
+        reason: 'Broadly autonomous agents must have full observability + kill switch — partial or no observability is unsafe without per-action human oversight.' },
+      { triggerFork: 'autonomy', triggerValue: 'semi',
+        targetFork: 'observe', allowedValues: ['yes', 'partial'],
+        reason: 'Semi-autonomous agents cannot have zero observability — human oversight exists, so some observability is required.' },
+
+      // High-risk → Data tier
+      { triggerFork: 'highrisk', triggerValue: 'yes',
+        targetFork: 'datatier', allowedValues: ['pii', 'secret'],
+        reason: 'High-risk actions imply sensitive impact — public/internal data with high-risk actions is contradictory.' },
+
+      // Delegated → Hosting (AWS has no native Entra auth context equivalent)
+      { triggerFork: 'identitytype', triggerValue: 'delegated',
+        targetFork: 'hosting', allowedValues: ['azure', 'external'],
+        reason: 'Delegated identity requires Entra auth context — AWS-native hosting does not support this natively.' },
+
+      // Cross-org + Delegated → Hosting
+      { triggerFork: 'crossorg', triggerValue: 'crossorg',
+        targetFork: 'hosting', allowedValues: ['external', 'azure'],
+        reason: 'Cross-org agents should be externally hosted or Azure-native for federation hygiene.' }
+    ];
+
     /* --- State --- */
     var state = {
       step: 0,                 // 0..FORKS.length-1, or FORKS.length when on result
       answers: {},             // {forkId: value}
-      finished: false
+      finished: false,
+      allowOverride: false     // when true, constraints are relaxed (escape hatch)
     };
 
     /* --- DOM refs --- */
@@ -1712,34 +1881,135 @@
       return decodeURIComponent(m[1]);
     }
 
+    /* --- Constraint helpers --- */
+
+    /* Returns the set of allowed values for targetFork given current answers.
+       If no constraint applies, returns null (meaning all values are allowed). */
+    function getActiveConstraints(targetForkId, answers){
+      var active = [];
+      for (var i = 0; i < CONSTRAINTS.length; i++){
+        var c = CONSTRAINTS[i];
+        if (c.targetFork !== targetForkId) continue;
+        if (answers[c.triggerFork] !== c.triggerValue) continue;
+        active.push(c);
+      }
+      return active;
+    }
+
+    /* Returns the union of allowed values across all active constraints.
+       If no constraints are active, returns null (all values allowed).
+       Also returns the most relevant reason for restricting each excluded value. */
+    function computeAllowedValues(targetForkId, answers){
+      var active = getActiveConstraints(targetForkId, answers);
+      if (active.length === 0) return { allowed: null, reasons: {} };
+
+      // The first active constraint determines the allowed set.
+      // (Constraints are designed so that only one applies per target fork
+      // per answer combination. If multiple somehow apply, we take the
+      // intersection.)
+      var allowed = null;
+      var reasons = {};
+      for (var i = 0; i < active.length; i++){
+        var c = active[i];
+        if (allowed === null){
+          // Clone the array
+          allowed = c.allowedValues.slice();
+          // Initialize reasons for excluded values
+          for (var j = 0; j < c.allowedValues.length; j++){
+            // allowed values have no reason
+          }
+        } else {
+          // Intersection
+          allowed = allowed.filter(function(v){ return c.allowedValues.indexOf(v) !== -1; });
+        }
+      }
+      // For values not in allowed, attach the first applicable reason
+      return { allowed: allowed, reasons: reasons, active: active };
+    }
+
+    /* When an earlier answer changes, check all later answers and clear any
+       that are now invalid under the new constraints. Returns the list of
+       cleared fork IDs (for UI feedback). */
+    function validateAndClearInvalidAnswers(changedForkId){
+      var cleared = [];
+      for (var i = 0; i < FORKS.length; i++){
+        var f = FORKS[i];
+        if (f.id === changedForkId) continue;
+        var ans = state.answers[f.id];
+        if (ans === undefined) continue;
+        var result = computeAllowedValues(f.id, state.answers);
+        if (result.allowed !== null && result.allowed.indexOf(ans) === -1){
+          delete state.answers[f.id];
+          cleared.push(f.id);
+        }
+      }
+      return cleared;
+    }
+
     /* --- Rendering --- */
     function renderQuestion(){
       var f = FORKS[state.step];
+      var constraintResult = computeAllowedValues(f.id, state.answers);
+      var allowedValues = constraintResult.allowed;
+      var activeConstraints = constraintResult.active || [];
+
       var html = '';
       html += '<div class="wizard-q-num">Question ' + (state.step + 1) + ' of ' + FORKS.length + '</div>';
       html += '<h3 class="wizard-q-title">' + f.title + '</h3>';
       html += '<p class="wizard-q-desc">' + f.desc + '</p>';
+
+      // If constraints are active, show a notice
+      if (allowedValues !== null && !state.allowOverride && activeConstraints.length > 0){
+        html += '<div class="constraint-notice">';
+        html += '<strong>Some options are restricted</strong> based on your earlier answers. ';
+        html += 'Hover over a grayed-out option to see why.';
+        html += '</div>';
+      }
+
       html += '<div class="wizard-options" role="radiogroup">';
       for (var i = 0; i < f.options.length; i++){
         var opt = f.options[i];
         var checked = (state.answers[f.id] === opt.value) ? 'checked' : '';
-        html += '<label class="wizard-opt">';
-        html += '<input type="radio" name="fork-' + f.id + '" value="' + opt.value + '" ' + checked + '>';
+        var isDisabled = false;
+        var disableReason = '';
+
+        if (allowedValues !== null && !state.allowOverride){
+          if (allowedValues.indexOf(opt.value) === -1){
+            isDisabled = true;
+            // Find the reason from the first active constraint
+            disableReason = activeConstraints[0].reason;
+          }
+        }
+
+        if (isDisabled){
+          html += '<label class="wizard-opt disabled" title="' + escapeAttr(disableReason) + '">';
+          html += '<input type="radio" name="fork-' + f.id + '" value="' + opt.value + '" disabled>';
+        } else {
+          html += '<label class="wizard-opt">';
+          html += '<input type="radio" name="fork-' + f.id + '" value="' + opt.value + '" ' + checked + '>';
+        }
         html += '<span class="dot"></span>';
         html += '<span class="opt-text"><span class="opt-title">' + opt.label + '</span>';
         html += '<span class="opt-detail">' + opt.detail + '</span></span>';
+        if (isDisabled){
+          html += '<span class="opt-restricted">Restricted</span>';
+        }
         html += '</label>';
       }
       html += '</div>';
       $q.innerHTML = html;
 
       // Wire change handler
-      var radios = $q.querySelectorAll('input[type="radio"]');
+      var radios = $q.querySelectorAll('input[type="radio"]:not([disabled])');
       for (var k = 0; k < radios.length; k++){
         radios[k].addEventListener('change', function(){
           state.answers[f.id] = this.value;
+          // Re-validate later answers — clear any that are now invalid
+          var cleared = validateAndClearInvalidAnswers(f.id);
           writeURL();
           $next.disabled = false;
+          // If we cleared answers, the user may need to re-walk later questions
+          // (we don't auto-advance — they'll see the cleared state when they navigate)
         });
       }
 
@@ -1752,6 +2022,10 @@
       $back.disabled = (state.step === 0);
       $next.disabled = (state.answers[f.id] === undefined);
       $next.textContent = (state.step === FORKS.length - 1) ? 'See result →' : 'Next →';
+    }
+
+    function escapeAttr(s){
+      return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
     function renderResult(){
@@ -2221,6 +2495,9 @@
       state.step = 0;
       state.answers = {};
       state.finished = false;
+      state.allowOverride = false;
+      var $override = document.getElementById('wiz-override');
+      if ($override) $override.checked = false;
       $next.style.display = '';
       $result.classList.remove('shown');
       $result.innerHTML = '';
@@ -2277,6 +2554,18 @@
       $next.addEventListener('click', next);
       $back.addEventListener('click', back);
       $restart.addEventListener('click', restart);
+
+      // Override toggle — when checked, constraints are relaxed
+      var $override = document.getElementById('wiz-override');
+      if ($override){
+        $override.addEventListener('change', function(){
+          state.allowOverride = this.checked;
+          // Re-render current question so options update
+          if (!state.finished){
+            renderQuestion();
+          }
+        });
+      }
 
       // Keyboard nav (Enter = next, Esc = back)
       document.addEventListener('keydown', function(e){
