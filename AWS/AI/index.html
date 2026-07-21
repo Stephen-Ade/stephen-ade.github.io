@@ -1050,121 +1050,366 @@ section#toc { display: none; }
         <div class="arch-diagram">
           <div class="diagram-container" style="gap:0;">
 
-            <!-- SVG arrow helpers as inline templates -->
-            <!-- Down arrow: used between vertical steps -->
-            <!-- Right arrow: used between horizontal steps -->
+            <!-- ─── Shared SVG defs ──────────────────────────────────── -->
+            <!-- ↓ down  → right  ↺ loopback shown via coloured dashed SVG paths -->
 
-            <!-- Row 1: Corporate User -->
-            <div class="flex-row"><div class="diagram-box">Corporate User</div></div>
-            <div style="display:flex;justify-content:center;margin:2px 0;">
-              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
+            <style>
+              .lb-note {
+                font-size: 9.5px; font-style: italic;
+                color: #94a3b8; text-align: center; margin: 1px 0 3px;
+              }
+              .lb-return {
+                font-size: 9.5px; font-weight: 700; font-style: normal;
+                color: #b45309; background: #fffbeb;
+                border: 1px solid #fde68a; border-radius: 4px;
+                padding: 1px 6px; white-space: nowrap;
+              }
+              .lb-block {
+                font-size: 9.5px; font-weight: 700; font-style: normal;
+                color: #b91c1c; background: #fef2f2;
+                border: 1px solid #fca5a5; border-radius: 4px;
+                padding: 1px 6px; white-space: nowrap;
+              }
+              .svg-down { display:flex; justify-content:center; margin:2px 0; }
+              .svg-right { display:flex; align-items:center; flex-shrink:0; }
+            </style>
 
-            <!-- Row 2: Two parallel paths — App Delivery + Authentication -->
-            <div style="display:flex;justify-content:center;align-items:flex-start;gap:48px;flex-wrap:wrap;margin:0;">
+            <!-- ══════════════════════════════════════════════════════════
+                 PHASE 1 — APP DELIVERY
+                 User requests SPA → WAF/CloudFront → Amplify → SPA loaded
+                 Loopback: cached response returns to browser (no Amplify hit)
+            ══════════════════════════════════════════════════════════ -->
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;text-align:center;background:#f8fafc;border-radius:6px;padding:4px 10px;margin-bottom:6px;">Phase 1 — App Delivery</div>
 
-              <!-- Left: App Delivery path -->
-              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
-                <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;margin-bottom:6px;">App Delivery</div>
-                <div class="diagram-box" style="background-color:#ebf8ff;">Amplify Hosted SPA<br><small>Angular — runs in browser</small></div>
-                <div style="display:flex;justify-content:center;margin:2px 0;">
-                  <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </div>
-                <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">CloudFront + WAF<br><small>Edge delivery &amp; protection</small></div>
-              </div>
-
-              <!-- Right: Authentication path -->
-              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
-                <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;margin-bottom:6px;">Authentication</div>
-                <div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;">AWS Cognito<br><small>User Pool + Federation</small></div>
-                <div style="display:flex;justify-content:center;margin:2px 0;">
-                  <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </div>
-                <div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;">Entra ID<br><small>Corporate IdP (SAML)</small></div>
-              </div>
-            </div>
-
-            <!-- Down to JWT step -->
-            <div style="display:flex;justify-content:center;margin:6px 0 2px;">
-              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-
-            <!-- JWT label row -->
             <div class="flex-row">
-              <div class="diagram-box" style="background-color:#ebf8ff;font-size:11.5px;padding:8px 16px;">SPA attaches JWT to API request</div>
+              <div class="diagram-box" style="background-color:#f1f5f9;border-color:#94a3b8;color:#334155;">① Corporate User<br><small>Web browser — requests SPA</small></div>
             </div>
-            <div style="display:flex;justify-content:center;margin:2px 0;">
-              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="svg-down">
+              <svg width="20" height="24" viewBox="0 0 20 24" fill="none"><line x1="10" y1="0" x2="10" y2="15" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,12 10,22 17,12" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
 
-            <!-- API Layer -->
-            <div style="border:1.5px dashed var(--border);border-radius:10px;padding:12px 16px;width:100%;box-sizing:border-box;margin:4px 0;">
-              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);text-align:center;margin-bottom:10px;">API Layer</div>
-              <div class="flex-row" style="gap:6px;">
-                <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">WAF<br><small>API Protection</small></div>
-                <svg width="32" height="18" viewBox="0 0 32 18" fill="none"><line x1="0" y1="9" x2="22" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="19,2 29,9 19,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">Regional API Gateway</div>
-                <svg width="32" height="18" viewBox="0 0 32 18" fill="none"><line x1="0" y1="9" x2="22" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="19,2 29,9 19,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">Lambda Authorizer</div>
+            <!-- CloudFront + WAF with cache-miss loopback to Amplify -->
+            <div style="border:1.5px solid #d1fae5;border-radius:10px;padding:12px 14px;width:100%;box-sizing:border-box;margin:2px 0;background:#f0fdf4;">
+              <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#15803d;text-align:center;margin-bottom:10px;">Edge Layer</div>
+              <div class="flex-row" style="gap:6px;align-items:center;">
+                <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">② WAF<br><small>Edge protection</small></div>
+                <svg width="28" height="18" viewBox="0 0 28 18" fill="none"><line x1="0" y1="9" x2="18" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">③ CloudFront CDN<br><small>Cache · SSL · Global edge</small></div>
+                <!-- cache-miss forward arrow -->
+                <svg width="28" height="18" viewBox="0 0 28 18" fill="none"><line x1="0" y1="9" x2="18" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div class="diagram-box" style="background-color:#ebf8ff;border-color:#63b3ed;">④ Amplify Hosting<br><small>Origin: static SPA files</small></div>
+              </div>
+              <!-- Cache-miss loopback label -->
+              <div style="display:flex;justify-content:flex-end;margin-top:6px;padding-right:4px;">
+                <span class="lb-return">↺ Cache miss: CloudFront fetches from Amplify &amp; caches · Cache hit: serves directly (no Amplify call)</span>
+              </div>
+              <!-- WAF block short-circuit -->
+              <div style="display:flex;justify-content:flex-start;margin-top:4px;">
+                <span class="lb-block">✕ WAF block at CloudFront edge: threat matched → 403 returned before forwarding to Amplify origin</span>
               </div>
             </div>
 
-            <div style="display:flex;justify-content:center;margin:2px 0;">
-              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="svg-down">
+              <svg width="20" height="24" viewBox="0 0 20 24" fill="none"><line x1="10" y1="0" x2="10" y2="15" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,12 10,22 17,12" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="lb-note">⑤ SPA loaded into browser</div>
+
+            <!-- ══════════════════════════════════════════════════════════
+                 PHASE 2 — AUTHENTICATION (full round-trip loopback)
+                 SPA → Cognito → Entra ID → Cognito → JWT → SPA
+                 Loopback: token refresh SPA ↔ Cognito (silent, periodic)
+            ══════════════════════════════════════════════════════════ -->
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;text-align:center;background:#f8fafc;border-radius:6px;padding:4px 10px;margin:6px 0 4px;">Phase 2 — Authentication</div>
+
+            <div style="border:1.5px solid #fee2e2;border-radius:10px;padding:14px 14px;width:100%;box-sizing:border-box;margin:2px 0;background:#fff5f5;">
+              <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#b91c1c;text-align:center;margin-bottom:12px;">Authentication Round-Trip Loopback</div>
+
+              <!-- Forward leg: SPA → Cognito → Entra ID -->
+              <div class="flex-row" style="gap:5px;margin-bottom:4px;">
+                <div class="diagram-box" style="background-color:#ebf8ff;border-color:#63b3ed;font-size:11px;padding:7px 9px;">⑥ Angular SPA<br><small>signInWithRedirect()</small></div>
+                <svg width="28" height="18" viewBox="0 0 28 18" fill="none"><line x1="0" y1="9" x2="18" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;font-size:11px;padding:7px 9px;">⑦ AWS Cognito<br><small>Hosted UI · SAML redirect</small></div>
+                <svg width="28" height="18" viewBox="0 0 28 18" fill="none"><line x1="0" y1="9" x2="18" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;font-size:11px;padding:7px 9px;">⑧ Entra ID<br><small>Validate credentials</small></div>
+              </div>
+              <div class="lb-note" style="text-align:left;padding-left:4px;">→ forward leg (request)</div>
+
+              <!-- Return leg: Entra ID → Cognito → SPA (loopback) -->
+              <div class="flex-row" style="gap:5px;margin-top:4px;margin-bottom:4px;flex-direction:row-reverse;">
+                <div class="diagram-box" style="background-color:#ebf8ff;border-color:#63b3ed;font-size:11px;padding:7px 9px;">⑪ Angular SPA<br><small>JWT stored &amp; session active</small></div>
+                <svg width="28" height="18" viewBox="0 0 28 18" fill="none" style="transform:rotate(180deg)"><line x1="0" y1="9" x2="18" y2="9" stroke="#b45309" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;font-size:11px;padding:7px 9px;">⑩ AWS Cognito<br><small>Issues Access + ID + Refresh JWT</small></div>
+                <svg width="28" height="18" viewBox="0 0 28 18" fill="none" style="transform:rotate(180deg)"><line x1="0" y1="9" x2="18" y2="9" stroke="#b45309" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;font-size:11px;padding:7px 9px;">⑨ Entra ID<br><small>SAML assertion → Cognito</small></div>
+              </div>
+              <div class="lb-note" style="text-align:right;padding-right:4px;color:#b45309;">← return leg (loopback — JWT arrives back at SPA)</div>
+
+              <!-- Token refresh loopback -->
+              <div style="margin-top:6px;">
+                <span class="lb-return">↺ Token refresh loopback: SPA silently calls Cognito with refresh token → new access token returned (every ~1 hr, no user interaction)</span>
+              </div>
             </div>
 
-            <!-- ML Services Layer -->
-            <div style="border:1.5px dashed var(--border);border-radius:10px;padding:12px 16px;width:100%;box-sizing:border-box;margin:4px 0;">
-              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);text-align:center;margin-bottom:10px;">ML Services Layer</div>
-              <div class="flex-row" style="gap:12px;">
-                <div class="diagram-box" style="background-color:#ebf4ff;border-color:#667eea;">Lambda Processors<br><small>ML Orchestration</small></div>
-                <svg width="32" height="18" viewBox="0 0 32 18" fill="none"><line x1="0" y1="9" x2="22" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="19,2 29,9 19,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                <div class="diagram-box" style="background-color:#ebf4ff;border-color:#667eea;">SageMaker Endpoints</div>
-                <div class="diagram-box" style="background-color:#ebf4ff;border-color:#667eea;">Bedrock Models</div>
+            <div class="svg-down">
+              <svg width="20" height="24" viewBox="0 0 20 24" fill="none"><line x1="10" y1="0" x2="10" y2="15" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,12 10,22 17,12" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+
+            <!-- ══════════════════════════════════════════════════════════
+                 PHASE 3 — API REQUEST + AUTHORIZER LOOPBACK
+                 SPA → WAF → API GW → Lambda Authorizer → API GW (policy) → Lambda Processor
+                 Loopback: Authorizer returns Allow/Deny back to API Gateway
+            ══════════════════════════════════════════════════════════ -->
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;text-align:center;background:#f8fafc;border-radius:6px;padding:4px 10px;margin:4px 0;">Phase 3 — Authorised API Request</div>
+
+            <div class="flex-row">
+              <div class="diagram-box" style="background-color:#ebf8ff;font-size:11.5px;padding:8px 16px;">⑫ SPA attaches JWT → API request</div>
+            </div>
+            <div class="svg-down">
+              <svg width="20" height="24" viewBox="0 0 20 24" fill="none"><line x1="10" y1="0" x2="10" y2="15" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,12 10,22 17,12" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+
+            <div style="border:1.5px solid #d1fae5;border-radius:10px;padding:12px 14px;width:100%;box-sizing:border-box;margin:2px 0;background:#f0fdf4;">
+              <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#15803d;text-align:center;margin-bottom:10px;">API Layer</div>
+              <!-- Forward: WAF → API GW → Authorizer -->
+              <div class="flex-row" style="gap:5px;margin-bottom:4px;">
+                <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;font-size:11px;padding:7px 9px;">⑬ WAF<br><small>Inspect &amp; filter</small></div>
+                <svg width="28" height="18" viewBox="0 0 28 18" fill="none"><line x1="0" y1="9" x2="18" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;font-size:11px;padding:7px 9px;">⑭ Regional API Gateway<br><small>Invoke authorizer</small></div>
+                <svg width="28" height="18" viewBox="0 0 28 18" fill="none"><line x1="0" y1="9" x2="18" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;font-size:11px;padding:7px 9px;">⑮ Lambda Authorizer<br><small>Verify JWT · check groups</small></div>
               </div>
+              <!-- Authorizer loopback: returns policy to API GW -->
+              <div class="flex-row" style="gap:5px;flex-direction:row-reverse;margin-bottom:4px;">
+                <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;font-size:11px;padding:7px 9px;">⑭ Regional API Gateway<br><small>Enforce decision</small></div>
+                <svg width="28" height="18" viewBox="0 0 28 18" fill="none" style="transform:rotate(180deg)"><line x1="0" y1="9" x2="18" y2="9" stroke="#b45309" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;font-size:11px;padding:7px 9px;">⑮ Lambda Authorizer<br><small>Returns IAM policy</small></div>
+              </div>
+              <div style="margin-top:4px;">
+                <span class="lb-return">↺ Authorizer loopback: Lambda returns Allow/Deny IAM policy back to API Gateway · Deny = 403 to SPA</span>
+              </div>
+              <div style="margin-top:4px;">
+                <span class="lb-block">✕ WAF block: 403 short-circuit directly to SPA — request never reaches API Gateway</span>
+              </div>
+            </div>
+
+            <div class="svg-down">
+              <svg width="20" height="24" viewBox="0 0 20 24" fill="none"><line x1="10" y1="0" x2="10" y2="15" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,12 10,22 17,12" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+
+            <!-- ══════════════════════════════════════════════════════════
+                 PHASE 4 — ML PROCESSING + RESPONSE LOOPBACK
+                 Lambda Processor → SageMaker / Bedrock → Lambda → API GW → SPA → User
+            ══════════════════════════════════════════════════════════ -->
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;text-align:center;background:#f8fafc;border-radius:6px;padding:4px 10px;margin:4px 0;">Phase 4 — ML Processing &amp; Response</div>
+
+            <div style="border:1.5px solid #e9d5ff;border-radius:10px;padding:12px 14px;width:100%;box-sizing:border-box;margin:2px 0;background:#f5f3ff;">
+              <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#6d28d9;text-align:center;margin-bottom:10px;">ML Services Layer</div>
+              <!-- Lambda fans out to both services -->
+              <div class="flex-row" style="gap:6px;align-items:flex-start;">
+                <div class="diagram-box" style="background-color:#ebf4ff;border-color:#667eea;align-self:center;">⑯ Lambda Processor<br><small>ML Orchestration</small></div>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <svg width="28" height="18" viewBox="0 0 28 18" fill="none"><line x1="0" y1="9" x2="18" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <div class="diagram-box" style="background-color:#ebf4ff;border-color:#667eea;">⑰ SageMaker Endpoint<br><small>Custom model inference</small></div>
+                    <svg width="28" height="18" viewBox="0 0 28 18" fill="none" style="transform:rotate(180deg)"><line x1="0" y1="9" x2="18" y2="9" stroke="#b45309" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span style="font-size:9.5px;color:#b45309;font-weight:700;">inference result</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <svg width="28" height="18" viewBox="0 0 28 18" fill="none"><line x1="0" y1="9" x2="18" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <div class="diagram-box" style="background-color:#ebf4ff;border-color:#667eea;">⑰ Bedrock Model<br><small>Foundation model inference</small></div>
+                    <svg width="28" height="18" viewBox="0 0 28 18" fill="none" style="transform:rotate(180deg)"><line x1="0" y1="9" x2="18" y2="9" stroke="#b45309" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span style="font-size:9.5px;color:#b45309;font-weight:700;">inference result</span>
+                  </div>
+                </div>
+              </div>
+              <div style="margin-top:6px;">
+                <span class="lb-return">↺ ML response loopback: inference result returns to Lambda Processor → API Gateway → WAF → Browser (API responses travel directly to the browser — not through the Amplify CloudFront distribution, which serves only static SPA files)</span>
+              </div>
+            </div>
+
+            <div class="svg-down">
+              <svg width="20" height="24" viewBox="0 0 20 24" fill="none"><line x1="10" y1="0" x2="10" y2="15" stroke="#b45309" stroke-width="3" stroke-linecap="round"/><polyline points="3,12 10,22 17,12" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="lb-note" style="color:#b45309;">⑱ Response travels back: ML → Lambda → API Gateway → WAF → Browser</div>
+            <div class="flex-row">
+              <div class="diagram-box" style="background-color:#f1f5f9;border-color:#94a3b8;color:#334155;">① Corporate User<br><small>Receives ML result in browser</small></div>
+            </div>
+
+            <!-- Legend -->
+            <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--border-soft);">
+              <span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#64748b;">
+                <svg width="24" height="10" viewBox="0 0 24 10" fill="none"><line x1="0" y1="5" x2="16" y2="5" stroke="#64748b" stroke-width="2.5" stroke-linecap="round"/><polyline points="13,1 21,5 13,9" fill="none" stroke="#64748b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Request / forward flow
+              </span>
+              <span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#b45309;">
+                <svg width="24" height="10" viewBox="0 0 24 10" fill="none"><line x1="0" y1="5" x2="16" y2="5" stroke="#b45309" stroke-width="2.5" stroke-linecap="round"/><polyline points="13,1 21,5 13,9" fill="none" stroke="#b45309" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Response / loopback
+              </span>
+              <span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#b91c1c;">
+                <span style="font-weight:700;">✕</span> WAF block / short-circuit
+              </span>
             </div>
 
           </div>
-          <p class="fig-caption">Figure 1: Overall System Architecture</p>
+          <p class="fig-caption">Figure 1: Overall System Architecture — with loopbacks</p>
         </div>
 
         <h4 class="block-title">Network Security Architecture</h4>
         <div class="arch-diagram">
           <div class="diagram-container" style="gap:0;">
-            <div class="flex-row"><div class="diagram-box">Internet</div></div>
-            <div style="display:flex;justify-content:center;margin:2px 0;">
-              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+            <!-- ══════════════════════════════════════════════════════════
+                 PHASE 1 — INBOUND REQUEST
+                 Internet → WAF (edge) → CloudFront
+                 Loopback: WAF block short-circuits at edge (403 to browser)
+            ══════════════════════════════════════════════════════════ -->
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;text-align:center;background:#f8fafc;border-radius:6px;padding:4px 10px;margin-bottom:6px;">Phase 1 — Inbound Request</div>
+
+            <div class="flex-row">
+              <div class="diagram-box" style="background-color:#f1f5f9;border-color:#94a3b8;color:#334155;">① Internet<br><small>User's browser — HTTPS request</small></div>
             </div>
-            <div class="flex-row"><div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;">WAF (Edge Protection)</div></div>
-            <div style="display:flex;justify-content:center;margin:2px 0;">
-              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="svg-down">
+              <svg width="20" height="24" viewBox="0 0 20 24" fill="none"><line x1="10" y1="0" x2="10" y2="15" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,12 10,22 17,12" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
-            <div class="flex-row"><div class="diagram-box">CloudFront<br><small>CDN + SSL Termination</small></div></div>
-            <div style="display:flex;justify-content:center;margin:2px 0;">
-              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-            <div class="flex-row" style="gap:24px;">
-              <div class="diagram-box">Amplify Hosting (SPA)</div>
-              <div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;">API Gateway WAF<br><small>2nd WAF Layer</small></div>
-            </div>
-            <div style="display:flex;justify-content:center;margin:2px 0;">
-              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-            <div class="flex-row"><div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">Regional API Gateway</div></div>
-            <div style="display:flex;justify-content:center;margin:2px 0;">
-              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-            <div class="vpc-box">
-              <div class="vpc-label">Internal AWS Network (VPC)</div>
-              <div class="flex-row" style="gap:8px;">
-                <div class="diagram-box">Lambda</div>
-                <svg width="32" height="18" viewBox="0 0 32 18" fill="none"><line x1="0" y1="9" x2="22" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="19,2 29,9 19,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                <div class="diagram-box">SageMaker</div>
-                <div class="diagram-box">Bedrock API Access</div>
+
+            <div style="border:1.5px solid #fee2e2;border-radius:10px;padding:12px 14px;width:100%;box-sizing:border-box;margin:2px 0;background:#fff5f5;">
+              <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#b91c1c;text-align:center;margin-bottom:10px;">Edge Protection</div>
+              <div class="flex-row" style="gap:6px;">
+                <div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;">② WAF<br><small>Edge Protection<br>SQLi · XSS · Rate limits · Geo-block</small></div>
+                <svg width="28" height="18" viewBox="0 0 28 18" fill="none"><line x1="0" y1="9" x2="18" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div class="diagram-box">③ CloudFront CDN<br><small>SSL termination<br>Cache · Global edge delivery</small></div>
+              </div>
+              <div style="margin-top:6px;">
+                <span class="lb-block">✕ WAF block at CloudFront edge: threat matched → 403 returned before forwarding to origin — Amplify never called</span>
               </div>
             </div>
+
+            <div class="svg-down">
+              <svg width="20" height="24" viewBox="0 0 20 24" fill="none"><line x1="10" y1="0" x2="10" y2="15" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,12 10,22 17,12" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+
+            <!-- ══════════════════════════════════════════════════════════
+                 PHASE 2 — CLOUDFRONT ROUTING (two paths)
+                 Path A: CloudFront → Amplify Hosting (SPA delivery)
+                         Loopback: cache-miss pulls from Amplify; cache-hit serves directly
+                 Path B: CloudFront → API Gateway WAF → Regional API Gateway
+            ══════════════════════════════════════════════════════════ -->
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;text-align:center;background:#f8fafc;border-radius:6px;padding:4px 10px;margin:4px 0;">Phase 2 — CloudFront Routes Traffic</div>
+
+            <div style="border:1.5px dashed var(--border);border-radius:10px;padding:14px 14px;width:100%;box-sizing:border-box;margin:2px 0;">
+              <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);text-align:center;margin-bottom:12px;">CloudFront dispatches to two separate destinations</div>
+              <div style="display:flex;justify-content:center;align-items:flex-start;gap:32px;flex-wrap:wrap;">
+
+                <!-- Path A: SPA delivery with cache loopback -->
+                <div style="display:flex;flex-direction:column;align-items:center;gap:4px;min-width:180px;">
+                  <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#1d4ed8;margin-bottom:4px;">Path A — SPA Delivery</div>
+                  <svg width="20" height="24" viewBox="0 0 20 24" fill="none"><line x1="10" y1="0" x2="10" y2="15" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,12 10,22 17,12" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <div style="border:1.5px solid #bfdbfe;border-radius:8px;padding:10px 12px;background:#eff6ff;width:100%;box-sizing:border-box;">
+                    <div class="diagram-box" style="background-color:#ebf8ff;border-color:#63b3ed;margin-bottom:6px;">④ Amplify Hosting<br><small>Origin: Angular SPA static files</small></div>
+                    <span class="lb-return" style="display:block;margin-bottom:4px;">↺ Cache miss: CloudFront fetches from Amplify &amp; caches result</span>
+                    <span class="lb-return" style="display:block;">↺ Cache hit: CloudFront serves directly — Amplify not called</span>
+                  </div>
+                  <svg width="20" height="24" viewBox="0 0 20 24" fill="none"><line x1="10" y1="0" x2="10" y2="15" stroke="#b45309" stroke-width="3" stroke-linecap="round"/><polyline points="3,12 10,22 17,12" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <div class="diagram-box" style="background-color:#ebf8ff;border-color:#63b3ed;">⑤ Angular SPA<br><small>Loaded into browser</small></div>
+                </div>
+
+                <!-- Path B: API call with WAF loopback -->
+                <div style="display:flex;flex-direction:column;align-items:center;gap:4px;min-width:180px;">
+                  <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#15803d;margin-bottom:4px;">Path B — API Calls</div>
+                  <svg width="20" height="24" viewBox="0 0 20 24" fill="none"><line x1="10" y1="0" x2="10" y2="15" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,12 10,22 17,12" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <div style="border:1.5px solid #bbf7d0;border-radius:8px;padding:10px 12px;background:#f0fdf4;width:100%;box-sizing:border-box;">
+                    <div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;margin-bottom:6px;">⑥ API Gateway WAF<br><small>2nd WAF layer — API-specific rules</small></div>
+                    <span class="lb-block" style="display:block;margin-bottom:4px;">✕ WAF block loopback: 403 returned to SPA — never reaches API Gateway</span>
+                    <svg width="20" height="24" viewBox="0 0 20 24" fill="none" style="display:block;margin:4px auto;"><line x1="10" y1="0" x2="10" y2="15" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,12 10,22 17,12" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">⑦ Regional API Gateway<br><small>Throttle · Route · Invoke authorizer</small></div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="svg-down">
+              <svg width="20" height="24" viewBox="0 0 20 24" fill="none"><line x1="10" y1="0" x2="10" y2="15" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,12 10,22 17,12" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+
+            <!-- ══════════════════════════════════════════════════════════
+                 PHASE 3 — VPC: LAMBDA AUTHORIZER LOOPBACK + ML FAN-OUT
+                 API GW → Lambda Authorizer → policy returned to API GW
+                 API GW → Lambda Processor → SageMaker / Bedrock → response back
+            ══════════════════════════════════════════════════════════ -->
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;text-align:center;background:#f8fafc;border-radius:6px;padding:4px 10px;margin:4px 0;">Phase 3 — Internal AWS Network (VPC)</div>
+
+            <div class="vpc-box" style="margin:2px 0;">
+              <div class="vpc-label">Internal AWS Network (VPC)</div>
+
+              <!-- Authorizer loopback -->
+              <div style="border:1.5px solid #d1fae5;border-radius:8px;padding:10px 12px;background:#f0fdf4;margin-bottom:10px;">
+                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#15803d;margin-bottom:8px;">Authorizer Round-Trip</div>
+                <div class="flex-row" style="gap:5px;margin-bottom:4px;">
+                  <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;font-size:11px;padding:7px 9px;">⑦ API Gateway<br><small>Invoke authorizer</small></div>
+                  <svg width="28" height="18" viewBox="0 0 28 18" fill="none"><line x1="0" y1="9" x2="18" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;font-size:11px;padding:7px 9px;">⑧ Lambda Authorizer<br><small>Verify JWT · check cognito:groups</small></div>
+                </div>
+                <div class="flex-row" style="gap:5px;flex-direction:row-reverse;margin-bottom:4px;">
+                  <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;font-size:11px;padding:7px 9px;">⑦ API Gateway<br><small>Enforces decision</small></div>
+                  <svg width="28" height="18" viewBox="0 0 28 18" fill="none" style="transform:rotate(180deg)"><line x1="0" y1="9" x2="18" y2="9" stroke="#b45309" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;font-size:11px;padding:7px 9px;">⑧ Lambda Authorizer<br><small>Returns Allow / Deny IAM policy</small></div>
+                </div>
+                <span class="lb-return" style="display:block;">↺ Authorizer loopback: IAM policy returned to API Gateway · Deny = 403 immediately back to SPA</span>
+              </div>
+
+              <!-- ML fan-out with response loopbacks -->
+              <div style="border:1.5px solid #e9d5ff;border-radius:8px;padding:10px 12px;background:#f5f3ff;">
+                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6d28d9;margin-bottom:8px;">ML Processing &amp; Response Loopbacks</div>
+                <div class="flex-row" style="gap:6px;align-items:flex-start;">
+                  <div class="diagram-box" style="background-color:#ebf4ff;border-color:#667eea;align-self:center;">⑨ Lambda Processor<br><small>ML Orchestration</small></div>
+                  <div style="display:flex;flex-direction:column;gap:8px;">
+                    <div style="display:flex;align-items:center;gap:5px;">
+                      <svg width="28" height="18" viewBox="0 0 28 18" fill="none"><line x1="0" y1="9" x2="18" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      <div class="diagram-box" style="background-color:#ebf4ff;border-color:#667eea;">⑩ SageMaker<br><small>Custom model inference</small></div>
+                      <svg width="28" height="18" viewBox="0 0 28 18" fill="none" style="transform:rotate(180deg)"><line x1="0" y1="9" x2="18" y2="9" stroke="#b45309" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      <span style="font-size:9px;color:#b45309;font-weight:700;">result</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:5px;">
+                      <svg width="28" height="18" viewBox="0 0 28 18" fill="none"><line x1="0" y1="9" x2="18" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      <div class="diagram-box" style="background-color:#ebf4ff;border-color:#667eea;">⑩ Bedrock API<br><small>Foundation model inference</small></div>
+                      <svg width="28" height="18" viewBox="0 0 28 18" fill="none" style="transform:rotate(180deg)"><line x1="0" y1="9" x2="18" y2="9" stroke="#b45309" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      <span style="font-size:9px;color:#b45309;font-weight:700;">result</span>
+                    </div>
+                  </div>
+                </div>
+                <span class="lb-return" style="display:block;margin-top:8px;">↺ ML response loopback: result → Lambda Processor → API Gateway → WAF → Browser</span>
+              </div>
+            </div>
+
+            <!-- ══════════════════════════════════════════════════════════
+                 PHASE 4 — RESPONSE RETURN PATH
+            ══════════════════════════════════════════════════════════ -->
+            <div class="svg-down">
+              <svg width="20" height="24" viewBox="0 0 20 24" fill="none"><line x1="10" y1="0" x2="10" y2="15" stroke="#b45309" stroke-width="3" stroke-linecap="round"/><polyline points="3,12 10,22 17,12" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="lb-note" style="color:#b45309;">⑪ Full response path: ML result → Lambda → API Gateway → WAF → Browser</div>
+            <div class="flex-row">
+              <div class="diagram-box" style="background-color:#f1f5f9;border-color:#94a3b8;color:#334155;">① User Browser<br><small>Receives ML result — round-trip complete</small></div>
+            </div>
+
+            <!-- Legend -->
+            <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--border-soft);">
+              <span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#64748b;">
+                <svg width="24" height="10" viewBox="0 0 24 10" fill="none"><line x1="0" y1="5" x2="16" y2="5" stroke="#64748b" stroke-width="2.5" stroke-linecap="round"/><polyline points="13,1 21,5 13,9" fill="none" stroke="#64748b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Request / forward flow
+              </span>
+              <span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#b45309;">
+                <svg width="24" height="10" viewBox="0 0 24 10" fill="none"><line x1="0" y1="5" x2="16" y2="5" stroke="#b45309" stroke-width="2.5" stroke-linecap="round"/><polyline points="13,1 21,5 13,9" fill="none" stroke="#b45309" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Response / loopback
+              </span>
+              <span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#b91c1c;">
+                <span style="font-weight:700;">✕</span> WAF block / short-circuit
+              </span>
+            </div>
+
           </div>
-          <p class="fig-caption">Figure 2: Network Security Architecture</p>
+          <p class="fig-caption">Figure 2: Network Security Architecture — with loopbacks</p>
         </div>
       </div>
 
@@ -1218,7 +1463,7 @@ section#toc { display: none; }
                 <li>WAF Web ACL associations for threat protection</li>
                 <li>Geo-restriction capabilities</li>
                 <li>Field-level encryption for sensitive data</li>
-                <li>Origin access identity for S3 backend protection</li>
+                <li>Amplify-managed origin access control (internal S3 bucket protected by CloudFront origin configuration — not user-configurable)</li>
                 <li>Custom HTTP security headers</li>
                 <li>DDoS protection via AWS Shield</li>
               </ul>
@@ -1227,23 +1472,29 @@ section#toc { display: none; }
         </div>
 
         <h4 class="block-title">CloudFront Configuration for SPA</h4>
-        <p>The CloudFront distribution configured by Amplify is optimized for Single Page Applications with the following settings.</p>
+        <p>The CloudFront distribution provisioned by Amplify Hosting is managed internally and is <strong>not directly user-configurable</strong> in the same way as a standalone CloudFront distribution. The following is a <em>conceptual illustration</em> of the key behaviours Amplify configures — it is not a deployable configuration block.</p>
+        <div class="callout note">
+          <div class="callout-icon">ℹ</div>
+          <div class="callout-body">
+            <strong>Amplify manages CloudFront internally</strong>
+            The actual origin domain is an internal Amplify S3 bucket, not <code>amplifyapp.com</code>. The origin path format and access control are managed by Amplify and are not exposed as user-configurable CloudFront settings. SPA client-side routing (404→200 redirect) is handled automatically by Amplify — a separate CloudFront Function is not needed.
+          </div>
+        </div>
         <div class="code-wrap">
-          <div class="code-header"><span class="code-lang">JSON</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+          <div class="code-header"><span class="code-lang">JSON — Conceptual illustration only (not a deployable config)</span><div class="code-dots"><span></span><span></span><span></span></div></div>
           <pre><code>{
   "Origin": {
-    "Domain": "amplifyapp.com",
-    "ID": "amplify-hosted-app",
-    "OriginPath": "/prod/[appId]"
+    "Domain": "[internal-amplify-managed-s3-bucket].s3.amazonaws.com",
+    "ID": "amplify-hosted-app"
+    // Note: actual origin domain is managed by Amplify — not user-configurable
   },
   "DefaultCacheBehavior": {
     "ViewerProtocolPolicy": "redirect-to-https",
     "AllowedMethods": ["GET", "HEAD", "OPTIONS"],
     "DefaultTTL": 86400,
-    "MaxTTL": 31536000,
-    "FunctionAssociations": [
-      { "EventType": "viewer-request", "FunctionARN": "arn:aws:cloudfront::function:SPA-Router" }
-    ]
+    "MaxTTL": 31536000
+    // Note: SPA routing (404→200) is handled automatically by Amplify
+    // A separate CloudFront Function for SPA routing is not required
   },
   "CustomErrorResponses": [
     { "ErrorCode": 404, "ResponseCode": 200, "ResponsePagePath": "/index.html" }
@@ -1254,10 +1505,10 @@ section#toc { display: none; }
 }</code></pre>
         </div>
         <ul>
-          <li>SPA routing support via custom 404→200 redirect to <code>index.html</code></li>
+          <li>SPA routing support via automatic 404→200 redirect to <code>index.html</code> — handled by Amplify, no CloudFront Function needed</li>
           <li>HTTPS enforcement with <code>redirect-to-https</code> viewer protocol policy</li>
           <li>Optimized caching strategy for static assets</li>
-          <li>WAF integration through <code>WebACLId</code></li>
+          <li>WAF integration via Web ACL associated with the CloudFront distribution</li>
           <li>Global distribution through <code>PriceClass_All</code></li>
         </ul>
       </div>
@@ -1294,15 +1545,15 @@ section#toc { display: none; }
 
         <div class="two-col">
           <div>
-            <h4 class="block-title">Private API Gateway</h4>
-            <p>The Private API Gateway is configured to:</p>
+            <h4 class="block-title">Regional API Gateway</h4>
+            <p>For browser-based SPAs, a <strong>Regional</strong> endpoint type is required. The Regional API Gateway is configured to:</p>
             <ul>
-              <li>Restrict access to internal network and authorized clients only</li>
-              <li>Use resource policies to enforce access control</li>
-              <li>Integrate with Lambda Authorizers for token validation</li>
-              <li>Implement endpoint routing to appropriate ML services</li>
-              <li>Enable detailed API request logging and monitoring</li>
-              <li>Implement request throttling to prevent abuse</li>
+              <li>Accept HTTPS requests directly from the user's browser</li>
+              <li>Use resource policies to restrict access by IP or VPC as needed</li>
+              <li>Integrate with Lambda Authorizers for JWT token validation</li>
+              <li>Route requests to appropriate ML services via Lambda</li>
+              <li>Enable structured access logging and CloudWatch monitoring</li>
+              <li>Implement request throttling and burst limits to prevent abuse</li>
             </ul>
           </div>
           <div>
@@ -1319,28 +1570,21 @@ section#toc { display: none; }
           </div>
         </div>
 
-        <div class="callout warning">
-          <div class="callout-icon">⚠</div>
+        <div class="callout note">
+          <div class="callout-icon">ℹ</div>
           <div class="callout-body">
-            <strong>Important: Private API Gateway vs. Browser-Based SPA</strong>
-            A <strong>Private</strong> API Gateway endpoint type (<code>"types": ["PRIVATE"]</code>) is accessible <em>only from within a VPC</em> — not from a public browser. An Amplify-hosted Angular SPA runs in the user's browser outside any VPC, so it <strong>cannot</strong> directly call a Private API Gateway endpoint. Choose one of the following patterns to resolve this:
-            <ul>
-              <li><strong>Regional API Gateway (recommended for browser SPAs):</strong> Use a Regional endpoint type protected by WAF, Cognito authorizer, and resource policies.</li>
-              <li><strong>VPC-peered proxy:</strong> Place an NLB or ALB inside a VPC to proxy requests from CloudFront to the Private API Gateway via a VPC Endpoint.</li>
-              <li><strong>AWS PrivateLink + CloudFront Origin:</strong> Route CloudFront to an internal origin using PrivateLink, keeping the API truly private.</li>
-            </ul>
-            Ensure your endpoint type matches your actual network topology before deploying.
+            <strong>Why Regional, not Private?</strong>
+            A Private API Gateway endpoint (<code>"types": ["PRIVATE"]</code>) is accessible only from within a VPC — not from a public browser. An Amplify-hosted Angular SPA runs in the user's browser outside any VPC and cannot call a Private API Gateway directly. A <strong>Regional</strong> endpoint type is the correct choice for this architecture. It can still be locked down using WAF rules, Cognito authorizers, and resource policies. If true network-level isolation is required, see the appendix for VPC-peered proxy and PrivateLink patterns.
           </div>
         </div>
 
         <h4 class="block-title">API Gateway Endpoint Configuration</h4>
         <div class="code-wrap">
-          <div class="code-header"><span class="code-lang">JSON</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+          <div class="code-header"><span class="code-lang">JSON — Regional endpoint (correct for browser SPA)</span><div class="code-dots"><span></span><span></span><span></span></div></div>
           <pre><code>{
   "apiId": "abc123def456",
   "endpointConfiguration": {
-    "types": ["PRIVATE"],
-    "vpcEndpointIds": ["vpce-0abc123def456789"]
+    "types": ["REGIONAL"]
   },
   "policy": {
     "Version": "2012-10-17",
@@ -1348,12 +1592,11 @@ section#toc { display: none; }
       "Effect": "Allow",
       "Principal": "*",
       "Action": "execute-api:Invoke",
-      "Resource": "arn:aws:execute-api:region:account-id:api-id/*",
-      "Condition": {
-        "StringEquals": { "aws:SourceVpce": "vpce-0abc123def456789" }
-      }
+      "Resource": "arn:aws:execute-api:region:account-id:api-id/*"
     }]
   }
+  // Access control is enforced by WAF Web ACL + Lambda Authorizer JWT validation
+  // not by VPC endpoint restriction (which requires Private endpoint type)
 }</code></pre>
         </div>
       </div>
@@ -1453,91 +1696,265 @@ section#toc { display: none; }
         <div class="arch-diagram">
           <div class="diagram-container" style="gap:0;">
 
-            <!-- Step 1: User hits SPA -->
+            <!-- ══════════════════════════════════════════════════════════
+                 PHASE 1 — INITIAL ACCESS
+                 User → SPA → Amplify Auth detects no session → triggers login
+            ══════════════════════════════════════════════════════════ -->
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;text-align:center;background:#f8fafc;border-radius:6px;padding:4px 10px;margin-bottom:6px;">Phase 1 — Initial Access</div>
+
             <div class="flex-row" style="gap:8px;">
-              <div class="diagram-box">User</div>
-              <svg width="32" height="18" viewBox="0 0 32 18" fill="none"><line x1="0" y1="9" x2="22" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="19,2 29,9 19,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <div class="diagram-box" style="background-color:#ebf8ff;">Angular SPA<br><small>Amplify Hosted</small></div>
+              <div class="diagram-box" style="background-color:#f1f5f9;border-color:#94a3b8;color:#334155;">① User<br><small>Opens browser → navigates to SPA</small></div>
+              <svg width="28" height="18" viewBox="0 0 28 18" fill="none"><line x1="0" y1="9" x2="18" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <div class="diagram-box" style="background-color:#ebf8ff;border-color:#63b3ed;">② Angular SPA<br><small>No active session detected</small></div>
             </div>
-            <div style="display:flex;justify-content:center;margin:2px 0;">
-              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="svg-down"><svg width="20" height="24" viewBox="0 0 20 24" fill="none"><line x1="10" y1="0" x2="10" y2="15" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,12 10,22 17,12" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="flex-row">
+              <div class="diagram-box">③ Amplify Auth Library<br><small>signInWithRedirect() — redirects browser to Cognito Hosted UI</small></div>
+            </div>
+            <div class="svg-down"><svg width="20" height="24" viewBox="0 0 20 24" fill="none"><line x1="10" y1="0" x2="10" y2="15" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,12 10,22 17,12" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+            <!-- ══════════════════════════════════════════════════════════
+                 PHASE 2 — SAML AUTHENTICATION ROUND-TRIP
+                 Cognito → Entra ID → user enters creds → Entra ID → Cognito
+                 Loopback A: failed login → stays on Entra ID login page (retry)
+                 Loopback B: SAML assertion returns from Entra ID back to Cognito
+            ══════════════════════════════════════════════════════════ -->
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;text-align:center;background:#f8fafc;border-radius:6px;padding:4px 10px;margin:4px 0;">Phase 2 — SAML Authentication Round-Trip</div>
+
+            <div style="border:1.5px solid #fee2e2;border-radius:10px;padding:14px 14px;width:100%;box-sizing:border-box;margin:2px 0;background:#fff5f5;">
+              <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#b91c1c;text-align:center;margin-bottom:12px;">SAML Round-Trip — Cognito ↔ Entra ID ↔ User</div>
+
+              <!-- Forward: Cognito → Entra ID login page presented to user -->
+              <div class="flex-row" style="gap:6px;margin-bottom:4px;">
+                <div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;font-size:11px;padding:7px 9px;">④ AWS Cognito<br><small>Hosted UI · SAML redirect</small></div>
+                <svg width="28" height="18" viewBox="0 0 28 18" fill="none"><line x1="0" y1="9" x2="18" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;font-size:11px;padding:7px 9px;">⑤ Entra ID<br><small>Login page presented</small></div>
+                <svg width="28" height="18" viewBox="0 0 28 18" fill="none"><line x1="0" y1="9" x2="18" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div class="diagram-box" style="background-color:#f1f5f9;border-color:#94a3b8;color:#334155;font-size:11px;padding:7px 9px;">① User<br><small>Enters credentials</small></div>
+              </div>
+              <div class="lb-note" style="text-align:left;padding-left:4px;">→ forward leg</div>
+
+              <!-- Failed login loopback: stays on Entra ID page -->
+              <div style="margin:6px 0;">
+                <span class="lb-block">✕ Failed login loopback: invalid credentials → Entra ID shows error → user retries on same login page (no redirect back to Cognito yet)</span>
+              </div>
+
+              <!-- Return: Entra ID validates → SAML assertion back to Cognito -->
+              <div class="flex-row" style="gap:6px;flex-direction:row-reverse;margin-top:6px;margin-bottom:4px;">
+                <div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;font-size:11px;padding:7px 9px;">④ AWS Cognito<br><small>Receives SAML assertion</small></div>
+                <svg width="28" height="18" viewBox="0 0 28 18" fill="none" style="transform:rotate(180deg)"><line x1="0" y1="9" x2="18" y2="9" stroke="#b45309" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;font-size:11px;padding:7px 9px;">⑥ Entra ID<br><small>Validates · issues SAML assertion</small></div>
+              </div>
+              <div class="lb-note" style="text-align:right;padding-right:4px;color:#b45309;">← return leg loopback (SAML assertion back to Cognito)</div>
             </div>
 
-            <!-- Step 2: Amplify Auth triggers redirect -->
-            <div class="flex-row"><div class="diagram-box">Amplify Auth Library<br><small>signInWithRedirect()</small></div></div>
-            <div style="display:flex;justify-content:center;margin:2px 0;">
-              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="svg-down"><svg width="20" height="24" viewBox="0 0 20 24" fill="none"><line x1="10" y1="0" x2="10" y2="15" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,12 10,22 17,12" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+            <!-- ══════════════════════════════════════════════════════════
+                 PHASE 3 — TOKEN ISSUANCE + CALLBACK LOOPBACK
+                 Cognito issues JWT → redirects browser back to SPA /auth/callback
+                 Loopback: browser redirected back to same SPA it started from
+            ══════════════════════════════════════════════════════════ -->
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;text-align:center;background:#f8fafc;border-radius:6px;padding:4px 10px;margin:4px 0;">Phase 3 — Token Issuance &amp; Callback Loopback</div>
+
+            <div style="border:1.5px solid #d1fae5;border-radius:10px;padding:14px 14px;width:100%;box-sizing:border-box;margin:2px 0;background:#f0fdf4;">
+              <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#15803d;text-align:center;margin-bottom:12px;">Cognito → SPA Callback Loopback</div>
+
+              <!-- Cognito issues tokens -->
+              <div class="flex-row" style="margin-bottom:6px;">
+                <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">⑦ Cognito Token Issuance<br><small>Access token (1 hr) · ID token · Refresh token (30 days)</small></div>
+              </div>
+              <div class="svg-down"><svg width="20" height="24" viewBox="0 0 20 24" fill="none"><line x1="10" y1="0" x2="10" y2="15" stroke="#b45309" stroke-width="3" stroke-linecap="round"/><polyline points="3,12 10,22 17,12" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+              <!-- Callback redirect loopback back to SPA -->
+              <div class="flex-row" style="gap:6px;margin-bottom:6px;">
+                <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;font-size:11px;padding:7px 9px;">⑧ JWT → SPA<br><small>Browser redirected to /auth/callback</small></div>
+                <svg width="28" height="18" viewBox="0 0 28 18" fill="none" style="transform:rotate(180deg)"><line x1="0" y1="9" x2="18" y2="9" stroke="#b45309" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div class="diagram-box" style="background-color:#ebf8ff;border-color:#63b3ed;font-size:11px;padding:7px 9px;">② Angular SPA<br><small>Back where it started</small></div>
+              </div>
+              <span class="lb-return" style="display:block;">↺ Callback loopback: browser redirected back to the same SPA that initiated login · Amplify Auth Library intercepts /auth/callback · tokens stored in memory</span>
             </div>
 
-            <!-- Step 3: Cognito redirects to Entra ID -->
-            <div class="flex-row" style="gap:8px;">
-              <div class="diagram-box">AWS Cognito<br><small>Hosted UI</small></div>
-              <svg width="32" height="18" viewBox="0 0 32 18" fill="none"><line x1="0" y1="9" x2="22" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="19,2 29,9 19,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;">Entra ID Login Page<br><small>SAML redirect</small></div>
-            </div>
-            <div style="display:flex;justify-content:center;margin:2px 0;">
-              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="svg-down"><svg width="20" height="24" viewBox="0 0 20 24" fill="none"><line x1="10" y1="0" x2="10" y2="15" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,12 10,22 17,12" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+            <!-- ══════════════════════════════════════════════════════════
+                 PHASE 4 — ACTIVE SESSION + REFRESH LOOPBACKS
+                 Token stored → session active → periodic silent refresh
+                 Loopback A: token refresh SPA ↔ Cognito every ~1hr
+                 Loopback B: refresh token expired → full re-auth from Phase 1
+            ══════════════════════════════════════════════════════════ -->
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;text-align:center;background:#f8fafc;border-radius:6px;padding:4px 10px;margin:4px 0;">Phase 4 — Active Session &amp; Refresh Loopbacks</div>
+
+            <div style="border:1.5px solid #e9d5ff;border-radius:10px;padding:14px 14px;width:100%;box-sizing:border-box;margin:2px 0;background:#f5f3ff;">
+              <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#6d28d9;text-align:center;margin-bottom:12px;">Session Management Loopbacks</div>
+
+              <div class="flex-row" style="margin-bottom:8px;">
+                <div class="diagram-box" style="background-color:#ebf8ff;border-color:#63b3ed;">⑨ Angular SPA — Session Active<br><small>Amplify manages token cache · user interacts with app</small></div>
+              </div>
+
+              <!-- Token refresh loopback -->
+              <div class="flex-row" style="gap:6px;margin-bottom:4px;">
+                <div class="diagram-box" style="background-color:#ebf8ff;border-color:#63b3ed;font-size:11px;padding:7px 9px;">⑨ Angular SPA<br><small>Access token nearing expiry</small></div>
+                <svg width="28" height="18" viewBox="0 0 28 18" fill="none"><line x1="0" y1="9" x2="18" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;font-size:11px;padding:7px 9px;">④ Cognito<br><small>Silent token refresh request</small></div>
+              </div>
+              <div class="flex-row" style="gap:6px;flex-direction:row-reverse;margin-bottom:6px;">
+                <div class="diagram-box" style="background-color:#ebf8ff;border-color:#63b3ed;font-size:11px;padding:7px 9px;">⑨ Angular SPA<br><small>New access + ID tokens stored</small></div>
+                <svg width="28" height="18" viewBox="0 0 28 18" fill="none" style="transform:rotate(180deg)"><line x1="0" y1="9" x2="18" y2="9" stroke="#b45309" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;font-size:11px;padding:7px 9px;">④ Cognito<br><small>Issues new access + ID tokens</small></div>
+              </div>
+              <span class="lb-return" style="display:block;margin-bottom:6px;">↺ Token refresh loopback: SPA silently exchanges refresh token with Cognito every ~1 hr · no user interaction · session stays active</span>
+              <span class="lb-block" style="display:block;">↺ Full re-auth loopback: if refresh token expires (30 days) → entire flow restarts from Phase 1 · user must log in again</span>
             </div>
 
-            <!-- Step 4: User enters credentials, Entra authenticates -->
-            <div class="flex-row" style="gap:8px;">
-              <div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;">Entra ID<br><small>Credential validation</small></div>
-              <svg width="32" height="18" viewBox="0 0 32 18" fill="none"><line x1="0" y1="9" x2="22" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="19,2 29,9 19,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">Cognito<br><small>SAML assertion received</small></div>
+            <!-- Legend -->
+            <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--border-soft);">
+              <span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#64748b;">
+                <svg width="24" height="10" viewBox="0 0 24 10" fill="none"><line x1="0" y1="5" x2="16" y2="5" stroke="#64748b" stroke-width="2.5" stroke-linecap="round"/><polyline points="13,1 21,5 13,9" fill="none" stroke="#64748b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Request / forward flow
+              </span>
+              <span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#b45309;">
+                <svg width="24" height="10" viewBox="0 0 24 10" fill="none"><line x1="0" y1="5" x2="16" y2="5" stroke="#b45309" stroke-width="2.5" stroke-linecap="round"/><polyline points="13,1 21,5 13,9" fill="none" stroke="#b45309" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Response / loopback
+              </span>
+              <span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#b91c1c;">
+                <span style="font-weight:700;">✕</span> Block / retry / re-auth
+              </span>
             </div>
-            <div style="display:flex;justify-content:center;margin:2px 0;">
-              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-
-            <!-- Step 5: Cognito issues JWT tokens -->
-            <div class="flex-row"><div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">Cognito Token Issuance<br><small>Access + ID + Refresh tokens</small></div></div>
-            <div style="display:flex;justify-content:center;margin:2px 0;">
-              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-
-            <!-- Step 6: JWT returned to SPA via callback -->
-            <div class="flex-row"><div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">JWT Tokens → SPA<br><small>via /auth/callback redirect</small></div></div>
-            <div style="display:flex;justify-content:center;margin:2px 0;">
-              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-
-            <!-- Step 7: Token stored -->
-            <div class="flex-row"><div class="diagram-box">Token Storage in SPA<br><small>Amplify manages token cache</small></div></div>
 
           </div>
-          <p class="fig-caption">Figure 4: User Authentication Flow</p>
+          <p class="fig-caption">Figure 4: User Authentication Flow — with loopbacks</p>
         </div>
 
         <h4 class="block-title">API Authorization Flow</h4>
         <div class="arch-diagram">
           <div class="diagram-container" style="gap:0;">
-            <div class="flex-row"><div class="diagram-box" style="background-color:#ebf8ff;">Angular SPA<br><small>Authenticated user</small></div></div>
-            <div style="display:flex;justify-content:center;margin:2px 0;">
-              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+            <!-- ══════════════════════════════════════════════════════════
+                 PHASE 1 — REQUEST DISPATCH
+                 SPA → WAF → API Gateway
+                 Loopback: WAF block short-circuits 403 back to SPA
+                 Loopback: expired token → 401 → SPA triggers token refresh
+            ══════════════════════════════════════════════════════════ -->
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;text-align:center;background:#f8fafc;border-radius:6px;padding:4px 10px;margin-bottom:6px;">Phase 1 — Request Dispatch</div>
+
+            <div class="flex-row">
+              <div class="diagram-box" style="background-color:#ebf8ff;border-color:#63b3ed;">① Angular SPA<br><small>Authenticated user · attaches JWT to Authorization header</small></div>
             </div>
-            <div class="flex-row"><div class="diagram-box">API Request + JWT Token<br><small>Authorization: Bearer &lt;access_token&gt;</small></div></div>
-            <div style="display:flex;justify-content:center;margin:2px 0;">
-              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="svg-down"><svg width="20" height="24" viewBox="0 0 20 24" fill="none"><line x1="10" y1="0" x2="10" y2="15" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,12 10,22 17,12" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="flex-row">
+              <div class="diagram-box">② API Request<br><small>Authorization: Bearer &lt;access_token&gt;</small></div>
             </div>
-            <div class="flex-row" style="gap:8px;">
-              <div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;">WAF Rules Check<br><small>Block malicious traffic</small></div>
-              <svg width="32" height="18" viewBox="0 0 32 18" fill="none"><line x1="0" y1="9" x2="22" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="19,2 29,9 19,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <div class="diagram-box">Regional API Gateway<br><small>Route to Lambda Authorizer</small></div>
+            <div class="svg-down"><svg width="20" height="24" viewBox="0 0 20 24" fill="none"><line x1="10" y1="0" x2="10" y2="15" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,12 10,22 17,12" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+            <div style="border:1.5px solid #fee2e2;border-radius:10px;padding:12px 14px;width:100%;box-sizing:border-box;margin:2px 0;background:#fff5f5;">
+              <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#b91c1c;text-align:center;margin-bottom:10px;">WAF Inspection</div>
+              <div class="flex-row" style="gap:6px;">
+                <div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;">③ WAF Rules Check<br><small>SQLi · XSS · Rate limits · IP rules</small></div>
+                <svg width="28" height="18" viewBox="0 0 28 18" fill="none"><line x1="0" y1="9" x2="18" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div class="diagram-box">④ Regional API Gateway<br><small>Receives request if WAF passes</small></div>
+              </div>
+              <div style="margin-top:6px;">
+                <span class="lb-block">✕ WAF block loopback: threat matched → 403 returned immediately to SPA — API Gateway never invoked</span>
+              </div>
+              <div style="margin-top:4px;">
+                <span class="lb-block">✕ Expired token loopback: API Gateway receives request with expired JWT → Lambda Authorizer returns Deny → 401 to SPA → SPA triggers silent token refresh with Cognito → retries request with new token</span>
+              </div>
             </div>
-            <div style="display:flex;justify-content:center;margin:2px 0;">
-              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+            <div class="svg-down"><svg width="20" height="24" viewBox="0 0 20 24" fill="none"><line x1="10" y1="0" x2="10" y2="15" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,12 10,22 17,12" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+            <!-- ══════════════════════════════════════════════════════════
+                 PHASE 2 — LAMBDA AUTHORIZER ROUND-TRIP LOOPBACK
+                 API Gateway → Lambda Authorizer → IAM policy → API Gateway
+                 Allow: proceeds to ML services
+                 Deny: 403 returned immediately to SPA
+            ══════════════════════════════════════════════════════════ -->
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;text-align:center;background:#f8fafc;border-radius:6px;padding:4px 10px;margin:4px 0;">Phase 2 — Authorizer Round-Trip Loopback</div>
+
+            <div style="border:1.5px solid #d1fae5;border-radius:10px;padding:14px 14px;width:100%;box-sizing:border-box;margin:2px 0;background:#f0fdf4;">
+              <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#15803d;text-align:center;margin-bottom:12px;">API Gateway ↔ Lambda Authorizer</div>
+
+              <!-- Forward: API GW invokes Lambda Authorizer -->
+              <div class="flex-row" style="gap:6px;margin-bottom:4px;">
+                <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;font-size:11px;padding:7px 9px;">④ API Gateway<br><small>Invokes authorizer</small></div>
+                <svg width="28" height="18" viewBox="0 0 28 18" fill="none"><line x1="0" y1="9" x2="18" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;font-size:11px;padding:7px 9px;">⑤ Lambda Authorizer<br><small>Verify RS256 · validate client_id · check cognito:groups</small></div>
+              </div>
+              <div class="lb-note" style="text-align:left;padding-left:4px;">→ forward invocation</div>
+
+              <!-- Return: Lambda returns IAM policy back to API Gateway -->
+              <div class="flex-row" style="gap:6px;flex-direction:row-reverse;margin-top:6px;margin-bottom:6px;">
+                <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;font-size:11px;padding:7px 9px;">④ API Gateway<br><small>Enforces policy decision</small></div>
+                <svg width="28" height="18" viewBox="0 0 28 18" fill="none" style="transform:rotate(180deg)"><line x1="0" y1="9" x2="18" y2="9" stroke="#b45309" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;font-size:11px;padding:7px 9px;">⑤ Lambda Authorizer<br><small>Returns Allow / Deny IAM policy</small></div>
+              </div>
+              <div class="lb-note" style="text-align:right;padding-right:4px;color:#b45309;">← return loopback (policy decision back to API Gateway)</div>
+
+              <!-- Allow vs Deny paths -->
+              <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;">
+                <span class="lb-return" style="flex:1;">✓ Allow: user in Administrators or MLUsers → API Gateway proceeds to Lambda Processor</span>
+                <span class="lb-block" style="flex:1;">✕ Deny loopback: user not in required group → API Gateway returns 403 directly back to SPA — no ML call made</span>
+              </div>
             </div>
-            <div class="flex-row"><div class="diagram-box" style="background-color:#fff5f5;border-color:#f56565;">Lambda Authorizer<br><small>Verify RS256 signature · validate claims · check cognito:groups</small></div></div>
-            <div style="display:flex;justify-content:center;margin:2px 0;">
-              <svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+            <div class="svg-down"><svg width="20" height="24" viewBox="0 0 20 24" fill="none"><line x1="10" y1="0" x2="10" y2="15" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,12 10,22 17,12" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+            <!-- ══════════════════════════════════════════════════════════
+                 PHASE 3 — ML PROCESSING + RESPONSE LOOPBACK
+                 Lambda Processor → SageMaker / Bedrock → result back to Lambda
+                 → API Gateway → SPA → User
+            ══════════════════════════════════════════════════════════ -->
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;text-align:center;background:#f8fafc;border-radius:6px;padding:4px 10px;margin:4px 0;">Phase 3 — ML Processing &amp; Response Loopback</div>
+
+            <div style="border:1.5px solid #e9d5ff;border-radius:10px;padding:14px 14px;width:100%;box-sizing:border-box;margin:2px 0;background:#f5f3ff;">
+              <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#6d28d9;text-align:center;margin-bottom:10px;">ML Services Round-Trip</div>
+
+              <!-- Lambda fans out to ML services -->
+              <div class="flex-row" style="gap:6px;align-items:flex-start;margin-bottom:8px;">
+                <div class="diagram-box" style="background-color:#ebf4ff;border-color:#667eea;align-self:center;">⑥ Lambda Processor<br><small>ML Orchestration</small></div>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                  <div style="display:flex;align-items:center;gap:5px;">
+                    <svg width="28" height="18" viewBox="0 0 28 18" fill="none"><line x1="0" y1="9" x2="18" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <div class="diagram-box" style="background-color:#ebf4ff;border-color:#667eea;">⑦ SageMaker Endpoint<br><small>Custom model inference</small></div>
+                    <svg width="28" height="18" viewBox="0 0 28 18" fill="none" style="transform:rotate(180deg)"><line x1="0" y1="9" x2="18" y2="9" stroke="#b45309" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span style="font-size:9px;color:#b45309;font-weight:700;">result</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:5px;">
+                    <svg width="28" height="18" viewBox="0 0 28 18" fill="none"><line x1="0" y1="9" x2="18" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <div class="diagram-box" style="background-color:#ebf4ff;border-color:#667eea;">⑦ Bedrock Model<br><small>Foundation model inference</small></div>
+                    <svg width="28" height="18" viewBox="0 0 28 18" fill="none" style="transform:rotate(180deg)"><line x1="0" y1="9" x2="18" y2="9" stroke="#b45309" stroke-width="3" stroke-linecap="round"/><polyline points="15,2 25,9 15,16" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span style="font-size:9px;color:#b45309;font-weight:700;">result</span>
+                  </div>
+                </div>
+              </div>
+              <span class="lb-return" style="display:block;">↺ ML response loopback: inference result → Lambda Processor → API Gateway → WAF → SPA → rendered to user</span>
             </div>
-            <div class="flex-row" style="gap:8px;">
-              <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">Allow → IAM Policy<br><small>User in Administrators or MLUsers</small></div>
-              <svg width="32" height="18" viewBox="0 0 32 18" fill="none"><line x1="0" y1="9" x2="22" y2="9" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="19,2 29,9 19,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <div class="diagram-box" style="background-color:#ebf4ff;border-color:#667eea;">ML Service Processing<br><small>Lambda Processor invoked</small></div>
+
+            <!-- Full response return to SPA -->
+            <div class="svg-down"><svg width="20" height="24" viewBox="0 0 20 24" fill="none"><line x1="10" y1="0" x2="10" y2="15" stroke="#b45309" stroke-width="3" stroke-linecap="round"/><polyline points="3,12 10,22 17,12" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="lb-note" style="color:#b45309;">⑧ Full return path: ML result → Lambda → API Gateway → WAF → SPA → rendered for user</div>
+            <div class="flex-row">
+              <div class="diagram-box" style="background-color:#ebf8ff;border-color:#63b3ed;">① Angular SPA<br><small>Displays ML result — round-trip complete</small></div>
             </div>
+
+            <!-- Legend -->
+            <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--border-soft);">
+              <span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#64748b;">
+                <svg width="24" height="10" viewBox="0 0 24 10" fill="none"><line x1="0" y1="5" x2="16" y2="5" stroke="#64748b" stroke-width="2.5" stroke-linecap="round"/><polyline points="13,1 21,5 13,9" fill="none" stroke="#64748b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Request / forward flow
+              </span>
+              <span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#b45309;">
+                <svg width="24" height="10" viewBox="0 0 24 10" fill="none"><line x1="0" y1="5" x2="16" y2="5" stroke="#b45309" stroke-width="2.5" stroke-linecap="round"/><polyline points="13,1 21,5 13,9" fill="none" stroke="#b45309" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Response / loopback
+              </span>
+              <span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#b91c1c;">
+                <span style="font-weight:700;">✕</span> Block / Deny / short-circuit
+              </span>
+            </div>
+
           </div>
-          <p class="fig-caption">Figure 5: API Authorization Flow</p>
+          <p class="fig-caption">Figure 5: API Authorization Flow — with loopbacks</p>
         </div>
       </div>
 
@@ -1550,7 +1967,7 @@ section#toc { display: none; }
           <li><strong>Decode Header</strong> — Decode the JWT header without verification to extract the <code>kid</code> (key ID)</li>
           <li><strong>Fetch Public Key</strong> — Retrieve the matching RSA public key from Cognito's JWKS endpoint</li>
           <li><strong>Verify Signature</strong> — Verify the token's RS256 signature using the public key</li>
-          <li><strong>Validate Claims</strong> — Check expiration (<code>exp</code>), issue time (<code>iat</code>), issuer (<code>iss</code>). For Cognito access tokens, validate <code>client_id</code> (not <code>aud</code>) and confirm <code>token_use === "access"</code></li>
+          <li><strong>Validate Claims</strong> — Check expiration (<code>exp</code>), issuer (<code>iss</code>). For Cognito access tokens, validate <code>client_id</code> (not <code>aud</code>) and confirm <code>token_use === "access"</code>. Note: <code>iat</code> is informational only and not enforced by the authorizer</li>
           <li><strong>Check Group Membership</strong> — Read group membership from the <code>cognito:groups</code> claim and verify required groups</li>
           <li><strong>Generate IAM Policy</strong> — Return an Allow or Deny policy to API Gateway with enriched user context</li>
         </ol>
@@ -1571,12 +1988,14 @@ section#toc { display: none; }
   "iss": "https://cognito-idp.region.amazonaws.com/us-east-1_example",
   "client_id": "clientidexample",
   "token_use": "access",
-  "scope": "openid profile email",
+  "scope": "aws.cognito.signin.user.admin",
   "auth_time": 1684858239,
   "exp": 1684861839,
   "iat": 1684858239,
   "username": "<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="80f5f3e5f2c0e5f8e1edf0ece5aee3efed">[email&#160;protected]</a>",
   "cognito:groups": ["ML_Users", "Data_Scientists"]
+  // Note: scope for SAML-federated users reflects Cognito internal scopes,
+  // not openid/profile/email — those appear in the ID token, not the access token
 }</code></pre>
         </div>
 
@@ -1589,7 +2008,7 @@ const jwksClient = require('jwks-rsa');
 const client = jwksClient({
   jwksUri: `https://cognito-idp.${process.env.REGION}.amazonaws.com/${process.env.USER_POOL_ID}/.well-known/jwks.json`,
   cache: true,
-  cacheMaxAge: 600000  // 10 minutes
+  cacheMaxAge: 3600000  // 1 hour — safe given Cognito pre-publishes new keys before rotation
 });
 
 const getSigningKey = (kid) => new Promise((resolve, reject) => {
@@ -1609,10 +2028,19 @@ const generatePolicy = (principalId, effect, resource, context = {}) => ({
   context
 });
 
-// Return true if user belongs to an allowed group for this method
+// Check group membership AND optionally scope by method ARN
+// methodArn format: arn:aws:execute-api:region:account:apiId/stage/METHOD/resource
 const determineAccess = (groups, methodArn) => {
   const allowedGroups = ['Administrators', 'MLUsers'];
-  return groups.some(g => allowedGroups.includes(g));
+  const hasGroup = groups.some(g => allowedGroups.includes(g));
+  if (!hasGroup) return false;
+
+  // Optional: scope Administrators to all methods, MLUsers to POST /ml/* only
+  const [, , , , , , method, ...resourceParts] = methodArn.split(/[:/]/);
+  const isMLRoute = resourceParts.join('/').startsWith('ml');
+  if (groups.includes('Administrators')) return true;
+  if (groups.includes('MLUsers') && method === 'POST' && isMLRoute) return true;
+  return false;
 };
 
 exports.handler = async (event) => {
@@ -1632,6 +2060,11 @@ exports.handler = async (event) => {
     // Manually validate client_id (replaces standard audience check)
     if (verifiedToken.client_id !== process.env.CLIENT_ID) {
       throw new Error('Invalid client_id');
+    }
+
+    // Confirm this is an access token, not an ID token
+    if (verifiedToken.token_use !== 'access') {
+      throw new Error('Invalid token_use: expected access token');
     }
 
     // Group membership is in cognito:groups — NOT groups
@@ -1660,19 +2093,20 @@ exports.handler = async (event) => {
 
       <div id="data-flow-end-to-end">
         <h3 class="subsection-title">End-to-End Data Flow</h3>
-        <p>The end-to-end data flow describes how data travels through the system, from the initial user request to the final ML response. The following steps walk through the complete journey.</p>
+        <p>The end-to-end data flow describes how data travels through the system, from the initial user request to the final ML response. The following steps walk through the complete journey including all loopbacks and decision points.</p>
 
         <ol class="step-list">
-          <li><strong>Initial Request</strong> — User accesses the SPA through a web browser</li>
-          <li><strong>Content Delivery</strong> — CloudFront delivers the SPA application files from the nearest edge location</li>
-          <li><strong>Authentication</strong> — User authenticates through Entra ID via Cognito federation and receives JWT tokens</li>
-          <li><strong>Local Interaction</strong> — User interacts with the Angular SPA interface to submit an ML request</li>
-          <li><strong>API Request Preparation</strong> — SPA prepares the request payload and attaches the JWT access token to the Authorization header</li>
-          <li><strong>WAF Filtering</strong> — The API Gateway WAF evaluates the request against rule sets; malicious traffic is rejected</li>
-          <li><strong>Lambda Authorization</strong> — Lambda Authorizer validates the JWT, checks group membership, and generates an IAM policy</li>
-          <li><strong>Backend Routing</strong> — Depending on the request type: either a direct SageMaker endpoint call (custom models) or a Lambda Processor invocation (Bedrock models)</li>
-          <li><strong>Response Processing</strong> — ML service responses are processed, formatted, and returned through API Gateway</li>
-          <li><strong>Result Delivery</strong> — Results are displayed in the Angular SPA for the user</li>
+          <li><div class="step-content"><strong>Initial Request</strong><span>User navigates to the SPA URL in a web browser. The request hits the internet-facing entry point.</span></div></li>
+          <li><div class="step-content"><strong>WAF Edge Inspection</strong><span>The request arrives at the CloudFront edge location, where the associated WAF web ACL is evaluated. WAF is not a separate network tier — it is a web ACL associated with the CloudFront distribution and evaluated at the edge before the request is forwarded to the origin. Requests matching threat rules (SQLi, XSS, rate limits, geo-blocks) receive a 403 at the edge before being forwarded to Amplify Hosting. Clean requests pass through to CloudFront's cache and origin logic.</span></div></li>
+          <li><div class="step-content"><strong>Content Delivery</strong><span>CloudFront delivers the Angular SPA static files from the nearest edge location. On a cache hit, Amplify Hosting is not called. On a cache miss, CloudFront fetches the files from Amplify Hosting as the origin, caches them, and serves them to the browser.</span></div></li>
+          <li><div class="step-content"><strong>Session Check &amp; Authentication</strong><span>The SPA loads in the browser and checks for an existing valid session via the Amplify Auth Library. If no session exists, <code>signInWithRedirect()</code> redirects the browser to the Cognito Hosted UI, which redirects again to Entra ID. The user enters corporate credentials. On success, Entra ID sends a SAML assertion back to Cognito, which issues three JWT tokens (Access, ID, Refresh) and redirects the browser back to the SPA via the <code>/auth/callback</code> URL. If a valid session already exists, this step is skipped entirely.</span></div></li>
+          <li><div class="step-content"><strong>Local Interaction</strong><span>The authenticated user interacts with the Angular SPA interface to compose and submit an ML request. The SPA formats the request payload client-side.</span></div></li>
+          <li><div class="step-content"><strong>API Request Preparation</strong><span>The SPA retrieves the current access token via <code>fetchAuthSession()</code>. If the access token has expired, Amplify silently exchanges the refresh token with Cognito to obtain a new one before proceeding. The JWT is attached to the <code>Authorization: Bearer</code> header of the outgoing API request.</span></div></li>
+          <li><div class="step-content"><strong>WAF API Inspection</strong><span>A second WAF layer dedicated to the API Gateway evaluates the request with API-specific rules. Blocked requests receive a 403 directly — the API Gateway is never invoked.</span></div></li>
+          <li><div class="step-content"><strong>Lambda Authorizer Round-Trip</strong><span>API Gateway invokes the Lambda Authorizer, which verifies the RS256 signature, validates <code>client_id</code> and <code>token_use</code>, and checks <code>cognito:groups</code> membership. The Authorizer returns an Allow or Deny IAM policy back to API Gateway. On Deny, API Gateway returns 403 to the SPA immediately — no ML service is called.</span></div></li>
+          <li><div class="step-content"><strong>Lambda Processor Invocation</strong><span>On Allow, API Gateway invokes the Lambda Processor. For <strong>Bedrock</strong>, Lambda is required — API Gateway has no native Bedrock integration. For <strong>SageMaker</strong>, API Gateway can technically invoke SageMaker endpoints directly via an AWS Service integration, but the Lambda Processor pattern is strongly recommended as it provides request/response transformation, error handling, timeout management, and a consistent interface for both ML service types. The Lambda Processor calls either the SageMaker real-time endpoint or the Bedrock Converse API depending on the request.</span></div></li>
+          <li><div class="step-content"><strong>ML Inference &amp; Response Loopback</strong><span>The ML service performs inference and returns the result to the Lambda Processor. The Lambda Processor formats the response and returns it to API Gateway, which passes it back through WAF directly to the browser. Note: the Amplify CloudFront distribution serves only static SPA files — API responses travel directly from API Gateway to the browser.</span></div></li>
+          <li><div class="step-content"><strong>Result Delivery</strong><span>The Angular SPA receives the ML response and renders the result for the user, completing the full round-trip.</span></div></li>
         </ol>
 
         <h4 class="block-title">Data Transformation Points</h4>
@@ -1682,11 +2116,12 @@ exports.handler = async (event) => {
               <tr><th>Transformation Point</th><th>Transformation Type</th><th>Purpose</th></tr>
             </thead>
             <tbody>
-              <tr><td>Client-side (Angular SPA)</td><td>User input formatting</td><td>Prepare data in format suitable for API requests</td></tr>
-              <tr><td>API Gateway</td><td>Request/response mapping</td><td>Transform between frontend and backend data formats</td></tr>
-              <tr><td>Lambda Processor</td><td>Model-specific formatting</td><td>Transform generic requests into Converse API format for Bedrock</td></tr>
-              <tr><td>SageMaker</td><td>Model inference transformation</td><td>Raw model output processed into structured response</td></tr>
-              <tr><td>Bedrock</td><td>Foundation model response</td><td>Standardized response via Converse API across all model families</td></tr>
+              <tr><td><strong>Client-side (Angular SPA)</strong></td><td>User input formatting</td><td>Prepare data in format suitable for API requests</td></tr>
+              <tr><td><strong>API Gateway</strong></td><td>Request/response mapping</td><td>Transform between frontend and backend data formats</td></tr>
+              <tr><td><strong>Lambda Processor (pre-call)</strong></td><td>Model-specific request formatting</td><td>Transform generic API request into Converse API format for Bedrock, or into SageMaker endpoint payload format. This transformation happens in Lambda <em>before</em> calling either ML service — API Gateway does not call ML services directly.</td></tr>
+              <tr><td><strong>SageMaker</strong></td><td>Model inference only</td><td>Executes the custom model and returns raw model output as-is. No response transformation occurs inside SageMaker — that is handled by Lambda Processor after receiving the output.</td></tr>
+              <tr><td><strong>Lambda Processor (post-call)</strong></td><td>Response normalisation</td><td>Processes and formats raw ML output (from SageMaker or Bedrock) into a structured, consistent JSON response before returning to API Gateway.</td></tr>
+              <tr><td><strong>Bedrock</strong></td><td>Foundation model response</td><td>Standardised response via Converse API across all model families — Anthropic, Amazon Nova, Meta Llama, Mistral, etc. Returned to Lambda Processor for normalisation.</td></tr>
             </tbody>
           </table>
         </div>
@@ -1694,49 +2129,120 @@ exports.handler = async (event) => {
 
       <div id="data-flow-sagemaker">
         <h3 class="subsection-title">SageMaker Integration Flow</h3>
-        <p>For custom internal ML models, requests are routed directly to SageMaker real-time inference endpoints.</p>
+        <p>For custom internal ML models, the Lambda Processor acts as the orchestration layer between API Gateway and the SageMaker real-time inference endpoint. The inference result returns through the same path back to the SPA.</p>
 
         <div class="arch-diagram">
           <div class="diagram-container" style="gap:0;">
-            <div class="flex-row"><div class="diagram-box">API Gateway</div></div>
+
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;text-align:center;background:#f8fafc;border-radius:6px;padding:4px 10px;margin-bottom:6px;">Request Path →</div>
+
+            <div class="flex-row"><div class="diagram-box">① API Gateway<br><small>Authorised request — invokes Lambda</small></div></div>
             <div style="display:flex;justify-content:center;margin:2px 0;"><svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            <div class="flex-row"><div class="diagram-box">Lambda Processor</div></div>
+
+            <div class="flex-row"><div class="diagram-box">② Lambda Processor<br><small>Formats request payload for SageMaker endpoint</small></div></div>
             <div style="display:flex;justify-content:center;margin:2px 0;"><svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            <div class="flex-row"><div class="diagram-box" style="background-color:#ebf4ff;border-color:#667eea;">SageMaker Real-Time Endpoint</div></div>
-            <div style="display:flex;justify-content:center;margin:2px 0;"><svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            <div class="flex-row"><div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">Model Inference Response</div></div>
+
+            <div class="flex-row"><div class="diagram-box" style="background-color:#ebf4ff;border-color:#667eea;">③ SageMaker Real-Time Endpoint<br><small>Executes custom model inference</small></div></div>
+
+            <div style="display:flex;justify-content:center;margin:2px 0;"><svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#b45309" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div style="display:flex;justify-content:center;margin:0 0 2px;"><span class="lb-note" style="color:#b45309;">← response loopback begins here</span></div>
+
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#b45309;text-align:center;background:#fffbeb;border-radius:6px;padding:4px 10px;margin:4px 0;">← Response Loopback Path</div>
+
+            <div class="flex-row"><div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">④ Raw Inference Result<br><small>Returned to Lambda Processor</small></div></div>
+            <div style="display:flex;justify-content:center;margin:2px 0;"><svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#b45309" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+            <div class="flex-row"><div class="diagram-box">⑤ Lambda Processor<br><small>Normalises &amp; formats response as structured JSON</small></div></div>
+            <div style="display:flex;justify-content:center;margin:2px 0;"><svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#b45309" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+            <div class="flex-row"><div class="diagram-box">⑥ API Gateway → WAF → Browser<br><small>Response travels directly back to browser — not through Amplify CloudFront</small></div></div>
+
+            <!-- Legend -->
+            <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:12px;padding-top:10px;border-top:1px solid var(--border-soft);">
+              <span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#64748b;">
+                <svg width="24" height="10" viewBox="0 0 24 10" fill="none"><line x1="0" y1="5" x2="16" y2="5" stroke="#64748b" stroke-width="2.5" stroke-linecap="round"/><polyline points="13,1 21,5 13,9" fill="none" stroke="#64748b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Request / forward
+              </span>
+              <span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#b45309;">
+                <svg width="24" height="10" viewBox="0 0 24 10" fill="none"><line x1="0" y1="5" x2="16" y2="5" stroke="#b45309" stroke-width="2.5" stroke-linecap="round"/><polyline points="13,1 21,5 13,9" fill="none" stroke="#b45309" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Response / loopback
+              </span>
+            </div>
+
           </div>
-          <p class="fig-caption">Figure 6: SageMaker Integration Flow</p>
+          <p class="fig-caption">Figure 6: SageMaker Integration Flow — with response loopback</p>
         </div>
 
         <div class="callout note">
           <div class="callout-icon">ℹ</div>
           <div class="callout-body">
-            <strong>Synchronous vs. Asynchronous Invocation</strong>
-            API Gateway enforces a hard <strong>29-second integration timeout</strong> for synchronous calls. Lambda functions can run up to 15 minutes when invoked asynchronously (via SQS, EventBridge, or direct async invocation). For ML inference tasks that may exceed 28 seconds, implement an asynchronous pattern: return a Job ID immediately, then poll for results via a separate status endpoint.
+            <strong>API Gateway Integration Timeout — the binding constraint</strong>
+            When Lambda sits behind API Gateway, the binding constraint is the <strong>API Gateway integration timeout of 29 seconds</strong> — not the Lambda maximum execution time. Even though Lambda can execute for up to 15 minutes in isolation, any Lambda invoked synchronously via API Gateway will be cut off at 29 seconds with a 504 error. For ML inference tasks likely to exceed 28 seconds, implement an asynchronous pattern: API Gateway returns a Job ID immediately, the Lambda Processor invokes the ML service asynchronously (via SQS or EventBridge), and the SPA polls a separate status endpoint for the result. The 15-minute Lambda limit only applies when Lambda is invoked outside of API Gateway (e.g. directly from SQS, S3, or EventBridge).
           </div>
         </div>
       </div>
 
       <div id="data-flow-bedrock">
         <h3 class="subsection-title">Bedrock Integration Flow</h3>
-        <p>For foundation model access, a Lambda Processor invokes the Bedrock Converse API, which provides a unified interface across all supported model families.</p>
+        <p>For foundation model access, the Lambda Processor invokes the Bedrock Converse API, which provides a unified interface across all supported <strong>text-based conversational model families</strong>. Note that the Converse API does not cover embedding models, image generation, or other non-conversational model types. The model response returns through Lambda back to API Gateway and then directly to the SPA.</p>
 
         <div class="arch-diagram">
           <div class="diagram-container" style="gap:0;">
-            <div class="flex-row"><div class="diagram-box">API Gateway</div></div>
+
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;text-align:center;background:#f8fafc;border-radius:6px;padding:4px 10px;margin-bottom:6px;">Request Path →</div>
+
+            <div class="flex-row"><div class="diagram-box">① API Gateway<br><small>Authorised request — invokes Lambda</small></div></div>
             <div style="display:flex;justify-content:center;margin:2px 0;"><svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            <div class="flex-row"><div class="diagram-box">Lambda Processor</div></div>
+
+            <div class="flex-row"><div class="diagram-box">② Lambda Processor<br><small>Formats Converse API request — selects model ID</small></div></div>
             <div style="display:flex;justify-content:center;margin:2px 0;"><svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            <div class="flex-row"><div class="diagram-box" style="background-color:#ebf4ff;border-color:#667eea;">Bedrock Converse API</div></div>
+
+            <div class="flex-row"><div class="diagram-box" style="background-color:#ebf4ff;border-color:#667eea;">③ Bedrock Converse API<br><small>Unified interface — routes to selected model family</small></div></div>
             <div style="display:flex;justify-content:center;margin:2px 0;"><svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#64748b" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            <div class="flex-row" style="gap:16px;">
-              <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">Anthropic Claude</div>
-              <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">Amazon Nova</div>
-              <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">Meta Llama 3</div>
+
+            <!-- Model fan-out with response arrows -->
+            <div class="flex-row" style="gap:16px;align-items:flex-start;">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+                <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">④ Anthropic Claude<br><small>Foundation model inference</small></div>
+                <svg width="20" height="22" viewBox="0 0 20 22" fill="none"><line x1="10" y1="0" x2="10" y2="13" stroke="#b45309" stroke-width="3" stroke-linecap="round"/><polyline points="3,10 10,20 17,10" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span style="font-size:9px;color:#b45309;font-weight:700;">result</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+                <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">④ Amazon Nova<br><small>Foundation model inference</small></div>
+                <svg width="20" height="22" viewBox="0 0 20 22" fill="none"><line x1="10" y1="0" x2="10" y2="13" stroke="#b45309" stroke-width="3" stroke-linecap="round"/><polyline points="3,10 10,20 17,10" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span style="font-size:9px;color:#b45309;font-weight:700;">result</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+                <div class="diagram-box" style="background-color:#f0fff4;border-color:#48bb78;">④ Meta Llama 3<br><small>Foundation model inference</small></div>
+                <svg width="20" height="22" viewBox="0 0 20 22" fill="none"><line x1="10" y1="0" x2="10" y2="13" stroke="#b45309" stroke-width="3" stroke-linecap="round"/><polyline points="3,10 10,20 17,10" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span style="font-size:9px;color:#b45309;font-weight:700;">result</span>
+              </div>
             </div>
+
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#b45309;text-align:center;background:#fffbeb;border-radius:6px;padding:4px 10px;margin:6px 0;">← Response Loopback Path</div>
+
+            <div class="flex-row"><div class="diagram-box" style="background-color:#ebf4ff;border-color:#667eea;">⑤ Bedrock Converse API<br><small>Returns standardised response to Lambda Processor</small></div></div>
+            <div style="display:flex;justify-content:center;margin:2px 0;"><svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#b45309" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+            <div class="flex-row"><div class="diagram-box">⑥ Lambda Processor<br><small>Extracts completion · formats structured JSON response</small></div></div>
+            <div style="display:flex;justify-content:center;margin:2px 0;"><svg width="20" height="28" viewBox="0 0 20 28" fill="none"><line x1="10" y1="0" x2="10" y2="19" stroke="#b45309" stroke-width="3" stroke-linecap="round"/><polyline points="3,16 10,26 17,16" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+            <div class="flex-row"><div class="diagram-box">⑦ API Gateway → WAF → Browser<br><small>Response travels directly back to browser — not through Amplify CloudFront</small></div></div>
+
+            <!-- Legend -->
+            <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:12px;padding-top:10px;border-top:1px solid var(--border-soft);">
+              <span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#64748b;">
+                <svg width="24" height="10" viewBox="0 0 24 10" fill="none"><line x1="0" y1="5" x2="16" y2="5" stroke="#64748b" stroke-width="2.5" stroke-linecap="round"/><polyline points="13,1 21,5 13,9" fill="none" stroke="#64748b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Request / forward
+              </span>
+              <span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#b45309;">
+                <svg width="24" height="10" viewBox="0 0 24 10" fill="none"><line x1="0" y1="5" x2="16" y2="5" stroke="#b45309" stroke-width="2.5" stroke-linecap="round"/><polyline points="13,1 21,5 13,9" fill="none" stroke="#b45309" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Response / loopback
+              </span>
+            </div>
+
           </div>
-          <p class="fig-caption">Figure 7: Bedrock Integration Flow</p>
+          <p class="fig-caption">Figure 7: Bedrock Integration Flow — with response loopback</p>
         </div>
 
         <h4 class="block-title">Bedrock Lambda Processor</h4>
@@ -1746,41 +2252,72 @@ exports.handler = async (event) => {
 
 const bedrockClient = new BedrockRuntimeClient({ region: process.env.AWS_REGION || "us-east-1" });
 
+// Map Bedrock error codes to appropriate HTTP status codes
+const mapBedrockError = (error) => {
+  const errorMap = {
+    ThrottlingException:        { statusCode: 429, message: 'Model throttled — retry after backoff' },
+    AccessDeniedException:      { statusCode: 403, message: 'Model access denied — check Bedrock model access permissions' },
+    ModelTimeoutException:      { statusCode: 504, message: 'Model inference timed out' },
+    ValidationException:        { statusCode: 400, message: `Invalid request: ${error.message}` },
+    ServiceUnavailableException:{ statusCode: 503, message: 'Bedrock service temporarily unavailable' },
+    ModelNotReadyException:     { statusCode: 503, message: 'Model not ready — access may not be enabled' },
+  };
+  return errorMap[error.name] || { statusCode: 500, message: `Bedrock error: ${error.message}` };
+};
+
 exports.handler = async (event) => {
-  const { prompt, model = "anthropic.claude-3-5-sonnet-20241022-v2:0", maxTokens = 1000, temperature = 0.7, systemPrompt } = JSON.parse(event.body);
+  try {
+    const { prompt, model = "anthropic.claude-3-5-sonnet-20241022-v2:0", maxTokens = 1000, temperature = 0.7, systemPrompt } = JSON.parse(event.body);
 
-  const params = {
-    modelId: model,
-    messages: [{ role: "user", content: [{ text: prompt }] }],
-    inferenceConfig: { maxTokens, temperature, topP: 0.9 }
-  };
-  if (systemPrompt) params.system = [{ text: systemPrompt }];
+    const params = {
+      modelId: model,
+      messages: [{ role: "user", content: [{ text: prompt }] }],
+      inferenceConfig: { maxTokens, temperature, topP: 0.9 }
+    };
+    if (systemPrompt) params.system = [{ text: systemPrompt }];
 
-  const response = await bedrockClient.send(new ConverseCommand(params));
-  const completion = response.output?.message?.content?.[0]?.text || "";
+    const response = await bedrockClient.send(new ConverseCommand(params));
+    const completion = response.output?.message?.content?.[0]?.text || "";
 
-  return {
-    statusCode: 200,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model,
-      completion,
-      stopReason: response.stopReason,
-      usage: {
-        input_tokens:  response.usage?.inputTokens  || 0,
-        output_tokens: response.usage?.outputTokens || 0,
-        total_tokens: (response.usage?.inputTokens  || 0) + (response.usage?.outputTokens || 0)
-      }
-    })
-  };
+    return {
+      statusCode: 200,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model,
+        completion,
+        stopReason: response.stopReason,
+        usage: {
+          input_tokens:  response.usage?.inputTokens  || 0,
+          output_tokens: response.usage?.outputTokens || 0,
+          total_tokens: (response.usage?.inputTokens  || 0) + (response.usage?.outputTokens || 0)
+        }
+      })
+    };
+
+  } catch (error) {
+    console.error('Bedrock invocation error:', { name: error.name, message: error.message });
+    const { statusCode, message } = mapBedrockError(error);
+    return {
+      statusCode,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ error: message, errorType: error.name })
+    };
+  }
 };</code></pre>
         </div>
 
         <h4 class="block-title">Supported Bedrock Model Families</h4>
+        <div class="callout note">
+          <div class="callout-icon">ℹ</div>
+          <div class="callout-body">
+            <strong>Converse API scope and model availability</strong>
+            The Converse API supports <strong>text-based conversational models only</strong> — it does not cover embedding models, image generation, or other non-conversational model types. Model IDs and availability vary by AWS region. Always verify current model IDs and regional availability in the <a href="https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference-supported-models-features.html" style="color:var(--accent);">Bedrock documentation</a> before deploying. Model IDs in this table were last verified July 2026.
+          </div>
+        </div>
         <div class="table-wrap">
           <table>
             <thead>
-              <tr><th>Model Family</th><th>Converse API</th><th>Recommended Model ID</th><th>Notes</th></tr>
+              <tr><th>Model Family</th><th>Converse API (text)</th><th>Recommended Model ID</th><th>Notes</th></tr>
             </thead>
             <tbody>
               <tr><td><strong>Anthropic Claude 3/3.5</strong></td><td><span class="tag">Supported</span></td><td><code>anthropic.claude-3-5-sonnet-20241022-v2:0</code></td><td>Use Converse API. Legacy Human/Assistant format deprecated.</td></tr>
@@ -1788,6 +2325,7 @@ exports.handler = async (event) => {
               <tr><td><strong>Meta Llama 3</strong></td><td><span class="tag">Supported</span></td><td><code>meta.llama3-70b-instruct-v1:0</code></td><td>Open-weight; Llama 3 replaces Llama 2 on Bedrock.</td></tr>
               <tr><td><strong>Mistral AI</strong></td><td><span class="tag">Supported</span></td><td><code>mistral.mistral-large-2402-v1:0</code></td><td>Strong multilingual performance.</td></tr>
               <tr><td><strong>AI21 Jamba</strong></td><td><span class="tag">Supported</span></td><td><code>ai21.jamba-1-5-large-v1:0</code></td><td>Replaces the Jurassic series.</td></tr>
+              <tr><td><strong>Cohere Command</strong></td><td><span class="tag">Supported</span></td><td><code>cohere.command-r-plus-v1:0</code></td><td>Strong at RAG and tool use. Cohere Embed models are not accessible via Converse API.</td></tr>
             </tbody>
           </table>
         </div>
