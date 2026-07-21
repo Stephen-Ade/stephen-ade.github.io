@@ -864,7 +864,7 @@
 <rect fill="#dbeafe" height="65" rx="8" stroke="#3b82f6" stroke-width="2" width="155" x="465" y="340"></rect><text font-size="12" font-weight="700" text-anchor="middle" x="543" y="367">SageMaker AI</text><text font-size="10" text-anchor="middle" x="543" y="384">Approved endpoint allowlist</text>
 <rect fill="#dbeafe" height="65" rx="8" stroke="#3b82f6" stroke-width="2" width="130" x="660" y="340"></rect><text font-size="12" font-weight="700" text-anchor="middle" x="725" y="367">Bedrock</text><text font-size="10" text-anchor="middle" x="725" y="384">Approved model profiles</text>
 <path d="M180 64 L245 64" marker-end="url(#archArrow)" stroke="#64748b" stroke-width="2.5"></path><text font-size="10" font-weight="700" text-anchor="middle" x="212" y="52">1</text>
-<path d="M620 64 L660 64" marker-end="url(#archArrow)" stroke="#64748b" stroke-width="2.5"></path><text font-size="10" font-weight="700" text-anchor="middle" x="640" y="52">2</text>
+<path d="M105 35 L105 8 L725 8 L725 35" fill="none" marker-end="url(#archArrow)" stroke="#64748b" stroke-width="2.5" stroke-dasharray="6,5"></path><text font-size="10" font-weight="700" text-anchor="middle" x="415" y="14">2</text>
 <path d="M725 93 L725 125 L543 125 L543 93" fill="none" marker-end="url(#archArrow)" stroke="#64748b" stroke-width="2.5"></path><text font-size="10" font-weight="700" text-anchor="middle" x="635" y="116">3a</text>
 <path d="M543 35 L543 15 L105 15 L105 35" fill="none" marker-end="url(#archArrow)" stroke="#64748b" stroke-width="2.5"></path><text font-size="10" font-weight="700" text-anchor="middle" x="324" y="12">3b</text>
 <path d="M105 93 L105 216 L245 216" fill="none" marker-end="url(#archArrow)" stroke="#64748b" stroke-width="2.5"></path><text font-size="10" font-weight="700" text-anchor="middle" x="150" y="205">4</text>
@@ -879,7 +879,7 @@
 <strong>Sequence legend</strong>
 <ol style="margin-top:.5rem;padding-left:1.25rem;font-size:.82rem;">
 <li><strong>1:</strong> Browser loads the SPA from Amplify Hosting’s managed hosting and CDN service.</li>
-<li><strong>2:</strong> Cognito redirects the browser to Entra ID for corporate authentication.</li>
+<li><strong>2:</strong> The browser is redirected by Cognito to Entra ID for corporate authentication.</li>
 <li><strong>3a:</strong> Entra returns the SAML response to Cognito.</li>
 <li><strong>3b:</strong> Cognito completes the authorization-code flow with PKCE and returns Cognito tokens to the SPA loaded in the user browser.</li>
 <li><strong>4:</strong> The SPA sends the Cognito access token in the <code>Authorization: Bearer</code> header to the public Regional API path.</li>
