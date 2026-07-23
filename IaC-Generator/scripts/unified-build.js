@@ -11,14 +11,39 @@ function parseAwsSchema(cfnSpec) {
     const resources = {};
     const types = Object.keys(cfnSpec.ResourceTypes);
     console.log(`[AWS] Parsing ${types.length} resource types with full deep properties...`);
+    
     types.forEach(typeName => {
         const cfnResource = cfnSpec.ResourceTypes[typeName];
         const properties = {};
         const required = [];
+        
         if (cfnResource.Properties) {
             Object.keys(cfnResource.Properties).forEach(propName => {
                 const prop = cfnResource.Properties[propName];
-                properties[propName] = { type: prop.PrimitiveType ? prop.PrimitiveType.toLowerCase() : 'object', description: prop.Description || '' };
+                const parseAwsType = (p) => {
+                    if (p.PrimitiveType) return p.PrimitiveType.toLowerCase();
+                    if (p.Type === 'List') return 'array';
+                    if (p.Type === 'Map') return 'object';
+                    return (p.Type || 'object').toLowerCase();
+                };
+
+                const node = { type: parseAwsType(prop), description: prop.Description || '' };
+
+                if (prop.Properties && Object.keys(prop.Properties).length > 0) {
+                    node.properties = {};
+                    Object.keys(prop.Properties).forEach(subName => {
+                        const subProp = prop.Properties[subName];
+                        const subNode = { type: parseAwsType(subProp), description: subProp.Description || '' };
+                        if (subProp.Properties && Object.keys(subProp.Properties).length > 0) {
+                            subNode.properties = {};
+                            Object.keys(subProp.Properties).forEach(subSubName => {
+                                subNode.properties[subSubName] = { type: parseAwsType(subProp.Properties[subSubName]), description: subProp.Properties[subSubName].Description || '' };
+                            });
+                        }
+                        node.properties[subName] = subNode;
+                    });
+                }
+                properties[propName] = node;
                 if (prop.Required) required.push(propName);
             });
         }
@@ -27,7 +52,6 @@ function parseAwsSchema(cfnSpec) {
     return resources;
 }
 
-// Helper to follow Microsoft's "#/7" pointers
 function resolveRef(rootData, refString) {
     if (!refString || !refString.startsWith('#/')) return null;
     const parts = refString.substring(2).split('/').map(p => isNaN(p) ? p : parseInt(p));
@@ -37,6 +61,50 @@ function resolveRef(rootData, refString) {
         current = current[p];
     }
     return current;
+}
+
+function getCleanType(node) {
+    if (!node || !node.type) return 'object';
+    if (typeof node.type === 'string') return node.type.toLowerCase();
+    if (node.type.name) return node.type.name.toLowerCase();
+    return 'object';
+}
+
+function resolveSchemaNode(fileData, node, depth = 0) {
+    if (depth > 10 || !node || typeof node !== 'object') return node;
+    
+    // Microsoft sometimes hides $ref inside the type object itself: "type": {"$ref": "#/4"}
+    if (node.type && typeof node.type === 'object' && node.type.$ref) {
+        const resolvedType = resolveRef(fileData, node.type.$ref);
+        if (typeof resolvedType === 'string') {
+            node = { ...node, type: resolvedType };
+        } else if (resolvedType && resolvedType.properties) {
+            // The ref pointed to an object definition, merge it in
+            node = { ...resolvedType, description: node.description || resolvedType.description };
+        }
+    }
+
+    // Standard $ref resolution
+    if (node.$ref) {
+        const resolved = resolveRef(fileData, node.$ref);
+        return resolveSchemaNode(fileData, resolved, depth + 1);
+    }
+
+    // If it's an object with properties, recurse into its children
+    if ((node.type === 'object' || !node.type) && node.properties) {
+        const resolvedProps = {};
+        for (const [k, v] of Object.entries(node.properties)) {
+            resolvedProps[k] = resolveSchemaNode(fileData, v, depth + 1);
+        }
+        return { ...node, properties: resolvedProps };
+    }
+
+    // If it's an array, resolve its items
+    if (node.type === 'array' && node.items) {
+        return { ...node, items: resolveSchemaNode(fileData, node.items, depth + 1) };
+    }
+
+    return node;
 }
 
 function parseAzureDeepSchemas() {
@@ -53,7 +121,6 @@ function parseAzureDeepSchemas() {
         const lastAtIdx = key.lastIndexOf('@');
         let typeName = key.substring(0, lastAtIdx);
 
-        // ref = "addons/microsoft.addons/2017-05-15/types.json#/17"
         const [filePathPart, pointerPart] = ref.split('#');
         const filePath = path.join(AZURE_TYPES_DIR, filePathPart);
         
@@ -61,66 +128,53 @@ function parseAzureDeepSchemas() {
 
         try {
             const fileData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-            
-            // 1. Follow pointer to the Resource Wrapper (e.g., #/17)
             const wrapper = resolveRef(fileData, '#' + pointerPart);
+            
             if (!wrapper || !wrapper.body) continue;
 
-            // 2. Follow the body pointer to the actual Object Type (e.g., #/7)
             let body = wrapper.body;
             if (body.$ref) {
                 body = resolveRef(fileData, body.$ref);
             }
+            
             if (!body || !body.properties) continue;
 
             const finalProps = {};
             const requiredList = body.required || [];
 
-            // 3. Extract properties
             for (const [propKey, propVal] of Object.entries(body.properties)) {
-                // Skip standard read-only ARM properties
                 if (['id', 'type', 'apiVersion'].includes(propKey)) continue;
 
-                if (propKey === 'name') {
-                    finalProps.Name = { type: 'string', description: 'Resource name' };
-                    continue;
-                }
-                if (propKey === 'location') {
-                    finalProps.Location = { type: 'string', description: 'Resource location' };
-                    continue;
-                }
-                if (propKey === 'tags') {
-                    finalProps.Tags = { type: 'object', description: 'Resource tags' };
-                    continue;
-                }
+                if (propKey === 'name') { finalProps.Name = { type: 'string', description: 'Resource name' }; continue; }
+                if (propKey === 'location') { finalProps.Location = { type: 'string', description: 'Resource location' }; continue; }
+                if (propKey === 'tags') { finalProps.Tags = { type: 'object', description: 'Resource tags' }; continue; }
 
-                // The real deep settings are inside the "properties" property
                 if (propKey === 'properties') {
                     let innerProps = propVal;
-                    // Resolve if it's another pointer
+                    
+                    // 1. Resolve if it's a root-level pointer
                     if (innerProps.$ref) {
                         innerProps = resolveRef(fileData, innerProps.$ref);
                     }
                     
+                    // 2. CRITICAL FIX: Resolve nested "type": {"$ref": "#/4"} structures
+                    innerProps = resolveSchemaNode(fileData, innerProps);
+                    
+                    // 3. Now safely extract the fully resolved properties
                     if (innerProps && innerProps.properties) {
                         for (const [innerKey, innerVal] of Object.entries(innerProps.properties)) {
-                            // Figure out the type (handle nested $refs gracefully)
-                            let typeStr = 'object';
-                            if (innerVal.type) {
-                                if (typeof innerVal.type === 'string') typeStr = innerVal.type.toLowerCase();
-                                else if (innerVal.type.name) typeStr = innerVal.type.name.toLowerCase();
-                                else if (innerVal.type.$ref) typeStr = 'object'; // complex type
-                            }
+                            const resolvedNode = resolveSchemaNode(fileData, innerVal);
                             
                             finalProps[innerKey] = {
-                                type: typeStr,
-                                description: innerVal.description || ''
+                                type: getCleanType(resolvedNode),
+                                description: resolvedNode.description || '',
+                                properties: resolvedNode.properties || undefined 
                             };
-
-                            if (innerProps.required && innerProps.required.includes(innerKey)) {
-                                requiredList.push(innerKey);
-                            }
+                            if (innerProps.required && innerProps.required.includes(innerKey)) requiredList.push(innerKey);
                         }
+                    } else {
+                        // Diagnostic log for true edge cases that still fail
+                        console.log(`[Azure-DEBUG] Missing inner properties for: ${typeName}`);
                     }
                     continue;
                 }
