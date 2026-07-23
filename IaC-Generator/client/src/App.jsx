@@ -55,12 +55,16 @@ function App() {
           axios.get(`http://localhost:3001/api/resources?search=${e.target.value}`).then(res => setResources(res.data));
         }} />
         <div className="resource-list">
-          {resources.map(r => (
-            <div key={r.typeName} className={`resource-item ${r.typeName === selectedType ? 'active' : ''}`} onClick={() => setSelectedType(r.typeName)}>
-              <span className={`badge ${r.provider}`}>{r.provider === 'external' ? r.vendor : r.provider.toUpperCase()}</span>
-              {r.deviceType || r.typeName.split('/').pop()}
-            </div>
-          ))}
+          {resources.map(r => {
+            const parts = r.typeName.split('/');
+            const displayName = r.deviceType || (parts.length > 2 ? `${parts[parts.length-2]} / ${parts[parts.length-1]}` : parts[parts.length-1]);
+            return (
+              <div key={r.typeName} className={`resource-item ${r.typeName === selectedType ? 'active' : ''}`} onClick={() => setSelectedType(r.typeName)}>
+                <span className={`badge ${r.provider}`}>{r.provider === 'external' ? r.vendor : r.provider.toUpperCase()}</span>
+                {displayName}
+              </div>
+            );
+          })}
         </div>
       </aside>
       <main className="form-panel">
