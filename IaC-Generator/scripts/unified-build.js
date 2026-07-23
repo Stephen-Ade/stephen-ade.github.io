@@ -9,9 +9,16 @@ const AZURE_INDEX_FILE = path.join(__dirname, '../db/azure-repo/generated/index.
 const AZURE_TYPES_DIR = path.join(__dirname, '../db/azure-repo/generated/');
 const GCP_INDEX_FILE = path.join(__dirname, '../db/google-apis-index.json');
 
-// Helper to fetch JSON over HTTPS (Node native, no external libs needed)
+// Helper to fetch JSON over HTTPS (Follows redirects automatically)
 const fetchJson = (url) => new Promise((resolve, reject) => {
     https.get(url, (res) => {
+        // Handle HTTP 301/302 Redirects
+        if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+            return fetchJson(res.headers.location).then(resolve).catch(reject);
+        }
+        if (res.statusCode !== 200) {
+            return reject(new Error(`HTTP ${res.statusCode} for ${url}`));
+        }
         let data = '';
         res.on('data', chunk => data += chunk);
         res.on('end', () => {
