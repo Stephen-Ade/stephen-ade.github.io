@@ -1,12 +1,25 @@
 const fs = require('fs');
 const path = require('path');
+const https = require('https'); // Added for GCP dynamic downloads
 
 const OUTPUT_DIR = path.join(__dirname, '../db');
 const OUTPUT_FILE = path.join(__dirname, '../db/schemas.json');
 const AWS_LOCAL_FILE = path.join(__dirname, '../db/CloudFormationResourceSpecification.json');
 const AZURE_INDEX_FILE = path.join(__dirname, '../db/azure-repo/generated/index.json');
 const AZURE_TYPES_DIR = path.join(__dirname, '../db/azure-repo/generated/');
-const GCP_LOCAL_FILE = path.join(__dirname, '../db/google-provider-schema.json');
+const GCP_INDEX_FILE = path.join(__dirname, '../db/google-apis-index.json');
+
+// Helper to fetch JSON over HTTPS (Node native, no external libs needed)
+const fetchJson = (url) => new Promise((resolve, reject) => {
+    https.get(url, (res) => {
+        let data = '';
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => {
+            try { resolve(JSON.parse(data)); }
+            catch (e) { reject(e); }
+        });
+    }).on('error', reject);
+});
 
 function parseAwsSchema(cfnSpec) {
     const resources = {};
@@ -76,11 +89,8 @@ function resolveSchemaNode(fileData, node, depth = 0) {
     
     if (node.type && typeof node.type === 'object' && node.type.$ref) {
         const resolvedType = resolveRef(fileData, node.type.$ref);
-        if (typeof resolvedType === 'string') {
-            node = { ...node, type: resolvedType };
-        } else if (resolvedType && resolvedType.properties) {
-            node = { ...resolvedType, description: node.description || resolvedType.description };
-        }
+        if (typeof resolvedType === 'string') node = { ...node, type: resolvedType };
+        else if (resolvedType && resolvedType.properties) node = { ...resolvedType, description: node.description || resolvedType.description };
     }
 
     if (node.$ref) {
@@ -106,15 +116,12 @@ function resolveSchemaNode(fileData, node, depth = 0) {
 function extractPropertiesFromNode(fileData, targetNode) {
     if (!targetNode) return null;
     const resolved = resolveSchemaNode(fileData, targetNode);
-    
     if (resolved && resolved.properties) return resolved;
-    
     const variant = resolved?.oneOf?.[0] || resolved?.allOf?.[0] || resolved?.anyOf?.[0];
     if (variant) {
         const resolvedVariant = resolveSchemaNode(fileData, variant);
         if (resolvedVariant && resolvedVariant.properties) return resolvedVariant;
     }
-    
     return null;
 }
 
@@ -128,20 +135,16 @@ function parseAzureDeepSchemas() {
     for (const key in indexResources) {
         const ref = indexResources[key].$ref;
         if (!ref) continue;
-
         const lastAtIdx = key.lastIndexOf('@');
         let typeName = key.substring(0, lastAtIdx);
-
         const [filePathPart, pointerPart] = ref.split('#');
         const filePath = path.join(AZURE_TYPES_DIR, filePathPart);
-        
         if (!fs.existsSync(filePath)) continue;
 
         try {
             const fileData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
             const wrapper = resolveRef(fileData, '#' + pointerPart);
             if (!wrapper || !wrapper.body) continue;
-
             let body = wrapper.body;
             if (body.$ref) body = resolveRef(fileData, body.$ref);
             if (!body || !body.properties) continue;
@@ -151,7 +154,6 @@ function parseAzureDeepSchemas() {
 
             for (const [propKey, propVal] of Object.entries(body.properties)) {
                 if (['id', 'type', 'apiVersion'].includes(propKey)) continue;
-
                 if (propKey === 'name') { finalProps.Name = { type: 'string', description: 'Resource name' }; continue; }
                 if (propKey === 'location') { finalProps.Location = { type: 'string', description: 'Resource location' }; continue; }
                 if (propKey === 'tags') { finalProps.Tags = { type: 'object', description: 'Resource tags' }; continue; }
@@ -159,13 +161,10 @@ function parseAzureDeepSchemas() {
                 if (propKey === 'properties') {
                     let innerProps = propVal;
                     if (innerProps.$ref) innerProps = resolveRef(fileData, innerProps.$ref);
-                    
                     const extractedNode = extractPropertiesFromNode(fileData, innerProps);
-                    
                     if (extractedNode && extractedNode.properties) {
                         for (const [innerKey, innerVal] of Object.entries(extractedNode.properties)) {
                             const resolvedNode = resolveSchemaNode(fileData, innerVal);
-                            
                             finalProps[innerKey] = {
                                 type: getCleanType(resolvedNode),
                                 description: resolvedNode.description || '',
@@ -177,71 +176,106 @@ function parseAzureDeepSchemas() {
                     continue;
                 }
             }
-
             if (Object.keys(finalProps).length > 0) {
                 resources[typeName] = { typeName, provider: 'azure', properties: finalProps, required: requiredList };
                 count++;
             }
-        } catch (e) {
-            // Skip broken files silently
-        }
+        } catch (e) {}
     }
     console.log(`[Azure] Parsed ${count} resource types with DEEP properties.`);
     return resources;
 }
 
-// --- NEW: GCP PARSER ---
-function parseGcpSchema(gcpSpec) {
+// --- NEW: GCP PARSER (Using Google Cloud Discovery API) ---
+const GCP_TARGET_APIS = [
+    'compute', 'sqladmin', 'container', 'redis', 'dns', 
+    'pubsub', 'storage', 'servicenetworking', 'file', 'cloudbuild'
+];
+
+async function parseGcpDiscovery() {
+    if (!fs.existsSync(GCP_INDEX_FILE)) return {};
+    
+    console.log(`[GCP] Fetching schemas for top infrastructure APIs...`);
+    const indexData = JSON.parse(fs.readFileSync(GCP_INDEX_FILE, 'utf8'));
     const resources = {};
-    const schemas = gcpSpec.resource_schemas || {};
-    const types = Object.keys(schemas);
-    console.log(`[GCP] Parsing ${types.length} resource types...`);
+    let count = 0;
 
-    types.forEach(typeName => {
-        const block = schemas[typeName].block;
-        if (!block || !block.attributes) return;
+    for (const api of indexData.items) {
+        if (!GCP_TARGET_APIS.includes(api.id)) continue;
 
-        const properties = {};
-        const required = [];
+        try {
+            console.log(`  -> Downloading ${api.id} schema...`);
+            const schema = await fetchJson(api.discoveryRestUrl);
+            if (!schema.resources || !schema.schemas) continue;
 
-        for (const [attrName, attrVal] of Object.entries(block.attributes)) {
-            // Skip auto-generated read-only fields that clutter the UI
-            if (attrVal.computed && !attrVal.optional) continue;
-            if (['id', 'self_link', 'project', 'zone', 'region', 'urn', 'effective_labels'].includes(attrName)) continue;
+            for (const [resName, resObj] of Object.entries(schema.resources)) {
+                // Only look for resources that can be created/inserted (ignores pure read-only endpoints)
+                const createMethod = resObj.methods?.insert || resObj.methods?.create;
+                if (!createMethod?.request?.$ref) continue;
 
-            let typeStr = 'string';
-            if (attrVal.type) {
-                if (Array.isArray(attrVal.type)) {
-                    typeStr = attrVal.type.includes('list') ? 'array' : 'object';
-                } else {
-                    typeStr = attrVal.type.toLowerCase();
-                }
+                const typeName = `google_${api.id}_${resName}`;
+                const rootSchemaDef = schema.schemas[createMethod.request.$ref];
+                
+                if (!rootSchemaDef?.properties) continue;
+
+                resources[typeName] = {
+                    typeName,
+                    provider: 'gcp',
+                    properties: resolveGcpSchema(rootSchemaDef, schema.schemas),
+                    required: rootSchemaDef.required || []
+                };
+                count++;
             }
-
-            const node = { type: typeStr, description: attrVal.description || '' };
-
-            // Handle nested blocks (e.g., boot_disk, network_interface)
-            if (attrVal.block && attrVal.block.attributes) {
-                node.properties = {};
-                for (const [subName, subVal] of Object.entries(attrVal.block.attributes)) {
-                    if (subVal.computed && !subVal.optional) continue;
-                    let subType = 'string';
-                    if (subVal.type) {
-                        subType = Array.isArray(subVal.type) ? (subVal.type.includes('list') ? 'array' : 'object') : subVal.type.toLowerCase();
-                    }
-                    node.properties[subName] = { type: subType, description: subVal.description || '' };
-                }
-            }
-
-            properties[attrName] = node;
-            if (attrVal.required) required.push(attrName);
+        } catch (err) {
+            console.error(`  -> Failed to parse ${api.id}:`, err.message);
         }
-
-        if (Object.keys(properties).length > 0) {
-            resources[typeName] = { typeName, provider: 'gcp', properties, required };
-        }
-    });
+    }
+    console.log(`[GCP] Parsed ${count} resource types.`);
     return resources;
+}
+
+function resolveGcpSchema(node, allSchemas, depth = 0) {
+    if (depth > 5 || !node) return {};
+    if (node.$ref) {
+        const resolved = allSchemas[node.$ref];
+        return resolved ? resolveGcpSchema(resolved, allSchemas, depth + 1) : {};
+    }
+
+    const finalProps = {};
+    if (node.properties) {
+        for (const [key, val] of Object.entries(node.properties)) {
+            // Skip read-only fields (like IDs, creation timestamps)
+            if (val.readOnly) continue;
+
+            if (val.$ref) {
+                const resolved = allSchemas[val.$ref];
+                finalProps[key] = {
+                    type: 'object',
+                    description: val.description || '',
+                    properties: resolved ? resolveGcpSchema(resolved, allSchemas, depth + 1) : undefined
+                };
+            } else if (val.type === 'array' && val.items?.$ref) {
+                const resolved = allSchemas[val.items.$ref];
+                finalProps[key] = {
+                    type: 'array',
+                    description: val.description || '',
+                    properties: resolved ? resolveGcpSchema(resolved, allSchemas, depth + 1) : undefined
+                };
+            } else if (val.type === 'object' && val.properties) {
+                finalProps[key] = {
+                    type: 'object',
+                    description: val.description || '',
+                    properties: resolveGcpSchema(val, allSchemas, depth + 1)
+                };
+            } else {
+                finalProps[key] = {
+                    type: val.type || 'string',
+                    description: val.description || ''
+                };
+            }
+        }
+    }
+    return finalProps;
 }
 
 async function main() {
@@ -259,14 +293,9 @@ async function main() {
         console.warn('WARNING: Azure repo not extracted, skipping.');
     }
 
-    let gcpResources = {};
-    if (fs.existsSync(GCP_LOCAL_FILE)) {
-        console.log('Loading GCP Terraform schemas...');
-        const gcpRaw = fs.readFileSync(GCP_LOCAL_FILE, 'utf8');
-        gcpResources = parseGcpSchema(JSON.parse(gcpRaw));
-    } else {
-        console.warn('WARNING: GCP schema not found, skipping.');
-    }
+    // GCP is now Async because it downloads schemas dynamically
+    console.log('Loading GCP schemas via Discovery API...');
+    const gcpResources = await parseGcpDiscovery();
 
     const db = {
         updatedAt: new Date().toISOString(),
