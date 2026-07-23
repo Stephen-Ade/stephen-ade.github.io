@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const https = require('https'); // Added for GCP dynamic downloads
+const https = require('https');
 
 const OUTPUT_DIR = path.join(__dirname, '../db');
 const OUTPUT_FILE = path.join(__dirname, '../db/schemas.json');
@@ -9,10 +9,8 @@ const AZURE_INDEX_FILE = path.join(__dirname, '../db/azure-repo/generated/index.
 const AZURE_TYPES_DIR = path.join(__dirname, '../db/azure-repo/generated/');
 const GCP_INDEX_FILE = path.join(__dirname, '../db/google-apis-index.json');
 
-// Helper to fetch JSON over HTTPS (Follows redirects automatically)
 const fetchJson = (url) => new Promise((resolve, reject) => {
     https.get(url, (res) => {
-        // Handle HTTP 301/302 Redirects
         if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
             return fetchJson(res.headers.location).then(resolve).catch(reject);
         }
@@ -193,7 +191,7 @@ function parseAzureDeepSchemas() {
     return resources;
 }
 
-// --- NEW: GCP PARSER (Using Google Cloud Discovery API) ---
+// --- GCP PARSER (Using Google Cloud Discovery API) ---
 const GCP_TARGET_APIS = [
     'compute', 'sqladmin', 'container', 'redis', 'dns', 
     'pubsub', 'storage', 'servicenetworking', 'file', 'cloudbuild'
@@ -208,19 +206,19 @@ async function parseGcpDiscovery() {
     let count = 0;
 
     for (const api of indexData.items) {
-        if (!GCP_TARGET_APIS.includes(api.id)) continue;
+        // FIX: Changed api.id to api.name (Google IDs have versions like "compute:v1")
+        if (!GCP_TARGET_APIS.includes(api.name)) continue;
 
         try {
-            console.log(`  -> Downloading ${api.id} schema...`);
+            console.log(`  -> Downloading ${api.name} schema...`);
             const schema = await fetchJson(api.discoveryRestUrl);
             if (!schema.resources || !schema.schemas) continue;
 
             for (const [resName, resObj] of Object.entries(schema.resources)) {
-                // Only look for resources that can be created/inserted (ignores pure read-only endpoints)
                 const createMethod = resObj.methods?.insert || resObj.methods?.create;
                 if (!createMethod?.request?.$ref) continue;
 
-                const typeName = `google_${api.id}_${resName}`;
+                const typeName = `google_${api.name}_${resName}`;
                 const rootSchemaDef = schema.schemas[createMethod.request.$ref];
                 
                 if (!rootSchemaDef?.properties) continue;
@@ -234,7 +232,7 @@ async function parseGcpDiscovery() {
                 count++;
             }
         } catch (err) {
-            console.error(`  -> Failed to parse ${api.id}:`, err.message);
+            console.error(`  -> Failed to parse ${api.name}:`, err.message);
         }
     }
     console.log(`[GCP] Parsed ${count} resource types.`);
@@ -251,7 +249,6 @@ function resolveGcpSchema(node, allSchemas, depth = 0) {
     const finalProps = {};
     if (node.properties) {
         for (const [key, val] of Object.entries(node.properties)) {
-            // Skip read-only fields (like IDs, creation timestamps)
             if (val.readOnly) continue;
 
             if (val.$ref) {
@@ -300,7 +297,6 @@ async function main() {
         console.warn('WARNING: Azure repo not extracted, skipping.');
     }
 
-    // GCP is now Async because it downloads schemas dynamically
     console.log('Loading GCP schemas via Discovery API...');
     const gcpResources = await parseGcpDiscovery();
 
