@@ -3,6 +3,66 @@ import axios from 'axios';
 import Editor from '@monaco-editor/react';
 import './App.css';
 
+// Helper to convert dot-notation keys (e.g. "hardwareProfile.vmSize") 
+// back into nested JSON objects for the backend compiler
+const unflattenObject = (obj) => {
+  const result = {};
+  for (const key in obj) {
+    const keys = key.split('.');
+    let current = result;
+    for (let i = 0; i < keys.length - 1; i++) {
+      if (!current[keys[i]]) current[keys[i]] = {};
+      current = current[keys[i]];
+    }
+    current[keys[keys.length - 1]] = obj[key];
+  }
+  return result;
+};
+
+// Recursive component to handle deep Azure/AWS schemas
+const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
+  const isRequired = requiredList.includes(name);
+
+  // If it's an object with nested properties, render a grouped section
+  if (schema.type === 'object' && schema.properties) {
+    return (
+      <div className="form-group nested-group">
+        <label className="nested-label">
+          {name} {isRequired && <span className="req">*</span>} 
+          <span className="type-badge">object</span>
+        </label>
+        <div className="nested-children">
+          {Object.entries(schema.properties).map(([childKey, childSchema]) => (
+            <FormField
+              key={childKey}
+              name={`${name}.${childKey}`}
+              schema={childSchema}
+              requiredList={schema.required || []}
+              formData={formData}
+              setFormData={setFormData}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Standard primitive rendering (string, boolean, number, array)
+  return (
+    <div className="form-group">
+      <label>
+        {name} {isRequired && <span className="req">*</span>}
+      </label>
+      <input
+        type="text"
+        placeholder={`(${schema.type || 'string'})`}
+        value={formData[name] || ''}
+        onChange={(e) => setFormData({ ...formData, [name]: e.target.value })}
+      />
+    </div>
+  );
+};
+
 function App() {
   const [resources, setResources] = useState([]);
   const [selectedType, setSelectedType] = useState(null);
@@ -30,12 +90,24 @@ function App() {
     e.preventDefault();
     if (!selectedType) return;
     setLoading(true);
-    const cleanConfig = Object.fromEntries(Object.entries(formData).filter(([_, v]) => v !== '' && v !== null));
+    
+    // Filter out empty fields
+    const cleanConfig = Object.fromEntries(
+      Object.entries(formData).filter(([_, v]) => v !== '' && v !== null)
+    );
+    
+    // Unflatten dot-notation keys into nested objects for the backend
+    const nestedConfig = unflattenObject(cleanConfig);
+
     try {
-      const res = await axios.post('http://localhost:3001/api/generate', { typeName: selectedType, platform, config: cleanConfig });
+      const res = await axios.post('http://localhost:3001/api/generate', { 
+        typeName: selectedType, 
+        platform, 
+        config: nestedConfig // Sending properly nested JSON now
+      });
       setGeneratedCode(res.data.code);
     } catch (err) {
-      setGeneratedCode(`// Error`);
+      setGeneratedCode(`// Error generating code`);
     }
     setLoading(false);
   };
@@ -57,7 +129,9 @@ function App() {
         <div className="resource-list">
           {resources.map(r => {
             const parts = r.typeName.split('/');
-            const displayName = r.deviceType || (parts.length > 2 ? `${parts[parts.length-2]} / ${parts[parts.length-1]}` : parts[parts.length-1]);
+            // FIX: Added formatName to standardize capitalization in the UI
+            const formatName = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+            const displayName = r.deviceType || (parts.length > 2 ? `${formatName(parts[parts.length-2])} / ${formatName(parts[parts.length-1])}` : formatName(parts[parts.length-1]));
             return (
               <div key={r.typeName} className={`resource-item ${r.typeName === selectedType ? 'active' : ''}`} onClick={() => setSelectedType(r.typeName)}>
                 <span className={`badge ${r.provider}`}>{r.provider === 'external' ? r.vendor : r.provider.toUpperCase()}</span>
@@ -67,6 +141,7 @@ function App() {
           })}
         </div>
       </aside>
+      
       <main className="form-panel">
         {schema ? (
           <>
@@ -78,13 +153,20 @@ function App() {
               ))}
             </div>
             <form onSubmit={handleGenerate} className="dynamic-form">
-              {Object.entries(schema.properties).slice(0, 20).map(([key, prop]) => (
-                <div key={key} className="form-group">
-                  <label>{key} {schema.required.includes(key) && <span className="req">*</span>}</label>
-                  <input type="text" placeholder={`(${prop.type})`} value={formData[key] || ''} onChange={(e) => setFormData({ ...formData, [key]: e.target.value })} />
-                </div>
+              {/* Removed .slice(0, 20) and using Recursive Component */}
+              {Object.entries(schema.properties).map(([key, prop]) => (
+                <FormField
+                  key={key}
+                  name={key}
+                  schema={prop}
+                  requiredList={schema.required || []}
+                  formData={formData}
+                  setFormData={setFormData}
+                />
               ))}
-              <button type="submit" disabled={loading}>{loading ? 'Generating...' : 'Generate Code'}</button>
+              <button type="submit" disabled={loading} style={{ marginTop: '20px' }}>
+                {loading ? 'Generating...' : 'Generate Code'}
+              </button>
             </form>
           </>
         ) : (
@@ -94,6 +176,7 @@ function App() {
           </div>
         )}
       </main>
+      
       <section className="code-panel">
         <Editor height="100%" language={getLanguage()} theme="vs-dark" value={generatedCode} options={{ minimap: { enabled: false }, readOnly: true, fontSize: 14 }} />
       </section>

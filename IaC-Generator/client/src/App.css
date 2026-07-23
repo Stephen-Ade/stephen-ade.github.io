@@ -23,3 +23,39 @@
 .dynamic-form button:disabled { background: #93c5fd; }
 .code-panel { flex: 2; background: #1e1e1e; }
 .placeholder { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; color: #666; }
+
+/* --- NEW: Styles for Nested Schema Objects (Light Theme) --- */
+.nested-group {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-left: 4px solid #007bff;
+  border-radius: 4px;
+}
+
+.nested-label {
+  color: #333;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+.type-badge {
+  font-size: 0.7rem;
+  font-weight: 400;
+  color: #6c757d;
+  background: #e9ecef;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.nested-children {
+  margin-left: 15px;
+  margin-top: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

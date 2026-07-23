@@ -73,24 +73,20 @@ function getCleanType(node) {
 function resolveSchemaNode(fileData, node, depth = 0) {
     if (depth > 10 || !node || typeof node !== 'object') return node;
     
-    // Microsoft sometimes hides $ref inside the type object itself: "type": {"$ref": "#/4"}
     if (node.type && typeof node.type === 'object' && node.type.$ref) {
         const resolvedType = resolveRef(fileData, node.type.$ref);
         if (typeof resolvedType === 'string') {
             node = { ...node, type: resolvedType };
         } else if (resolvedType && resolvedType.properties) {
-            // The ref pointed to an object definition, merge it in
             node = { ...resolvedType, description: node.description || resolvedType.description };
         }
     }
 
-    // Standard $ref resolution
     if (node.$ref) {
         const resolved = resolveRef(fileData, node.$ref);
         return resolveSchemaNode(fileData, resolved, depth + 1);
     }
 
-    // If it's an object with properties, recurse into its children
     if ((node.type === 'object' || !node.type) && node.properties) {
         const resolvedProps = {};
         for (const [k, v] of Object.entries(node.properties)) {
@@ -99,12 +95,28 @@ function resolveSchemaNode(fileData, node, depth = 0) {
         return { ...node, properties: resolvedProps };
     }
 
-    // If it's an array, resolve its items
     if (node.type === 'array' && node.items) {
         return { ...node, items: resolveSchemaNode(fileData, node.items, depth + 1) };
     }
 
     return node;
+}
+
+function extractPropertiesFromNode(fileData, targetNode) {
+    if (!targetNode) return null;
+    const resolved = resolveSchemaNode(fileData, targetNode);
+    
+    // Standard direct properties
+    if (resolved && resolved.properties) return resolved;
+    
+    // Microsoft Discriminated Union Fallback (oneOf, allOf, anyOf)
+    const variant = resolved?.oneOf?.[0] || resolved?.allOf?.[0] || resolved?.anyOf?.[0];
+    if (variant) {
+        const resolvedVariant = resolveSchemaNode(fileData, variant);
+        if (resolvedVariant && resolvedVariant.properties) return resolvedVariant;
+    }
+    
+    return null;
 }
 
 function parseAzureDeepSchemas() {
@@ -129,14 +141,10 @@ function parseAzureDeepSchemas() {
         try {
             const fileData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
             const wrapper = resolveRef(fileData, '#' + pointerPart);
-            
             if (!wrapper || !wrapper.body) continue;
 
             let body = wrapper.body;
-            if (body.$ref) {
-                body = resolveRef(fileData, body.$ref);
-            }
-            
+            if (body.$ref) body = resolveRef(fileData, body.$ref);
             if (!body || !body.properties) continue;
 
             const finalProps = {};
@@ -151,18 +159,13 @@ function parseAzureDeepSchemas() {
 
                 if (propKey === 'properties') {
                     let innerProps = propVal;
+                    if (innerProps.$ref) innerProps = resolveRef(fileData, innerProps.$ref);
                     
-                    // 1. Resolve if it's a root-level pointer
-                    if (innerProps.$ref) {
-                        innerProps = resolveRef(fileData, innerProps.$ref);
-                    }
+                    // Use the smart extractor (handles standard, nested $ref, and oneOf)
+                    const extractedNode = extractPropertiesFromNode(fileData, innerProps);
                     
-                    // 2. CRITICAL FIX: Resolve nested "type": {"$ref": "#/4"} structures
-                    innerProps = resolveSchemaNode(fileData, innerProps);
-                    
-                    // 3. Now safely extract the fully resolved properties
-                    if (innerProps && innerProps.properties) {
-                        for (const [innerKey, innerVal] of Object.entries(innerProps.properties)) {
+                    if (extractedNode && extractedNode.properties) {
+                        for (const [innerKey, innerVal] of Object.entries(extractedNode.properties)) {
                             const resolvedNode = resolveSchemaNode(fileData, innerVal);
                             
                             finalProps[innerKey] = {
@@ -170,11 +173,8 @@ function parseAzureDeepSchemas() {
                                 description: resolvedNode.description || '',
                                 properties: resolvedNode.properties || undefined 
                             };
-                            if (innerProps.required && innerProps.required.includes(innerKey)) requiredList.push(innerKey);
+                            if (extractedNode.required && extractedNode.required.includes(innerKey)) requiredList.push(innerKey);
                         }
-                    } else {
-                        // Diagnostic log for true edge cases that still fail
-                        console.log(`[Azure-DEBUG] Missing inner properties for: ${typeName}`);
                     }
                     continue;
                 }
