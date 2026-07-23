@@ -1,0 +1,66 @@
+# Microsoft.Authorization @ 2022-04-01
+
+## Resource Microsoft.Authorization/roleAssignments@2022-04-01
+* **Readable Scope(s)**: Tenant, ManagementGroup, Subscription, ResourceGroup, Extension
+* **Writable Scope(s)**: Tenant, ManagementGroup, Subscription, ResourceGroup, Extension
+### Properties
+* **apiVersion**: '2022-04-01' (ReadOnly, DeployTimeConstant): The resource api version
+* **id**: string (ReadOnly, DeployTimeConstant): The resource id
+* **name**: string (Required, DeployTimeConstant): The resource name
+* **properties**: [RoleAssignmentProperties](#roleassignmentproperties) (Required): Role assignment properties.
+* **systemData**: [SystemData](#systemdata) (ReadOnly): Azure Resource Manager metadata containing createdBy and modifiedBy information.
+* **type**: 'Microsoft.Authorization/roleAssignments' (ReadOnly, DeployTimeConstant): The resource type
+
+## Resource Microsoft.Authorization/roleDefinitions@2022-04-01
+* **Readable Scope(s)**: Tenant, ManagementGroup, Subscription, ResourceGroup, Extension
+* **Writable Scope(s)**: Tenant, ManagementGroup, Subscription, ResourceGroup, Extension
+### Properties
+* **apiVersion**: '2022-04-01' (ReadOnly, DeployTimeConstant): The resource api version
+* **id**: string (ReadOnly, DeployTimeConstant): The resource id
+* **name**: string (Required, DeployTimeConstant): The resource name
+* **properties**: [RoleDefinitionProperties](#roledefinitionproperties): Role definition properties.
+* **type**: 'Microsoft.Authorization/roleDefinitions' (ReadOnly, DeployTimeConstant): The resource type
+
+## Permission
+### Properties
+* **actions**: string[]: Allowed actions.
+* **dataActions**: string[]: Allowed Data actions.
+* **notActions**: string[]: Denied actions.
+* **notDataActions**: string[]: Denied Data actions.
+
+## RoleAssignmentProperties
+### Properties
+* **condition**: string: The conditions on the role assignment. This limits the resources it can be assigned to. e.g.: @Resource[Microsoft.Storage/storageAccounts/blobServices/containers:ContainerName] StringEqualsIgnoreCase 'foo_storage_container'
+* **conditionVersion**: string: Version of the condition. Currently the only accepted value is '2.0'
+* **createdBy**: string (ReadOnly): Id of the user who created the assignment
+* **createdOn**: string (ReadOnly): Time it was created
+* **delegatedManagedIdentityResourceId**: string: Id of the delegated managed identity resource
+* **description**: string: Description of role assignment
+* **principalId**: string (Required): The principal ID.
+* **principalType**: 'Device' | 'ForeignGroup' | 'Group' | 'ServicePrincipal' | 'User' | string: The principal type of the assigned principal ID.
+* **roleDefinitionId**: string (Required): The role definition ID.
+* **scope**: string (ReadOnly): The role assignment scope.
+* **updatedBy**: string (ReadOnly): Id of the user who updated the assignment
+* **updatedOn**: string (ReadOnly): Time it was updated
+
+## RoleDefinitionProperties
+### Properties
+* **assignableScopes**: string[]: Role definition assignable scopes.
+* **createdBy**: string (ReadOnly): Id of the user who created the assignment
+* **createdOn**: string (ReadOnly): Time it was created
+* **description**: string: The role definition description.
+* **permissions**: [Permission](#permission)[]: Role definition permissions.
+* **roleName**: string: The role name.
+* **type**: string: The role type.
+* **updatedBy**: string (ReadOnly): Id of the user who updated the assignment
+* **updatedOn**: string (ReadOnly): Time it was updated
+
+## SystemData
+### Properties
+* **createdAt**: string: The timestamp of resource creation (UTC).
+* **createdBy**: string: The identity that created the resource.
+* **createdByType**: 'Application' | 'Key' | 'ManagedIdentity' | 'User' | string: The type of identity that created the resource.
+* **lastModifiedAt**: string: The timestamp of resource last modification (UTC)
+* **lastModifiedBy**: string: The identity that last modified the resource.
+* **lastModifiedByType**: 'Application' | 'Key' | 'ManagedIdentity' | 'User' | string: The type of identity that last modified the resource.
+

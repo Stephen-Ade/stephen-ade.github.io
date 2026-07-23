@@ -1,0 +1,2225 @@
+[
+  {
+    "$type": "StringType",
+    "minLength": 1,
+    "maxLength": 50,
+    "pattern": "^[a-zA-Z][a-zA-Z0-9-]*$"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Microsoft.NotificationHubs/namespaces"
+  },
+  {
+    "$type": "StringType"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "2023-10-01-preview"
+  },
+  {
+    "$type": "ObjectType",
+    "name": "Microsoft.NotificationHubs/namespaces",
+    "properties": {
+      "id": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 10,
+        "description": "The resource id"
+      },
+      "name": {
+        "type": {
+          "$ref": "#/0"
+        },
+        "flags": 9,
+        "description": "The resource name"
+      },
+      "type": {
+        "type": {
+          "$ref": "#/1"
+        },
+        "flags": 10,
+        "description": "The resource type"
+      },
+      "apiVersion": {
+        "type": {
+          "$ref": "#/3"
+        },
+        "flags": 10,
+        "description": "The resource api version"
+      },
+      "properties": {
+        "type": {
+          "$ref": "#/5"
+        },
+        "flags": 0,
+        "description": "Represents namespace properties."
+      },
+      "sku": {
+        "type": {
+          "$ref": "#/105"
+        },
+        "flags": 1,
+        "description": "The Sku description for a namespace"
+      },
+      "tags": {
+        "type": {
+          "$ref": "#/111"
+        },
+        "flags": 0,
+        "description": "Resource tags."
+      },
+      "location": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 1,
+        "description": "The geo-location where the resource lives"
+      },
+      "systemData": {
+        "type": {
+          "$ref": "#/90"
+        },
+        "flags": 2,
+        "description": "Azure Resource Manager metadata containing createdBy and modifiedBy information."
+      }
+    }
+  },
+  {
+    "$type": "ObjectType",
+    "name": "NamespaceProperties",
+    "properties": {
+      "name": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 2,
+        "description": "Name of the Notification Hubs namespace. This is immutable property, set automatically\nby the service when the namespace is created."
+      },
+      "provisioningState": {
+        "type": {
+          "$ref": "#/13"
+        },
+        "flags": 0,
+        "description": "Defines values for OperationProvisioningState."
+      },
+      "status": {
+        "type": {
+          "$ref": "#/18"
+        },
+        "flags": 0,
+        "description": "Namespace status."
+      },
+      "enabled": {
+        "type": {
+          "$ref": "#/19"
+        },
+        "flags": 2,
+        "description": "Gets or sets whether or not the namespace is currently enabled."
+      },
+      "critical": {
+        "type": {
+          "$ref": "#/19"
+        },
+        "flags": 2,
+        "description": "Gets or sets whether or not the namespace is set as Critical."
+      },
+      "subscriptionId": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 2,
+        "description": "Namespace subscription id."
+      },
+      "region": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 2,
+        "description": "Region. The value is always set to the same value as Namespace.Location, so we are deprecating\nthis property."
+      },
+      "metricId": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 2,
+        "description": "Azure Insights Metrics id."
+      },
+      "createdAt": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 2,
+        "description": "Time when the namespace was created."
+      },
+      "updatedAt": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 2,
+        "description": "Time when the namespace was updated."
+      },
+      "namespaceType": {
+        "type": {
+          "$ref": "#/22"
+        },
+        "flags": 0,
+        "description": "Defines values for NamespaceType."
+      },
+      "replicationRegion": {
+        "type": {
+          "$ref": "#/31"
+        },
+        "flags": 0,
+        "description": "Allowed replication region"
+      },
+      "zoneRedundancy": {
+        "type": {
+          "$ref": "#/34"
+        },
+        "flags": 0,
+        "description": "Namespace SKU name."
+      },
+      "networkAcls": {
+        "type": {
+          "$ref": "#/35"
+        },
+        "flags": 0,
+        "description": "A collection of network authorization rules."
+      },
+      "pnsCredentials": {
+        "type": {
+          "$ref": "#/50"
+        },
+        "flags": 0,
+        "description": "Collection of Notification Hub or Notification Hub Namespace PNS credentials."
+      },
+      "serviceBusEndpoint": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 2,
+        "description": "Gets or sets endpoint you can use to perform NotificationHub\noperations."
+      },
+      "privateEndpointConnections": {
+        "type": {
+          "$ref": "#/101"
+        },
+        "flags": 2,
+        "description": "Private Endpoint Connections for namespace"
+      },
+      "scaleUnit": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 0,
+        "description": "Gets or sets scaleUnit where the namespace gets created"
+      },
+      "dataCenter": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 0,
+        "description": "Deprecated."
+      },
+      "publicNetworkAccess": {
+        "type": {
+          "$ref": "#/104"
+        },
+        "flags": 0,
+        "description": "Type of public network access."
+      }
+    }
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Unknown"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "InProgress"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Succeeded"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Failed"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Canceled"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Pending"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Disabled"
+  },
+  {
+    "$type": "UnionType",
+    "elements": [
+      {
+        "$ref": "#/6"
+      },
+      {
+        "$ref": "#/7"
+      },
+      {
+        "$ref": "#/8"
+      },
+      {
+        "$ref": "#/9"
+      },
+      {
+        "$ref": "#/10"
+      },
+      {
+        "$ref": "#/11"
+      },
+      {
+        "$ref": "#/12"
+      },
+      {
+        "$ref": "#/2"
+      }
+    ]
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Created"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Creating"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Suspended"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Deleting"
+  },
+  {
+    "$type": "UnionType",
+    "elements": [
+      {
+        "$ref": "#/14"
+      },
+      {
+        "$ref": "#/15"
+      },
+      {
+        "$ref": "#/16"
+      },
+      {
+        "$ref": "#/17"
+      },
+      {
+        "$ref": "#/2"
+      }
+    ]
+  },
+  {
+    "$type": "BooleanType"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Messaging"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "NotificationHub"
+  },
+  {
+    "$type": "UnionType",
+    "elements": [
+      {
+        "$ref": "#/20"
+      },
+      {
+        "$ref": "#/21"
+      },
+      {
+        "$ref": "#/2"
+      }
+    ]
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Default"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "WestUs2"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "NorthEurope"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "AustraliaEast"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "BrazilSouth"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "SouthEastAsia"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "SouthAfricaNorth"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "None"
+  },
+  {
+    "$type": "UnionType",
+    "elements": [
+      {
+        "$ref": "#/23"
+      },
+      {
+        "$ref": "#/24"
+      },
+      {
+        "$ref": "#/25"
+      },
+      {
+        "$ref": "#/26"
+      },
+      {
+        "$ref": "#/27"
+      },
+      {
+        "$ref": "#/28"
+      },
+      {
+        "$ref": "#/29"
+      },
+      {
+        "$ref": "#/30"
+      },
+      {
+        "$ref": "#/2"
+      }
+    ]
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Disabled"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Enabled"
+  },
+  {
+    "$type": "UnionType",
+    "elements": [
+      {
+        "$ref": "#/32"
+      },
+      {
+        "$ref": "#/33"
+      },
+      {
+        "$ref": "#/2"
+      }
+    ]
+  },
+  {
+    "$type": "ObjectType",
+    "name": "NetworkAcls",
+    "properties": {
+      "ipRules": {
+        "type": {
+          "$ref": "#/43"
+        },
+        "flags": 0,
+        "description": "List of IP rules."
+      },
+      "publicNetworkRule": {
+        "type": {
+          "$ref": "#/44"
+        },
+        "flags": 0,
+        "description": "A default (public Internet) network authorization rule, which contains rights if no other network rule matches."
+      }
+    }
+  },
+  {
+    "$type": "ObjectType",
+    "name": "IpRule",
+    "properties": {
+      "ipMask": {
+        "type": {
+          "$ref": "#/37"
+        },
+        "flags": 1,
+        "description": "IP mask."
+      },
+      "rights": {
+        "type": {
+          "$ref": "#/42"
+        },
+        "flags": 1,
+        "description": "List of access rights."
+      }
+    }
+  },
+  {
+    "$type": "StringType",
+    "minLength": 1
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Manage"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Send"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Listen"
+  },
+  {
+    "$type": "UnionType",
+    "elements": [
+      {
+        "$ref": "#/38"
+      },
+      {
+        "$ref": "#/39"
+      },
+      {
+        "$ref": "#/40"
+      },
+      {
+        "$ref": "#/2"
+      }
+    ]
+  },
+  {
+    "$type": "ArrayType",
+    "itemType": {
+      "$ref": "#/41"
+    }
+  },
+  {
+    "$type": "ArrayType",
+    "itemType": {
+      "$ref": "#/36"
+    }
+  },
+  {
+    "$type": "ObjectType",
+    "name": "PublicInternetAuthorizationRule",
+    "properties": {
+      "rights": {
+        "type": {
+          "$ref": "#/49"
+        },
+        "flags": 1,
+        "description": "List of access rights."
+      }
+    }
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Manage"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Send"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Listen"
+  },
+  {
+    "$type": "UnionType",
+    "elements": [
+      {
+        "$ref": "#/45"
+      },
+      {
+        "$ref": "#/46"
+      },
+      {
+        "$ref": "#/47"
+      },
+      {
+        "$ref": "#/2"
+      }
+    ]
+  },
+  {
+    "$type": "ArrayType",
+    "itemType": {
+      "$ref": "#/48"
+    }
+  },
+  {
+    "$type": "ObjectType",
+    "name": "PnsCredentials",
+    "properties": {
+      "admCredential": {
+        "type": {
+          "$ref": "#/51"
+        },
+        "flags": 0,
+        "description": "Description of a NotificationHub AdmCredential."
+      },
+      "apnsCredential": {
+        "type": {
+          "$ref": "#/54"
+        },
+        "flags": 0,
+        "description": "Description of a NotificationHub ApnsCredential."
+      },
+      "baiduCredential": {
+        "type": {
+          "$ref": "#/57"
+        },
+        "flags": 0,
+        "description": "Description of a NotificationHub BaiduCredential."
+      },
+      "browserCredential": {
+        "type": {
+          "$ref": "#/59"
+        },
+        "flags": 0,
+        "description": "Description of a NotificationHub BrowserCredential."
+      },
+      "gcmCredential": {
+        "type": {
+          "$ref": "#/61"
+        },
+        "flags": 0,
+        "description": "Description of a NotificationHub GcmCredential."
+      },
+      "mpnsCredential": {
+        "type": {
+          "$ref": "#/63"
+        },
+        "flags": 0,
+        "description": "Description of a NotificationHub MpnsCredential."
+      },
+      "wnsCredential": {
+        "type": {
+          "$ref": "#/65"
+        },
+        "flags": 0,
+        "description": "Description of a NotificationHub WnsCredential."
+      },
+      "xiaomiCredential": {
+        "type": {
+          "$ref": "#/67"
+        },
+        "flags": 0,
+        "description": "Description of a NotificationHub XiaomiCredential."
+      },
+      "fcmV1Credential": {
+        "type": {
+          "$ref": "#/69"
+        },
+        "flags": 0,
+        "description": "Description of a NotificationHub FcmV1Credential."
+      }
+    }
+  },
+  {
+    "$type": "ObjectType",
+    "name": "AdmCredential",
+    "properties": {
+      "properties": {
+        "type": {
+          "$ref": "#/52"
+        },
+        "flags": 1,
+        "description": "Description of a NotificationHub AdmCredential."
+      }
+    }
+  },
+  {
+    "$type": "ObjectType",
+    "name": "AdmCredentialProperties",
+    "properties": {
+      "clientId": {
+        "type": {
+          "$ref": "#/53"
+        },
+        "flags": 1,
+        "description": "Gets or sets the client identifier."
+      },
+      "clientSecret": {
+        "type": {
+          "$ref": "#/53"
+        },
+        "flags": 1,
+        "description": "Gets or sets the credential secret access key."
+      },
+      "authTokenUrl": {
+        "type": {
+          "$ref": "#/53"
+        },
+        "flags": 1,
+        "description": "Gets or sets the URL of the authorization token."
+      }
+    }
+  },
+  {
+    "$type": "StringType",
+    "sensitive": true,
+    "minLength": 1
+  },
+  {
+    "$type": "ObjectType",
+    "name": "ApnsCredential",
+    "properties": {
+      "properties": {
+        "type": {
+          "$ref": "#/55"
+        },
+        "flags": 1,
+        "description": "Description of a NotificationHub ApnsCredential."
+      }
+    }
+  },
+  {
+    "$type": "ObjectType",
+    "name": "ApnsCredentialProperties",
+    "properties": {
+      "apnsCertificate": {
+        "type": {
+          "$ref": "#/56"
+        },
+        "flags": 0,
+        "description": "Gets or sets the APNS certificate."
+      },
+      "certificateKey": {
+        "type": {
+          "$ref": "#/56"
+        },
+        "flags": 0,
+        "description": "Gets or sets the certificate key."
+      },
+      "endpoint": {
+        "type": {
+          "$ref": "#/53"
+        },
+        "flags": 1,
+        "description": "Gets or sets the endpoint of this credential."
+      },
+      "thumbprint": {
+        "type": {
+          "$ref": "#/56"
+        },
+        "flags": 0,
+        "description": "Gets or sets the APNS certificate Thumbprint"
+      },
+      "keyId": {
+        "type": {
+          "$ref": "#/56"
+        },
+        "flags": 0,
+        "description": "Gets or sets a 10-character key identifier (kid) key, obtained from\nyour developer account"
+      },
+      "appName": {
+        "type": {
+          "$ref": "#/56"
+        },
+        "flags": 0,
+        "description": "Gets or sets the name of the application"
+      },
+      "appId": {
+        "type": {
+          "$ref": "#/56"
+        },
+        "flags": 0,
+        "description": "Gets or sets the issuer (iss) registered claim key, whose value is\nyour 10-character Team ID, obtained from your developer account"
+      },
+      "token": {
+        "type": {
+          "$ref": "#/56"
+        },
+        "flags": 0,
+        "description": "Gets or sets provider Authentication Token, obtained through your\ndeveloper account"
+      }
+    }
+  },
+  {
+    "$type": "StringType",
+    "sensitive": true
+  },
+  {
+    "$type": "ObjectType",
+    "name": "BaiduCredential",
+    "properties": {
+      "properties": {
+        "type": {
+          "$ref": "#/58"
+        },
+        "flags": 1,
+        "description": "Description of a NotificationHub BaiduCredential."
+      }
+    }
+  },
+  {
+    "$type": "ObjectType",
+    "name": "BaiduCredentialProperties",
+    "properties": {
+      "baiduApiKey": {
+        "type": {
+          "$ref": "#/53"
+        },
+        "flags": 1,
+        "description": "Gets or sets baidu Api Key."
+      },
+      "baiduEndPoint": {
+        "type": {
+          "$ref": "#/53"
+        },
+        "flags": 1,
+        "description": "Gets or sets baidu Endpoint."
+      },
+      "baiduSecretKey": {
+        "type": {
+          "$ref": "#/53"
+        },
+        "flags": 1,
+        "description": "Gets or sets baidu Secret Key"
+      }
+    }
+  },
+  {
+    "$type": "ObjectType",
+    "name": "BrowserCredential",
+    "properties": {
+      "properties": {
+        "type": {
+          "$ref": "#/60"
+        },
+        "flags": 1,
+        "description": "Description of a NotificationHub BrowserCredential."
+      }
+    }
+  },
+  {
+    "$type": "ObjectType",
+    "name": "BrowserCredentialProperties",
+    "properties": {
+      "subject": {
+        "type": {
+          "$ref": "#/53"
+        },
+        "flags": 1,
+        "description": "Gets or sets web push subject."
+      },
+      "vapidPrivateKey": {
+        "type": {
+          "$ref": "#/53"
+        },
+        "flags": 1,
+        "description": "Gets or sets VAPID private key."
+      },
+      "vapidPublicKey": {
+        "type": {
+          "$ref": "#/53"
+        },
+        "flags": 1,
+        "description": "Gets or sets VAPID public key."
+      }
+    }
+  },
+  {
+    "$type": "ObjectType",
+    "name": "GcmCredential",
+    "properties": {
+      "properties": {
+        "type": {
+          "$ref": "#/62"
+        },
+        "flags": 1,
+        "description": "Description of a NotificationHub GcmCredential."
+      }
+    }
+  },
+  {
+    "$type": "ObjectType",
+    "name": "GcmCredentialProperties",
+    "properties": {
+      "gcmEndpoint": {
+        "type": {
+          "$ref": "#/56"
+        },
+        "flags": 0,
+        "description": "Gets or sets the GCM endpoint."
+      },
+      "googleApiKey": {
+        "type": {
+          "$ref": "#/53"
+        },
+        "flags": 1,
+        "description": "Gets or sets the Google API key."
+      }
+    }
+  },
+  {
+    "$type": "ObjectType",
+    "name": "MpnsCredential",
+    "properties": {
+      "properties": {
+        "type": {
+          "$ref": "#/64"
+        },
+        "flags": 1,
+        "description": "Description of a NotificationHub MpnsCredential."
+      }
+    }
+  },
+  {
+    "$type": "ObjectType",
+    "name": "MpnsCredentialProperties",
+    "properties": {
+      "mpnsCertificate": {
+        "type": {
+          "$ref": "#/53"
+        },
+        "flags": 1,
+        "description": "Gets or sets the MPNS certificate."
+      },
+      "certificateKey": {
+        "type": {
+          "$ref": "#/53"
+        },
+        "flags": 1,
+        "description": "Gets or sets the certificate key for this credential."
+      },
+      "thumbprint": {
+        "type": {
+          "$ref": "#/53"
+        },
+        "flags": 1,
+        "description": "Gets or sets the MPNS certificate Thumbprint"
+      }
+    }
+  },
+  {
+    "$type": "ObjectType",
+    "name": "WnsCredential",
+    "properties": {
+      "properties": {
+        "type": {
+          "$ref": "#/66"
+        },
+        "flags": 1,
+        "description": "Description of a NotificationHub WnsCredential."
+      }
+    }
+  },
+  {
+    "$type": "ObjectType",
+    "name": "WnsCredentialProperties",
+    "properties": {
+      "packageSid": {
+        "type": {
+          "$ref": "#/56"
+        },
+        "flags": 0,
+        "description": "Gets or sets the package ID for this credential."
+      },
+      "secretKey": {
+        "type": {
+          "$ref": "#/56"
+        },
+        "flags": 0,
+        "description": "Gets or sets the secret key."
+      },
+      "windowsLiveEndpoint": {
+        "type": {
+          "$ref": "#/56"
+        },
+        "flags": 0,
+        "description": "Gets or sets the Windows Live endpoint."
+      },
+      "certificateKey": {
+        "type": {
+          "$ref": "#/56"
+        },
+        "flags": 0,
+        "description": "Ges or sets the WNS Certificate Key."
+      },
+      "wnsCertificate": {
+        "type": {
+          "$ref": "#/56"
+        },
+        "flags": 0,
+        "description": "Gets or sets the WNS Certificate."
+      }
+    }
+  },
+  {
+    "$type": "ObjectType",
+    "name": "XiaomiCredential",
+    "properties": {
+      "properties": {
+        "type": {
+          "$ref": "#/68"
+        },
+        "flags": 1,
+        "description": "Description of a NotificationHub XiaomiCredentialProperties."
+      }
+    }
+  },
+  {
+    "$type": "ObjectType",
+    "name": "XiaomiCredentialProperties",
+    "properties": {
+      "appSecret": {
+        "type": {
+          "$ref": "#/56"
+        },
+        "flags": 0,
+        "description": "Gets or sets app secret."
+      },
+      "endpoint": {
+        "type": {
+          "$ref": "#/56"
+        },
+        "flags": 0,
+        "description": "Gets or sets xiaomi service endpoint."
+      }
+    }
+  },
+  {
+    "$type": "ObjectType",
+    "name": "FcmV1Credential",
+    "properties": {
+      "properties": {
+        "type": {
+          "$ref": "#/70"
+        },
+        "flags": 1,
+        "description": "Description of a NotificationHub FcmV1Credential."
+      }
+    }
+  },
+  {
+    "$type": "ObjectType",
+    "name": "FcmV1CredentialProperties",
+    "properties": {
+      "clientEmail": {
+        "type": {
+          "$ref": "#/53"
+        },
+        "flags": 1,
+        "description": "Gets or sets client email."
+      },
+      "privateKey": {
+        "type": {
+          "$ref": "#/53"
+        },
+        "flags": 1,
+        "description": "Gets or sets private key."
+      },
+      "projectId": {
+        "type": {
+          "$ref": "#/53"
+        },
+        "flags": 1,
+        "description": "Gets or sets project id."
+      }
+    }
+  },
+  {
+    "$type": "ObjectType",
+    "name": "PrivateEndpointConnectionResource",
+    "properties": {
+      "properties": {
+        "type": {
+          "$ref": "#/72"
+        },
+        "flags": 0,
+        "description": "Private Endpoint Connection properties."
+      },
+      "id": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 2,
+        "description": "Fully qualified resource ID for the resource. E.g. \"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}\""
+      },
+      "name": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 2,
+        "description": "The name of the resource"
+      },
+      "type": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 2,
+        "description": "The type of the resource. E.g. \"Microsoft.Compute/virtualMachines\" or \"Microsoft.Storage/storageAccounts\""
+      },
+      "systemData": {
+        "type": {
+          "$ref": "#/90"
+        },
+        "flags": 2,
+        "description": "Azure Resource Manager metadata containing createdBy and modifiedBy information."
+      }
+    }
+  },
+  {
+    "$type": "ObjectType",
+    "name": "PrivateEndpointConnectionProperties",
+    "properties": {
+      "provisioningState": {
+        "type": {
+          "$ref": "#/81"
+        },
+        "flags": 0,
+        "description": "State of Private Endpoint Connection."
+      },
+      "privateEndpoint": {
+        "type": {
+          "$ref": "#/82"
+        },
+        "flags": 0,
+        "description": "Represents a Private Endpoint that is connected to Notification Hubs namespace using Private Endpoint Connection."
+      },
+      "groupIds": {
+        "type": {
+          "$ref": "#/83"
+        },
+        "flags": 2,
+        "description": "List of group ids. For Notification Hubs, it always contains a single \"namespace\" element."
+      },
+      "privateLinkServiceConnectionState": {
+        "type": {
+          "$ref": "#/84"
+        },
+        "flags": 0,
+        "description": "State of the Private Link Service connection."
+      }
+    }
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Unknown"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Succeeded"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Creating"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Updating"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "UpdatingByProxy"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Deleting"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "DeletingByProxy"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Deleted"
+  },
+  {
+    "$type": "UnionType",
+    "elements": [
+      {
+        "$ref": "#/73"
+      },
+      {
+        "$ref": "#/74"
+      },
+      {
+        "$ref": "#/75"
+      },
+      {
+        "$ref": "#/76"
+      },
+      {
+        "$ref": "#/77"
+      },
+      {
+        "$ref": "#/78"
+      },
+      {
+        "$ref": "#/79"
+      },
+      {
+        "$ref": "#/80"
+      },
+      {
+        "$ref": "#/2"
+      }
+    ]
+  },
+  {
+    "$type": "ObjectType",
+    "name": "RemotePrivateEndpointConnection",
+    "properties": {
+      "id": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 2,
+        "description": "ARM resource ID of the Private Endpoint. This may belong to different subscription and resource group than a Notification Hubs namespace."
+      }
+    }
+  },
+  {
+    "$type": "ArrayType",
+    "itemType": {
+      "$ref": "#/2"
+    }
+  },
+  {
+    "$type": "ObjectType",
+    "name": "RemotePrivateLinkServiceConnectionState",
+    "properties": {
+      "status": {
+        "type": {
+          "$ref": "#/89"
+        },
+        "flags": 0,
+        "description": "State of Private Link Connection."
+      },
+      "description": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 2,
+        "description": "Human-friendly description."
+      },
+      "actionsRequired": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 2,
+        "description": "Human-friendly description of required actions."
+      }
+    }
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Disconnected"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Pending"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Approved"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Rejected"
+  },
+  {
+    "$type": "UnionType",
+    "elements": [
+      {
+        "$ref": "#/85"
+      },
+      {
+        "$ref": "#/86"
+      },
+      {
+        "$ref": "#/87"
+      },
+      {
+        "$ref": "#/88"
+      },
+      {
+        "$ref": "#/2"
+      }
+    ]
+  },
+  {
+    "$type": "ObjectType",
+    "name": "SystemData",
+    "properties": {
+      "createdBy": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 0,
+        "description": "The identity that created the resource."
+      },
+      "createdByType": {
+        "type": {
+          "$ref": "#/95"
+        },
+        "flags": 0,
+        "description": "The type of identity that created the resource."
+      },
+      "createdAt": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 0,
+        "description": "The timestamp of resource creation (UTC)."
+      },
+      "lastModifiedBy": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 0,
+        "description": "The identity that last modified the resource."
+      },
+      "lastModifiedByType": {
+        "type": {
+          "$ref": "#/100"
+        },
+        "flags": 0,
+        "description": "The type of identity that last modified the resource."
+      },
+      "lastModifiedAt": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 0,
+        "description": "The timestamp of resource last modification (UTC)"
+      }
+    }
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "User"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Application"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "ManagedIdentity"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Key"
+  },
+  {
+    "$type": "UnionType",
+    "elements": [
+      {
+        "$ref": "#/91"
+      },
+      {
+        "$ref": "#/92"
+      },
+      {
+        "$ref": "#/93"
+      },
+      {
+        "$ref": "#/94"
+      },
+      {
+        "$ref": "#/2"
+      }
+    ]
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "User"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Application"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "ManagedIdentity"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Key"
+  },
+  {
+    "$type": "UnionType",
+    "elements": [
+      {
+        "$ref": "#/96"
+      },
+      {
+        "$ref": "#/97"
+      },
+      {
+        "$ref": "#/98"
+      },
+      {
+        "$ref": "#/99"
+      },
+      {
+        "$ref": "#/2"
+      }
+    ]
+  },
+  {
+    "$type": "ArrayType",
+    "itemType": {
+      "$ref": "#/71"
+    }
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Enabled"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Disabled"
+  },
+  {
+    "$type": "UnionType",
+    "elements": [
+      {
+        "$ref": "#/102"
+      },
+      {
+        "$ref": "#/103"
+      },
+      {
+        "$ref": "#/2"
+      }
+    ]
+  },
+  {
+    "$type": "ObjectType",
+    "name": "Sku",
+    "properties": {
+      "name": {
+        "type": {
+          "$ref": "#/109"
+        },
+        "flags": 1,
+        "description": "Namespace SKU name."
+      },
+      "tier": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 0,
+        "description": "Gets or sets the tier of particular sku"
+      },
+      "size": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 0,
+        "description": "Gets or sets the Sku size"
+      },
+      "family": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 0,
+        "description": "Gets or sets the Sku Family"
+      },
+      "capacity": {
+        "type": {
+          "$ref": "#/110"
+        },
+        "flags": 0,
+        "description": "Gets or sets the capacity of the resource"
+      }
+    }
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Free"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Basic"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Standard"
+  },
+  {
+    "$type": "UnionType",
+    "elements": [
+      {
+        "$ref": "#/106"
+      },
+      {
+        "$ref": "#/107"
+      },
+      {
+        "$ref": "#/108"
+      },
+      {
+        "$ref": "#/2"
+      }
+    ]
+  },
+  {
+    "$type": "IntegerType"
+  },
+  {
+    "$type": "ObjectType",
+    "name": "TrackedResourceTags",
+    "properties": {},
+    "additionalProperties": {
+      "$ref": "#/2"
+    }
+  },
+  {
+    "$type": "ResourceType",
+    "name": "Microsoft.NotificationHubs/namespaces@2023-10-01-preview",
+    "body": {
+      "$ref": "#/4"
+    },
+    "readableScopes": 8,
+    "writableScopes": 8
+  },
+  {
+    "$type": "StringType",
+    "minLength": 1,
+    "maxLength": 256,
+    "pattern": "^[a-zA-Z0-9!()*-._]+$"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Microsoft.NotificationHubs/namespaces/authorizationRules"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "2023-10-01-preview"
+  },
+  {
+    "$type": "ObjectType",
+    "name": "Microsoft.NotificationHubs/namespaces/authorizationRules",
+    "properties": {
+      "id": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 10,
+        "description": "The resource id"
+      },
+      "name": {
+        "type": {
+          "$ref": "#/113"
+        },
+        "flags": 9,
+        "description": "The resource name"
+      },
+      "type": {
+        "type": {
+          "$ref": "#/114"
+        },
+        "flags": 10,
+        "description": "The resource type"
+      },
+      "apiVersion": {
+        "type": {
+          "$ref": "#/115"
+        },
+        "flags": 10,
+        "description": "The resource api version"
+      },
+      "properties": {
+        "type": {
+          "$ref": "#/117"
+        },
+        "flags": 0,
+        "description": "SharedAccessAuthorizationRule properties."
+      },
+      "location": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 0
+      },
+      "tags": {
+        "type": {
+          "$ref": "#/123"
+        },
+        "flags": 0,
+        "description": "Dictionary of <string>"
+      },
+      "systemData": {
+        "type": {
+          "$ref": "#/90"
+        },
+        "flags": 2,
+        "description": "Azure Resource Manager metadata containing createdBy and modifiedBy information."
+      }
+    }
+  },
+  {
+    "$type": "ObjectType",
+    "name": "SharedAccessAuthorizationRuleProperties",
+    "properties": {
+      "rights": {
+        "type": {
+          "$ref": "#/122"
+        },
+        "flags": 1,
+        "description": "Gets or sets the rights associated with the rule."
+      },
+      "primaryKey": {
+        "type": {
+          "$ref": "#/56"
+        },
+        "flags": 0,
+        "description": "Gets a base64-encoded 256-bit primary key for signing and\nvalidating the SAS token."
+      },
+      "secondaryKey": {
+        "type": {
+          "$ref": "#/56"
+        },
+        "flags": 0,
+        "description": "Gets a base64-encoded 256-bit primary key for signing and\nvalidating the SAS token."
+      },
+      "keyName": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 2,
+        "description": "Gets a string that describes the authorization rule."
+      },
+      "modifiedTime": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 2,
+        "description": "Gets the last modified time for this rule"
+      },
+      "createdTime": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 2,
+        "description": "Gets the created time for this rule"
+      },
+      "claimType": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 2,
+        "description": "Gets a string that describes the claim type"
+      },
+      "claimValue": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 2,
+        "description": "Gets a string that describes the claim value"
+      },
+      "revision": {
+        "type": {
+          "$ref": "#/110"
+        },
+        "flags": 2,
+        "description": "Gets the revision number for the rule"
+      }
+    }
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Manage"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Send"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Listen"
+  },
+  {
+    "$type": "UnionType",
+    "elements": [
+      {
+        "$ref": "#/118"
+      },
+      {
+        "$ref": "#/119"
+      },
+      {
+        "$ref": "#/120"
+      },
+      {
+        "$ref": "#/2"
+      }
+    ]
+  },
+  {
+    "$type": "ArrayType",
+    "itemType": {
+      "$ref": "#/121"
+    }
+  },
+  {
+    "$type": "ObjectType",
+    "name": "SharedAccessAuthorizationRuleResourceTags",
+    "properties": {},
+    "additionalProperties": {
+      "$ref": "#/2"
+    }
+  },
+  {
+    "$type": "ResourceType",
+    "name": "Microsoft.NotificationHubs/namespaces/authorizationRules@2023-10-01-preview",
+    "body": {
+      "$ref": "#/116"
+    },
+    "readableScopes": 8,
+    "writableScopes": 8
+  },
+  {
+    "$type": "StringType",
+    "minLength": 1,
+    "maxLength": 265,
+    "pattern": "^[a-zA-Z][a-zA-Z0-9-./_]*$"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Microsoft.NotificationHubs/namespaces/notificationHubs"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "2023-10-01-preview"
+  },
+  {
+    "$type": "ObjectType",
+    "name": "Microsoft.NotificationHubs/namespaces/notificationHubs",
+    "properties": {
+      "id": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 10,
+        "description": "The resource id"
+      },
+      "name": {
+        "type": {
+          "$ref": "#/125"
+        },
+        "flags": 9,
+        "description": "The resource name"
+      },
+      "type": {
+        "type": {
+          "$ref": "#/126"
+        },
+        "flags": 10,
+        "description": "The resource type"
+      },
+      "apiVersion": {
+        "type": {
+          "$ref": "#/127"
+        },
+        "flags": 10,
+        "description": "The resource api version"
+      },
+      "properties": {
+        "type": {
+          "$ref": "#/129"
+        },
+        "flags": 0,
+        "description": "NotificationHub properties."
+      },
+      "sku": {
+        "type": {
+          "$ref": "#/105"
+        },
+        "flags": 0,
+        "description": "The Sku description for a namespace"
+      },
+      "tags": {
+        "type": {
+          "$ref": "#/131"
+        },
+        "flags": 0,
+        "description": "Resource tags."
+      },
+      "location": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 1,
+        "description": "The geo-location where the resource lives"
+      },
+      "systemData": {
+        "type": {
+          "$ref": "#/90"
+        },
+        "flags": 2,
+        "description": "Azure Resource Manager metadata containing createdBy and modifiedBy information."
+      }
+    }
+  },
+  {
+    "$type": "ObjectType",
+    "name": "NotificationHubProperties",
+    "properties": {
+      "name": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 0,
+        "description": "Gets or sets the NotificationHub name."
+      },
+      "registrationTtl": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 0,
+        "description": "Gets or sets the RegistrationTtl of the created NotificationHub"
+      },
+      "authorizationRules": {
+        "type": {
+          "$ref": "#/130"
+        },
+        "flags": 2,
+        "description": "Gets or sets the AuthorizationRules of the created NotificationHub"
+      },
+      "apnsCredential": {
+        "type": {
+          "$ref": "#/54"
+        },
+        "flags": 0,
+        "description": "Description of a NotificationHub ApnsCredential."
+      },
+      "wnsCredential": {
+        "type": {
+          "$ref": "#/65"
+        },
+        "flags": 0,
+        "description": "Description of a NotificationHub WnsCredential."
+      },
+      "gcmCredential": {
+        "type": {
+          "$ref": "#/61"
+        },
+        "flags": 0,
+        "description": "Description of a NotificationHub GcmCredential."
+      },
+      "mpnsCredential": {
+        "type": {
+          "$ref": "#/63"
+        },
+        "flags": 0,
+        "description": "Description of a NotificationHub MpnsCredential."
+      },
+      "admCredential": {
+        "type": {
+          "$ref": "#/51"
+        },
+        "flags": 0,
+        "description": "Description of a NotificationHub AdmCredential."
+      },
+      "baiduCredential": {
+        "type": {
+          "$ref": "#/57"
+        },
+        "flags": 0,
+        "description": "Description of a NotificationHub BaiduCredential."
+      },
+      "browserCredential": {
+        "type": {
+          "$ref": "#/59"
+        },
+        "flags": 0,
+        "description": "Description of a NotificationHub BrowserCredential."
+      },
+      "xiaomiCredential": {
+        "type": {
+          "$ref": "#/67"
+        },
+        "flags": 0,
+        "description": "Description of a NotificationHub XiaomiCredential."
+      },
+      "fcmV1Credential": {
+        "type": {
+          "$ref": "#/69"
+        },
+        "flags": 0,
+        "description": "Description of a NotificationHub FcmV1Credential."
+      },
+      "dailyMaxActiveDevices": {
+        "type": {
+          "$ref": "#/110"
+        },
+        "flags": 2
+      }
+    }
+  },
+  {
+    "$type": "ArrayType",
+    "itemType": {
+      "$ref": "#/117"
+    }
+  },
+  {
+    "$type": "ObjectType",
+    "name": "TrackedResourceTags",
+    "properties": {},
+    "additionalProperties": {
+      "$ref": "#/2"
+    }
+  },
+  {
+    "$type": "ResourceType",
+    "name": "Microsoft.NotificationHubs/namespaces/notificationHubs@2023-10-01-preview",
+    "body": {
+      "$ref": "#/128"
+    },
+    "readableScopes": 8,
+    "writableScopes": 8
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Microsoft.NotificationHubs/namespaces/notificationHubs/authorizationRules"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "2023-10-01-preview"
+  },
+  {
+    "$type": "ObjectType",
+    "name": "Microsoft.NotificationHubs/namespaces/notificationHubs/authorizationRules",
+    "properties": {
+      "id": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 10,
+        "description": "The resource id"
+      },
+      "name": {
+        "type": {
+          "$ref": "#/113"
+        },
+        "flags": 9,
+        "description": "The resource name"
+      },
+      "type": {
+        "type": {
+          "$ref": "#/133"
+        },
+        "flags": 10,
+        "description": "The resource type"
+      },
+      "apiVersion": {
+        "type": {
+          "$ref": "#/134"
+        },
+        "flags": 10,
+        "description": "The resource api version"
+      },
+      "properties": {
+        "type": {
+          "$ref": "#/117"
+        },
+        "flags": 0,
+        "description": "SharedAccessAuthorizationRule properties."
+      },
+      "location": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 0
+      },
+      "tags": {
+        "type": {
+          "$ref": "#/136"
+        },
+        "flags": 0,
+        "description": "Dictionary of <string>"
+      },
+      "systemData": {
+        "type": {
+          "$ref": "#/90"
+        },
+        "flags": 2,
+        "description": "Azure Resource Manager metadata containing createdBy and modifiedBy information."
+      }
+    }
+  },
+  {
+    "$type": "ObjectType",
+    "name": "SharedAccessAuthorizationRuleResourceTags",
+    "properties": {},
+    "additionalProperties": {
+      "$ref": "#/2"
+    }
+  },
+  {
+    "$type": "ResourceType",
+    "name": "Microsoft.NotificationHubs/namespaces/notificationHubs/authorizationRules@2023-10-01-preview",
+    "body": {
+      "$ref": "#/135"
+    },
+    "readableScopes": 8,
+    "writableScopes": 8
+  },
+  {
+    "$type": "StringType",
+    "minLength": 1,
+    "maxLength": 87,
+    "pattern": "^[a-zA-Z][a-zA-Z0-9-]*\\.[a-fA-F0-9\\-]+$"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Microsoft.NotificationHubs/namespaces/privateEndpointConnections"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "2023-10-01-preview"
+  },
+  {
+    "$type": "ObjectType",
+    "name": "Microsoft.NotificationHubs/namespaces/privateEndpointConnections",
+    "properties": {
+      "id": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 10,
+        "description": "The resource id"
+      },
+      "name": {
+        "type": {
+          "$ref": "#/138"
+        },
+        "flags": 9,
+        "description": "The resource name"
+      },
+      "type": {
+        "type": {
+          "$ref": "#/139"
+        },
+        "flags": 10,
+        "description": "The resource type"
+      },
+      "apiVersion": {
+        "type": {
+          "$ref": "#/140"
+        },
+        "flags": 10,
+        "description": "The resource api version"
+      },
+      "properties": {
+        "type": {
+          "$ref": "#/72"
+        },
+        "flags": 0,
+        "description": "Private Endpoint Connection properties."
+      },
+      "systemData": {
+        "type": {
+          "$ref": "#/90"
+        },
+        "flags": 2,
+        "description": "Azure Resource Manager metadata containing createdBy and modifiedBy information."
+      }
+    }
+  },
+  {
+    "$type": "ResourceType",
+    "name": "Microsoft.NotificationHubs/namespaces/privateEndpointConnections@2023-10-01-preview",
+    "body": {
+      "$ref": "#/141"
+    },
+    "readableScopes": 8,
+    "writableScopes": 8
+  },
+  {
+    "$type": "StringType",
+    "pattern": "^namespace$"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "Microsoft.NotificationHubs/namespaces/privateLinkResources"
+  },
+  {
+    "$type": "StringLiteralType",
+    "value": "2023-10-01-preview"
+  },
+  {
+    "$type": "ObjectType",
+    "name": "Microsoft.NotificationHubs/namespaces/privateLinkResources",
+    "properties": {
+      "id": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 10,
+        "description": "The resource id"
+      },
+      "name": {
+        "type": {
+          "$ref": "#/143"
+        },
+        "flags": 9,
+        "description": "The resource name"
+      },
+      "type": {
+        "type": {
+          "$ref": "#/144"
+        },
+        "flags": 10,
+        "description": "The resource type"
+      },
+      "apiVersion": {
+        "type": {
+          "$ref": "#/145"
+        },
+        "flags": 10,
+        "description": "The resource api version"
+      },
+      "properties": {
+        "type": {
+          "$ref": "#/147"
+        },
+        "flags": 2,
+        "description": "Represents properties of Private Link Resource."
+      },
+      "systemData": {
+        "type": {
+          "$ref": "#/90"
+        },
+        "flags": 2,
+        "description": "Azure Resource Manager metadata containing createdBy and modifiedBy information."
+      }
+    }
+  },
+  {
+    "$type": "ObjectType",
+    "name": "PrivateLinkResourceProperties",
+    "properties": {
+      "groupId": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 2,
+        "description": "A Group Id for Private Link. For Notification Hubs, it is always set to \"namespace\"."
+      },
+      "requiredMembers": {
+        "type": {
+          "$ref": "#/148"
+        },
+        "flags": 2,
+        "description": "Required members. For Notification Hubs, it's always a collection with a single \"namespace\" item."
+      },
+      "requiredZoneNames": {
+        "type": {
+          "$ref": "#/149"
+        },
+        "flags": 2,
+        "description": "Required DNS zone names. For Notification Hubs, it contains two CNames for Service Bus and Notification Hubs zones."
+      }
+    }
+  },
+  {
+    "$type": "ArrayType",
+    "itemType": {
+      "$ref": "#/2"
+    }
+  },
+  {
+    "$type": "ArrayType",
+    "itemType": {
+      "$ref": "#/2"
+    }
+  },
+  {
+    "$type": "ResourceType",
+    "name": "Microsoft.NotificationHubs/namespaces/privateLinkResources@2023-10-01-preview",
+    "body": {
+      "$ref": "#/146"
+    },
+    "readableScopes": 8,
+    "writableScopes": 0
+  },
+  {
+    "$type": "ObjectType",
+    "name": "ResourceListKeys",
+    "properties": {
+      "primaryConnectionString": {
+        "type": {
+          "$ref": "#/56"
+        },
+        "flags": 2,
+        "description": "Gets or sets primaryConnectionString of the AuthorizationRule."
+      },
+      "secondaryConnectionString": {
+        "type": {
+          "$ref": "#/56"
+        },
+        "flags": 2,
+        "description": "Gets or sets secondaryConnectionString of the created\nAuthorizationRule"
+      },
+      "primaryKey": {
+        "type": {
+          "$ref": "#/56"
+        },
+        "flags": 2,
+        "description": "Gets or sets primaryKey of the created AuthorizationRule."
+      },
+      "secondaryKey": {
+        "type": {
+          "$ref": "#/56"
+        },
+        "flags": 2,
+        "description": "Gets or sets secondaryKey of the created AuthorizationRule"
+      },
+      "keyName": {
+        "type": {
+          "$ref": "#/2"
+        },
+        "flags": 2,
+        "description": "Gets or sets keyName of the created AuthorizationRule"
+      }
+    }
+  },
+  {
+    "$type": "ResourceFunctionType",
+    "name": "listKeys",
+    "resourceType": "Microsoft.NotificationHubs/namespaces/authorizationRules",
+    "apiVersion": "2023-10-01-preview",
+    "output": {
+      "$ref": "#/151"
+    }
+  },
+  {
+    "$type": "ResourceFunctionType",
+    "name": "listKeys",
+    "resourceType": "Microsoft.NotificationHubs/namespaces/notificationHubs/authorizationRules",
+    "apiVersion": "2023-10-01-preview",
+    "output": {
+      "$ref": "#/151"
+    }
+  }
+]

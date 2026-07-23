@@ -1,0 +1,433 @@
+# Microsoft.Security @ 2020-01-01
+
+## Resource Microsoft.Security/assessmentMetadata@2020-01-01
+* **Readable Scope(s)**: Tenant, Subscription
+* **Writable Scope(s)**: Subscription
+### Properties
+* **apiVersion**: '2020-01-01' (ReadOnly, DeployTimeConstant): The resource api version
+* **id**: string (ReadOnly, DeployTimeConstant): The resource id
+* **name**: string (Required, DeployTimeConstant): The resource name
+* **properties**: [SecurityAssessmentMetadataProperties](#securityassessmentmetadataproperties): Describes properties of an assessment metadata.
+* **type**: 'Microsoft.Security/assessmentMetadata' (ReadOnly, DeployTimeConstant): The resource type
+
+## Resource Microsoft.Security/assessments@2020-01-01
+* **Readable Scope(s)**: Tenant, ManagementGroup, Subscription, ResourceGroup, Extension
+* **Writable Scope(s)**: Tenant, ManagementGroup, Subscription, ResourceGroup, Extension
+### Properties
+* **apiVersion**: '2020-01-01' (ReadOnly, DeployTimeConstant): The resource api version
+* **id**: string (ReadOnly, DeployTimeConstant): The resource id
+* **name**: string (Required, DeployTimeConstant): The resource name
+* **properties**: [SecurityAssessmentProperties](#securityassessmentproperties): Describes properties of an assessment.
+* **type**: 'Microsoft.Security/assessments' (ReadOnly, DeployTimeConstant): The resource type
+
+## Resource Microsoft.Security/locations/alerts@2020-01-01
+* **Readable Scope(s)**: Subscription, ResourceGroup
+* **Writable Scope(s)**: None
+### Properties
+* **apiVersion**: '2020-01-01' (ReadOnly, DeployTimeConstant): The resource api version
+* **id**: string (ReadOnly, DeployTimeConstant): The resource id
+* **name**: string (Required, DeployTimeConstant): The resource name
+* **properties**: [AlertProperties](#alertproperties) (ReadOnly): describes security alert properties.
+* **type**: 'Microsoft.Security/locations/alerts' (ReadOnly, DeployTimeConstant): The resource type
+
+## Resource Microsoft.Security/locations/allowedConnections@2020-01-01
+* **Readable Scope(s)**: ResourceGroup
+* **Writable Scope(s)**: None
+### Properties
+* **apiVersion**: '2020-01-01' (ReadOnly, DeployTimeConstant): The resource api version
+* **id**: string (ReadOnly, DeployTimeConstant): The resource id
+* **location**: string (ReadOnly): Location where the resource is stored
+* **name**: 'External' | 'Internal' | string (Required, DeployTimeConstant): The resource name
+* **properties**: [AllowedConnectionsResourceProperties](#allowedconnectionsresourceproperties) (ReadOnly): Describes the allowed traffic between Azure resources
+* **systemData**: [SystemData](#systemdata) (ReadOnly): Azure Resource Manager metadata containing createdBy and modifiedBy information.
+* **type**: 'Microsoft.Security/locations/allowedConnections' (ReadOnly, DeployTimeConstant): The resource type
+
+## Resource Microsoft.Security/locations/discoveredSecuritySolutions@2020-01-01
+* **Readable Scope(s)**: ResourceGroup
+* **Writable Scope(s)**: None
+### Properties
+* **apiVersion**: '2020-01-01' (ReadOnly, DeployTimeConstant): The resource api version
+* **id**: string (ReadOnly, DeployTimeConstant): The resource id
+* **location**: string (ReadOnly): Location where the resource is stored
+* **name**: string (Required, DeployTimeConstant): The resource name
+* **properties**: [DiscoveredSecuritySolutionProperties](#discoveredsecuritysolutionproperties) (ReadOnly)
+* **systemData**: [SystemData](#systemdata) (ReadOnly): Azure Resource Manager metadata containing createdBy and modifiedBy information.
+* **type**: 'Microsoft.Security/locations/discoveredSecuritySolutions' (ReadOnly, DeployTimeConstant): The resource type
+
+## Resource Microsoft.Security/locations/ExternalSecuritySolutions@2020-01-01
+* **Readable Scope(s)**: ResourceGroup
+* **Writable Scope(s)**: None
+* **Discriminator**: kind
+
+### Base Properties
+* **apiVersion**: '2020-01-01' (ReadOnly, DeployTimeConstant): The resource api version
+* **id**: string (ReadOnly, DeployTimeConstant): The resource id
+* **location**: string (ReadOnly): Location where the resource is stored
+* **name**: string (Required, DeployTimeConstant): The resource name
+* **properties**: any (ReadOnly): The resource-specific properties for this resource.
+* **systemData**: [SystemData](#systemdata) (ReadOnly): Azure Resource Manager metadata containing createdBy and modifiedBy information.
+* **type**: 'Microsoft.Security/locations/ExternalSecuritySolutions' (ReadOnly, DeployTimeConstant): The resource type
+
+### AadExternalSecuritySolution
+#### Properties
+* **kind**: 'AAD' (Required): The kind of the external solution
+* **properties**: [AadSolutionProperties](#aadsolutionproperties) (ReadOnly): The external security solution properties for AAD solutions
+
+### AtaExternalSecuritySolution
+#### Properties
+* **kind**: 'ATA' (Required): The kind of the external solution
+* **properties**: [AtaSolutionProperties](#atasolutionproperties) (ReadOnly): The external security solution properties for ATA solutions
+
+### CefExternalSecuritySolution
+#### Properties
+* **kind**: 'CEF' (Required): The kind of the external solution
+* **properties**: [CefSolutionProperties](#cefsolutionproperties) (ReadOnly): The external security solution properties for CEF solutions
+
+
+## Resource Microsoft.Security/locations/jitNetworkAccessPolicies@2020-01-01
+* **Readable Scope(s)**: ResourceGroup
+* **Writable Scope(s)**: ResourceGroup
+### Properties
+* **apiVersion**: '2020-01-01' (ReadOnly, DeployTimeConstant): The resource api version
+* **id**: string (ReadOnly, DeployTimeConstant): The resource id
+* **kind**: string: Kind of the resource
+* **location**: string (Required, ReadOnly): Location where the resource is stored
+* **name**: string (Required, DeployTimeConstant): The resource name
+* **properties**: [JitNetworkAccessPolicyProperties](#jitnetworkaccesspolicyproperties) (Required)
+* **systemData**: [SystemData](#systemdata) (ReadOnly): Azure Resource Manager metadata containing createdBy and modifiedBy information.
+* **type**: 'Microsoft.Security/locations/jitNetworkAccessPolicies' (ReadOnly, DeployTimeConstant): The resource type
+
+## Resource Microsoft.Security/locations/securitySolutions@2020-01-01
+* **Readable Scope(s)**: ResourceGroup
+* **Writable Scope(s)**: None
+### Properties
+* **apiVersion**: '2020-01-01' (ReadOnly, DeployTimeConstant): The resource api version
+* **id**: string (ReadOnly, DeployTimeConstant): The resource id
+* **location**: string (ReadOnly): Location where the resource is stored
+* **name**: string (Required, DeployTimeConstant): The resource name
+* **properties**: [SecuritySolutionProperties](#securitysolutionproperties) (ReadOnly)
+* **systemData**: [SystemData](#systemdata) (ReadOnly): Azure Resource Manager metadata containing createdBy and modifiedBy information.
+* **type**: 'Microsoft.Security/locations/securitySolutions' (ReadOnly, DeployTimeConstant): The resource type
+
+## Resource Microsoft.Security/locations/topologies@2020-01-01
+* **Readable Scope(s)**: ResourceGroup
+* **Writable Scope(s)**: None
+### Properties
+* **apiVersion**: '2020-01-01' (ReadOnly, DeployTimeConstant): The resource api version
+* **id**: string (ReadOnly, DeployTimeConstant): The resource id
+* **location**: string (ReadOnly): Location where the resource is stored
+* **name**: string (Required, DeployTimeConstant): The resource name
+* **properties**: [TopologyResourceProperties](#topologyresourceproperties) (ReadOnly)
+* **systemData**: [SystemData](#systemdata) (ReadOnly): Azure Resource Manager metadata containing createdBy and modifiedBy information.
+* **type**: 'Microsoft.Security/locations/topologies' (ReadOnly, DeployTimeConstant): The resource type
+
+## Resource Microsoft.Security/secureScores@2020-01-01
+* **Readable Scope(s)**: Subscription
+* **Writable Scope(s)**: None
+### Properties
+* **apiVersion**: '2020-01-01' (ReadOnly, DeployTimeConstant): The resource api version
+* **id**: string (ReadOnly, DeployTimeConstant): The resource id
+* **name**: string (Required, DeployTimeConstant): The resource name
+* **properties**: [SecureScoreItemProperties](#securescoreitemproperties) (ReadOnly): Secure score item
+* **systemData**: [SystemData](#systemdata) (ReadOnly): Azure Resource Manager metadata containing createdBy and modifiedBy information.
+* **type**: 'Microsoft.Security/secureScores' (ReadOnly, DeployTimeConstant): The resource type
+
+## Resource Microsoft.Security/serverVulnerabilityAssessments@2020-01-01
+* **Readable Scope(s)**: Extension
+* **Writable Scope(s)**: Extension
+### Properties
+* **apiVersion**: '2020-01-01' (ReadOnly, DeployTimeConstant): The resource api version
+* **id**: string (ReadOnly, DeployTimeConstant): The resource id
+* **name**: 'default' (Required, DeployTimeConstant): The resource name
+* **properties**: [ServerVulnerabilityAssessmentProperties](#servervulnerabilityassessmentproperties) (ReadOnly): describes ServerVulnerabilityAssessment properties.
+* **systemData**: [SystemData](#systemdata) (ReadOnly): Azure Resource Manager metadata containing createdBy and modifiedBy information.
+* **type**: 'Microsoft.Security/serverVulnerabilityAssessments' (ReadOnly, DeployTimeConstant): The resource type
+
+## AadSolutionProperties
+### Properties
+* **connectivityState**: 'Connected' | 'Discovered' | 'NotLicensed' | string: The connectivity state of the external AAD solution
+* **deviceType**: string
+* **deviceVendor**: string
+* **workspace**: [ConnectedWorkspace](#connectedworkspace): Represents an OMS workspace to which the solution is connected
+### Additional Properties
+* **Additional Properties Type**: any
+
+## AlertEntity
+### Properties
+* **type**: string (ReadOnly): Type of entity
+### Additional Properties
+* **Additional Properties Type**: any
+
+## AlertExtendedLinks
+### Properties
+### Additional Properties
+* **Additional Properties Type**: string
+
+## AlertExtendedProperties
+### Properties
+### Additional Properties
+* **Additional Properties Type**: string
+
+## AlertProperties
+### Properties
+* **alertDisplayName**: string (ReadOnly): The display name of the alert.
+* **alertType**: string (ReadOnly): Unique identifier for the detection logic (all alert instances from the same detection logic will have the same alertType).
+* **alertUri**: string (ReadOnly): A direct link to the alert page in Azure Portal.
+* **compromisedEntity**: string (ReadOnly): The display name of the resource most related to this alert.
+* **correlationKey**: string (ReadOnly): Key for corelating related alerts. Alerts with the same correlation key considered to be related.
+* **description**: string (ReadOnly): Description of the suspicious activity that was detected.
+* **endTimeUtc**: string (ReadOnly): The UTC time of the last event or activity included in the alert in ISO8601 format.
+* **entities**: [AlertEntity](#alertentity)[] (ReadOnly): A list of entities related to the alert.
+* **extendedLinks**: [AlertExtendedLinks](#alertextendedlinks)[] (ReadOnly): Links related to the alert
+* **extendedProperties**: [AlertExtendedProperties](#alertextendedproperties): Custom properties for the alert.
+* **intent**: 'Collection' | 'CommandAndControl' | 'CredentialAccess' | 'DefenseEvasion' | 'Discovery' | 'Execution' | 'Exfiltration' | 'Exploitation' | 'Impact' | 'InitialAccess' | 'LateralMovement' | 'Persistence' | 'PreAttack' | 'PrivilegeEscalation' | 'Probing' | 'Unknown' | string (ReadOnly): The kill chain related intent behind the alert. For list of supported values, and explanations of Azure Security Center's supported kill chain intents.
+* **isIncident**: bool (ReadOnly): This field determines whether the alert is an incident (a compound grouping of several alerts) or a single alert.
+* **processingEndTimeUtc**: string (ReadOnly): The UTC processing end time of the alert in ISO8601 format.
+* **productComponentName**: string (ReadOnly): The name of Azure Security Center pricing tier which powering this alert. Learn more: https://docs.microsoft.com/en-us/azure/security-center/security-center-pricing
+* **productName**: string (ReadOnly): The name of the product which published this alert (Azure Security Center, Azure ATP, Microsoft Defender ATP, O365 ATP, and so on).
+* **remediationSteps**: string[] (ReadOnly): Manual action items to take to remediate the alert.
+* **resourceIdentifiers**: [ResourceIdentifier](#resourceidentifier)[] (ReadOnly): The resource identifiers that can be used to direct the alert to the right product exposure group (tenant, workspace, subscription etc.). There can be multiple identifiers of different type per alert.
+* **severity**: 'High' | 'Informational' | 'Low' | 'Medium' | string (ReadOnly): The risk level of the threat that was detected. Learn more: https://docs.microsoft.com/en-us/azure/security-center/security-center-alerts-overview#how-are-alerts-classified.
+* **startTimeUtc**: string (ReadOnly): The UTC time of the first event or activity included in the alert in ISO8601 format.
+* **status**: 'Active' | 'Dismissed' | 'Resolved' | string (ReadOnly): The life cycle status of the alert.
+* **systemAlertId**: string (ReadOnly): Unique identifier for the alert.
+* **timeGeneratedUtc**: string (ReadOnly): The UTC time the alert was generated in ISO8601 format.
+* **vendorName**: string (ReadOnly): The name of the vendor that raises the alert.
+
+## AllowedConnectionsResourceProperties
+### Properties
+* **calculatedDateTime**: string (ReadOnly): The UTC time on which the allowed connections resource was calculated
+* **connectableResources**: [ConnectableResource](#connectableresource)[] (ReadOnly): List of connectable resources
+
+## AssessmentLinks
+### Properties
+* **azurePortalUri**: string (ReadOnly): Link to assessment in Azure Portal
+
+## AssessmentStatus
+### Properties
+* **cause**: string: Programmatic code for the cause of the assessment status
+* **code**: 'Healthy' | 'NotApplicable' | 'Unhealthy' | string (Required): Programmatic code for the status of the assessment
+* **description**: string: Human readable description of the assessment status
+
+## AtaSolutionProperties
+### Properties
+* **deviceType**: string
+* **deviceVendor**: string
+* **lastEventReceived**: string
+* **workspace**: [ConnectedWorkspace](#connectedworkspace): Represents an OMS workspace to which the solution is connected
+### Additional Properties
+* **Additional Properties Type**: any
+
+## CefSolutionProperties
+### Properties
+* **agent**: string
+* **deviceType**: string
+* **deviceVendor**: string
+* **hostname**: string
+* **lastEventReceived**: string
+* **workspace**: [ConnectedWorkspace](#connectedworkspace): Represents an OMS workspace to which the solution is connected
+### Additional Properties
+* **Additional Properties Type**: any
+
+## ConnectableResource
+### Properties
+* **id**: string (ReadOnly): The Azure resource id
+* **inboundConnectedResources**: [ConnectedResource](#connectedresource)[] (ReadOnly): The list of Azure resources that the resource has inbound allowed connection from
+* **outboundConnectedResources**: [ConnectedResource](#connectedresource)[] (ReadOnly): The list of Azure resources that the resource has outbound allowed connection to
+
+## ConnectedResource
+### Properties
+* **connectedResourceId**: string (ReadOnly): The Azure resource id of the connected resource
+* **tcpPorts**: string (ReadOnly): The allowed tcp ports
+* **udpPorts**: string (ReadOnly): The allowed udp ports
+
+## ConnectedWorkspace
+### Properties
+* **id**: string: Azure resource ID of the connected OMS workspace
+
+## DiscoveredSecuritySolutionProperties
+### Properties
+* **offer**: string (Required): The security solutions' image offer
+* **publisher**: string (Required): The security solutions' image publisher
+* **securityFamily**: 'Ngfw' | 'SaasWaf' | 'Va' | 'Waf' | string (Required): The security family of the discovered solution
+* **sku**: string (Required): The security solutions' image sku
+
+## JitNetworkAccessPolicyProperties
+### Properties
+* **provisioningState**: string (ReadOnly): Gets the provisioning state of the Just-in-Time policy.
+* **requests**: [JitNetworkAccessRequest](#jitnetworkaccessrequest)[]
+* **virtualMachines**: [JitNetworkAccessPolicyVirtualMachine](#jitnetworkaccesspolicyvirtualmachine)[] (Required): Configurations for Microsoft.Compute/virtualMachines resource type.
+
+## JitNetworkAccessPolicyVirtualMachine
+### Properties
+* **id**: string (Required): Resource ID of the virtual machine that is linked to this policy
+* **ports**: [JitNetworkAccessPortRule](#jitnetworkaccessportrule)[] (Required): Port configurations for the virtual machine
+* **publicIpAddress**: string: Public IP address of the Azure Firewall that is linked to this policy, if applicable
+
+## JitNetworkAccessPortRule
+### Properties
+* **allowedSourceAddressPrefix**: string: Mutually exclusive with the "allowedSourceAddressPrefixes" parameter. Should be an IP address or CIDR, for example "192.168.0.3" or "192.168.0.0/16".
+* **allowedSourceAddressPrefixes**: string[]: Mutually exclusive with the "allowedSourceAddressPrefix" parameter.
+* **maxRequestAccessDuration**: string (Required): Maximum duration requests can be made for. In ISO 8601 duration format. Minimum 5 minutes, maximum 1 day
+* **number**: int {minValue: 0, maxValue: 65535} (Required)
+* **protocol**: '*' | 'TCP' | 'UDP' | string (Required)
+
+## JitNetworkAccessRequest
+### Properties
+* **justification**: string: The justification for making the initiate request
+* **requestor**: string (Required): The identity of the person who made the request
+* **startTimeUtc**: string (Required): The start time of the request in UTC
+* **virtualMachines**: [JitNetworkAccessRequestVirtualMachine](#jitnetworkaccessrequestvirtualmachine)[] (Required)
+
+## JitNetworkAccessRequestPort
+### Properties
+* **allowedSourceAddressPrefix**: string: Mutually exclusive with the "allowedSourceAddressPrefixes" parameter. Should be an IP address or CIDR, for example "192.168.0.3" or "192.168.0.0/16".
+* **allowedSourceAddressPrefixes**: string[]: Mutually exclusive with the "allowedSourceAddressPrefix" parameter.
+* **endTimeUtc**: string (Required): The date & time at which the request ends in UTC
+* **mappedPort**: int: The port which is mapped to this port's `number` in the Azure Firewall, if applicable
+* **number**: int {minValue: 0, maxValue: 65535} (Required)
+* **status**: 'Initiated' | 'Revoked' | string (Required): The status of the port
+* **statusReason**: 'Expired' | 'NewerRequestInitiated' | 'UserRequested' | string (Required): A description of why the `status` has its value
+
+## JitNetworkAccessRequestVirtualMachine
+### Properties
+* **id**: string (Required): Resource ID of the virtual machine that is linked to this policy
+* **ports**: [JitNetworkAccessRequestPort](#jitnetworkaccessrequestport)[] (Required): The ports that were opened for the virtual machine
+
+## ResourceDetails
+* **Discriminator**: source
+
+### Base Properties
+
+### AzureResourceDetails
+#### Properties
+* **id**: string (ReadOnly): Azure resource Id of the assessed resource
+* **source**: 'Azure' (Required): The platform where the assessed resource resides
+
+### OnPremiseSqlResourceDetails
+#### Properties
+* **databaseName**: string (Required): The Sql database name installed on the machine
+* **machineName**: string (Required): The name of the machine
+* **serverName**: string (Required): The Sql server name installed on the machine
+* **source**: 'OnPremiseSql' (Required): The platform where the assessed resource resides
+* **sourceComputerId**: string (Required): The oms agent Id installed on the machine
+* **vmuuid**: string (Required): The unique Id of the machine
+* **workspaceId**: string (Required): Azure resource Id of the workspace the machine is attached to
+
+
+## ResourceIdentifier
+* **Discriminator**: type
+
+### Base Properties
+
+### AzureResourceIdentifier
+#### Properties
+* **azureResourceId**: string (ReadOnly): ARM resource identifier for the cloud resource being alerted on
+* **type**: 'AzureResource' (Required): There can be multiple identifiers of different type per alert, this field specify the identifier type.
+
+### LogAnalyticsIdentifier
+#### Properties
+* **agentId**: string (ReadOnly): (optional) The LogAnalytics agent id reporting the event that this alert is based on.
+* **type**: 'LogAnalytics' (Required): There can be multiple identifiers of different type per alert, this field specify the identifier type.
+* **workspaceId**: string (ReadOnly): The LogAnalytics workspace id that stores this alert.
+* **workspaceResourceGroup**: string (ReadOnly): The azure resource group for the LogAnalytics workspace storing this alert
+* **workspaceSubscriptionId**: string {pattern: "^[0-9A-Fa-f]{8}-([0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}$"} (ReadOnly): The azure subscription id for the LogAnalytics workspace storing this alert.
+
+
+## ScoreDetails
+### Properties
+* **current**: int {minValue: 0} (ReadOnly): Current score
+* **max**: int {minValue: 0} (ReadOnly): Maximum score available
+* **percentage**: int {minValue: 0, maxValue: 1} (ReadOnly): Ratio of the current score divided by the maximum. Rounded to 4 digits after the decimal point
+
+## SecureScoreItemProperties
+### Properties
+* **displayName**: string (ReadOnly): The initiative's name
+* **score**: [ScoreDetails](#scoredetails) (ReadOnly): score object
+* **weight**: int {minValue: 0} (ReadOnly): The relative weight for each subscription. Used when calculating an aggregated secure score for multiple subscriptions.
+
+## SecurityAssessmentMetadataPartnerData
+### Properties
+* **partnerName**: string (Required): Name of the company of the partner
+* **productName**: string: Name of the product of the partner that created the assessment
+* **secret**: string {sensitive} (Required): Secret to authenticate the partner and verify it created the assessment - write only
+
+## SecurityAssessmentMetadataProperties
+### Properties
+* **assessmentType**: 'BuiltIn' | 'CustomPolicy' | 'CustomerManaged' | 'VerifiedPartner' | string (Required): BuiltIn if the assessment based on built-in Azure Policy definition, Custom if the assessment based on custom Azure Policy definition
+* **categories**: ('Compute' | 'Data' | 'IdentityAndAccess' | 'IoT' | 'Networking' | string)[]
+* **description**: string: Human readable description of the assessment
+* **displayName**: string (Required): User friendly display name of the assessment
+* **implementationEffort**: 'High' | 'Low' | 'Moderate' | string: The implementation effort required to remediate this assessment
+* **partnerData**: [SecurityAssessmentMetadataPartnerData](#securityassessmentmetadatapartnerdata): Describes the partner that created the assessment
+* **policyDefinitionId**: string (ReadOnly): Azure resource ID of the policy definition that turns this assessment calculation on
+* **preview**: bool: True if this assessment is in preview release status
+* **remediationDescription**: string: Human readable description of what you should do to mitigate this security issue
+* **severity**: 'High' | 'Low' | 'Medium' | string (Required): The severity level of the assessment
+* **threats**: ('accountBreach' | 'dataExfiltration' | 'dataSpillage' | 'denialOfService' | 'elevationOfPrivilege' | 'maliciousInsider' | 'missingCoverage' | 'threatResistance' | string)[]
+* **userImpact**: 'High' | 'Low' | 'Moderate' | string: The user impact of the assessment
+
+## SecurityAssessmentPartnerData
+### Properties
+* **partnerName**: string (Required): Name of the company of the partner
+* **secret**: string {sensitive} (Required): secret to authenticate the partner - write only
+
+## SecurityAssessmentProperties
+### Properties
+* **additionalData**: [SecurityAssessmentPropertiesAdditionalData](#securityassessmentpropertiesadditionaldata): Additional data regarding the assessment
+* **displayName**: string (ReadOnly): User friendly display name of the assessment
+* **links**: [AssessmentLinks](#assessmentlinks) (ReadOnly): Links relevant to the assessment
+* **metadata**: [SecurityAssessmentMetadataProperties](#securityassessmentmetadataproperties): Describes properties of an assessment metadata.
+* **partnersData**: [SecurityAssessmentPartnerData](#securityassessmentpartnerdata): Data regarding 3rd party partner integration
+* **resourceDetails**: [ResourceDetails](#resourcedetails) (Required): Details of the resource that was assessed
+* **status**: [AssessmentStatus](#assessmentstatus) (Required): The result of the assessment
+
+## SecurityAssessmentPropertiesAdditionalData
+### Properties
+### Additional Properties
+* **Additional Properties Type**: string
+
+## SecuritySolutionProperties
+### Properties
+* **protectionStatus**: string (Required): The security solutions' status
+* **provisioningState**: 'Canceled' | 'Creating' | 'Deleting' | 'Failed' | 'InProgress' | 'Succeeded' | 'Updating' | string (Required): The security family provisioning State
+* **securityFamily**: 'Ngfw' | 'SaasWaf' | 'Va' | 'Waf' | string (Required): The security family of the security solution
+* **template**: string (Required): The security solutions' template
+
+## ServerVulnerabilityAssessmentProperties
+### Properties
+* **provisioningState**: 'Canceled' | 'Deprovisioning' | 'Failed' | 'Provisioning' | 'Succeeded' | string (ReadOnly): The provisioningState of the vulnerability assessment capability on the VM
+
+## SystemData
+### Properties
+* **createdAt**: string: The timestamp of resource creation (UTC).
+* **createdBy**: string: The identity that created the resource.
+* **createdByType**: 'Application' | 'Key' | 'ManagedIdentity' | 'User' | string: The type of identity that created the resource.
+* **lastModifiedAt**: string: The timestamp of resource last modification (UTC)
+* **lastModifiedBy**: string: The identity that last modified the resource.
+* **lastModifiedByType**: 'Application' | 'Key' | 'ManagedIdentity' | 'User' | string: The type of identity that last modified the resource.
+
+## TopologyResourceProperties
+### Properties
+* **calculatedDateTime**: string (ReadOnly): The UTC time on which the topology was calculated
+* **topologyResources**: [TopologySingleResource](#topologysingleresource)[] (ReadOnly): Azure resources which are part of this topology resource
+
+## TopologySingleResource
+### Properties
+* **children**: [TopologySingleResourceChild](#topologysingleresourcechild)[] (ReadOnly): Azure resources connected to this resource which are in lower level in the topology view
+* **location**: string (ReadOnly): The location of this resource
+* **networkZones**: string (ReadOnly): Indicates the resource connectivity level to the Internet (InternetFacing, Internal ,etc.)
+* **parents**: [TopologySingleResourceParent](#topologysingleresourceparent)[] (ReadOnly): Azure resources connected to this resource which are in higher level in the topology view
+* **recommendationsExist**: bool (ReadOnly): Indicates if the resource has security recommendations
+* **resourceId**: string (ReadOnly): Azure resource id
+* **severity**: string (ReadOnly): The security severity of the resource
+* **topologyScore**: int (ReadOnly): Score of the resource based on its security severity
+
+## TopologySingleResourceChild
+### Properties
+* **resourceId**: string (ReadOnly): Azure resource id which serves as child resource in topology view
+
+## TopologySingleResourceParent
+### Properties
+* **resourceId**: string (ReadOnly): Azure resource id which serves as parent resource in topology view
+

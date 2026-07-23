@@ -1,0 +1,99 @@
+# Microsoft.Security @ 2019-01-01
+
+## Resource Microsoft.Security/advancedThreatProtectionSettings@2019-01-01
+* **Readable Scope(s)**: Tenant, ManagementGroup, Subscription, ResourceGroup, Extension
+* **Writable Scope(s)**: Tenant, ManagementGroup, Subscription, ResourceGroup, Extension
+### Properties
+* **apiVersion**: '2019-01-01' (ReadOnly, DeployTimeConstant): The resource api version
+* **id**: string (ReadOnly, DeployTimeConstant): The resource id
+* **name**: 'current' (Required, DeployTimeConstant): The resource name
+* **properties**: [AdvancedThreatProtectionProperties](#advancedthreatprotectionproperties): The Advanced Threat Protection settings.
+* **systemData**: [SystemData](#systemdata) (ReadOnly): Azure Resource Manager metadata containing createdBy and modifiedBy information.
+* **type**: 'Microsoft.Security/advancedThreatProtectionSettings' (ReadOnly, DeployTimeConstant): The resource type
+
+## Resource Microsoft.Security/locations/alerts@2019-01-01
+* **Readable Scope(s)**: Subscription, ResourceGroup
+* **Writable Scope(s)**: None
+### Properties
+* **apiVersion**: '2019-01-01' (ReadOnly, DeployTimeConstant): The resource api version
+* **id**: string (ReadOnly, DeployTimeConstant): The resource id
+* **name**: string (Required, DeployTimeConstant): The resource name
+* **properties**: [AlertProperties](#alertproperties) (ReadOnly): describes security alert properties.
+* **type**: 'Microsoft.Security/locations/alerts' (ReadOnly, DeployTimeConstant): The resource type
+
+## Resource Microsoft.Security/settings@2019-01-01
+* **Readable Scope(s)**: Subscription
+* **Writable Scope(s)**: Subscription
+* **Discriminator**: kind
+
+### Base Properties
+* **apiVersion**: '2019-01-01' (ReadOnly, DeployTimeConstant): The resource api version
+* **id**: string (ReadOnly, DeployTimeConstant): The resource id
+* **name**: 'MCAS' | 'WDATP' | string (Required, DeployTimeConstant): The resource name
+* **type**: 'Microsoft.Security/settings' (ReadOnly, DeployTimeConstant): The resource type
+
+### DataExportSettings
+#### Properties
+* **kind**: 'DataExportSettings' (Required): the kind of the settings string (DataExportSettings)
+* **properties**: [DataExportSettingProperties](#dataexportsettingproperties): Data export setting data
+
+
+## AdvancedThreatProtectionProperties
+### Properties
+* **isEnabled**: bool: Indicates whether Advanced Threat Protection is enabled.
+
+## AlertConfidenceReason
+### Properties
+* **reason**: string (ReadOnly): description of the confidence reason
+* **type**: string (ReadOnly): Type of confidence factor
+
+## AlertEntity
+### Properties
+* **type**: string (ReadOnly): Type of entity
+### Additional Properties
+* **Additional Properties Type**: any
+
+## AlertExtendedProperties
+### Properties
+### Additional Properties
+* **Additional Properties Type**: any
+
+## AlertProperties
+### Properties
+* **actionTaken**: string (ReadOnly): The action that was taken as a response to the alert (Active, Blocked etc.)
+* **alertDisplayName**: string (ReadOnly): Display name of the alert type
+* **alertName**: string (ReadOnly): Name of the alert type
+* **associatedResource**: string (ReadOnly): Azure resource ID of the associated resource
+* **canBeInvestigated**: bool (ReadOnly): Whether this alert can be investigated with Azure Security Center
+* **compromisedEntity**: string (ReadOnly): The entity that the incident happened on
+* **confidenceReasons**: [AlertConfidenceReason](#alertconfidencereason)[]: reasons the alert got the confidenceScore value
+* **confidenceScore**: int {minValue: 0, maxValue: 1} (ReadOnly): level of confidence we have on the alert
+* **correlationKey**: string (ReadOnly): Alerts with the same CorrelationKey will be grouped together in Ibiza.
+* **description**: string (ReadOnly): Description of the incident and what it means
+* **detectedTimeUtc**: string (ReadOnly): The time the incident was detected by the vendor
+* **entities**: [AlertEntity](#alertentity)[]: objects that are related to this alerts
+* **extendedProperties**: [AlertExtendedProperties](#alertextendedproperties): Changing set of properties depending on the alert type.
+* **instanceId**: string (ReadOnly): Instance ID of the alert.
+* **isIncident**: bool (ReadOnly): Whether this alert is for incident type or not (otherwise - single alert)
+* **remediationSteps**: string (ReadOnly): Recommended steps to reradiate the incident
+* **reportedSeverity**: 'High' | 'Informational' | 'Low' | 'Medium' | string (ReadOnly): Estimated severity of this alert
+* **reportedTimeUtc**: string (ReadOnly): The time the incident was reported to Microsoft.Security in UTC
+* **state**: string (ReadOnly): State of the alert (Active, Dismissed etc.)
+* **subscriptionId**: string (ReadOnly): Azure subscription ID of the resource that had the security alert or the subscription ID of the workspace that this resource reports to
+* **systemSource**: string (ReadOnly): The type of the alerted resource (Azure, Non-Azure)
+* **vendorName**: string (ReadOnly): Name of the vendor that discovered the incident
+* **workspaceArmId**: string (ReadOnly): Azure resource ID of the workspace that the alert was reported to.
+
+## DataExportSettingProperties
+### Properties
+* **enabled**: bool (Required): Is the data export setting is enabled
+
+## SystemData
+### Properties
+* **createdAt**: string: The timestamp of resource creation (UTC).
+* **createdBy**: string: The identity that created the resource.
+* **createdByType**: 'Application' | 'Key' | 'ManagedIdentity' | 'User' | string: The type of identity that created the resource.
+* **lastModifiedAt**: string: The timestamp of resource last modification (UTC)
+* **lastModifiedBy**: string: The identity that last modified the resource.
+* **lastModifiedByType**: 'Application' | 'Key' | 'ManagedIdentity' | 'User' | string: The type of identity that last modified the resource.
+
