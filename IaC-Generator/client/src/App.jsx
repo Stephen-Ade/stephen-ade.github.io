@@ -117,7 +117,10 @@ function App() {
     return map[platform] || 'plaintext';
   };
 
-  const platforms = schema?.supportedPlatforms || (schema?.provider === 'aws' ? ['terraform', 'cdk-python', 'cloudformation'] : ['terraform', 'bicep']);
+  // UPDATED: Added GCP check to only show Terraform button for Google resources
+  const platforms = schema?.supportedPlatforms || 
+    (schema?.provider === 'aws' ? ['terraform', 'cdk-python', 'cloudformation'] : 
+    (schema?.provider === 'gcp' ? ['terraform'] : ['terraform', 'bicep']));
 
   return (
     <div className="app-container">
@@ -129,8 +132,15 @@ function App() {
         <div className="resource-list">
           {resources.map(r => {
             const parts = r.typeName.split('/');
-            // FIX: Added formatName to standardize capitalization in the UI
-            const formatName = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+            
+            // UPDATED: Added GCP underscore formatter (google_compute_instance -> Google Compute Instance)
+            const formatName = (str) => {
+              if (str.startsWith('google_')) {
+                return str.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+              }
+              return str.charAt(0).toUpperCase() + str.slice(1);
+            };
+            
             const displayName = r.deviceType || (parts.length > 2 ? `${formatName(parts[parts.length-2])} / ${formatName(parts[parts.length-1])}` : formatName(parts[parts.length-1]));
             return (
               <div key={r.typeName} className={`resource-item ${r.typeName === selectedType ? 'active' : ''}`} onClick={() => setSelectedType(r.typeName)}>

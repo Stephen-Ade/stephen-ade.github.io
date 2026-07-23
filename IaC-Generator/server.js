@@ -29,17 +29,41 @@ if (fs.existsSync(REGISTRY_PATH)) {
 
 // --- DYNAMIC COMPILERS ---
 
-function toSnakeCase(str) { return str.replace(/([A-Z])/g, '_$1').toLowerCase(); }
+function toSnakeCase(str) { return str.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, ''); }
 
+// --- TERRAFORM (Handles deep nested blocks) ---
 function compileTerraform(schema, config, safeName) {
-    const tfKey = toSnakeCase(safeName);
-    let hcl = `resource "${tfKey}" "${safeName}" {\n`;
-    for (const [key, value] of Object.entries(config)) {
-        if (value === null || value === undefined) continue;
-        const propKey = toSnakeCase(key);
-        hcl += `  ${propKey} = ${convertToHcl(value)}\n`;
-    }
+    const tfType = toSnakeCase(safeName);
+    let hcl = `resource "${tfType}" "${tfType}_this" {\n`;
+    hcl += compileTerraformProps(schema.properties, config, '  ');
     hcl += `}\n`;
+    return hcl;
+}
+
+function compileTerraformProps(schemaProps, configNode, indent) {
+    let hcl = '';
+    for (const [key, value] of Object.entries(configNode)) {
+        if (value === null || value === undefined || value === '') continue;
+        const tfKey = toSnakeCase(key);
+        const propSchema = schemaProps?.[key];
+
+        if (typeof value === 'object' && !Array.isArray(value)) {
+            // Nested Object -> Create a Terraform block
+            hcl += `${indent}${tfKey} {\n`;
+            hcl += compileTerraformProps(propSchema?.properties || {}, value, indent + '  ');
+            hcl += `${indent}}\n`;
+        } else if (Array.isArray(value) && value.length > 0 && typeof value[0] === 'object') {
+            // Array of Objects -> Create multiple Terraform blocks
+            value.forEach(item => {
+                hcl += `${indent}${tfKey} {\n`;
+                hcl += compileTerraformProps(propSchema?.properties || {}, item, indent + '  ');
+                hcl += `${indent}}\n`;
+            });
+        } else {
+            // Primitive or Array of Primitives -> Create an argument
+            hcl += `${indent}${tfKey} = ${convertToHcl(value)}\n`;
+        }
+    }
     return hcl;
 }
 
@@ -49,25 +73,70 @@ function convertToHcl(value) {
     if (Array.isArray(value)) {
         if (value.length === 0) return '[]';
         if (typeof value[0] === 'string') return `["${value.join('", "')}"]`;
-        return `[${value.map(v => typeof v === 'object' ? convertObjToHcl(v) : v).join(', ')}]`;
+        return `[${value.map(v => typeof v === 'object' ? convertObjToHclInline(v) : v).join(', ')}]`;
     }
-    if (typeof value === 'object') return convertObjToHcl(value);
+    if (typeof value === 'object') return convertObjToHclInline(value);
     return 'null';
 }
 
-function convertObjToHcl(obj) {
+// Used for inline maps if needed (e.g. tags)
+function convertObjToHclInline(obj) {
     const lines = Object.entries(obj).map(([k, v]) => `    ${toSnakeCase(k)} = ${convertToHcl(v)}`);
     return `{\n${lines.join('\n')}\n  }`;
 }
 
+
+// --- BICEP (Handles deep nested objects) ---
 function compileBicep(schema, config, safeName) {
-    let bicep = `resource ${safeName} '${schema.typeName}' = {\n  name: '${config.name || safeName}'\n  properties: {\n`;
-    for (const [key, value] of Object.entries(config)) {
-        if (['name', 'type'].includes(key.toLowerCase())) continue;
-        const propKey = key.substring(0,1).toLowerCase() + key.substring(1);
-        bicep += `    ${propKey}: ${convertToBicep(value)}\n`;
+    let bicep = `resource ${safeName} '${schema.typeName}' = {\n`;
+    
+    // Top level ARM properties
+    if (config.Name) bicep += `  name: '${config.Name}'\n`;
+    if (config.Location) bicep += `  location: ${config.Location}\n`;
+    
+    // Everything else goes inside 'properties: {}'
+    const propsConfig = { ...config };
+    delete propsConfig.Name;
+    delete propsConfig.Location;
+    delete propsConfig.Tags; // Tags usually go at top level in Bicep, but keeping it simple here
+
+    if (Object.keys(propsConfig).length > 0) {
+        bicep += `  properties: {\n`;
+        bicep += compileBicepProps(schema.properties?.properties || {}, propsConfig, '    ');
+        bicep += `  }\n`;
     }
-    bicep += `  }\n}\n`;
+    
+    bicep += `}\n`;
+    return bicep;
+}
+
+function compileBicepProps(schemaProps, configNode, indent) {
+    let bicep = '';
+    for (const [key, value] of Object.entries(configNode)) {
+        if (value === null || value === undefined || value === '') continue;
+        const bicepKey = key.substring(0,1).toLowerCase() + key.substring(1);
+        const propSchema = schemaProps?.[key];
+
+        if (typeof value === 'object' && !Array.isArray(value)) {
+            bicep += `${indent}${bicepKey}: {\n`;
+            bicep += compileBicepProps(propSchema?.properties || {}, value, indent + '    ');
+            bicep += `${indent}}\n`;
+        } else if (Array.isArray(value)) {
+            bicep += `${indent}${bicepKey}: [\n`;
+            value.forEach(item => {
+                if (typeof item === 'object') {
+                    bicep += `${indent}  {\n`;
+                    bicep += compileBicepProps(propSchema?.items?.properties || {}, item, indent + '    ');
+                    bicep += `${indent}  }\n`;
+                } else {
+                    bicep += `${indent}  ${convertToBicep(item)}\n`;
+                }
+            });
+            bicep += `${indent}]\n`;
+        } else {
+            bicep += `${indent}${bicepKey}: ${convertToBicep(value)}\n`;
+        }
+    }
     return bicep;
 }
 
@@ -76,9 +145,11 @@ function convertToBicep(value) {
     if (typeof value === 'boolean') return value ? 'true' : 'false';
     if (typeof value === 'number') return String(value);
     if (Array.isArray(value)) return `[${value.map(v => typeof v === 'string' ? `'${v}'` : v).join(', ')}]`;
-    return '{}'; // Simplified object handling
+    return '{}';
 }
 
+
+// --- CDK PYTHON (Handles deep nested dictionaries) ---
 function compileCdkPython(schema, config, safeName) {
     const [_, service, resource] = schema.typeName.split('::');
     const moduleName = service.toLowerCase();
@@ -86,11 +157,36 @@ function compileCdkPython(schema, config, safeName) {
     let py = `from aws_cdk_lib import ${moduleName}\n\n`;
     py += `${safeName} = ${moduleName}.${className}(\n`;
     py += `    scope, "${safeName}",\n`;
-    for (const [key, value] of Object.entries(config)) {
-        pyKey = toSnakeCase(key);
-        py += `    ${pyKey}=${convertToPython(value)},\n`;
-    }
+    
+    py += compilePythonProps(schema.properties, config, '    ');
+    
     py += `)\n`;
+    return py;
+}
+
+function compilePythonProps(schemaProps, configNode, indent) {
+    let py = '';
+    for (const [key, value] of Object.entries(configNode)) {
+        if (value === null || value === undefined || value === '') continue;
+        const pyKey = toSnakeCase(key);
+        const propSchema = schemaProps?.[key];
+
+        if (typeof value === 'object' && !Array.isArray(value)) {
+            py += `${indent}${pyKey}={\n`;
+            py += compilePythonProps(propSchema?.properties || {}, value, indent + '    ');
+            py += `${indent}},\n`;
+        } else if (Array.isArray(value) && value.length > 0 && typeof value[0] === 'object') {
+            py += `${indent}${pyKey}=[\n`;
+            value.forEach(item => {
+                py += `${indent}  {\n`;
+                py += compilePythonProps(propSchema?.items?.properties || {}, item, indent + '    ');
+                py += `${indent}  },\n`;
+            });
+            py += `${indent}],\n`;
+        } else {
+            py += `${indent}${pyKey}=${convertToPython(value)},\n`;
+        }
+    }
     return py;
 }
 
@@ -101,6 +197,7 @@ function convertToPython(value) {
     if (Array.isArray(value)) return `["${value.join('", "')}"]`;
     return '{}';
 }
+
 
 // --- API ROUTES ---
 
@@ -141,10 +238,15 @@ app.post('/api/generate', (req, res) => {
     if (db.resources[typeName]) {
         const schema = db.resources[typeName];
         const safeName = typeName.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+        
         if (platform === 'terraform') { code = compileTerraform(schema, config, safeName); language = 'hcl'; }
         else if (platform === 'bicep') { code = compileBicep(schema, config, safeName); language = 'bicep'; }
         else if (platform === 'cdk-python') { code = compileCdkPython(schema, config, safeName); language = 'python'; }
-        else if (platform === 'cloudformation') { code = JSON.stringify({ Resources: { [safeName]: { Type: typeName, Properties: config } } }, null, 2); language = 'json'; }
+        else if (platform === 'cloudformation') { 
+            // CFN natively supports deep JSON, no changes needed!
+            code = JSON.stringify({ Resources: { [safeName]: { Type: typeName, Properties: config } } }, null, 2); 
+            language = 'json'; 
+        }
     } 
     // Handle External Modules
     else {
