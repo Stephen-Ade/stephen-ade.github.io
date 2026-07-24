@@ -1,12 +1,12 @@
 {
   "modules": [
     {
-      "id": "panos_security_rule",
+      "id": "panos_security_policy_rules",
       "vendor": "Palo Alto",
-      "deviceType": "Security Rule",
+      "deviceType": "Security Policy Rules",
       "supportedPlatforms": ["terraform"],
-      "schemaFile": "panos-security-rule.schema.json",
-      "templateFile": "panos-security-rule.hcl"
+      "schemaFile": "panos-security-policy-rules.schema.json",
+      "templateFile": "panos-security-policy-rules.hcl"
     }
   ]
 }

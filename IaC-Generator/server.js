@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const handlebars = require('handlebars');
 
-// --- NEW: Handlebars Helper to safely output arrays from text ingestion ---
+// --- Handlebars Helper to safely output arrays from text ingestion ---
 handlebars.registerHelper('safeArray', function(items) {
     if (!items) return '[]';
     // If the text parser passed a string, wrap it in an array
@@ -16,10 +16,17 @@ handlebars.registerHelper('safeArray', function(items) {
     return '[]';
 });
 
-// --- NEW: Handlebars Helper to format Terraform resource names safely ---
+// --- Handlebars Helper to format Terraform resource names safely (Acronym Aware) ---
 handlebars.registerHelper('snakeCase', function(str) {
     if (!str) return '';
-    return str.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, '');
+    // 1. Normalize spaces/underscores/hyphens to underscores
+    // 2. Add underscore before a lowercase-to-uppercase transition (e.g., aB -> a_b)
+    // 3. Add underscore before an acronym-to-word transition (e.g., DMZD -> DMZ_D)
+    // 4. Lowercase everything
+    return str.replace(/[^a-zA-Z0-9]+/g, '_')
+              .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
+              .replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
+              .toLowerCase();
 });
 
 const app = express();
