@@ -1,0 +1,27 @@
+{
+  "typeName": "panos_service_object",
+  "provider": "external",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the service object (e.g., tcp-3389)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of the service object"
+    },
+    "protocol": {
+      "type": "string",
+      "description": "The protocol (tcp, udp, etc.)"
+    },
+    "destination_port": {
+      "type": "string",
+      "description": "The destination port (e.g., 3389)"
+    },
+    "source_port": {
+      "type": "string",
+      "description": "The source port (usually '*')"
+    }
+  },
+  "required": ["name", "protocol", "destination_port"]
+}
