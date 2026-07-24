@@ -18,19 +18,19 @@ const unflattenObject = (obj) => {
 };
 
 const parseTextToConfig = (text) => {
-  // FIX: Strip Windows UTF-8 BOM if present!
-  if (text.charCodeAt(0) === 0xFEFF) {
-    text = text.slice(1);
-  }
+  // BULLETPROOF: Strip Windows UTF-8 BOM using Regex
+  text = text.replace(/^\uFEFF/, '');
 
-  const lines = text.split('\n');
+  // Handle both Windows (\r\n) and Linux (\n) line endings cleanly
+  const lines = text.split(/\r?\n/); 
   const config = {};
+  
   lines.forEach(line => {
     if (!line.trim()) return;
     const match = line.match(/^([^:]+):\s*(.*)$/);
     if (!match) return;
     
-    let key = match[1].trim();
+    let key = match[1].trim().replace(/^\uFEFF/, ''); // Extra BOM safety on keys
     let value = match[2].trim();
     
     // Strip out comments like "(Note: ...)"
@@ -115,13 +115,15 @@ function App() {
   const [generatedCode, setGeneratedCode] = useState('// Select a resource and click Generate');
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
+  
   const [pendingFormData, setPendingFormData] = useState(null);
+  // FIX: A counter to force React to process the upload, even if already on the PANOS screen
+  const [ingestTrigger, setIngestTrigger] = useState(0); 
 
   useEffect(() => {
     axios.get('http://localhost:3001/api/resources').then(res => setResources(res.data));
   }, []);
 
-  // FIX: Combined into a single effect to prevent race conditions between schema loading and text ingestion
   useEffect(() => {
     if (!selectedType) return;
     
@@ -129,7 +131,7 @@ function App() {
       setSchema(res.data);
       setPlatform(res.data.provider === 'azure' ? 'bicep' : 'terraform');
       
-      // If we have pending text data, apply it. Otherwise clear form.
+      // If we have pending text data waiting to be applied, use it!
       if (pendingFormData) {
         setFormData(pendingFormData);
         setGeneratedCode(`// Ingested from text file. Click Generate to compile.`);
@@ -139,7 +141,7 @@ function App() {
         setGeneratedCode(`// Ready to generate ${selectedType}`);
       }
     });
-  }, [selectedType, pendingFormData]); // Listen to BOTH so uploads always trigger schema resolution
+  }, [selectedType, ingestTrigger]); // ingestTrigger forces this to run every time a file is uploaded
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
@@ -150,8 +152,12 @@ function App() {
       const text = e.target.result;
       const parsedConfig = parseTextToConfig(text);
       
+      // 1. Store parsed data
       setPendingFormData(parsedConfig);
+      // 2. Switch to PANOS module
       setSelectedType('panos_security_rule');
+      // 3. Bump the trigger counter to GUARANTEE the effect above runs
+      setIngestTrigger(prev => prev + 1); 
     };
     reader.readAsText(file);
     event.target.value = null; 
