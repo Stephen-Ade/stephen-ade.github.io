@@ -1,0 +1,43 @@
+{
+  "typeName": "panos_security_rule",
+  "provider": "external",
+  "properties": {
+    "rule_name": {
+      "type": "string",
+      "description": "The name of the security rule."
+    },
+    "device_group": {
+      "type": "string",
+      "description": "The Panorama device group to apply this rule to."
+    },
+    "source_zone": {
+      "type": "string",
+      "description": "Source security zone (e.g., trust)."
+    },
+    "destination_zone": {
+      "type": "string",
+      "description": "Destination security zone (e.g., untrust)."
+    },
+    "source_address": {
+      "type": "array",
+      "description": "List of source IP addresses or ranges (comma separated)."
+    },
+    "destination_address": {
+      "type": "array",
+      "description": "List of destination IP addresses or ranges."
+    },
+    "application": {
+      "type": "array",
+      "description": "List of applications (e.g., web-browsing, ssh)."
+    },
+    "service": {
+      "type": "array",
+      "description": "List of services (e.g., application-default, tcp-22)."
+    },
+    "action": {
+      "type": "string",
+      "description": "Action to take (allow or deny)."
+    }
+  },
+  "required": ["rule_name", "source_zone", "destination_zone", "action"]
+}

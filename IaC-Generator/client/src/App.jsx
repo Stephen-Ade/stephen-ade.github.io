@@ -1,10 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import Editor from '@monaco-editor/react';
 import './App.css';
 
-// Helper to convert dot-notation keys (e.g. "hardwareProfile.vmSize") 
-// back into nested JSON objects for the backend compiler
 const unflattenObject = (obj) => {
   const result = {};
   for (const key in obj) {
@@ -19,15 +17,36 @@ const unflattenObject = (obj) => {
   return result;
 };
 
-// Recursive component to handle deep Azure/AWS schemas
+// --- NEW: Text Ingestion Parser ---
+const parseTextToConfig = (text) => {
+  const lines = text.split('\n');
+  const config = {};
+  lines.forEach(line => {
+    if (!line.trim()) return;
+    const match = line.match(/^([^:]+):\s*(.*)$/);
+    if (!match) return;
+    
+    let key = match[1].trim();
+    let value = match[2].trim();
+    
+    // Strip out comments like "(Note: ...)"
+    value = value.replace(/\s*\(.*?\)\s*/g, '').trim();
+    
+    // If there are commas, convert to an array automatically
+    if (value.includes(',')) {
+      config[key] = value.split(',').map(v => v.trim()).filter(v => v);
+    } else {
+      config[key] = value;
+    }
+  });
+  return config;
+};
+
 const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
   const isRequired = requiredList.includes(name);
-  
-  // NEW: Build dynamic tooltip text
   const baseDescription = schema.description || 'No description available.';
   const tooltipText = `${name}: ${baseDescription}${isRequired ? ' (Required)' : ''}`;
 
-  // If it's an object with nested properties, render a grouped section
   if (schema.type === 'object' && schema.properties) {
     return (
       <div className="form-group nested-group" title={tooltipText}>
@@ -51,7 +70,24 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
     );
   }
 
-  // Standard primitive rendering (string, boolean, number, array)
+  // FIX: Smart value handling for Arrays
+  const currentValue = formData[name];
+  let displayValue = '';
+  if (Array.isArray(currentValue)) {
+    displayValue = currentValue.join(', ');
+  } else {
+    displayValue = currentValue || '';
+  }
+
+  const handleChange = (e) => {
+    let val = e.target.value;
+    // If schema expects an array, convert comma-separated string back to array
+    if (schema.type === 'array') {
+      val = val.split(',').map(v => v.trim()).filter(v => v);
+    }
+    setFormData({ ...formData, [name]: val });
+  };
+
   return (
     <div className="form-group">
       <label title={tooltipText}>
@@ -61,8 +97,8 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
         type="text"
         title={tooltipText}
         placeholder={`(${schema.type || 'string'})`}
-        value={formData[name] || ''}
-        onChange={(e) => setFormData({ ...formData, [name]: e.target.value })}
+        value={displayValue}
+        onChange={handleChange}
       />
     </div>
   );
@@ -76,6 +112,7 @@ function App() {
   const [platform, setPlatform] = useState('terraform');
   const [generatedCode, setGeneratedCode] = useState('// Select a resource and click Generate');
   const [loading, setLoading] = useState(false);
+  const fileInputRef = useRef(null); // NEW: Ref for hidden file input
 
   useEffect(() => {
     axios.get('http://localhost:3001/api/resources').then(res => setResources(res.data));
@@ -91,24 +128,48 @@ function App() {
     });
   }, [selectedType]);
 
+  // --- NEW: Handle File Upload ---
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target.result;
+      const parsedConfig = parseTextConfig(text);
+      
+      // Auto-select the PANOS module
+      const targetModule = 'panos_security_rule';
+      setSelectedType(targetModule);
+      
+      // Populate the form data (use a small timeout to ensure schema is loaded first)
+      setTimeout(() => {
+        setFormData(parsedConfig);
+        setGeneratedCode(`// Ingested from ${file.name}. Click Generate to compile.`);
+      }, 100);
+    };
+    reader.readAsText(file);
+    
+    // Reset file input so the same file can be uploaded again if needed
+    event.target.value = null; 
+  };
+
   const handleGenerate = async (e) => {
     e.preventDefault();
     if (!selectedType) return;
     setLoading(true);
     
-    // Filter out empty fields
     const cleanConfig = Object.fromEntries(
-      Object.entries(formData).filter(([_, v]) => v !== '' && v !== null)
+      Object.entries(formData).filter(([_, v]) => v !== '' && v !== null && !(Array.isArray(v) && v.length === 0))
     );
     
-    // Unflatten dot-notation keys into nested objects for the backend
     const nestedConfig = unflattenObject(cleanConfig);
 
     try {
       const res = await axios.post('http://localhost:3001/api/generate', { 
         typeName: selectedType, 
         platform, 
-        config: nestedConfig // Sending properly nested JSON now
+        config: nestedConfig 
       });
       setGeneratedCode(res.data.code);
     } catch (err) {
@@ -122,7 +183,6 @@ function App() {
     return map[platform] || 'plaintext';
   };
 
-  // Added GCP check to only show Terraform button for Google resources
   const platforms = schema?.supportedPlatforms || 
     (schema?.provider === 'aws' ? ['terraform', 'cdk-python', 'cloudformation'] : 
     (schema?.provider === 'gcp' ? ['terraform'] : ['terraform', 'bicep']));
@@ -137,8 +197,6 @@ function App() {
         <div className="resource-list">
           {resources.map(r => {
             const parts = r.typeName.split('/');
-            
-            // Added GCP underscore formatter
             const formatName = (str) => {
               if (str.startsWith('google_')) {
                 return str.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
@@ -163,16 +221,29 @@ function App() {
             <h2>{schema.typeName.split('/').pop()}</h2>
             <p className="type-path">{schema.typeName}</p>
             
-            {/* Header actions wrapper for Platform toggles & PDF button */}
             <div className="header-actions">
               <div className="platform-selector">
                 {platforms.map(p => (
                   <button key={p} onClick={() => setPlatform(p)} className={platform === p ? 'active' : ''}>{p}</button>
                 ))}
               </div>
-              <button type="button" className="print-btn" onClick={() => window.print()}>
-                Export to PDF
-              </button>
+              
+              <div className="action-btns">
+                <button type="button" className="print-btn" onClick={() => window.print()}>
+                  Export PDF
+                </button>
+                {/* NEW: Text Ingestion Button */}
+                <button type="button" className="ingest-btn" onClick={() => fileInputRef.current.click()}>
+                  Ingest Text File
+                </button>
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  style={{ display: 'none' }} 
+                  accept=".txt,.csv,.cfg,.conf" 
+                  onChange={handleFileUpload} 
+                />
+              </div>
             </div>
 
             <form onSubmit={handleGenerate} className="dynamic-form">
