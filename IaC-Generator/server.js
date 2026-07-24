@@ -4,6 +4,18 @@ const path = require('path');
 const fs = require('fs');
 const handlebars = require('handlebars');
 
+// --- NEW: Handlebars Helper to safely output arrays from text ingestion ---
+handlebars.registerHelper('safeArray', function(items) {
+    if (!items) return '[]';
+    // If the text parser passed a string, wrap it in an array
+    if (typeof items === 'string') return `["${items}"]`;
+    // If it's an actual array, format it properly
+    if (Array.isArray(items)) {
+        return `[${items.map(i => `"${i}"`).join(', ')}]`;
+    }
+    return '[]';
+});
+
 const app = express();
 app.use(cors());
 app.use(express.json());

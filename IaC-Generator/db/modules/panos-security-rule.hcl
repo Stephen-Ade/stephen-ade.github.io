@@ -10,12 +10,12 @@ terraform {
 resource "panos_security_rule" "{{rule_name}}" {
   name                  = "{{rule_name}}"
   device_group          = "{{device_group}}"
-  source_zone           = ["{{source_zone}}"]
-  destination_zone      = ["{{destination_zone}}"]
-  source_address        = [{{#each source_address}}"{{this}}"{{#unless @last}}, {{/unless}}{{/each}}]
-  destination_address   = [{{#each destination_address}}"{{this}}"{{#unless @last}}, {{/unless}}{{/each}}]
-  application           = [{{#each application}}"{{this}}"{{#unless @last}}, {{/unless}}{{/each}}]
-  service               = [{{#each service}}"{{this}}"{{#unless @last}}, {{/unless}}{{/each}}]
+  source_zone           = {{{safeArray source_zone}}}
+  destination_zone      = {{{safeArray destination_zone}}}
+  source_address        = {{{safeArray source_address}}}
+  destination_address   = {{{safeArray destination_address}}}
+  application           = {{{safeArray application}}}
+  service               = {{{safeArray service}}}
   action                = "{{action}}"
   
   # Logging and tracking best practices
