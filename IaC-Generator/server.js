@@ -16,6 +16,12 @@ handlebars.registerHelper('safeArray', function(items) {
     return '[]';
 });
 
+// --- NEW: Handlebars Helper to format Terraform resource names safely ---
+handlebars.registerHelper('snakeCase', function(str) {
+    if (!str) return '';
+    return str.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, '');
+});
+
 const app = express();
 app.use(cors());
 app.use(express.json());
