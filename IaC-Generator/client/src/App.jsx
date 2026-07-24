@@ -17,7 +17,6 @@ const unflattenObject = (obj) => {
   return result;
 };
 
-// --- NEW: Text Ingestion Parser ---
 const parseTextToConfig = (text) => {
   const lines = text.split('\n');
   const config = {};
@@ -70,7 +69,6 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
     );
   }
 
-  // FIX: Smart value handling for Arrays
   const currentValue = formData[name];
   let displayValue = '';
   if (Array.isArray(currentValue)) {
@@ -81,7 +79,6 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
 
   const handleChange = (e) => {
     let val = e.target.value;
-    // If schema expects an array, convert comma-separated string back to array
     if (schema.type === 'array') {
       val = val.split(',').map(v => v.trim()).filter(v => v);
     }
@@ -112,7 +109,10 @@ function App() {
   const [platform, setPlatform] = useState('terraform');
   const [generatedCode, setGeneratedCode] = useState('// Select a resource and click Generate');
   const [loading, setLoading] = useState(false);
-  const fileInputRef = useRef(null); // NEW: Ref for hidden file input
+  const fileInputRef = useRef(null);
+  
+  // FIX: Buffer to hold ingested text data until the schema is ready
+  const [pendingFormData, setPendingFormData] = useState(null);
 
   useEffect(() => {
     axios.get('http://localhost:3001/api/resources').then(res => setResources(res.data));
@@ -122,13 +122,21 @@ function App() {
     if (!selectedType) return;
     axios.get(`http://localhost:3001/api/schema/${encodeURIComponent(selectedType)}`).then(res => {
       setSchema(res.data);
-      setFormData({});
-      setGeneratedCode(`// Ready to generate ${selectedType}`);
+      
+      // FIX: If we have pending data from a text ingestion, use it! Otherwise start fresh.
+      if (pendingFormData) {
+        setFormData(pendingFormData);
+        setGeneratedCode(`// Ingested from text file. Click Generate to compile.`);
+        setPendingFormData(null); // Clear buffer after applying
+      } else {
+        setFormData({});
+        setGeneratedCode(`// Ready to generate ${selectedType}`);
+      }
+      
       setPlatform(res.data.provider === 'azure' ? 'bicep' : 'terraform');
     });
-  }, [selectedType]);
+  }, [selectedType]); // Removed pendingFormData from deps to prevent loops, React 18 batching handles it safely.
 
-  // --- NEW: Handle File Upload ---
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -136,21 +144,15 @@ function App() {
     const reader = new FileReader();
     reader.onload = (e) => {
       const text = e.target.result;
-      const parsedConfig = parseTextConfig(text);
+      const parsedConfig = parseTextToConfig(text);
       
-      // Auto-select the PANOS module
-      const targetModule = 'panos_security_rule';
-      setSelectedType(targetModule);
+      // 1. Store the parsed data in the buffer
+      setPendingFormData(parsedConfig);
       
-      // Populate the form data (use a small timeout to ensure schema is loaded first)
-      setTimeout(() => {
-        setFormData(parsedConfig);
-        setGeneratedCode(`// Ingested from ${file.name}. Click Generate to compile.`);
-      }, 100);
+      // 2. Trigger the module switch (which triggers the useEffect above)
+      setSelectedType('panos_security_rule');
     };
     reader.readAsText(file);
-    
-    // Reset file input so the same file can be uploaded again if needed
     event.target.value = null; 
   };
 
@@ -232,7 +234,6 @@ function App() {
                 <button type="button" className="print-btn" onClick={() => window.print()}>
                   Export PDF
                 </button>
-                {/* NEW: Text Ingestion Button */}
                 <button type="button" className="ingest-btn" onClick={() => fileInputRef.current.click()}>
                   Ingest Text File
                 </button>
