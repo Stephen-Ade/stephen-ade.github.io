@@ -10,34 +10,46 @@
       "type": "string",
       "description": "The Panorama device group to apply this rule to."
     },
-    "source_zone": {
+    "rulebase": {
       "type": "string",
-      "description": "Source security zone (e.g., trust)."
+      "description": "The rulebase (e.g., pre-rulebase, post-rulebase)."
     },
-    "destination_zone": {
+    "position": {
       "type": "string",
-      "description": "Destination security zone (e.g., untrust)."
+      "description": "Where to place the rule (e.g., top, bottom)."
     },
-    "source_address": {
+    "source_zones": {
       "type": "array",
-      "description": "List of source IP addresses or ranges (comma separated)."
+      "description": "List of source security zones."
     },
-    "destination_address": {
+    "destination_zones": {
+      "type": "array",
+      "description": "List of destination security zones."
+    },
+    "source_addresses": {
+      "type": "array",
+      "description": "List of source IP addresses or ranges."
+    },
+    "destination_addresses": {
       "type": "array",
       "description": "List of destination IP addresses or ranges."
     },
-    "application": {
+    "applications": {
       "type": "array",
-      "description": "List of applications (e.g., web-browsing, ssh)."
+      "description": "List of App-ID applications."
     },
-    "service": {
+    "services": {
       "type": "array",
-      "description": "List of services (e.g., application-default, tcp-22)."
+      "description": "List of service objects."
     },
     "action": {
       "type": "string",
       "description": "Action to take (allow or deny)."
+    },
+    "log_end": {
+      "type": "string",
+      "description": "Log at session end (true/false)."
     }
   },
-  "required": ["rule_name", "source_zone", "destination_zone", "action"]
+  "required": ["rule_name", "device_group", "source_zones", "destination_zones", "action"]
 }
