@@ -1,0 +1,43 @@
+{
+  "typeName": "panos_address",
+  "provider": "external",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the address object"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of the address object"
+    },
+    "scope_type": {
+      "type": "string",
+      "description": "Where the object lives (device_group, shared, vsys)"
+    },
+    "device_group_name": {
+      "type": "string",
+      "description": "The Panorama device group name (if scope_type is device_group)"
+    },
+    "vsys_name": {
+      "type": "string",
+      "description": "The virtual system name (if scope_type is vsys)"
+    },
+    "address_type": {
+      "type": "string",
+      "description": "The type of address (ip_netmask, ip_range, fqdn, ip_wildcard)"
+    },
+    "value": {
+      "type": "string",
+      "description": "The value (e.g., 172.16.10.50/32 or app.example.com)"
+    },
+    "tags": {
+      "type": "array",
+      "description": "Comma-separated list of tags"
+    },
+    "disable_override": {
+      "type": "string",
+      "description": "Disable override (true/false)"
+    }
+  },
+  "required": ["name", "scope_type", "address_type", "value"]
+}

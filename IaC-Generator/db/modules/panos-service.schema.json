@@ -1,0 +1,59 @@
+{
+  "typeName": "panos_service",
+  "provider": "external",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the service object"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of the service object"
+    },
+    "scope_type": {
+      "type": "string",
+      "description": "Where the object lives (device_group, shared, vsys)"
+    },
+    "device_group_name": {
+      "type": "string",
+      "description": "The Panorama device group name (if scope_type is device_group)"
+    },
+    "vsys_name": {
+      "type": "string",
+      "description": "The virtual system name (if scope_type is vsys)"
+    },
+    "protocol": {
+      "type": "string",
+      "description": "The protocol (tcp or udp)"
+    },
+    "destination_port": {
+      "type": "string",
+      "description": "The destination port (e.g., 443)"
+    },
+    "source_port": {
+      "type": "string",
+      "description": "The source port (e.g., any or 1024-65535)"
+    },
+    "override_timeout": {
+      "type": "string",
+      "description": "Override global timeout (true/false)"
+    },
+    "halfclose_timeout": {
+      "type": "string",
+      "description": "TCP halfclose timeout in seconds"
+    },
+    "timewait_timeout": {
+      "type": "string",
+      "description": "TCP timewait timeout in seconds"
+    },
+    "tags": {
+      "type": "array",
+      "description": "Comma-separated list of tags"
+    },
+    "disable_override": {
+      "type": "string",
+      "description": "Disable override (true/false)"
+    }
+  },
+  "required": ["name", "scope_type", "protocol", "destination_port"]
+}

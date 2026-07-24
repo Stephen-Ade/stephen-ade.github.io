@@ -9,20 +9,20 @@
       "templateFile": "panos-security-policy-rules.hcl"
     },
     {
-      "id": "panos_address_object",
+      "id": "panos_address",
       "vendor": "Palo Alto",
       "deviceType": "Address Object",
       "supportedPlatforms": ["terraform"],
-      "schemaFile": "panos-address-object.schema.json",
-      "templateFile": "panos-address-object.hcl"
+      "schemaFile": "panos-address.schema.json",
+      "templateFile": "panos-address.hcl"
     },
     {
-      "id": "panos_service_object",
+      "id": "panos_service",
       "vendor": "Palo Alto",
       "deviceType": "Service Object",
       "supportedPlatforms": ["terraform"],
-      "schemaFile": "panos-service-object.schema.json",
-      "templateFile": "panos-service-object.hcl"
+      "schemaFile": "panos-service.schema.json",
+      "templateFile": "panos-service.hcl"
     }
   ]
 }
