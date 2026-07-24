@@ -17,20 +17,28 @@ const unflattenObject = (obj) => {
   return result;
 };
 
+// --- UPDATED: Parser that extracts the target module from the text file ---
 const parseTextToConfig = (text) => {
-  // BULLETPROOF: Strip Windows UTF-8 BOM using Regex
+  // BULLETPROOF: Strip Windows UTF-8 BOM
   text = text.replace(/^\uFEFF/, '');
-
-  // Handle both Windows (\r\n) and Linux (\n) line endings cleanly
   const lines = text.split(/\r?\n/); 
+  
+  let targetModule = null;
   const config = {};
   
   lines.forEach(line => {
+    // Check for module routing tag: @module: panos_address
+    const moduleMatch = line.match(/^@module:\s*(.*)$/);
+    if (moduleMatch) {
+      targetModule = moduleMatch[1].trim();
+      return; // Don't process this line as config data
+    }
+
     if (!line.trim()) return;
     const match = line.match(/^([^:]+):\s*(.*)$/);
     if (!match) return;
     
-    let key = match[1].trim().replace(/^\uFEFF/, ''); // Extra BOM safety on keys
+    let key = match[1].trim().replace(/^\uFEFF/, ''); 
     let value = match[2].trim();
     
     // Strip out comments like "(Note: ...)"
@@ -43,7 +51,8 @@ const parseTextToConfig = (text) => {
       config[key] = value;
     }
   });
-  return config;
+  
+  return { targetModule, config };
 };
 
 const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
@@ -117,7 +126,6 @@ function App() {
   const fileInputRef = useRef(null);
   
   const [pendingFormData, setPendingFormData] = useState(null);
-  // FIX: A counter to force React to process the upload, even if already on the PANOS screen
   const [ingestTrigger, setIngestTrigger] = useState(0); 
 
   useEffect(() => {
@@ -131,7 +139,6 @@ function App() {
       setSchema(res.data);
       setPlatform(res.data.provider === 'azure' ? 'bicep' : 'terraform');
       
-      // If we have pending text data waiting to be applied, use it!
       if (pendingFormData) {
         setFormData(pendingFormData);
         setGeneratedCode(`// Ingested from text file. Click Generate to compile.`);
@@ -141,8 +148,9 @@ function App() {
         setGeneratedCode(`// Ready to generate ${selectedType}`);
       }
     });
-  }, [selectedType, ingestTrigger]); // ingestTrigger forces this to run every time a file is uploaded
+  }, [selectedType, ingestTrigger]);
 
+  // --- UPDATED: File Upload Handler that uses the dynamic module ---
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -150,12 +158,12 @@ function App() {
     const reader = new FileReader();
     reader.onload = (e) => {
       const text = e.target.result;
-      const parsedConfig = parseTextToConfig(text);
+      const { targetModule, config } = parseTextToConfig(text);
       
       // 1. Store parsed data
-      setPendingFormData(parsedConfig);
-      // 2. Switch to PANOS 2.x module
-      setSelectedType('panos_security_policy_rules');
+      setPendingFormData(config);
+      // 2. Switch to the extracted module, or fallback to security policy rules
+      setSelectedType(targetModule || 'panos_security_policy_rules');
       // 3. Bump the trigger counter to GUARANTEE the effect above runs
       setIngestTrigger(prev => prev + 1); 
     };
@@ -216,7 +224,7 @@ function App() {
             const displayName = r.deviceType || (parts.length > 2 ? `${formatName(parts[parts.length-2])} / ${formatName(parts[parts.length-1])}` : formatName(parts[parts.length-1]));
             return (
               <div key={r.typeName} className={`resource-item ${r.typeName === selectedType ? 'active' : ''}`} onClick={() => {
-                setPendingFormData(null); // Clear buffer if manually clicking around
+                setPendingFormData(null); 
                 setSelectedType(r.typeName);
               }}>
                 <span className={`badge ${r.provider}`}>{r.provider === 'external' ? r.vendor : r.provider.toUpperCase()}</span>
