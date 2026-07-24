@@ -1,16 +1,45 @@
 .app-container { display: flex; height: 100vh; font-family: sans-serif; }
-.sidebar { width: 300px; background: #f1f1f1; border-right: 1px solid #ccc; display: flex; flex-direction: column; }
+
+/* --- Sidebar Updates (Wider & No horizontal scroll) --- */
+.sidebar { 
+  width: 450px; 
+  min-width: 350px; /* Prevents it from squishing too much */
+  background: #f1f1f1; 
+  border-right: 1px solid #ccc; 
+  display: flex; 
+  flex-direction: column; 
+}
 .sidebar h3 { padding: 15px; margin: 0; background: #333; color: white; }
 .sidebar input { margin: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
 .resource-list { overflow-y: auto; flex: 1; }
-.resource-item { padding: 10px 15px; cursor: pointer; border-bottom: 1px solid #ddd; display: flex; align-items: center; gap: 10px; }
+.resource-item { 
+  padding: 12px 15px; 
+  cursor: pointer; 
+  border-bottom: 1px solid #ddd; 
+  display: flex; 
+  align-items: flex-start; /* Left-aligns text if it wraps to a second line */
+  gap: 10px; 
+  overflow-wrap: break-word; /* Forces long text to wrap instead of scrolling */
+  word-break: break-word; 
+}
 .resource-item:hover { background: #e2e2e2; }
 .resource-item.active { background: #007bff; color: white; }
-.badge { font-size: 10px; padding: 3px 6px; border-radius: 3px; color: white; font-weight: bold; }
+
+/* --- Badge Updates (Purple for GCP) --- */
+.badge { 
+  font-size: 10px; 
+  padding: 3px 6px; 
+  border-radius: 3px; 
+  color: white; 
+  font-weight: bold; 
+  flex-shrink: 0; /* Prevents badge from squishing when text is long */
+}
 .badge.aws { background: #ff9900; }
 .badge.azure { background: #0078d4; }
-.badge.gcp { background: #4285f4; }
+.badge.gcp { background: #9C27B0; /* Updated to Google Purple */ }
 .badge.external { background: #28a745; }
+
+/* --- Main Panels --- */
 .form-panel { flex: 1; padding: 20px; overflow-y: auto; background: white; }
 .type-path { color: #666; font-size: 12px; margin-bottom: 20px; }
 .platform-selector { margin-bottom: 20px; display: flex; gap: 10px; }
@@ -58,7 +87,7 @@
   gap: 10px;
 }
 
-/* --- Print to PDF Styles --- */
+/* --- Header Actions & Buttons --- */
 .header-actions {
   display: flex;
   justify-content: space-between;
@@ -79,21 +108,34 @@
 .print-btn:hover {
   background: #555;
 }
+.action-btns {
+  display: flex;
+  gap: 10px;
+}
+.ingest-btn {
+  padding: 8px 16px;
+  background: #17a2b8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.ingest-btn:hover {
+  background: #138496;
+}
 
+/* --- Print to PDF Styles --- */
 @media print {
-  /* 1. Hide sidebar, action buttons, and generate button */
   .sidebar, .header-actions, .dynamic-form button[type="submit"] {
     display: none !important;
   }
-  
-  /* 2. Stack Form and Code vertically for the PDF */
   .app-container {
     display: flex !important;
     flex-direction: column !important;
     height: auto !important;
   }
-  
-  /* 3. Make Form Panel print-friendly */
   .form-panel {
     width: 100% !important;
     flex: unset !important;
@@ -104,8 +146,6 @@
     border-bottom: 2px solid #333 !important;
     padding-bottom: 20px !important;
   }
-
-  /* 4. Make Code Panel print-friendly and force text black */
   .code-panel {
     flex: unset !important;
     width: 100% !important;
@@ -125,14 +165,10 @@
   .monaco-editor .view-line span {
     color: black !important;
   }
-
-  /* 5. Show empty input borders so blank fields are visible on paper */
   .form-group input {
     border: 1px solid #999 !important;
     background: white !important;
   }
-  
-  /* Prevent awkward page breaks inside forms */
   .nested-group {
     page-break-inside: avoid;
   }
