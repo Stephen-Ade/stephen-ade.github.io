@@ -22,11 +22,15 @@ const unflattenObject = (obj) => {
 // Recursive component to handle deep Azure/AWS schemas
 const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
   const isRequired = requiredList.includes(name);
+  
+  // NEW: Build dynamic tooltip text
+  const baseDescription = schema.description || 'No description available.';
+  const tooltipText = `${name}: ${baseDescription}${isRequired ? ' (Required)' : ''}`;
 
   // If it's an object with nested properties, render a grouped section
   if (schema.type === 'object' && schema.properties) {
     return (
-      <div className="form-group nested-group">
+      <div className="form-group nested-group" title={tooltipText}>
         <label className="nested-label">
           {name} {isRequired && <span className="req">*</span>} 
           <span className="type-badge">object</span>
@@ -50,11 +54,12 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
   // Standard primitive rendering (string, boolean, number, array)
   return (
     <div className="form-group">
-      <label>
+      <label title={tooltipText}>
         {name} {isRequired && <span className="req">*</span>}
       </label>
       <input
         type="text"
+        title={tooltipText}
         placeholder={`(${schema.type || 'string'})`}
         value={formData[name] || ''}
         onChange={(e) => setFormData({ ...formData, [name]: e.target.value })}
@@ -117,7 +122,7 @@ function App() {
     return map[platform] || 'plaintext';
   };
 
-  // UPDATED: Added GCP check to only show Terraform button for Google resources
+  // Added GCP check to only show Terraform button for Google resources
   const platforms = schema?.supportedPlatforms || 
     (schema?.provider === 'aws' ? ['terraform', 'cdk-python', 'cloudformation'] : 
     (schema?.provider === 'gcp' ? ['terraform'] : ['terraform', 'bicep']));
@@ -133,7 +138,7 @@ function App() {
           {resources.map(r => {
             const parts = r.typeName.split('/');
             
-            // UPDATED: Added GCP underscore formatter (google_compute_instance -> Google Compute Instance)
+            // Added GCP underscore formatter
             const formatName = (str) => {
               if (str.startsWith('google_')) {
                 return str.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
@@ -157,13 +162,20 @@ function App() {
           <>
             <h2>{schema.typeName.split('/').pop()}</h2>
             <p className="type-path">{schema.typeName}</p>
-            <div className="platform-selector">
-              {platforms.map(p => (
-                <button key={p} onClick={() => setPlatform(p)} className={platform === p ? 'active' : ''}>{p}</button>
-              ))}
+            
+            {/* Header actions wrapper for Platform toggles & PDF button */}
+            <div className="header-actions">
+              <div className="platform-selector">
+                {platforms.map(p => (
+                  <button key={p} onClick={() => setPlatform(p)} className={platform === p ? 'active' : ''}>{p}</button>
+                ))}
+              </div>
+              <button type="button" className="print-btn" onClick={() => window.print()}>
+                Export to PDF
+              </button>
             </div>
+
             <form onSubmit={handleGenerate} className="dynamic-form">
-              {/* Removed .slice(0, 20) and using Recursive Component */}
               {Object.entries(schema.properties).map(([key, prop]) => (
                 <FormField
                   key={key}

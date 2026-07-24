@@ -25,7 +25,7 @@
 .code-panel { flex: 2; background: #1e1e1e; }
 .placeholder { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; color: #666; }
 
-/* --- NEW: Styles for Nested Schema Objects (Light Theme) --- */
+/* --- Styles for Nested Schema Objects (Light Theme) --- */
 .nested-group {
   margin-top: 5px;
   margin-bottom: 5px;
@@ -34,7 +34,6 @@
   border-left: 4px solid #007bff;
   border-radius: 4px;
 }
-
 .nested-label {
   color: #333;
   font-weight: 600;
@@ -43,7 +42,6 @@
   gap: 8px;
   margin-bottom: 5px;
 }
-
 .type-badge {
   font-size: 0.7rem;
   font-weight: 400;
@@ -52,11 +50,90 @@
   padding: 2px 6px;
   border-radius: 4px;
 }
-
 .nested-children {
   margin-left: 15px;
   margin-top: 5px;
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+/* --- Print to PDF Styles --- */
+.header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 10px;
+}
+.print-btn {
+  padding: 8px 16px;
+  background: #333;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.print-btn:hover {
+  background: #555;
+}
+
+@media print {
+  /* 1. Hide sidebar, action buttons, and generate button */
+  .sidebar, .header-actions, .dynamic-form button[type="submit"] {
+    display: none !important;
+  }
+  
+  /* 2. Stack Form and Code vertically for the PDF */
+  .app-container {
+    display: flex !important;
+    flex-direction: column !important;
+    height: auto !important;
+  }
+  
+  /* 3. Make Form Panel print-friendly */
+  .form-panel {
+    width: 100% !important;
+    flex: unset !important;
+    height: auto !important;
+    overflow: visible !important;
+    background: white !important;
+    color: black !important;
+    border-bottom: 2px solid #333 !important;
+    padding-bottom: 20px !important;
+  }
+
+  /* 4. Make Code Panel print-friendly and force text black */
+  .code-panel {
+    flex: unset !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 400px !important;
+    overflow: visible !important;
+    background: white !important;
+    padding: 20px !important;
+    box-sizing: border-box !important;
+  }
+  .monaco-editor, .monaco-editor-background, .monaco-editor .margin {
+    background-color: white !important;
+  }
+  .monaco-editor .view-lines {
+    color: black !important;
+  }
+  .monaco-editor .view-line span {
+    color: black !important;
+  }
+
+  /* 5. Show empty input borders so blank fields are visible on paper */
+  .form-group input {
+    border: 1px solid #999 !important;
+    background: white !important;
+  }
+  
+  /* Prevent awkward page breaks inside forms */
+  .nested-group {
+    page-break-inside: avoid;
+  }
 }
