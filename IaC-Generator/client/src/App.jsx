@@ -18,6 +18,11 @@ const unflattenObject = (obj) => {
 };
 
 const parseTextToConfig = (text) => {
+  // FIX: Strip Windows UTF-8 BOM if present!
+  if (text.charCodeAt(0) === 0xFEFF) {
+    text = text.slice(1);
+  }
+
   const lines = text.split('\n');
   const config = {};
   lines.forEach(line => {
@@ -110,32 +115,31 @@ function App() {
   const [generatedCode, setGeneratedCode] = useState('// Select a resource and click Generate');
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
-  
-  // FIX: Buffer to hold ingested text data until the schema is ready
   const [pendingFormData, setPendingFormData] = useState(null);
 
   useEffect(() => {
     axios.get('http://localhost:3001/api/resources').then(res => setResources(res.data));
   }, []);
 
+  // FIX: Combined into a single effect to prevent race conditions between schema loading and text ingestion
   useEffect(() => {
     if (!selectedType) return;
+    
     axios.get(`http://localhost:3001/api/schema/${encodeURIComponent(selectedType)}`).then(res => {
       setSchema(res.data);
+      setPlatform(res.data.provider === 'azure' ? 'bicep' : 'terraform');
       
-      // FIX: If we have pending data from a text ingestion, use it! Otherwise start fresh.
+      // If we have pending text data, apply it. Otherwise clear form.
       if (pendingFormData) {
         setFormData(pendingFormData);
         setGeneratedCode(`// Ingested from text file. Click Generate to compile.`);
-        setPendingFormData(null); // Clear buffer after applying
+        setPendingFormData(null); 
       } else {
         setFormData({});
         setGeneratedCode(`// Ready to generate ${selectedType}`);
       }
-      
-      setPlatform(res.data.provider === 'azure' ? 'bicep' : 'terraform');
     });
-  }, [selectedType]); // Removed pendingFormData from deps to prevent loops, React 18 batching handles it safely.
+  }, [selectedType, pendingFormData]); // Listen to BOTH so uploads always trigger schema resolution
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
@@ -146,10 +150,7 @@ function App() {
       const text = e.target.result;
       const parsedConfig = parseTextToConfig(text);
       
-      // 1. Store the parsed data in the buffer
       setPendingFormData(parsedConfig);
-      
-      // 2. Trigger the module switch (which triggers the useEffect above)
       setSelectedType('panos_security_rule');
     };
     reader.readAsText(file);
@@ -208,7 +209,10 @@ function App() {
             
             const displayName = r.deviceType || (parts.length > 2 ? `${formatName(parts[parts.length-2])} / ${formatName(parts[parts.length-1])}` : formatName(parts[parts.length-1]));
             return (
-              <div key={r.typeName} className={`resource-item ${r.typeName === selectedType ? 'active' : ''}`} onClick={() => setSelectedType(r.typeName)}>
+              <div key={r.typeName} className={`resource-item ${r.typeName === selectedType ? 'active' : ''}`} onClick={() => {
+                setPendingFormData(null); // Clear buffer if manually clicking around
+                setSelectedType(r.typeName);
+              }}>
                 <span className={`badge ${r.provider}`}>{r.provider === 'external' ? r.vendor : r.provider.toUpperCase()}</span>
                 {displayName}
               </div>
