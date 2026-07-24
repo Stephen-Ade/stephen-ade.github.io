@@ -154,8 +154,8 @@ function App() {
       
       // 1. Store parsed data
       setPendingFormData(parsedConfig);
-      // 2. Switch to PANOS module
-      setSelectedType('panos_security_rule');
+      // 2. Switch to PANOS 2.x module
+      setSelectedType('panos_security_policy_rules');
       // 3. Bump the trigger counter to GUARANTEE the effect above runs
       setIngestTrigger(prev => prev + 1); 
     };
