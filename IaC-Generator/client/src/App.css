@@ -1,13 +1,19 @@
-.app-container { display: flex; height: 100vh; font-family: sans-serif; }
+.app-container { 
+  display: flex; 
+  height: 100vh; 
+  font-family: sans-serif;
+  overflow: hidden; /* Prevents container from growing past viewport */
+}
 
-/* --- Sidebar Updates (Wider & No horizontal scroll) --- */
+/* --- Sidebar Updates (Equal Width, No rigid pixels) --- */
 .sidebar { 
-  width: 450px; 
-  min-width: 350px;
+  flex: 1 1 0%; /* Takes exactly 1/3rd of space */
+  min-width: 0;  /* CRITICAL: Allows flex item to shrink below content size */
   background: #f1f1f1; 
   border-right: 1px solid #ccc; 
   display: flex; 
   flex-direction: column; 
+  overflow: hidden; /* Prevents sidebar from breaking layout */
 }
 .sidebar h3 { padding: 15px; margin: 0; background: #333; color: white; }
 .sidebar input { margin: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
@@ -39,10 +45,17 @@
 .badge.gcp { background: #9C27B0; }
 .badge.external { background: #28a745; }
 
-/* --- Main Panels --- */
-.form-panel { flex: 1; padding: 20px; overflow-y: auto; background: white; }
+/* --- Main Panels (Equal Width 1/3rd each) --- */
+.form-panel { 
+  flex: 1 1 0%; /* Takes exactly 1/3rd of space */
+  min-width: 0;  /* CRITICAL: Prevents crushing */
+  padding: 20px; 
+  overflow-y: auto; 
+  background: white; 
+  box-sizing: border-box;
+}
 .type-path { color: #666; font-size: 12px; margin-bottom: 20px; }
-.platform-selector { margin-bottom: 20px; display: flex; gap: 10px; }
+.platform-selector { margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
 .platform-selector button { padding: 8px 16px; border: 1px solid #ccc; background: white; cursor: pointer; border-radius: 4px; }
 .platform-selector button.active { background: #007bff; color: white; border-color: #007bff; }
 .dynamic-form { display: flex; flex-direction: column; gap: 15px; }
@@ -51,7 +64,13 @@
 .form-group input[type="text"] { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
 .dynamic-form button { padding: 10px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-top: 10px; }
 .dynamic-form button:disabled { background: #93c5fd; }
-.code-panel { flex: 2; background: #1e1e1e; }
+
+.code-panel { 
+  flex: 1 1 0%; /* Takes exactly 1/3rd of space */
+  min-width: 0;  /* CRITICAL: Prevents crushing */
+  background: #1e1e1e; 
+  overflow: hidden; /* Monaco editor handles its own internal scrolling */
+}
 .placeholder { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; color: #666; }
 
 /* --- Styles for Nested Schema Objects (Light Theme) --- */
@@ -94,6 +113,7 @@
   align-items: center;
   margin-bottom: 20px;
   gap: 10px;
+  flex-wrap: wrap; /* Allows buttons to wrap to next line if panel gets too narrow */
 }
 .print-btn {
   padding: 8px 16px;
