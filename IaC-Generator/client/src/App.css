@@ -39,7 +39,20 @@
   word-break: break-word; 
 }
 .resource-item:hover { background: #e2e2e2; }
-.resource-item.active { background: #007bff; color: white; }
+
+/* --- Updated Highlighted Selection --- */
+.resource-item.active { 
+  background: #0056b3; /* Darker, richer blue so white text pops */
+  color: white; 
+  border-left: 4px solid #ffc107; /* Bright gold highlight bar on the left */
+  font-weight: 500;
+}
+
+/* Force badges to become semi-transparent white when the item is active */
+.resource-item.active .badge {
+  background-color: rgba(255, 255, 255, 0.25); 
+  color: white;
+}
 
 /* --- Vendor Grouping & Dropdown Styles --- */
 .vendor-category {
