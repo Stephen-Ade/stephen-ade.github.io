@@ -58,7 +58,7 @@ resource "panos_nat_policy_rules" "{{tfLabel name}}" {
     {
       name                  = "{{name}}"
       {{#if description}}description           = "{{description}}"{{/if}}
-      disabled              = {{disabled}}
+      disabled              = {{#if disabled}}{{disabled}}{{else}}false{{/if}}
 
       source_zones          = {{{safeArray source_zones}}}
       destination_zone      = {{{safeArray destination_zone}}}
