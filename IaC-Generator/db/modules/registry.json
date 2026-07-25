@@ -31,6 +31,14 @@
       "supportedPlatforms": ["terraform"],
       "schemaFile": "panos-nat-policy-rules.schema.json",
       "templateFile": "panos-nat-policy-rules.hcl"
+    },
+    {
+      "id": "panos_security_profile_group",
+      "vendor": "Palo Alto",
+      "deviceType": "Security Profile Group",
+      "supportedPlatforms": ["terraform"],
+      "schemaFile": "panos-security-profile-group.schema.json",
+      "templateFile": "panos-security-profile-group.hcl"
     }
   ]
 }
