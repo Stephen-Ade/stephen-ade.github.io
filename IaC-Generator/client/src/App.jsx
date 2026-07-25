@@ -294,6 +294,32 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
   );
 };
 
+// --- VENDOR GROUPING CONFIGURATION ---
+const VENDOR_GROUPS = [
+  {
+    category: "Cloud Platforms",
+    vendors: [
+      { id: "aws", label: "AWS", matchProvider: "aws" },
+      { id: "azure", label: "AZURE", matchProvider: "azure" },
+      { id: "gcp", label: "GCP", matchProvider: "gcp" }
+    ]
+  },
+  {
+    category: "Security SaaS",
+    vendors: [
+      // Adjust 'matchProvider' if your DB uses a different string for Defender (e.g., 'defender')
+      { id: "defender", label: "Microsoft Defender XDR", matchProvider: "microsoft" } 
+    ]
+  },
+  {
+    category: "Security Appliances",
+    vendors: [
+      { id: "panos", label: "Palo Alto Firewalls", matchProvider: "external", matchVendor: "Palo Alto" },
+      { id: "checkpoint", label: "Checkpoint Firewalls", matchProvider: "external", matchVendor: "Checkpoint" }
+    ]
+  }
+];
+
 function App() {
   const [resources, setResources] = useState([]);
   const [selectedType, setSelectedType] = useState(null);
@@ -306,6 +332,7 @@ function App() {
   
   const [pendingFormData, setPendingFormData] = useState(null);
   const [ingestTrigger, setIngestTrigger] = useState(0); 
+  const [expandedGroups, setExpandedGroups] = useState({});
 
   useEffect(() => {
     axios.get('http://localhost:3001/api/resources').then(res => setResources(res.data));
@@ -389,6 +416,32 @@ function App() {
     return `${resourceType}.${normalizeToSnakeCase(nameValue)}`;
   };
 
+  // --- HELPER: Group flat resources into vendor hierarchy ---
+  const getGroupedResources = () => {
+    const grouped = VENDOR_GROUPS.map(cat => ({
+      ...cat,
+      vendors: cat.vendors.map(v => ({ ...v, resources: [] }))
+    }));
+
+    resources.forEach(r => {
+      let found = false;
+      for (const cat of grouped) {
+        for (const vendor of cat.vendors) {
+          const providerMatch = r.provider === vendor.matchProvider;
+          const vendorMatch = vendor.matchVendor ? r.vendor === vendor.matchVendor : true;
+          
+          if (providerMatch && vendorMatch) {
+            vendor.resources.push(r);
+            found = true;
+            break;
+          }
+        }
+        if (found) break;
+      }
+    });
+    return grouped;
+  };
+
   return (
     <div className="app-container">
       <aside className="sidebar">
@@ -397,26 +450,58 @@ function App() {
           axios.get(`http://localhost:3001/api/resources?search=${e.target.value}`).then(res => setResources(res.data));
         }} />
         <div className="resource-list">
-          {resources.map(r => {
-            const parts = r.typeName.split('/');
-            const formatName = (str) => {
-              if (str.startsWith('google_')) {
-                return str.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-              }
-              return str.charAt(0).toUpperCase() + str.slice(1);
-            };
-            
-            const displayName = r.deviceType || (parts.length > 2 ? `${formatName(parts[parts.length-2])} / ${formatName(parts[parts.length-1])}` : formatName(parts[parts.length-1]));
-            return (
-              <div key={r.typeName} className={`resource-item ${r.typeName === selectedType ? 'active' : ''}`} onClick={() => {
-                setPendingFormData(null); 
-                setSelectedType(r.typeName);
-              }}>
-                <span className={`badge ${r.provider}`}>{r.provider === 'external' ? r.vendor : r.provider.toUpperCase()}</span>
-                {displayName}
-              </div>
-            );
-          })}
+          {getGroupedResources().map(cat => (
+            <div key={cat.category} className="vendor-category">
+              <div className="category-header">{cat.category}</div>
+              {cat.vendors.map(vendor => {
+                if (vendor.resources.length === 0) return null; // Hide empty vendors
+                
+                const isExpanded = expandedGroups[vendor.id] !== false; // Default to expanded
+                
+                return (
+                  <div key={vendor.id} className="vendor-group">
+                    <div 
+                      className="vendor-header" 
+                      onClick={() => setExpandedGroups(prev => ({ ...prev, [vendor.id]: !isExpanded }))}
+                    >
+                      <span className={`chevron ${isExpanded ? 'expanded' : ''}`}>▶</span>
+                      <span className="vendor-name">{vendor.label}</span>
+                      <span className="resource-count">{vendor.resources.length}</span>
+                    </div>
+                    {isExpanded && (
+                      <div className="vendor-resources">
+                        {vendor.resources.map(r => {
+                          const parts = r.typeName.split('/');
+                          const formatName = (str) => {
+                            if (str.startsWith('google_')) {
+                              return str.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                            }
+                            return str.charAt(0).toUpperCase() + str.slice(1);
+                          };
+                          
+                          const displayName = r.deviceType || (parts.length > 2 ? `${formatName(parts[parts.length-2])} / ${formatName(parts[parts.length-1])}` : formatName(parts[parts.length-1]));
+                          
+                          return (
+                            <div 
+                              key={r.typeName} 
+                              className={`resource-item ${r.typeName === selectedType ? 'active' : ''}`} 
+                              onClick={() => {
+                                setPendingFormData(null); 
+                                setSelectedType(r.typeName);
+                              }}
+                            >
+                              <span className={`badge ${r.provider}`}>{r.provider === 'external' ? r.vendor : r.provider.toUpperCase()}</span>
+                              {displayName}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ))}
         </div>
       </aside>
       

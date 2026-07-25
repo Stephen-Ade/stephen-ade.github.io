@@ -1,7 +1,10 @@
+/* --- Font Import --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 .app-container { 
   display: flex; 
   height: 100vh; 
-  font-family: sans-serif;
+  font-family: 'Inter', sans-serif;
   overflow: hidden; /* Prevents container from growing past viewport */
 }
 
@@ -17,7 +20,14 @@
 }
 .sidebar h3 { padding: 15px; margin: 0; background: #333; color: white; }
 .sidebar input { margin: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-.resource-list { overflow-y: auto; flex: 1; }
+
+.resource-list { 
+  overflow-y: auto; 
+  flex: 1; 
+  display: flex;
+  flex-direction: column;
+}
+
 .resource-item { 
   padding: 12px 15px; 
   cursor: pointer; 
@@ -30,6 +40,89 @@
 }
 .resource-item:hover { background: #e2e2e2; }
 .resource-item.active { background: #007bff; color: white; }
+
+/* --- Vendor Grouping & Dropdown Styles --- */
+.vendor-category {
+  margin-bottom: 5px;
+}
+
+.category-header {
+  padding: 10px 15px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #555;
+  background: #e4e6e8;
+  border-bottom: 1px solid #ccc;
+  border-top: 1px solid #ccc;
+  letter-spacing: 0.5px;
+  position: sticky;
+  top: 0;
+  z-index: 10; /* Keeps category visible when scrolling */
+}
+
+.vendor-group {
+  border-bottom: 1px solid #ddd;
+}
+
+.vendor-header {
+  padding: 10px 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f8f9fa;
+  transition: background 0.2s;
+  user-select: none;
+}
+
+.vendor-header:hover {
+  background: #e9ecef;
+}
+
+.chevron {
+  font-size: 10px;
+  transition: transform 0.2s ease-in-out;
+  display: inline-block;
+  color: #666;
+  width: 12px;
+  text-align: center;
+}
+
+.chevron.expanded {
+  transform: rotate(90deg);
+}
+
+.vendor-name {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+.resource-count {
+  font-size: 10px;
+  background: #dee2e6;
+  color: #495057;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.vendor-resources {
+  overflow: hidden;
+}
+
+/* Indent and style resources sitting inside a vendor dropdown */
+.vendor-resources .resource-item {
+  padding-left: 37px; /* Indent to align with vendor text */
+  border-bottom: 1px solid #eee;
+  background: white;
+}
+
+.vendor-resources .resource-item:last-child {
+  border-bottom: none;
+}
 
 /* --- Badge Updates (Purple for GCP) --- */
 .badge { 
@@ -155,7 +248,7 @@
   width: 100%;
   padding: 8px 32px 8px 10px;
   font-size: 14px;
-  font-family: inherit;
+  font-family: inherit; /* Inherits Inter from app-container */
   color: #202124;
   background-color: #fff;
   border: 1px solid #ccc;
@@ -273,7 +366,7 @@
   background-color: rgba(0, 123, 255, 0.1);
   padding: 2px 8px;
   border-radius: 4px;
-  font-family: 'SF Mono', 'Roboto Mono', 'Courier New', monospace;
+  font-family: 'SF Mono', 'Roboto Mono', 'Courier New', monospace; /* Monospace override for code */
   font-size: 13px;
   color: #1967d2;
 }
