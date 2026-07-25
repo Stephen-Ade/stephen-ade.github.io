@@ -4,62 +4,74 @@
   "vendor": "Palo Alto",
   "deviceType": "Security Profile Group",
   "supportedPlatforms": ["terraform"],
-  "description": "Groups multiple security profiles into a single object referenced by Security Policy rules.",
+  "description": "Groups multiple security profiles into a single object referenced by Security Policy rules (Provider v2.0.x).",
   "properties": {
     "name": {
       "type": "string",
-      "description": "Name of the security profile group. Use alphanumeric characters and hyphens; will be normalized to snake_case for Terraform labels."
-    },
-    "description": {
-      "type": "string",
-      "description": "Optional description of this profile group."
+      "description": "Name of the security profile group."
     },
     "scope_type": {
       "type": "string",
-      "description": "Whether this object lives in a VSYS (standalone firewall) or Device Group (Panorama-managed).",
-      "enum": ["vsys", "device_group"]
+      "description": "Scope for this object. Note: vsys is not supported for this resource in v2.0.x.",
+      "enum": ["device_group", "shared"]
     },
-    "vsys": {
+    "device_group_name": {
       "type": "string",
-      "description": "The virtual system to assign this object to.",
-      "visibleWhen": { "field": "scope_type", "value": "vsys" }
-    },
-    "device_group": {
-      "type": "string",
-      "description": "The Panorama device group to assign this object to.",
+      "description": "The Panorama device group name.",
       "visibleWhen": { "field": "scope_type", "value": "device_group" }
     },
-    "antivirus": {
+    "panorama_device": {
       "type": "string",
-      "description": "Reference to an Antivirus security profile. Leave blank to skip antivirus inspection."
+      "description": "Target Panorama device (if applicable)."
     },
-    "anti_spyware": {
-      "type": "string",
-      "description": "Reference to an Anti-Spyware security profile. Leave blank to skip anti-spyware inspection."
+    "virus": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Antivirus profiles. Comma-separated if multiple."
+    },
+    "spyware": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Anti-Spyware profiles (includes DNS Security logic). Comma-separated if multiple."
     },
     "vulnerability": {
-      "type": "string",
-      "description": "Reference to a Vulnerability protection profile. Leave blank to skip vulnerability inspection."
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Vulnerability protection profiles. Comma-separated if multiple."
     },
     "url_filtering": {
-      "type": "string",
-      "description": "Reference to a URL Filtering profile. Leave blank to skip URL filtering."
-    },
-    "wildfire_analysis": {
-      "type": "string",
-      "description": "Reference to a WildFire Analysis profile. Leave blank to skip WildFire analysis."
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "URL Filtering profiles. Comma-separated if multiple."
     },
     "file_blocking": {
-      "type": "string",
-      "description": "Reference to a File Blocking profile. Leave blank to skip file blocking."
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "File Blocking profiles. Comma-separated if multiple."
+    },
+    "wildfire_analysis": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "WildFire Analysis profiles. Comma-separated if multiple."
     },
     "data_filtering": {
-      "type": "string",
-      "description": "Reference to a Data Filtering profile. Leave blank to skip data filtering."
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Data Filtering profiles. Comma-separated if multiple."
     },
-    "dns_security": {
+    "gtp": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "GTP profiles. Comma-separated if multiple."
+    },
+    "sctp": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "SCTP profiles. Comma-separated if multiple."
+    },
+    "disable_override": {
       "type": "string",
-      "description": "Reference to a DNS Security profile. Leave blank to skip DNS security inspection."
+      "description": "Override disable setting."
     }
   },
   "required": ["name", "scope_type"]

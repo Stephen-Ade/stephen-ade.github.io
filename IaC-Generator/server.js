@@ -27,7 +27,9 @@ handlebars.registerHelper('snakeCase', function(str) {
 // --- Handlebars Helper for clean Terraform labels (Fixes DMZ-Database -> dmz_database) ---
 // MUST match frontend normalizeToSnakeCase() exactly to ensure consistency
 handlebars.registerHelper('tfLabel', function(str) {
-    if (!str) return '';
+    // BULLETPROOF: If str is missing, undefined, or an object (context leak), fallback safely
+    if (typeof str !== 'string') return 'resource';
+    
     // 1. Lowercase everything
     // 2. Replace any non-alphanumeric sequence with single underscore
     // 3. Strip leading/trailing underscores
