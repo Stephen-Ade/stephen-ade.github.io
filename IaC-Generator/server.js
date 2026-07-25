@@ -15,6 +15,7 @@ handlebars.registerHelper('safeArray', function(items) {
 });
 
 // --- Handlebars Helper to format Terraform resource names safely (Acronym Aware) ---
+// Used for AWS/GCP/Azure resource type names (e.g., aws_instance -> aws_instance)
 handlebars.registerHelper('snakeCase', function(str) {
     if (!str) return '';
     return str.replace(/[^a-zA-Z0-9]+/g, '_')
@@ -24,9 +25,13 @@ handlebars.registerHelper('snakeCase', function(str) {
 });
 
 // --- Handlebars Helper for clean Terraform labels (Fixes DMZ-Database -> dmz_database) ---
+// MUST match frontend normalizeToSnakeCase() exactly to ensure consistency
 handlebars.registerHelper('tfLabel', function(str) {
     if (!str) return '';
-    return str.replace(/-/g, '_').toLowerCase();
+    // 1. Lowercase everything
+    // 2. Replace any non-alphanumeric sequence with single underscore
+    // 3. Strip leading/trailing underscores
+    return str.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
 });
 
 // --- Handlebars Helper to check equality in templates (Required for Location blocks) ---

@@ -3,7 +3,7 @@
 /* --- Sidebar Updates (Wider & No horizontal scroll) --- */
 .sidebar { 
   width: 450px; 
-  min-width: 350px; /* Prevents it from squishing too much */
+  min-width: 350px;
   background: #f1f1f1; 
   border-right: 1px solid #ccc; 
   display: flex; 
@@ -17,9 +17,9 @@
   cursor: pointer; 
   border-bottom: 1px solid #ddd; 
   display: flex; 
-  align-items: flex-start; /* Left-aligns text if it wraps to a second line */
+  align-items: flex-start;
   gap: 10px; 
-  overflow-wrap: break-word; /* Forces long text to wrap instead of scrolling */
+  overflow-wrap: break-word;
   word-break: break-word; 
 }
 .resource-item:hover { background: #e2e2e2; }
@@ -32,11 +32,11 @@
   border-radius: 3px; 
   color: white; 
   font-weight: bold; 
-  flex-shrink: 0; /* Prevents badge from squishing when text is long */
+  flex-shrink: 0;
 }
 .badge.aws { background: #ff9900; }
 .badge.azure { background: #0078d4; }
-.badge.gcp { background: #9C27B0; /* Updated to Google Purple */ }
+.badge.gcp { background: #9C27B0; }
 .badge.external { background: #28a745; }
 
 /* --- Main Panels --- */

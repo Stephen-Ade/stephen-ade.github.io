@@ -14,28 +14,41 @@ provider "panos" {
   api_key  = var.panorama_api_key
 }
 
-resource "panos_address" "{{snakeCase name}}" {
-  {{#if (eq scope_type "device_group")}}
+resource "panos_address" "{{tfLabel name}}" {
+  {{#if location}}
   location = {
+    {{#eq location.scope_type 'device_group'}}
     device_group = {
-      name = "{{device_group_name}}"
+      name = "{{location.device_group.name}}"
     }
-  }
-  {{/if}}
-  {{#if (eq scope_type "shared")}}
-  location = { shared = true }
-  {{/if}}
-  {{#if (eq scope_type "vsys")}}
-  location = {
-    vsys = "{{vsys_name}}"
+    {{/eq}}
+    {{#eq location.scope_type 'vsys'}}
+    vsys = {
+      name = "{{location.vsys.name}}"
+    }
+    {{/eq}}
+    {{#eq location.scope_type 'shared'}}
+    shared = {}
+    {{/eq}}
   }
   {{/if}}
 
-  name        = "{{name}}"
-  description = "{{description}}"
-  
-  {{address_type}} = "{{value}}"
-  
+  name = "{{name}}"
+  {{#if description}}description = "{{description}}"{{/if}}
+
+  {{#eq address_type 'ip_netmask'}}
+  ip_netmask = "{{ip_netmask}}"
+  {{/eq}}
+  {{#eq address_type 'ip_range'}}
+  ip_range = "{{ip_range}}"
+  {{/eq}}
+  {{#eq address_type 'fqdn'}}
+  fqdn = "{{fqdn}}"
+  {{/eq}}
+  {{#eq address_type 'ip_wildcard'}}
+  ip_wildcard = "{{ip_wildcard}}"
+  {{/eq}}
+
+  {{#if disable_override}}disable_override = "{{disable_override}}"{{/if}}
   {{#if tags}}tags = {{{safeArray tags}}}{{/if}}
-  {{#if disable_override}}disable_override = {{disable_override}}{{/if}}
 }

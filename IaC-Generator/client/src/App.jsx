@@ -28,7 +28,6 @@ const unflattenObject = (obj) => {
 
 // --- UPDATED: Parser that extracts the target module from the text file ---
 const parseTextToConfig = (text) => {
-  // BULLETPROOF: Strip Windows UTF-8 BOM
   text = text.replace(/^\uFEFF/, '');
   const lines = text.split(/\r?\n/); 
   
@@ -36,11 +35,10 @@ const parseTextToConfig = (text) => {
   const config = {};
   
   lines.forEach(line => {
-    // Check for module routing tag: @module: panos_address
     const moduleMatch = line.match(/^@module:\s*(.*)$/);
     if (moduleMatch) {
       targetModule = moduleMatch[1].trim();
-      return; // Don't process this line as config data
+      return;
     }
 
     if (!line.trim()) return;
@@ -49,11 +47,8 @@ const parseTextToConfig = (text) => {
     
     let key = match[1].trim().replace(/^\uFEFF/, ''); 
     let value = match[2].trim();
-    
-    // Strip out comments like "(Note: ...)"
     value = value.replace(/\s*\(.*?\)\s*/g, '').trim();
     
-    // If there are commas, convert to an array automatically
     if (value.includes(',')) {
       config[key] = value.split(',').map(v => v.trim()).filter(v => v);
     } else {
@@ -64,7 +59,42 @@ const parseTextToConfig = (text) => {
   return { targetModule, config };
 };
 
-// --- UPDATED: Enhanced FormField with enum, boolean, and conditional visibility support ---
+// --- HELPER: Detect PAN-OS string fields that should be yes/no dropdowns ---
+// The PAN-OS provider uses strings like "yes"/"no" instead of true/false
+const PANOS_YES_NO_FIELDS = [
+  'disable_override',
+  'enabled', 
+  'disabled',
+  'enable',
+  'disable'
+];
+
+const isPanosYesNoField = (name, schema) => {
+  if (schema.type !== 'string') return false;
+  const fieldName = name.split('.').pop().toLowerCase();
+  return PANOS_YES_NO_FIELDS.includes(fieldName);
+};
+
+// --- HELPER: Detect address-type value fields that need dynamic placeholders ---
+const ADDRESS_TYPE_FIELDS = ['ip_netmask', 'ip_range', 'fqdn', 'ip_wildcard'];
+
+const isAddressValueField = (name) => {
+  const fieldName = name.split('.').pop().toLowerCase();
+  return ADDRESS_TYPE_FIELDS.includes(fieldName);
+};
+
+const getAddressPlaceholder = (name) => {
+  const fieldName = name.split('.').pop().toLowerCase();
+  switch (fieldName) {
+    case 'ip_netmask': return '172.16.10.50/32';
+    case 'ip_range': return '172.16.10.50-172.16.10.60';
+    case 'fqdn': return 'db.example.com';
+    case 'ip_wildcard': return '10.20.0.0/0.0.255.255';
+    default: return '';
+  }
+};
+
+// --- UPDATED: Enhanced FormField with enum, boolean, PAN-OS yes/no, and conditional visibility ---
 const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
   const isRequired = requiredList.includes(name);
   const baseDescription = schema.description || '';
@@ -74,11 +104,9 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
   const displayName = name.split('.').pop();
 
   // --- CONDITIONAL VISIBILITY ---
-  // Check for visibleWhen: { field: "location.scope_type", value: "device_group" }
   if (schema.visibleWhen) {
     const { field, value } = schema.visibleWhen;
     const fieldValue = formData[field];
-    // Hide if the condition field is set but doesn't match
     if (fieldValue !== undefined && fieldValue !== value) {
       return null;
     }
@@ -143,17 +171,17 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
             const updated = { ...formData, [name]: newVal };
             
             // Auto-clear dependent fields when scope_type changes
-            if (name.endsWith('.scope_type') || name === 'scope_type') {
+            if (displayName === 'scope_type') {
               const basePath = name.includes('.') 
                 ? name.substring(0, name.lastIndexOf('.')) 
                 : '';
               const dgPath = basePath ? `${basePath}.device_group.name` : 'device_group.name';
               const vsysPath = basePath ? `${basePath}.vsys.name` : 'vsys.name';
               
-              if (newVal !== 'device_group') {
+              if (newVal !== 'device_group' && updated[dgPath]) {
                 delete updated[dgPath];
               }
-              if (newVal !== 'vsys') {
+              if (newVal !== 'vsys' && updated[vsysPath]) {
                 delete updated[vsysPath];
               }
             }
@@ -172,6 +200,34 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
     );
   }
 
+  // --- PAN-OS YES/NO STRING FIELD (dropdown) ---
+  // Provider uses "yes"/"no" strings instead of boolean true/false
+  if (isPanosYesNoField(name, schema)) {
+    return (
+      <div className="form-group">
+        <label title={tooltipText}>
+          {displayName} {isRequired && <span className="req">*</span>}
+          <span className="type-badge">yes/no</span>
+        </label>
+        <select
+          className="select-input"
+          value={formData[name] || ''}
+          onChange={(e) => setFormData({ ...formData, [name]: e.target.value })}
+          title={tooltipText}
+        >
+          <option value="">-- Not Set (omit from HCL) --</option>
+          <option value="yes">yes</option>
+          <option value="no">no</option>
+        </select>
+        {baseDescription && (
+          <span className="help-text">
+            {baseDescription} (PAN-OS uses quoted string values: "yes" or "no")
+          </span>
+        )}
+      </div>
+    );
+  }
+
   // --- ARRAY FIELD (comma-separated input for tags, etc.) ---
   if (schema.type === 'array') {
     const currentValue = formData[name];
@@ -183,7 +239,7 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
       <div className="form-group">
         <label title={tooltipText}>
           {displayName} {isRequired && <span className="req">*</span>}
-          <span className="type-badge">array</span>
+          <span className="type-badge">list</span>
         </label>
         <input
           type="text"
@@ -205,6 +261,9 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
 
   // --- DEFAULT: TEXT INPUT (string, number, etc.) ---
   const currentValue = formData[name] || '';
+  const placeholder = isAddressValueField(name) 
+    ? getAddressPlaceholder(name) 
+    : `(${schema.type || 'string'})`;
 
   return (
     <div className="form-group">
@@ -214,7 +273,7 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
       <input
         type="text"
         title={tooltipText}
-        placeholder={`(${schema.type || 'string'})`}
+        placeholder={placeholder}
         value={currentValue}
         onChange={(e) => setFormData({ ...formData, [name]: e.target.value })}
       />
@@ -258,7 +317,7 @@ function App() {
     });
   }, [selectedType, ingestTrigger]);
 
-  // --- UPDATED: File Upload Handler that uses the dynamic module ---
+  // --- File Upload Handler ---
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -268,11 +327,8 @@ function App() {
       const text = e.target.result;
       const { targetModule, config } = parseTextToConfig(text);
       
-      // 1. Store parsed data
       setPendingFormData(config);
-      // 2. Switch to the extracted module, or fallback to security policy rules
       setSelectedType(targetModule || 'panos_security_policy_rules');
-      // 3. Bump the trigger counter to GUARANTEE the effect above runs
       setIngestTrigger(prev => prev + 1); 
     };
     reader.readAsText(file);
@@ -314,11 +370,9 @@ function App() {
 
   // --- HELPER: Get the object name from formData for label preview ---
   const getObjectLabel = () => {
-    // Check for common name field patterns
     const nameValue = formData.name || formData['object.name'] || '';
     if (!nameValue) return null;
     
-    // Extract resource type from selectedType
     const resourceType = selectedType?.split('/').pop() || 'resource';
     return `${resourceType}.${normalizeToSnakeCase(nameValue)}`;
   };
@@ -384,7 +438,7 @@ function App() {
               </div>
             </div>
 
-            {/* --- NEW: Resource Label Preview for PAN-OS resources --- */}
+            {/* Resource Label Preview for PAN-OS resources */}
             {selectedType?.startsWith('panos_') && getObjectLabel() && (
               <div className="label-preview">
                 <span className="preview-label">Terraform Resource Label:</span>
