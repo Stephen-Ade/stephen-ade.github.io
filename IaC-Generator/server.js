@@ -5,13 +5,14 @@ const fs = require('fs');
 const handlebars = require('handlebars');
 
 // --- Handlebars Helper to safely output arrays from text ingestion ---
+// BULLETPROOF: Wraps in SafeString to prevent Handlebars from HTML-escaping quotes into &quot;
 handlebars.registerHelper('safeArray', function(items) {
-    if (!items) return '[]';
-    if (typeof items === 'string') return `["${items}"]`;
+    if (!items) return new handlebars.SafeString('[]');
+    if (typeof items === 'string') return new handlebars.SafeString(`["${items}"]`);
     if (Array.isArray(items)) {
-        return `[${items.map(i => `"${i}"`).join(', ')}]`;
+        return new handlebars.SafeString(`[${items.map(i => `"${i}"`).join(', ')}]`);
     }
-    return '[]';
+    return new handlebars.SafeString('[]');
 });
 
 // --- Handlebars Helper to format Terraform resource names safely (Acronym Aware) ---

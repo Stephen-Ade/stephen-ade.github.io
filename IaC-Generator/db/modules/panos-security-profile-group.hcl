@@ -9,10 +9,19 @@ terraform {
   }
 }
 
-# provider "panos" {
-#   hostname = var.panorama_hostname
-#   api_key  = var.panorama_api_key
-# }
+variable "panorama_hostname" {
+  type = string
+}
+
+variable "panorama_api_key" {
+  type      = string
+  sensitive = true
+}
+
+provider "panos" {
+  hostname = var.panorama_hostname
+  api_key  = var.panorama_api_key
+}
 
 resource "panos_security_profile_group" "{{tfLabel name}}" {
 {{#eq scope_type "device_group"}}
