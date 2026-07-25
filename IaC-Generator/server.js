@@ -19,14 +19,15 @@ handlebars.registerHelper('safeArray', function(items) {
 // --- Handlebars Helper to format Terraform resource names safely (Acronym Aware) ---
 handlebars.registerHelper('snakeCase', function(str) {
     if (!str) return '';
-    // 1. Normalize spaces/underscores/hyphens to underscores
-    // 2. Add underscore before a lowercase-to-uppercase transition (e.g., aB -> a_b)
-    // 3. Add underscore before an acronym-to-word transition (e.g., DMZD -> DMZ_D)
-    // 4. Lowercase everything
-    return str.replace(/[^a-zA-Z0-9]+/g, '_')
+    return str.replace(/[^a-zA-Z0-0-9]+/g, '_')
               .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
               .replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
               .toLowerCase();
+});
+
+// --- Handlebars Helper to check equality in templates (Required for Location blocks) ---
+handlebars.registerHelper('eq', function(a, b) {
+    return a === b;
 });
 
 const app = express();
