@@ -103,11 +103,18 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
   // Get display name (last part of dotted path for nested fields)
   const displayName = name.split('.').pop();
 
-  // --- CONDITIONAL VISIBILITY ---
+  // --- CONDITIONAL VISIBILITY (UPGRADED FOR AND LOGIC) ---
+  // Supports single object { field, value } or array of objects [ {field, value}, ... ]
   if (schema.visibleWhen) {
-    const { field, value } = schema.visibleWhen;
-    const fieldValue = formData[field];
-    if (fieldValue !== undefined && fieldValue !== value) {
+    const conditions = Array.isArray(schema.visibleWhen) ? schema.visibleWhen : [schema.visibleWhen];
+    const isVisible = conditions.every(({ field, value }) => {
+      const fieldValue = formData[field];
+      // If the parent condition field doesn't exist yet, default to hidden (safe)
+      if (fieldValue === undefined) return false;
+      return fieldValue === value;
+    });
+
+    if (!isVisible) {
       return null;
     }
   }

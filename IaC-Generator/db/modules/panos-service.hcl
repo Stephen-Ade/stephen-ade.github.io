@@ -14,37 +14,56 @@ provider "panos" {
   api_key  = var.panorama_api_key
 }
 
-resource "panos_service" "{{snakeCase name}}" {
-  {{#if (eq scope_type "device_group")}}
+resource "panos_service" "{{tfLabel name}}" {
+  {{#if location}}
   location = {
+    {{#eq location.scope_type 'device_group'}}
     device_group = {
-      name = "{{device_group_name}}"
+      name = "{{location.device_group.name}}"
+      {{#if location.device_group.panorama_device}}panorama_device = "{{location.device_group.panorama_device}}"{{/if}}
     }
-  }
-  {{/if}}
-  {{#if (eq scope_type "shared")}}
-  location = { shared = true }
-  {{/if}}
-  {{#if (eq scope_type "vsys")}}
-  location = {
-    vsys = "{{vsys_name}}"
+    {{/eq}}
+    {{#eq location.scope_type 'vsys'}}
+    vsys = {
+      name = "{{location.vsys.name}}"
+      {{#if location.vsys.ngfw_device}}ngfw_device = "{{location.vsys.ngfw_device}}"{{/if}}
+    }
+    {{/eq}}
+    {{#eq location.scope_type 'shared'}}
+    shared = {}
+    {{/eq}}
   }
   {{/if}}
 
-  name        = "{{name}}"
-  description = "{{description}}"
+  name = "{{name}}"
+  {{#if description}}description = "{{description}}"{{/if}}
 
   protocol = {
-    {{protocol}} = {
-    {{#if destination_port}}destination_port = "{{destination_port}}"{{/if}}
-    {{#if source_port}}source_port      = "{{source_port}}"{{/if}}
+    {{#eq protocol.protocol_type 'tcp'}}
+    tcp = {
+      destination_port = "{{protocol.tcp.destination_port}}"
+      {{#if protocol.tcp.source_port}}source_port      = "{{protocol.tcp.source_port}}"{{/if}}
+      {{#if protocol.tcp.enable_timeout_override}}
+      override = {
+        {{#if protocol.tcp.timeout}}timeout           = {{protocol.tcp.timeout}}{{/if}}
+        {{#if protocol.tcp.halfclose_timeout}}halfclose_timeout = {{protocol.tcp.halfclose_timeout}}{{/if}}
+        {{#if protocol.tcp.timewait_timeout}}timewait_timeout  = {{protocol.tcp.timewait_timeout}}{{/if}}
+      }
+      {{/if}}
     }
+    {{/eq}}
+    {{#eq protocol.protocol_type 'udp'}}
+    udp = {
+      destination_port = "{{protocol.udp.destination_port}}"
+      {{#if protocol.udp.enable_timeout_override}}
+      override = {
+        {{#if protocol.udp.timeout}}timeout = {{protocol.udp.timeout}}{{/if}}
+      }
+      {{/if}}
+    }
+    {{/eq}}
   }
 
-  {{#if override_timeout}}override_timeout       = {{override_timeout}}{{/if}}
-  {{#if halfclose_timeout}}halfclose_timeout      = {{halfclose_timeout}}{{/if}}
-  {{#if timewait_timeout}}timewait_timeout        = {{timewait_timeout}}{{/if}}
-  
+  {{#if disable_override}}disable_override = "{{disable_override}}"{{/if}}
   {{#if tags}}tags = {{{safeArray tags}}}{{/if}}
-  {{#if disable_override}}disable_override = {{disable_override}}{{/if}}
 }
