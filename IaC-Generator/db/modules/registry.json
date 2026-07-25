@@ -23,6 +23,14 @@
       "supportedPlatforms": ["terraform"],
       "schemaFile": "panos-service.schema.json",
       "templateFile": "panos-service.hcl"
+    },
+    {
+      "id": "panos_nat_policy_rules",
+      "vendor": "Palo Alto",
+      "deviceType": "NAT Policy Rules",
+      "supportedPlatforms": ["terraform"],
+      "schemaFile": "panos-nat-policy-rules.schema.json",
+      "templateFile": "panos-nat-policy-rules.hcl"
     }
   ]
 }

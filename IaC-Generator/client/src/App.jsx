@@ -49,7 +49,12 @@ const parseTextToConfig = (text) => {
     let value = match[2].trim();
     value = value.replace(/\s*\(.*?\)\s*/g, '').trim();
     
-    if (value.includes(',')) {
+    // FIX: Convert string booleans to actual booleans so React checkboxes work correctly
+    if (value.toLowerCase() === 'true') {
+      value = true;
+    } else if (value.toLowerCase() === 'false') {
+      value = false;
+    } else if (value.includes(',')) {
       config[key] = value.split(',').map(v => v.trim()).filter(v => v);
     } else {
       config[key] = value;

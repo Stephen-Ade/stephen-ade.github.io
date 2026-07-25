@@ -46,7 +46,6 @@ resource "panos_nat_policy_rules" "{{tfLabel name}}" {
     {
       name                  = "{{name}}"
       {{#if description}}description           = "{{description}}"{{/if}}
-      {{#if disabled}}disabled              = {{disabled}}{{/if}}
       
       source_zones          = {{{safeArray source_zones}}}
       destination_zone      = {{{safeArray destination_zone}}}
@@ -56,9 +55,8 @@ resource "panos_nat_policy_rules" "{{tfLabel name}}" {
       to_interface          = "{{to_interface}}"
       nat_type              = "{{nat_type}}"
 
-      {{#if source_translation_type}}
+      {{#eq source_translation_type 'dynamic_ip_and_port'}}
       source_translation = {
-        {{#eq source_translation_type 'dynamic_ip_and_port'}}
         dynamic_ip_and_port = {
           {{#eq source_dyn_ip_port_mode 'interface_address'}}
           interface_address = {
@@ -70,20 +68,23 @@ resource "panos_nat_policy_rules" "{{tfLabel name}}" {
           translated_address = {{{safeArray source_dyn_ip_port_addresses}}}
           {{/eq}}
         }
-        {{/eq}}
-        {{#eq source_translation_type 'dynamic_ip'}}
+      }
+      {{/eq}}
+      {{#eq source_translation_type 'dynamic_ip'}}
+      source_translation = {
         dynamic_ip = {
           translated_address = {{{safeArray source_dynamic_ip_addresses}}}
         }
-        {{/eq}}
-        {{#eq source_translation_type 'static_ip'}}
+      }
+      {{/eq}}
+      {{#eq source_translation_type 'static_ip'}}
+      source_translation = {
         static_ip = {
           translated_address = "{{static_translated_address}}"
           bi_directional      = "{{bi_directional}}"
         }
-        {{/eq}}
       }
-      {{/if}}
+      {{/eq}}
 
       {{#if enable_destination_translation}}
       destination_translation = {
@@ -92,6 +93,7 @@ resource "panos_nat_policy_rules" "{{tfLabel name}}" {
       }
       {{/if}}
 
+      {{#if disabled}}disabled              = {{disabled}}{{/if}}
       {{#if tag}}tag      = {{{safeArray tag}}}{{/if}}
       {{#if group_tag}}group_tag = "{{group_tag}}"{{/if}}
     }
