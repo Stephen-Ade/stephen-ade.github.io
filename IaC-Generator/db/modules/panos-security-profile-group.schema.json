@@ -1,119 +1,66 @@
 {
-  "name": "panos_security_profile_group",
-  "friendlyName": "Security Profile Group",
-  "description": "Groups multiple security profiles (Antivirus, Anti-Spyware, Vulnerability, URL Filtering, WildFire, File Blocking, Data Filtering, DNS Security) into a single object that can be referenced by Security Policy rules.",
-  "category": "Objects",
-  "icon": "shield-halved",
-  "fields": [
-    {
-      "id": "name",
-      "label": "Name",
-      "type": "text",
-      "required": true,
-      "placeholder": "e.g., high-security-profiles",
-      "helpText": "Name of the security profile group. Use alphanumeric characters and hyphens; will be normalized to snake_case for Terraform labels."
+  "typeName": "panos/panos_security_profile_group",
+  "provider": "panos",
+  "vendor": "Palo Alto",
+  "deviceType": "Security Profile Group",
+  "supportedPlatforms": ["terraform"],
+  "description": "Groups multiple security profiles into a single object referenced by Security Policy rules.",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the security profile group. Use alphanumeric characters and hyphens; will be normalized to snake_case for Terraform labels."
     },
-    {
-      "id": "description",
-      "label": "Description",
-      "type": "text",
-      "required": false,
-      "placeholder": "Optional description of this profile group"
+    "description": {
+      "type": "string",
+      "description": "Optional description of this profile group."
     },
-    {
-      "id": "scope_type",
-      "label": "Scope",
-      "type": "select",
-      "required": true,
-      "defaultValue": "vsys",
-      "options": [
-        { "value": "vsys", "label": "Virtual System (VSYS)" },
-        { "value": "device_group", "label": "Device Group (Panorama)" }
-      ],
-      "helpText": "Whether this object lives in a VSYS (standalone firewall) or Device Group (Panorama-managed)."
+    "scope_type": {
+      "type": "string",
+      "description": "Whether this object lives in a VSYS (standalone firewall) or Device Group (Panorama-managed).",
+      "enum": ["vsys", "device_group"]
     },
-    {
-      "id": "vsys",
-      "label": "VSYS",
-      "type": "text",
-      "required": false,
-      "defaultValue": "vsys1",
-      "placeholder": "e.g., vsys1, vsys2, vsys3",
-      "visibleWhen": { "field": "scope_type", "equals": "vsys" },
-      "helpText": "The virtual system to assign this object to."
+    "vsys": {
+      "type": "string",
+      "description": "The virtual system to assign this object to.",
+      "visibleWhen": { "field": "scope_type", "value": "vsys" }
     },
-    {
-      "id": "device_group",
-      "label": "Device Group",
-      "type": "text",
-      "required": false,
-      "placeholder": "e.g., Production-Firewalls",
-      "visibleWhen": { "field": "scope_type", "equals": "device_group" },
-      "helpText": "The Panorama device group to assign this object to."
+    "device_group": {
+      "type": "string",
+      "description": "The Panorama device group to assign this object to.",
+      "visibleWhen": { "field": "scope_type", "value": "device_group" }
     },
-    {
-      "id": "antivirus",
-      "label": "Antivirus Profile",
-      "type": "text",
-      "required": false,
-      "placeholder": "e.g., strict, default",
-      "helpText": "Reference to an Antivirus security profile. Leave blank to skip antivirus inspection for rules using this group."
+    "antivirus": {
+      "type": "string",
+      "description": "Reference to an Antivirus security profile. Leave blank to skip antivirus inspection."
     },
-    {
-      "id": "anti_spyware",
-      "label": "Anti-Spyware Profile",
-      "type": "text",
-      "required": false,
-      "placeholder": "e.g., strict, default",
-      "helpText": "Reference to an Anti-Spyware security profile. Leave blank to skip anti-spyware inspection."
+    "anti_spyware": {
+      "type": "string",
+      "description": "Reference to an Anti-Spyware security profile. Leave blank to skip anti-spyware inspection."
     },
-    {
-      "id": "vulnerability",
-      "label": "Vulnerability Profile",
-      "type": "text",
-      "required": false,
-      "placeholder": "e.g., strict, default",
-      "helpText": "Reference to a Vulnerability protection profile. Leave blank to skip vulnerability inspection."
+    "vulnerability": {
+      "type": "string",
+      "description": "Reference to a Vulnerability protection profile. Leave blank to skip vulnerability inspection."
     },
-    {
-      "id": "url_filtering",
-      "label": "URL Filtering Profile",
-      "type": "text",
-      "required": false,
-      "placeholder": "e.g., default, blocking",
-      "helpText": "Reference to a URL Filtering profile. Leave blank to skip URL filtering."
+    "url_filtering": {
+      "type": "string",
+      "description": "Reference to a URL Filtering profile. Leave blank to skip URL filtering."
     },
-    {
-      "id": "wildfire_analysis",
-      "label": "WildFire Analysis Profile",
-      "type": "text",
-      "required": false,
-      "placeholder": "e.g., default, strict",
-      "helpText": "Reference to a WildFire Analysis profile. Leave blank to skip WildFire analysis."
+    "wildfire_analysis": {
+      "type": "string",
+      "description": "Reference to a WildFire Analysis profile. Leave blank to skip WildFire analysis."
     },
-    {
-      "id": "file_blocking",
-      "label": "File Blocking Profile",
-      "type": "text",
-      "required": false,
-      "placeholder": "e.g., default, strict",
-      "helpText": "Reference to a File Blocking profile. Leave blank to skip file blocking."
+    "file_blocking": {
+      "type": "string",
+      "description": "Reference to a File Blocking profile. Leave blank to skip file blocking."
     },
-    {
-      "id": "data_filtering",
-      "label": "Data Filtering Profile",
-      "type": "text",
-      "required": false,
-      "placeholder": "e.g., default",
-      "helpText": "Reference to a Data Filtering profile. Leave blank to skip data filtering."
+    "data_filtering": {
+      "type": "string",
+      "description": "Reference to a Data Filtering profile. Leave blank to skip data filtering."
     },
-    {
-      "id": "dns_security",
-      "label": "DNS Security Profile",
-      "type": "text",
-      "required": false,
-      "placeholder": "e.g., default",
-      "helpText": "Reference to a DNS Security profile. Leave blank to skip DNS security inspection."
+    "dns_security": {
+      "type": "string",
+      "description": "Reference to a DNS Security profile. Leave blank to skip DNS security inspection."
     }
-  ]
+  },
+  "required": ["name", "scope_type"]
 }

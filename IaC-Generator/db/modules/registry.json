@@ -5,7 +5,7 @@
       "vendor": "Palo Alto",
       "deviceType": "Security Policy Rules",
       "supportedPlatforms": ["terraform"],
-      "schemaFile": "panos-security-policy-rules.schema",
+      "schemaFile": "panos-security-policy-rules.schema.json",
       "templateFile": "panos-security-policy-rules.hcl"
     },
     {
@@ -13,7 +13,7 @@
       "vendor": "Palo Alto",
       "deviceType": "Address Object",
       "supportedPlatforms": ["terraform"],
-      "schemaFile": "panos-address.schema",
+      "schemaFile": "panos-address.schema.json",
       "templateFile": "panos-address.hcl"
     },
     {
@@ -21,7 +21,7 @@
       "vendor": "Palo Alto",
       "deviceType": "Service Object",
       "supportedPlatforms": ["terraform"],
-      "schemaFile": "panos-service.schema",
+      "schemaFile": "panos-service.schema.json",
       "templateFile": "panos-service.hcl"
     },
     {
@@ -29,7 +29,7 @@
       "vendor": "Palo Alto",
       "deviceType": "NAT Policy Rules",
       "supportedPlatforms": ["terraform"],
-      "schemaFile": "panos-nat-policy-rules.schema",
+      "schemaFile": "panos-nat-policy-rules.schema.json",
       "templateFile": "panos-nat-policy-rules.hcl"
     },
     {
@@ -37,7 +37,7 @@
       "vendor": "Palo Alto",
       "deviceType": "Security Profile Group",
       "supportedPlatforms": ["terraform"],
-      "schemaFile": "panos-security-profile-group.schema",
+      "schemaFile": "panos-security-profile-group.schema.json",
       "templateFile": "panos-security-profile-group.hcl"
     }
   ]
