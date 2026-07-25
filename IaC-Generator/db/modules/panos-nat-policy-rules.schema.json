@@ -1,0 +1,219 @@
+{
+  "typeName": "panos_nat_policy_rules",
+  "provider": "external",
+  "vendor": "Palo Alto",
+  "deviceType": "NAT Policy Rules",
+  "supportedPlatforms": ["terraform"],
+  "required": ["name", "location", "position", "source_zones", "destination_zone", "source_addresses", "destination_addresses"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the NAT rule (also used to generate the Terraform resource label)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of the NAT rule"
+    },
+    "disabled": {
+      "type": "boolean",
+      "description": "Set to true to disable this rule"
+    },
+    "tag": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Comma-separated list of tags (Note: provider uses singular 'tag', not 'tags')"
+    },
+    "group_tag": {
+      "type": "string",
+      "description": "Group tag for the rule"
+    },
+    "location": {
+      "type": "object",
+      "description": "Panorama/Firewall location placement",
+      "properties": {
+        "scope_type": {
+          "type": "string",
+          "enum": ["device_group", "shared", "vsys"],
+          "description": "The scope/location type for this object"
+        },
+        "device_group": {
+          "type": "object",
+          "description": "Device group location (Panorama only)",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Device group name (e.g., Corp-DMZ)",
+              "visibleWhen": { "field": "location.scope_type", "value": "device_group" }
+            },
+            "rulebase": {
+              "type": "string",
+              "enum": ["pre-rulebase", "post-rulebase"],
+              "description": "Panorama rulebase",
+              "visibleWhen": { "field": "location.scope_type", "value": "device_group" }
+            },
+            "panorama_device": {
+              "type": "string",
+              "description": "Optional specific Panorama device serial number",
+              "visibleWhen": { "field": "location.scope_type", "value": "device_group" }
+            }
+          }
+        },
+        "shared": {
+          "type": "object",
+          "description": "Shared location (Panorama only)",
+          "properties": {
+            "rulebase": {
+              "type": "string",
+              "enum": ["pre-rulebase", "post-rulebase"],
+              "description": "Panorama rulebase",
+              "visibleWhen": { "field": "location.scope_type", "value": "shared" }
+            }
+          }
+        },
+        "vsys": {
+          "type": "object",
+          "description": "Virtual system location (Firewall only)",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "VSYS name (e.g., vsys1)",
+              "visibleWhen": { "field": "location.scope_type", "value": "vsys" }
+            },
+            "ngfw_device": {
+              "type": "string",
+              "description": "Optional specific NGFW device serial number",
+              "visibleWhen": { "field": "location.scope_type", "value": "vsys" }
+            }
+          }
+        }
+      }
+    },
+    "position": {
+      "type": "object",
+      "description": "Rule positioning in the rulebase",
+      "properties": {
+        "where": {
+          "type": "string",
+          "enum": ["first", "last", "before", "after"],
+          "description": "Where to place the rule"
+        },
+        "pivot": {
+          "type": "string",
+          "description": "The name of the rule to position relative to",
+          "visibleWhen": [
+            { "field": "position.where", "value": "before" },
+            { "field": "position.where", "value": "after" }
+          ]
+        },
+        "directly": {
+          "type": "boolean",
+          "description": "Position directly adjacent to the pivot rule",
+          "visibleWhen": [
+            { "field": "position.where", "value": "before" },
+            { "field": "position.where", "value": "after" }
+          ]
+        }
+      }
+    },
+    "source_zones": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Comma-separated list of source zones (e.g., trust, dmz)"
+    },
+    "destination_zone": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Comma-separated list of destination zones (Singular name in provider, but accepts a list)"
+    },
+    "source_addresses": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Comma-separated list of source addresses"
+    },
+    "destination_addresses": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Comma-separated list of destination addresses"
+    },
+    "service": {
+      "type": "string",
+      "description": "Service object name or 'any'"
+    },
+    "to_interface": {
+      "type": "string",
+      "description": "Egress interface name or 'any'"
+    },
+    "nat_type": {
+      "type": "string",
+      "enum": ["ipv4", "ipv6", "nptv6"],
+      "description": "Type of NAT"
+    },
+    "source_translation_type": {
+      "type": "string",
+      "enum": ["none", "dynamic_ip_and_port", "dynamic_ip", "static_ip"],
+      "description": "UI abstraction: Select the source translation mode"
+    },
+    "source_dyn_ip_port_mode": {
+      "type": "string",
+      "enum": ["interface_address", "translated_address"],
+      "description": "Dynamic IP & Port: Use interface IP or an address pool?",
+      "visibleWhen": { "field": "source_translation_type", "value": "dynamic_ip_and_port" }
+    },
+    "source_interface": {
+      "type": "string",
+      "description": "Interface name for dynamic IP & Port (e.g., ethernet1/1)",
+      "visibleWhen": [
+        { "field": "source_translation_type", "value": "dynamic_ip_and_port" },
+        { "field": "source_dyn_ip_port_mode", "value": "interface_address" }
+      ]
+    },
+    "source_interface_ip": {
+      "type": "string",
+      "description": "Specific IP on the interface (optional)",
+      "visibleWhen": [
+        { "field": "source_translation_type", "value": "dynamic_ip_and_port" },
+        { "field": "source_dyn_ip_port_mode", "value": "interface_address" }
+      ]
+    },
+    "source_dyn_ip_port_addresses": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Comma-separated translated address pool names for Dynamic IP & Port",
+      "visibleWhen": [
+        { "field": "source_translation_type", "value": "dynamic_ip_and_port" },
+        { "field": "source_dyn_ip_port_mode", "value": "translated_address" }
+      ]
+    },
+    "source_dynamic_ip_addresses": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Comma-separated translated address pool names for Dynamic IP",
+      "visibleWhen": { "field": "source_translation_type", "value": "dynamic_ip" }
+    },
+    "static_translated_address": {
+      "type": "string",
+      "description": "Translated address for Static IP NAT",
+      "visibleWhen": { "field": "source_translation_type", "value": "static_ip" }
+    },
+    "bi_directional": {
+      "type": "string",
+      "enum": ["yes", "no"],
+      "description": "Enable bi-directional Static NAT (PAN-OS quoted string: yes/no)",
+      "visibleWhen": { "field": "source_translation_type", "value": "static_ip" }
+    },
+    "enable_destination_translation": {
+      "type": "boolean",
+      "description": "Enable destination NAT translation"
+    },
+    "destination_translated_address": {
+      "type": "string",
+      "description": "Translated destination address object name or IP",
+      "visibleWhen": { "field": "enable_destination_translation", "value": true }
+    },
+    "destination_translated_port": {
+      "type": "string",
+      "description": "Translated port number (numeric, will be unquoted in HCL)",
+      "visibleWhen": { "field": "enable_destination_translation", "value": true }
+    }
+  }
+}
