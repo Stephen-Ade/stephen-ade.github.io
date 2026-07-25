@@ -35,7 +35,12 @@ handlebars.registerHelper('tfLabel', function(str) {
 });
 
 // --- Handlebars Helper to check equality in templates (Required for Location blocks) ---
-handlebars.registerHelper('eq', function(a, b) {
+handlebars.registerHelper('eq', function(a, b, options) {
+    // BULLETPROOF: Explicitly handle block helper {{#eq}} 
+    // This guarantees the word "true" or "false" can NEVER leak into the generated HCL
+    if (options && options.fn) {
+        return (a === b) ? options.fn(this) : '';
+    }
     return a === b;
 });
 
