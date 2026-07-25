@@ -7,9 +7,7 @@ const handlebars = require('handlebars');
 // --- Handlebars Helper to safely output arrays from text ingestion ---
 handlebars.registerHelper('safeArray', function(items) {
     if (!items) return '[]';
-    // If the text parser passed a string, wrap it in an array
     if (typeof items === 'string') return `["${items}"]`;
-    // If it's an actual array, format it properly
     if (Array.isArray(items)) {
         return `[${items.map(i => `"${i}"`).join(', ')}]`;
     }
@@ -19,10 +17,16 @@ handlebars.registerHelper('safeArray', function(items) {
 // --- Handlebars Helper to format Terraform resource names safely (Acronym Aware) ---
 handlebars.registerHelper('snakeCase', function(str) {
     if (!str) return '';
-    return str.replace(/[^a-zA-Z0-0-9]+/g, '_')
+    return str.replace(/[^a-zA-Z0-9]+/g, '_')
               .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
               .replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
               .toLowerCase();
+});
+
+// --- Handlebars Helper for clean Terraform labels (Fixes DMZ-Database -> dmz_database) ---
+handlebars.registerHelper('tfLabel', function(str) {
+    if (!str) return '';
+    return str.replace(/-/g, '_').toLowerCase();
 });
 
 // --- Handlebars Helper to check equality in templates (Required for Location blocks) ---
@@ -74,19 +78,16 @@ function compileTerraformProps(schemaProps, configNode, indent) {
         const propSchema = schemaProps?.[key];
 
         if (typeof value === 'object' && !Array.isArray(value)) {
-            // Nested Object -> Create a Terraform block
             hcl += `${indent}${tfKey} {\n`;
             hcl += compileTerraformProps(propSchema?.properties || {}, value, indent + '  ');
             hcl += `${indent}}\n`;
         } else if (Array.isArray(value) && value.length > 0 && typeof value[0] === 'object') {
-            // Array of Objects -> Create multiple Terraform blocks
             value.forEach(item => {
                 hcl += `${indent}${tfKey} {\n`;
                 hcl += compileTerraformProps(propSchema?.properties || {}, item, indent + '  ');
                 hcl += `${indent}}\n`;
             });
         } else {
-            // Primitive or Array of Primitives -> Create an argument
             hcl += `${indent}${tfKey} = ${convertToHcl(value)}\n`;
         }
     }
@@ -105,7 +106,6 @@ function convertToHcl(value) {
     return 'null';
 }
 
-// Used for inline maps if needed (e.g. tags)
 function convertObjToHclInline(obj) {
     const lines = Object.entries(obj).map(([k, v]) => `    ${toSnakeCase(k)} = ${convertToHcl(v)}`);
     return `{\n${lines.join('\n')}\n  }`;
@@ -116,15 +116,13 @@ function convertObjToHclInline(obj) {
 function compileBicep(schema, config, safeName) {
     let bicep = `resource ${safeName} '${schema.typeName}' = {\n`;
     
-    // Top level ARM properties
     if (config.Name) bicep += `  name: '${config.Name}'\n`;
     if (config.Location) bicep += `  location: ${config.Location}\n`;
     
-    // Everything else goes inside 'properties: {}'
     const propsConfig = { ...config };
     delete propsConfig.Name;
     delete propsConfig.Location;
-    delete propsConfig.Tags; // Tags usually go at top level in Bicep, but keeping it simple here
+    delete propsConfig.Tags;
 
     if (Object.keys(propsConfig).length > 0) {
         bicep += `  properties: {\n`;
@@ -231,7 +229,6 @@ app.get('/api/resources', (req, res) => {
     const { search } = req.query;
     let resources = Object.values(db.resources).map(r => ({ typeName: r.typeName, provider: r.provider }));
     
-    // Add External Modules
     moduleRegistry.modules.forEach(mod => {
         resources.push({ typeName: mod.id, provider: 'external', vendor: mod.vendor, deviceType: mod.deviceType, supportedPlatforms: mod.supportedPlatforms });
     });
@@ -260,7 +257,6 @@ app.post('/api/generate', (req, res) => {
     let code = '';
     let language = 'plaintext';
 
-    // Handle Native Cloud Resources
     if (db.resources[typeName]) {
         const schema = db.resources[typeName];
         const safeName = typeName.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
@@ -269,12 +265,10 @@ app.post('/api/generate', (req, res) => {
         else if (platform === 'bicep') { code = compileBicep(schema, config, safeName); language = 'bicep'; }
         else if (platform === 'cdk-python') { code = compileCdkPython(schema, config, safeName); language = 'python'; }
         else if (platform === 'cloudformation') { 
-            // CFN natively supports deep JSON, no changes needed!
             code = JSON.stringify({ Resources: { [safeName]: { Type: typeName, Properties: config } } }, null, 2); 
             language = 'json'; 
         }
     } 
-    // Handle External Modules
     else {
         const modMeta = moduleRegistry.modules.find(m => m.id === typeName);
         if (modMeta) {

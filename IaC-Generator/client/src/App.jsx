@@ -3,6 +3,15 @@ import axios from 'axios';
 import Editor from '@monaco-editor/react';
 import './App.css';
 
+// --- HELPER: Normalize name to snake_case for Terraform resource label ---
+const normalizeToSnakeCase = (name) => {
+  if (!name) return '';
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_|_$/g, '');
+};
+
 const unflattenObject = (obj) => {
   const result = {};
   for (const key in obj) {
@@ -55,16 +64,32 @@ const parseTextToConfig = (text) => {
   return { targetModule, config };
 };
 
+// --- UPDATED: Enhanced FormField with enum, boolean, and conditional visibility support ---
 const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
   const isRequired = requiredList.includes(name);
-  const baseDescription = schema.description || 'No description available.';
+  const baseDescription = schema.description || '';
   const tooltipText = `${name}: ${baseDescription}${isRequired ? ' (Required)' : ''}`;
+  
+  // Get display name (last part of dotted path for nested fields)
+  const displayName = name.split('.').pop();
 
+  // --- CONDITIONAL VISIBILITY ---
+  // Check for visibleWhen: { field: "location.scope_type", value: "device_group" }
+  if (schema.visibleWhen) {
+    const { field, value } = schema.visibleWhen;
+    const fieldValue = formData[field];
+    // Hide if the condition field is set but doesn't match
+    if (fieldValue !== undefined && fieldValue !== value) {
+      return null;
+    }
+  }
+
+  // --- NESTED OBJECT ---
   if (schema.type === 'object' && schema.properties) {
     return (
       <div className="form-group nested-group" title={tooltipText}>
         <label className="nested-label">
-          {name} {isRequired && <span className="req">*</span>} 
+          {displayName} {isRequired && <span className="req">*</span>} 
           <span className="type-badge">object</span>
         </label>
         <div className="nested-children">
@@ -83,34 +108,117 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
     );
   }
 
-  const currentValue = formData[name];
-  let displayValue = '';
-  if (Array.isArray(currentValue)) {
-    displayValue = currentValue.join(', ');
-  } else {
-    displayValue = currentValue || '';
+  // --- BOOLEAN FIELD (checkbox) ---
+  if (schema.type === 'boolean') {
+    return (
+      <div className="form-group checkbox-group">
+        <label className="checkbox-label" title={tooltipText}>
+          <input
+            type="checkbox"
+            checked={!!formData[name]}
+            onChange={(e) => setFormData({ ...formData, [name]: e.target.checked })}
+          />
+          <span className="checkbox-custom"></span>
+          <span>
+            {displayName} {isRequired && <span className="req">*</span>}
+          </span>
+        </label>
+        {baseDescription && <span className="help-text">{baseDescription}</span>}
+      </div>
+    );
   }
 
-  const handleChange = (e) => {
-    let val = e.target.value;
-    if (schema.type === 'array') {
-      val = val.split(',').map(v => v.trim()).filter(v => v);
-    }
-    setFormData({ ...formData, [name]: val });
-  };
+  // --- ENUM FIELD (select dropdown) ---
+  if (schema.enum && schema.enum.length > 0) {
+    return (
+      <div className="form-group">
+        <label title={tooltipText}>
+          {displayName} {isRequired && <span className="req">*</span>}
+        </label>
+        <select
+          className="select-input"
+          value={formData[name] || ''}
+          onChange={(e) => {
+            const newVal = e.target.value;
+            const updated = { ...formData, [name]: newVal };
+            
+            // Auto-clear dependent fields when scope_type changes
+            if (name.endsWith('.scope_type') || name === 'scope_type') {
+              const basePath = name.includes('.') 
+                ? name.substring(0, name.lastIndexOf('.')) 
+                : '';
+              const dgPath = basePath ? `${basePath}.device_group.name` : 'device_group.name';
+              const vsysPath = basePath ? `${basePath}.vsys.name` : 'vsys.name';
+              
+              if (newVal !== 'device_group') {
+                delete updated[dgPath];
+              }
+              if (newVal !== 'vsys') {
+                delete updated[vsysPath];
+              }
+            }
+            
+            setFormData(updated);
+          }}
+          title={tooltipText}
+        >
+          <option value="">-- Select {displayName} --</option>
+          {schema.enum.map(opt => (
+            <option key={opt} value={opt}>{opt}</option>
+          ))}
+        </select>
+        {baseDescription && <span className="help-text">{baseDescription}</span>}
+      </div>
+    );
+  }
+
+  // --- ARRAY FIELD (comma-separated input for tags, etc.) ---
+  if (schema.type === 'array') {
+    const currentValue = formData[name];
+    const displayValue = Array.isArray(currentValue) 
+      ? currentValue.join(', ') 
+      : (currentValue || '');
+
+    return (
+      <div className="form-group">
+        <label title={tooltipText}>
+          {displayName} {isRequired && <span className="req">*</span>}
+          <span className="type-badge">array</span>
+        </label>
+        <input
+          type="text"
+          title={tooltipText}
+          placeholder={`(${schema.items?.type || 'string'}) - comma separated`}
+          value={displayValue}
+          onChange={(e) => {
+            const val = e.target.value
+              .split(',')
+              .map(v => v.trim())
+              .filter(v => v);
+            setFormData({ ...formData, [name]: val });
+          }}
+        />
+        {baseDescription && <span className="help-text">{baseDescription}</span>}
+      </div>
+    );
+  }
+
+  // --- DEFAULT: TEXT INPUT (string, number, etc.) ---
+  const currentValue = formData[name] || '';
 
   return (
     <div className="form-group">
       <label title={tooltipText}>
-        {name} {isRequired && <span className="req">*</span>}
+        {displayName} {isRequired && <span className="req">*</span>}
       </label>
       <input
         type="text"
         title={tooltipText}
         placeholder={`(${schema.type || 'string'})`}
-        value={displayValue}
-        onChange={handleChange}
+        value={currentValue}
+        onChange={(e) => setFormData({ ...formData, [name]: e.target.value })}
       />
+      {baseDescription && <span className="help-text">{baseDescription}</span>}
     </div>
   );
 };
@@ -204,6 +312,17 @@ function App() {
     (schema?.provider === 'aws' ? ['terraform', 'cdk-python', 'cloudformation'] : 
     (schema?.provider === 'gcp' ? ['terraform'] : ['terraform', 'bicep']));
 
+  // --- HELPER: Get the object name from formData for label preview ---
+  const getObjectLabel = () => {
+    // Check for common name field patterns
+    const nameValue = formData.name || formData['object.name'] || '';
+    if (!nameValue) return null;
+    
+    // Extract resource type from selectedType
+    const resourceType = selectedType?.split('/').pop() || 'resource';
+    return `${resourceType}.${normalizeToSnakeCase(nameValue)}`;
+  };
+
   return (
     <div className="app-container">
       <aside className="sidebar">
@@ -264,6 +383,17 @@ function App() {
                 />
               </div>
             </div>
+
+            {/* --- NEW: Resource Label Preview for PAN-OS resources --- */}
+            {selectedType?.startsWith('panos_') && getObjectLabel() && (
+              <div className="label-preview">
+                <span className="preview-label">Terraform Resource Label:</span>
+                <code className="preview-code">{getObjectLabel()}</code>
+                <span className="preview-note">
+                  (Object name "{formData.name || formData['object.name']}" preserved as-is in HCL)
+                </span>
+              </div>
+            )}
 
             <form onSubmit={handleGenerate} className="dynamic-form">
               {Object.entries(schema.properties).map(([key, prop]) => (

@@ -48,7 +48,7 @@
 .dynamic-form { display: flex; flex-direction: column; gap: 15px; }
 .form-group label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px; }
 .req { color: red; }
-.form-group input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+.form-group input[type="text"] { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
 .dynamic-form button { padding: 10px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-top: 10px; }
 .dynamic-form button:disabled { background: #93c5fd; }
 .code-panel { flex: 2; background: #1e1e1e; }
@@ -126,6 +126,160 @@
   background: #138496;
 }
 
+/* ============================================
+   Enhanced Form Field Styles
+   ============================================ */
+
+/* --- Select Dropdown --- */
+.select-input {
+  width: 100%;
+  padding: 8px 32px 8px 10px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #202124;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235f6368' d='M6 8.825L1.175 4 2.238 2.938 6 6.7 9.763 2.937 10.825 4z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.select-input:hover {
+  border-color: #5f6368;
+}
+
+.select-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* --- Checkbox Group --- */
+.checkbox-group {
+  margin-bottom: 0;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-weight: 400 !important;
+  margin-bottom: 0 !important;
+  font-size: 14px !important;
+  user-select: none;
+}
+
+.checkbox-label input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.checkbox-custom {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #ccc;
+  border-radius: 3px;
+  background-color: #fff;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkbox-custom {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkbox-custom::after {
+  content: '';
+  display: block;
+  width: 5px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  margin-top: -2px;
+}
+
+.checkbox-label input[type="checkbox"]:focus + .checkbox-custom {
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.checkbox-label:hover .checkbox-custom {
+  border-color: #007bff;
+}
+
+/* --- Help Text --- */
+.help-text {
+  display: block;
+  font-size: 12px;
+  color: #80868b;
+  margin-top: 4px;
+  line-height: 1.4;
+  font-weight: 400;
+}
+
+/* --- Resource Label Preview --- */
+.label-preview {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  background-color: #e8f0fe;
+  border: 1px solid #d2e3fc;
+  border-radius: 6px;
+  font-size: 13px;
+  flex-wrap: wrap;
+}
+
+.preview-label {
+  color: #1967d2;
+  font-weight: 600;
+}
+
+.preview-code {
+  background-color: rgba(0, 123, 255, 0.1);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Roboto Mono', 'Courier New', monospace;
+  font-size: 13px;
+  color: #1967d2;
+}
+
+.preview-note {
+  color: #5f6368;
+  font-style: italic;
+  font-size: 11px;
+}
+
+/* --- Conditional Field Animation --- */
+.nested-children .form-group {
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* --- Print to PDF Styles --- */
 @media print {
   .sidebar, .header-actions, .dynamic-form button[type="submit"] {
@@ -165,9 +319,38 @@
   .monaco-editor .view-line span {
     color: black !important;
   }
-  .form-group input {
+  .form-group input[type="text"],
+  .select-input {
     border: 1px solid #999 !important;
     background: white !important;
+  }
+  .select-input {
+    appearance: auto;
+    -webkit-appearance: auto;
+    background-image: none;
+    padding-right: 8px;
+  }
+  .checkbox-label input[type="checkbox"] {
+    position: static;
+    opacity: 1;
+    width: auto;
+    height: auto;
+  }
+  .checkbox-custom {
+    display: none;
+  }
+  .label-preview {
+    background-color: #eee !important;
+    border-color: #ccc !important;
+    color: black !important;
+  }
+  .preview-label,
+  .preview-code {
+    color: #333 !important;
+    background: none !important;
+  }
+  .preview-note {
+    color: #666 !important;
   }
   .nested-group {
     page-break-inside: avoid;
