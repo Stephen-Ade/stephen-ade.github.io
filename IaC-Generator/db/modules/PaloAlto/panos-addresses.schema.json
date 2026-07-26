@@ -1,84 +1,80 @@
 {
   "typeName": "panos/panos_addresses",
   "provider": "panos",
-  "vendor": "Palo Alto",
+  "vendor": "Palo Alto Networks",
   "deviceType": "Bulk Address Objects",
   "supportedPlatforms": ["terraform"],
   "description": "Manages bulk PAN-OS Address Objects in a single resource (Provider v2.0.x).",
   "properties": {
+    "name": {
+      "type": "string",
+      "description": "Terraform resource label only (e.g., bulk_dmz_addresses). Not passed to the provider."
+    },
     "scope_type": {
       "type": "string",
-      "description": "Where this object lives.",
-      "enum": ["vsys", "device_group", "shared"],
-      "default": "vsys"
-    },
-    "vsys_name": {
-      "type": "string",
-      "description": "The VSYS name (e.g., vsys1).",
-      "visibleWhen": { "field": "scope_type", "value": "vsys" }
+      "enum": ["device_group", "shared", "vsys"]
     },
     "device_group_name": {
       "type": "string",
-      "description": "The Panorama device group name.",
-      "visibleWhen": { "field": "scope_type", "value": "device_group" }
+      "visibleWhen": {
+        "field": "scope_type",
+        "value": "device_group"
+      }
     },
-    "disable_override": {
+    "vsys_name": {
       "type": "string",
-      "description": "Prevent child firewalls from overriding. PAN-OS uses quoted string values (yes/no).",
-      "visibleWhen": { "field": "scope_type", "value": "device_group" }
+      "visibleWhen": {
+        "field": "scope_type",
+        "value": "vsys"
+      }
     },
-    "address_objects": {
+    "addresses": {
       "type": "array",
-      "description": "Array of address object definitions to be bulk-created.",
+      "minItems": 1,
+      "description": "Array of address objects to be converted to a map by the renderer.",
       "items": {
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "description": "PAN-OS object name (e.g., DMZ-Database). Preserved as-is in HCL."
+            "type": "string"
           },
           "description": {
-            "type": "string",
-            "description": "Description of the address object."
+            "type": "string"
           },
           "address_type": {
             "type": "string",
-            "description": "Type of address value. Determines which field is mapped to the HCL 'value' attribute.",
-            "enum": ["ip_netmask", "ip_range", "fqdn", "ip_wildcard"]
+            "enum": [
+              "ip_netmask",
+              "ip_range",
+              "fqdn",
+              "ip_wildcard"
+            ]
           },
-          "ip_netmask": {
-            "type": "string",
-            "description": "IP address with CIDR netmask (e.g., 172.16.10.50/32)",
-            "visibleWhen": { "field": "address_type", "value": "ip_netmask" }
-          },
-          "ip_range": {
-            "type": "string",
-            "description": "IP range with hyphen separator (e.g., 172.16.10.50-172.16.10.60)",
-            "visibleWhen": { "field": "address_type", "value": "ip_range" }
-          },
-          "fqdn": {
-            "type": "string",
-            "description": "Fully qualified domain name (e.g., db.example.com)",
-            "visibleWhen": { "field": "address_type", "value": "fqdn" }
-          },
-          "ip_wildcard": {
-            "type": "string",
-            "description": "IP address with wildcard mask (e.g., 10.20.0.0/0.0.255.255)",
-            "visibleWhen": { "field": "address_type", "value": "ip_wildcard" }
+          "value": {
+            "type": "string"
           },
           "tags": {
             "type": "array",
-            "items": { 
-              "type": "string",
-              "minLength": 1
-            },
-            "uniqueItems": true,
-            "description": "Administrative tags (SafeArray - empty strings strictly prohibited)."
+            "items": {
+              "type": "string"
+            }
+          },
+          "disable_override": {
+            "type": "string",
+            "enum": ["yes", "no"]
           }
         },
-        "required": ["name", "address_type"]
+        "required": [
+          "name",
+          "address_type",
+          "value"
+        ]
       }
     }
   },
-  "required": ["scope_type", "address_objects"]
+  "required": [
+    "name",
+    "scope_type",
+    "addresses"
+  ]
 }
