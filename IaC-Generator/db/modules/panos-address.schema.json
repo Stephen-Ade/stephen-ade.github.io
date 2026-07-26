@@ -1,10 +1,10 @@
 {
-  "typeName": "panos_address",
-  "provider": "external",
+  "typeName": "panos/panos_address",
+  "provider": "panos",
   "vendor": "Palo Alto",
   "deviceType": "Address Object",
   "supportedPlatforms": ["terraform"],
-  "required": ["name", "location", "address_type"],
+  "description": "Manages a PAN-OS Address Object (Provider v2.0.x).",
   "properties": {
     "name": {
       "type": "string",
@@ -12,71 +12,60 @@
     },
     "description": {
       "type": "string",
-      "description": "Description of the address object"
+      "description": "Description of the address object."
     },
-    "location": {
-      "type": "object",
-      "description": "Panorama/Firewall location placement (Provider v2.x)",
-      "properties": {
-        "scope_type": {
-          "type": "string",
-          "enum": ["device_group", "shared", "vsys"],
-          "description": "The scope/location type for this object"
-        },
-        "device_group": {
-          "type": "object",
-          "description": "Device group location (Panorama only)",
-          "properties": {
-            "name": {
-              "type": "string",
-              "description": "Device group name (e.g., Corp-DMZ)",
-              "visibleWhen": { "field": "location.scope_type", "value": "device_group" }
-            }
-          }
-        },
-        "vsys": {
-          "type": "object",
-          "description": "Virtual system location (Firewall only)",
-          "properties": {
-            "name": {
-              "type": "string",
-              "description": "VSYS name (e.g., vsys1)",
-              "visibleWhen": { "field": "location.scope_type", "value": "vsys" }
-            }
-          }
-        }
-      }
+    "scope_type": {
+      "type": "string",
+      "description": "Where this object lives.",
+      "enum": ["vsys", "device_group", "shared"],
+      "default": "vsys"
+    },
+    "vsys_name": {
+      "type": "string",
+      "description": "The VSYS name (e.g., vsys1).",
+      "visibleWhen": { "field": "scope_type", "value": "vsys" }
+    },
+    "device_group_name": {
+      "type": "string",
+      "description": "The Panorama device group name.",
+      "visibleWhen": { "field": "scope_type", "value": "device_group" }
     },
     "address_type": {
       "type": "string",
-      "enum": ["ip_netmask", "ip_range", "fqdn", "ip_wildcard"],
-      "description": "Type of address value. UI abstraction only — not emitted to HCL."
+      "description": "Type of address value. Determines which field is mapped to the HCL 'value' attribute.",
+      "enum": ["ip_netmask", "ip_range", "fqdn", "ip_wildcard"]
     },
     "ip_netmask": {
       "type": "string",
-      "description": "IP address with CIDR netmask (e.g., 172.16.10.50/32)"
+      "description": "IP address with CIDR netmask (e.g., 172.16.10.50/32)",
+      "visibleWhen": { "field": "address_type", "value": "ip_netmask" }
     },
     "ip_range": {
       "type": "string",
-      "description": "IP range with hyphen separator (e.g., 172.16.10.50-172.16.10.60)"
+      "description": "IP range with hyphen separator (e.g., 172.16.10.50-172.16.10.60)",
+      "visibleWhen": { "field": "address_type", "value": "ip_range" }
     },
     "fqdn": {
       "type": "string",
-      "description": "Fully qualified domain name (e.g., db.example.com)"
+      "description": "Fully qualified domain name (e.g., db.example.com)",
+      "visibleWhen": { "field": "address_type", "value": "fqdn" }
     },
     "ip_wildcard": {
       "type": "string",
-      "description": "IP address with wildcard mask (e.g., 10.20.0.0/0.0.255.255)"
+      "description": "IP address with wildcard mask (e.g., 10.20.0.0/0.0.255.255)",
+      "visibleWhen": { "field": "address_type", "value": "ip_wildcard" }
     },
     "disable_override": {
       "type": "string",
-      "description": "Prevent child firewalls from overriding this address object. PAN-OS uses quoted string values (yes/no).",
-      "visibleWhen": { "field": "location.scope_type", "value": "device_group" }
+      "description": "Prevent child firewalls from overriding. PAN-OS uses quoted string values (yes/no).",
+      "visibleWhen": { "field": "scope_type", "value": "device_group" }
     },
     "tags": {
       "type": "array",
       "items": { "type": "string" },
-      "description": "Comma-separated list of tags (e.g., dmz, production)"
+      "uniqueItems": true,
+      "description": "Administrative tags (comma-separated)."
     }
-  }
+  },
+  "required": ["name", "scope_type", "address_type"]
 }
