@@ -259,6 +259,9 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
         setFormData({ ...formData, [name]: currentArray.filter((_, i) => i !== index) });
       };
 
+      // FIX: Calculate correct singular name for the button (e.g., "addresses" -> "Address")
+      const singularDisplayName = displayName.replace(/es$/, '').charAt(0).toUpperCase() + displayName.replace(/es$/, '').slice(1);
+
       return (
         <div className="form-group nested-group" title={tooltipText}>
           <label className="nested-label">
@@ -268,8 +271,9 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
           {baseDescription && <span className="help-text">{baseDescription}</span>}
           
           {currentArray.map((item, index) => (
-            <div key={index} style={{ border: '1px solid #555', padding: '15px', marginBottom: '15px', borderRadius: '4px', background: '#2b2b2b' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', borderBottom: '1px solid #444', paddingBottom: '5px' }}>
+            // FIX: Changed background to #383838 and border to #666 for better visibility
+            <div key={index} style={{ border: '1px solid #666', padding: '15px', marginBottom: '15px', borderRadius: '4px', background: '#383838' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', borderBottom: '1px solid #555', paddingBottom: '5px' }}>
                 <strong style={{ color: '#fff' }}>Object {index + 1}</strong>
                 {currentArray.length > 1 && (
                   <button type="button" onClick={() => removeItem(index)} style={{ color: '#ff5555', background: 'none', border: '1px solid #ff5555', cursor: 'pointer', borderRadius: '3px', padding: '2px 6px' }}>Remove</button>
@@ -333,7 +337,7 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
           ))}
           
           <button type="button" onClick={addItem} className="ingest-btn" style={{ marginTop: '10px', width: '100%' }}>
-            + Add {displayName.replace(/s$/, '')} Object
+            + Add {singularDisplayName} Object
           </button>
         </div>
       );
