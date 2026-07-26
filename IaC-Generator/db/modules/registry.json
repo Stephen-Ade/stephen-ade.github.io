@@ -17,6 +17,14 @@
       "templateFile": "PaloAlto/panos-address.hcl"
     },
     {
+      "id": "panos_addresses",
+      "vendor": "Palo Alto",
+      "deviceType": "Bulk Address Objects",
+      "supportedPlatforms": ["terraform"],
+      "schemaFile": "PaloAlto/panos-addresses.schema.json",
+      "templateFile": "PaloAlto/panos-addresses.hcl"
+    },
+    {
       "id": "panos_service",
       "vendor": "Palo Alto",
       "deviceType": "Service Objects",
