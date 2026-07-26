@@ -70,6 +70,47 @@ if (fs.existsSync(REGISTRY_PATH)) {
     moduleRegistry = JSON.parse(fs.readFileSync(REGISTRY_PATH, 'utf8'));
 }
 
+// --- 3RD PARTY AUDITOR VALIDATION: Bulk Address Objects ---
+// Prevents empty "" = {} map keys and enforces strict schema compliance
+function validateBulkAddresses(entries) {
+    if (!Array.isArray(entries) || entries.length === 0) {
+        throw new Error("At least one address object is required.");
+    }
+
+    const validTypes = new Set([
+        "ip_netmask",
+        "ip_range",
+        "fqdn",
+        "ip_wildcard"
+    ]);
+
+    for (const [index, entry] of entries.entries()) {
+        // 1. Reject empty object names (Prevents "" = {} in HCL)
+        if (!entry.name || !entry.name.trim()) {
+            throw new Error(`Address entry ${index + 1} requires a valid object name.`);
+        }
+
+        // 2. Validate address type
+        if (!validTypes.has(entry.address_type)) {
+            throw new Error(`Address entry "${entry.name || index + 1}" has an invalid or missing address type.`);
+        }
+
+        // 3. Validate that the corresponding value field exists and is not empty
+        const valueField = entry.address_type; 
+        if (!entry[valueField] || !entry[valueField].trim()) {
+            throw new Error(`Address entry "${entry.name}" is missing a value for "${valueField}".`);
+        }
+
+        // 4. Ensure tags is an array and has no empty strings (SafeArray compliance)
+        if (entry.tags && !Array.isArray(entry.tags)) {
+            throw new Error(`Tags for "${entry.name}" must be an array.`);
+        }
+        if (entry.tags && entry.tags.some(t => typeof t !== 'string' || t.trim() === "")) {
+            throw new Error(`Tags array for "${entry.name}" contains empty strings, which violates SafeArray rules.`);
+        }
+    }
+}
+
 // --- DYNAMIC COMPILERS ---
 
 function toSnakeCase(str) { return str.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, ''); }
@@ -285,11 +326,24 @@ app.post('/api/generate', (req, res) => {
     else {
         const modMeta = moduleRegistry.modules.find(m => m.id === typeName);
         if (modMeta) {
-            const templatePath = path.join(__dirname, 'db/modules', modMeta.templateFile);
-            const templateString = fs.readFileSync(templatePath, 'utf8');
-            const template = handlebars.compile(templateString);
-            code = template({ resourceName: typeName.replace(/[^a-zA-Z0-9]/g, '_'), ...config });
-            language = 'hcl';
+            try {
+                // --- RUN 3RD PARTY AUDITOR VALIDATION BEFORE TERRAFORM COMPILATION ---
+                if (typeName === 'panos/panos_addresses') {
+                    if (!config.addresses) {
+                        throw new Error("Missing 'addresses' array in payload.");
+                    }
+                    validateBulkAddresses(config.addresses);
+                }
+
+                const templatePath = path.join(__dirname, 'db/modules', modMeta.templateFile);
+                const templateString = fs.readFileSync(templatePath, 'utf8');
+                const template = handlebars.compile(templateString);
+                code = template({ resourceName: typeName.replace(/[^a-zA-Z0-9]/g, '_'), ...config });
+                language = 'hcl';
+            } catch (error) {
+                // Intercept validation errors and return them to the React UI safely
+                return res.status(400).json({ success: false, error: error.message });
+            }
         } else {
             return res.status(404).json({ error: 'Resource type not found' });
         }
