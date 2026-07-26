@@ -271,12 +271,18 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
           {baseDescription && <span className="help-text">{baseDescription}</span>}
           
           {currentArray.map((item, index) => (
-            // FIX: Changed background to #383838 and border to #666 for better visibility
-            <div key={index} style={{ border: '1px solid #666', padding: '15px', marginBottom: '15px', borderRadius: '4px', background: '#383838' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', borderBottom: '1px solid #555', paddingBottom: '5px' }}>
-                <strong style={{ color: '#fff' }}>Object {index + 1}</strong>
+            <div key={index} style={{ 
+              border: '1px solid #bbb', 
+              padding: '15px', 
+              marginBottom: '15px', 
+              borderRadius: '4px', 
+              background: '#f4f4f4', // Light grey background
+              color: '#000000'      // Force dark text globally for this block
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', borderBottom: '1px solid #ccc', paddingBottom: '5px' }}>
+                <strong style={{ color: '#222' }}>Object {index + 1}</strong>
                 {currentArray.length > 1 && (
-                  <button type="button" onClick={() => removeItem(index)} style={{ color: '#ff5555', background: 'none', border: '1px solid #ff5555', cursor: 'pointer', borderRadius: '3px', padding: '2px 6px' }}>Remove</button>
+                  <button type="button" onClick={() => removeItem(index)} style={{ color: '#d9534f', background: '#fff', border: '1px solid #d9534f', cursor: 'pointer', borderRadius: '3px', padding: '2px 6px' }}>Remove</button>
                 )}
               </div>
               
@@ -285,7 +291,9 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
                 const isChildRequired = (schema.items.required || []).includes(childKey);
                 const childTooltip = `${childKey}: ${childSchema.description || ''}${isChildRequired ? ' (Required)' : ''}`;
 
-                // Handle visibleWhen inside the array item (crucial for ip_netmask hiding when fqdn is selected)
+                const lightInputStyle = { marginTop: '5px', color: '#000' };
+
+                // Handle visibleWhen inside the array item
                 if (childSchema.visibleWhen) {
                    const conditions = Array.isArray(childSchema.visibleWhen) ? childSchema.visibleWhen : [childSchema.visibleWhen];
                    const isVisible = conditions.every(({ field, value }) => item[field] === value);
@@ -295,13 +303,21 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
                 // Handle Enums (e.g., address_type)
                 if (childSchema.enum) {
                    return (
-                     <div className="form-group" key={childKey} style={{ marginTop: '5px' }}>
-                       <label title={childTooltip}>{childKey} {isChildRequired && <span className="req">*</span>}</label>
-                       <select className="select-input" value={val} onChange={(e) => handleItemChange(index, childKey, e.target.value)} title={childTooltip}>
+                     <div className="form-group" key={childKey} style={lightInputStyle}>
+                       <label title={childTooltip} style={{ color: '#000', fontWeight: '500' }}>
+                         {childKey} {isChildRequired && <span style={{color: 'red'}}>*</span>}
+                       </label>
+                       <select 
+                         className="select-input" 
+                         value={val} 
+                         onChange={(e) => handleItemChange(index, childKey, e.target.value)} 
+                         title={childTooltip}
+                         style={{ background: '#fff', color: '#000', border: '1px solid #ccc' }}
+                       >
                          <option value="">-- Select {childKey} --</option>
                          {childSchema.enum.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                        </select>
-                       {childSchema.description && <span className="help-text">{childSchema.description}</span>}
+                       {childSchema.description && <span className="help-text" style={{ color: '#555' }}>{childSchema.description}</span>}
                      </div>
                    );
                 }
@@ -310,13 +326,21 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
                 if (childSchema.type === 'array') {
                    const displayVal = Array.isArray(val) ? val.join(', ') : '';
                    return (
-                     <div className="form-group" key={childKey} style={{ marginTop: '5px' }}>
-                       <label title={childTooltip}>{childKey} <span className="type-badge">list</span></label>
-                       <input type="text" placeholder="comma separated" value={displayVal} onChange={(e) => {
-                         const arrVal = e.target.value.split(',').map(v => v.trim()).filter(v => v);
-                         handleItemChange(index, childKey, arrVal);
-                       }} />
-                       {childSchema.description && <span className="help-text">{childSchema.description}</span>}
+                     <div className="form-group" key={childKey} style={lightInputStyle}>
+                       <label title={childTooltip} style={{ color: '#000', fontWeight: '500' }}>
+                         {childKey} <span className="type-badge" style={{ background: '#ddd', color: '#333' }}>list</span>
+                       </label>
+                       <input 
+                         type="text" 
+                         placeholder="comma separated" 
+                         value={displayVal} 
+                         onChange={(e) => {
+                           const arrVal = e.target.value.split(',').map(v => v.trim()).filter(v => v);
+                           handleItemChange(index, childKey, arrVal);
+                         }}
+                         style={{ background: '#fff', color: '#000', border: '1px solid #ccc' }}
+                       />
+                       {childSchema.description && <span className="help-text" style={{ color: '#555' }}>{childSchema.description}</span>}
                      </div>
                    );
                 }
@@ -326,10 +350,18 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
                 if (ADDRESS_TYPE_FIELDS.includes(childKey)) placeholder = getAddressPlaceholder(childKey);
                 
                 return (
-                  <div className="form-group" key={childKey} style={{ marginTop: '5px' }}>
-                    <label title={childTooltip}>{childKey} {isChildRequired && <span className="req">*</span>}</label>
-                    <input type="text" placeholder={placeholder} value={val} onChange={(e) => handleItemChange(index, childKey, e.target.value)} />
-                    {childSchema.description && <span className="help-text">{childSchema.description}</span>}
+                  <div className="form-group" key={childKey} style={lightInputStyle}>
+                    <label title={childTooltip} style={{ color: '#000', fontWeight: '500' }}>
+                      {childKey} {isChildRequired && <span style={{color: 'red'}}>*</span>}
+                    </label>
+                    <input 
+                      type="text" 
+                      placeholder={placeholder} 
+                      value={val} 
+                      onChange={(e) => handleItemChange(index, childKey, e.target.value)}
+                      style={{ background: '#fff', color: '#000', border: '1px solid #ccc' }}
+                    />
+                    {childSchema.description && <span className="help-text" style={{ color: '#555' }}>{childSchema.description}</span>}
                   </div>
                 );
               })}
