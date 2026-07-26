@@ -39,6 +39,14 @@
       "supportedPlatforms": ["terraform"],
       "schemaFile": "panos-security-profile-group.schema.json",
       "templateFile": "panos-security-profile-group.hcl"
+    },
+    {
+      "id": "panos_decryption_policy_rules",
+      "vendor": "Palo Alto",
+      "deviceType": "Decryption Policy Rule",
+      "supportedPlatforms": ["terraform"],
+      "schemaFile": "panos-decryption-policy-rules.schema.json",
+      "templateFile": "panos-decryption-policy-rules.hcl"
     }
   ]
 }
