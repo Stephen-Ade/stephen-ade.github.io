@@ -1,0 +1,155 @@
+{
+  "typeName": "panos/panos_dos_policy_rules",
+  "provider": "panos",
+  "vendor": "Palo Alto",
+  "deviceType": "DoS Policy Rules",
+  "supportedPlatforms": ["terraform"],
+  "description": "Manages positioned DoS Protection policy rules for PAN-OS Provider 2.0.x.",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the DoS rule."
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional description for the rule."
+    },
+    "scope_type": {
+      "type": "string",
+      "description": "Where this rule lives.",
+      "enum": ["device_group", "shared", "vsys"]
+    },
+    "device_group_name": {
+      "type": "string",
+      "description": "The Panorama device group name.",
+      "visibleWhen": { "field": "scope_type", "value": "device_group" }
+    },
+    "vsys": {
+      "type": "string",
+      "description": "The VSYS ID (e.g., vsys1).",
+      "visibleWhen": { "field": "scope_type", "value": "vsys" }
+    },
+    "rulebase": {
+      "type": "string",
+      "description": "The Panorama rulebase. (Note: Also applicable to shared scope in provider 2.x).",
+      "enum": ["pre-rulebase", "post-rulebase"],
+      "visibleWhen": { "field": "scope_type", "value": "device_group" }
+    },
+    "position_where": {
+      "type": "string",
+      "description": "Positioning of the rule in the rulebase.",
+      "enum": ["first", "last", "before", "after"]
+    },
+    "position_pivot": {
+      "type": "string",
+      "description": "Existing rule used as the positioning pivot (required if position is before/after)."
+    },
+    "source_type": {
+      "type": "string",
+      "description": "Match traffic by source zone or source interface.",
+      "enum": ["zone", "interface"]
+    },
+    "source_zones": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Source zones (comma-separated).",
+      "visibleWhen": { "field": "source_type", "value": "zone" }
+    },
+    "source_interfaces": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Source interfaces (comma-separated).",
+      "visibleWhen": { "field": "source_type", "value": "interface" }
+    },
+    "destination_type": {
+      "type": "string",
+      "description": "Match traffic by destination zone or destination interface.",
+      "enum": ["zone", "interface"]
+    },
+    "destination_zones": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Destination zones (comma-separated).",
+      "visibleWhen": { "field": "destination_type", "value": "zone" }
+    },
+    "destination_interfaces": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Destination interfaces (comma-separated).",
+      "visibleWhen": { "field": "destination_type", "value": "interface" }
+    },
+    "source_addresses": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Source addresses (comma-separated). Use 'any' for all."
+    },
+    "destination_addresses": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Destination addresses (comma-separated). Use 'any' for all."
+    },
+    "negate_source": {
+      "type": "boolean",
+      "description": "Match on the inverse of the source address list."
+    },
+    "negate_destination": {
+      "type": "boolean",
+      "description": "Match on the inverse of the destination address list."
+    },
+    "source_user": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Source users or user groups. Use 'any' for all users."
+    },
+    "service": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Services or service groups to match. Use 'any' to match all services."
+    },
+    "schedule": {
+      "type": "string",
+      "description": "Optional schedule object controlling when the rule is active."
+    },
+    "action": {
+      "type": "string",
+      "description": "The action to take.",
+      "enum": ["allow", "deny", "protect"]
+    },
+    "protection_type": {
+      "type": "string",
+      "description": "Type of protection to apply.",
+      "enum": ["aggregate", "classified", "aggregate_and_classified"],
+      "visibleWhen": { "field": "action", "value": "protect" }
+    },
+    "aggregate_profile": {
+      "type": "string",
+      "description": "Reference to the aggregate DoS profile.",
+      "visibleWhen": { "field": "action", "value": "protect" }
+    },
+    "classified_profile": {
+      "type": "string",
+      "description": "Reference to the classified DoS profile.",
+      "visibleWhen": { "field": "action", "value": "protect" }
+    },
+    "classified_address_type": {
+      "type": "string",
+      "description": "Classification basis for the classified profile.",
+      "enum": ["source_ip_only", "destination_ip_only", "source_and_destination_ip"],
+      "visibleWhen": { "field": "action", "value": "protect" }
+    },
+    "disabled": {
+      "type": "boolean",
+      "description": "Set to true to disable this rule."
+    },
+    "tag": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Administrative tags (comma-separated)."
+    },
+    "log_setting": {
+      "type": "string",
+      "description": "Custom log forwarding profile."
+    }
+  },
+  "required": ["name", "scope_type", "source_type", "destination_type", "source_addresses", "destination_addresses", "action"]
+}
