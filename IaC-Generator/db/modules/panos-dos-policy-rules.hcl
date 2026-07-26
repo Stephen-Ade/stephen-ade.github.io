@@ -32,13 +32,19 @@ resource "panos_dos_policy_rules" "{{tfLabel name}}" {
     }
   }
 {{/eq}}
-{{#eq scope_type "vsys"}}
+{{#eq scope_type "shared"}}
   location = {
-    vsys = "{{vsys}}"
+    shared = {
+      rulebase = "{{rulebase}}"
+    }
   }
 {{/eq}}
-{{#eq scope_type "shared"}}
-  location = "shared"
+{{#eq scope_type "vsys"}}
+  location = {
+    vsys = {
+      name = "{{vsys_name}}"
+    }
+  }
 {{/eq}}
 
   position = {

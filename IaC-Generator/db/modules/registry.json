@@ -1,4 +1,3 @@
-
 {
   "modules": [
     {
@@ -59,8 +58,8 @@
     },
     {
       "id": "panos_dos_policy_rules",
-      "vendor": "Palo Alto",
-      "deviceType": "DoS Policy Rules",
+      "vendor": "Palo Alto Networks",
+      "deviceType": "DoS Protection Policy Rules",
       "supportedPlatforms": ["terraform"],
       "schemaFile": "panos-dos-policy-rules.schema.json",
       "templateFile": "panos-dos-policy-rules.hcl"
