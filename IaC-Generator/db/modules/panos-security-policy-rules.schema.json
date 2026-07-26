@@ -84,13 +84,13 @@
       "description": "Match the inverse of the destination address list.",
       "default": false
     },
-    "source_user": {
+    "source_users": {
       "type": "array",
       "items": { "type": "string" },
       "minItems": 1,
       "uniqueItems": true,
       "default": ["any"],
-      "description": "Source users or user groups."
+      "description": "Source users or user groups. (Note: Security Policy uses plural 'source_users')."
     },
     "applications": {
       "type": "array",

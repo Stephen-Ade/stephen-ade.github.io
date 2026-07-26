@@ -68,7 +68,7 @@ resource "panos_security_policy_rules" "{{tfLabel name}}" {
     negate_source         = {{#if negate_source}}true{{else}}false{{/if}}
     negate_destination    = {{#if negate_destination}}true{{else}}false{{/if}}
     
-    source_user           = {{safeArray source_user}}
+    source_users          = {{safeArray source_users}}
     applications          = {{safeArray applications}}
     services              = {{safeArray services}}
 
