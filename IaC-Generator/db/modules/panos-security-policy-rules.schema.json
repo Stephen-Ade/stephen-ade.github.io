@@ -1,55 +1,166 @@
 {
-  "typeName": "panos_security_rule",
-  "provider": "external",
+  "typeName": "panos/panos_security_policy_rules",
+  "provider": "panos",
+  "vendor": "Palo Alto",
+  "deviceType": "Security Policy Rules",
+  "supportedPlatforms": ["terraform"],
+  "description": "Manages positioned Security policy rules for PAN-OS Provider 2.0.x.",
   "properties": {
-    "rule_name": {
+    "name": {
       "type": "string",
       "description": "The name of the security rule."
     },
-    "device_group": {
+    "description": {
       "type": "string",
-      "description": "The Panorama device group to apply this rule to."
+      "description": "Description of the security rule."
+    },
+    "scope_type": {
+      "type": "string",
+      "description": "Where this rule lives.",
+      "enum": ["device_group", "shared", "vsys"],
+      "default": "device_group"
+    },
+    "device_group_name": {
+      "type": "string",
+      "description": "The Panorama device group name.",
+      "visibleWhen": { "field": "scope_type", "value": "device_group" }
+    },
+    "vsys_name": {
+      "type": "string",
+      "description": "The VSYS name (e.g., vsys1).",
+      "visibleWhen": { "field": "scope_type", "value": "vsys" }
     },
     "rulebase": {
       "type": "string",
-      "description": "The rulebase (e.g., pre-rulebase, post-rulebase)."
+      "description": "The Panorama rulebase.",
+      "enum": ["pre-rulebase", "post-rulebase"],
+      "default": "pre-rulebase"
     },
-    "position": {
+    "position_where": {
       "type": "string",
-      "description": "Where to place the rule (e.g., top, bottom)."
+      "description": "Position of the rule in the rulebase.",
+      "enum": ["first", "last", "before", "after"],
+      "default": "last"
+    },
+    "position_pivot": {
+      "type": "string",
+      "description": "Existing rule used as the before/after positioning pivot."
     },
     "source_zones": {
       "type": "array",
-      "description": "List of source security zones."
+      "items": { "type": "string" },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Source zones."
     },
     "destination_zones": {
       "type": "array",
-      "description": "List of destination security zones."
+      "items": { "type": "string" },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Destination zones."
     },
     "source_addresses": {
       "type": "array",
-      "description": "List of source IP addresses or ranges."
+      "items": { "type": "string" },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Source addresses."
     },
     "destination_addresses": {
       "type": "array",
-      "description": "List of destination IP addresses or ranges."
+      "items": { "type": "string" },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Destination addresses."
+    },
+    "negate_source": {
+      "type": "boolean",
+      "description": "Match the inverse of the source address list.",
+      "default": false
+    },
+    "negate_destination": {
+      "type": "boolean",
+      "description": "Match the inverse of the destination address list.",
+      "default": false
+    },
+    "source_user": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "uniqueItems": true,
+      "default": ["any"],
+      "description": "Source users or user groups."
     },
     "applications": {
       "type": "array",
-      "description": "List of App-ID applications."
+      "items": { "type": "string" },
+      "minItems": 1,
+      "uniqueItems": true,
+      "default": ["any"],
+      "description": "Applications to match."
     },
     "services": {
       "type": "array",
-      "description": "List of service objects."
+      "items": { "type": "string" },
+      "minItems": 1,
+      "uniqueItems": true,
+      "default": ["application-default"],
+      "description": "Services to match."
     },
     "action": {
       "type": "string",
-      "description": "Action to take (allow or deny)."
+      "enum": ["allow", "deny", "drop", "reset-client", "reset-server", "reset-both"],
+      "default": "allow",
+      "description": "Action to take when traffic matches."
+    },
+    "profile_setting_group": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true,
+      "description": "Security profile groups to attach (comma-separated)."
+    },
+    "disabled": {
+      "type": "boolean",
+      "description": "Set to true to disable this rule.",
+      "default": false
+    },
+    "log_start": {
+      "type": "boolean",
+      "description": "Log at session start.",
+      "default": false
     },
     "log_end": {
+      "type": "boolean",
+      "description": "Log at session end.",
+      "default": true
+    },
+    "log_setting": {
       "type": "string",
-      "description": "Log at session end (true/false)."
+      "description": "Custom log forwarding profile."
+    },
+    "schedule": {
+      "type": "string",
+      "description": "Optional schedule object."
+    },
+    "tag": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true,
+      "description": "Administrative tags (comma-separated)."
+    },
+    "group_tag": {
+      "type": "string",
+      "description": "Group tag for the rule."
     }
   },
-  "required": ["rule_name", "device_group", "source_zones", "destination_zones", "action"]
+  "required": [
+    "name",
+    "scope_type",
+    "source_zones",
+    "destination_zones",
+    "source_addresses",
+    "destination_addresses",
+    "action"
+  ]
 }
