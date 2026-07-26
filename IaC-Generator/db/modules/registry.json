@@ -11,7 +11,7 @@
     {
       "id": "panos_address",
       "vendor": "Palo Alto",
-      "deviceType": "Address Object",
+      "deviceType": "Address Objects",
       "supportedPlatforms": ["terraform"],
       "schemaFile": "panos-address.schema.json",
       "templateFile": "panos-address.hcl"
@@ -19,7 +19,7 @@
     {
       "id": "panos_service",
       "vendor": "Palo Alto",
-      "deviceType": "Service Object",
+      "deviceType": "Service Objects",
       "supportedPlatforms": ["terraform"],
       "schemaFile": "panos-service.schema.json",
       "templateFile": "panos-service.hcl"
@@ -35,7 +35,7 @@
     {
       "id": "panos_security_profile_group",
       "vendor": "Palo Alto",
-      "deviceType": "Security Profile Group",
+      "deviceType": "Security Profile Groups",
       "supportedPlatforms": ["terraform"],
       "schemaFile": "panos-security-profile-group.schema.json",
       "templateFile": "panos-security-profile-group.hcl"
@@ -43,7 +43,7 @@
     {
       "id": "panos_decryption_policy_rules",
       "vendor": "Palo Alto",
-      "deviceType": "Decryption Policy Rule",
+      "deviceType": "Decryption Policy Rules",
       "supportedPlatforms": ["terraform"],
       "schemaFile": "panos-decryption-policy-rules.schema.json",
       "templateFile": "panos-decryption-policy-rules.hcl"

@@ -456,7 +456,7 @@ function App() {
               {cat.vendors.map(vendor => {
                 if (vendor.resources.length === 0) return null; // Hide empty vendors
                 
-                const isExpanded = expandedGroups[vendor.id] !== false; // Default to expanded
+                const isExpanded = expandedGroups[vendor.id] === true; // Default to collapsed
                 
                 return (
                   <div key={vendor.id} className="vendor-group">
