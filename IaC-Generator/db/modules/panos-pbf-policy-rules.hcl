@@ -51,7 +51,13 @@ resource "panos_pbf_policy_rules" "{{tfLabel name}}" {
     description           = "{{description}}"
 {{/if}}
 
+{{#eq source_type "zone"}}
     source_zone           = "{{source_zone}}"
+{{/eq}}
+{{#eq source_type "interface"}}
+    source_interface      = "{{source_interface}}"
+{{/eq}}
+
     source_addresses      = {{safeArray source_addresses}}
     destination_addresses = {{safeArray destination_addresses}}
     
@@ -65,17 +71,21 @@ resource "panos_pbf_policy_rules" "{{tfLabel name}}" {
 {{#eq action "forward"}}
     forwarding = {
       egress_interface = "{{egress_interface}}"
-{{#if next_hop}}
-      next_hop         = {{safeArray next_hop}}
-{{/if}}
+{{#eq next_hop_type "ip_address"}}
+      next_hop = {
+        ip_address = "{{next_hop_value}}"
+      }
+{{/eq}}
+{{#eq next_hop_type "fqdn"}}
+      next_hop = {
+        fqdn = "{{next_hop_value}}"
+      }
+{{/eq}}
     }
 {{/eq}}
 
     tag                   = {{safeArray tag}}
     
     disabled              = {{#if disabled}}true{{else}}false{{/if}}
-{{#if log_setting}}
-    log_setting           = "{{log_setting}}"
-{{/if}}
   }]
 }

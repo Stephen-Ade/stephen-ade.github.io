@@ -40,9 +40,20 @@
       "description": "Positioning of the rule in the rulebase.",
       "enum": ["first", "last", "before", "after"]
     },
+    "source_type": {
+      "type": "string",
+      "description": "Match traffic by source zone or source interface.",
+      "enum": ["zone", "interface"]
+    },
     "source_zone": {
       "type": "string",
-      "description": "The source zone (PBF uses a singular zone, not an array)."
+      "description": "The source zone (used if Source Type = zone).",
+      "visibleWhen": { "field": "source_type", "value": "zone" }
+    },
+    "source_interface": {
+      "type": "string",
+      "description": "The source interface (used if Source Type = interface).",
+      "visibleWhen": { "field": "source_type", "value": "interface" }
     },
     "source_addresses": {
       "type": "array",
@@ -82,10 +93,15 @@
       "description": "The interface to forward traffic out of.",
       "visibleWhen": { "field": "action", "value": "forward" }
     },
-    "next_hop": {
-      "type": "array",
-      "items": { "type": "string" },
-      "description": "Next hop IP addresses for the egress interface (comma-separated).",
+    "next_hop_type": {
+      "type": "string",
+      "description": "Type of next hop. Select 'none' to omit the next_hop block.",
+      "enum": ["none", "ip_address", "fqdn"],
+      "visibleWhen": { "field": "action", "value": "forward" }
+    },
+    "next_hop_value": {
+      "type": "string",
+      "description": "The IP address or FQDN of the next hop.",
       "visibleWhen": { "field": "action", "value": "forward" }
     },
     "tag": {
@@ -96,11 +112,7 @@
     "disabled": {
       "type": "boolean",
       "description": "Set to true to disable this rule."
-    },
-    "log_setting": {
-      "type": "string",
-      "description": "Custom log forwarding profile."
     }
   },
-  "required": ["name", "scope_type", "source_zone", "source_addresses", "destination_addresses", "action"]
+  "required": ["name", "scope_type", "source_type", "source_addresses", "destination_addresses", "action"]
 }
