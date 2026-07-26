@@ -40,15 +40,9 @@
       "description": "Positioning of the rule in the rulebase.",
       "enum": ["first", "last", "before", "after"]
     },
-    "source_zones": {
-      "type": "array",
-      "items": { "type": "string" },
-      "description": "Source zones (comma-separated)."
-    },
-    "destination_zones": {
-      "type": "array",
-      "items": { "type": "string" },
-      "description": "Destination zones (comma-separated)."
+    "source_zone": {
+      "type": "string",
+      "description": "The source zone (PBF uses a singular zone, not an array)."
     },
     "source_addresses": {
       "type": "array",
@@ -88,6 +82,12 @@
       "description": "The interface to forward traffic out of.",
       "visibleWhen": { "field": "action", "value": "forward" }
     },
+    "next_hop": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Next hop IP addresses for the egress interface (comma-separated).",
+      "visibleWhen": { "field": "action", "value": "forward" }
+    },
     "tag": {
       "type": "array",
       "items": { "type": "string" },
@@ -97,14 +97,10 @@
       "type": "boolean",
       "description": "Set to true to disable this rule."
     },
-    "log_end": {
-      "type": "boolean",
-      "description": "Log the end of the session."
-    },
     "log_setting": {
       "type": "string",
       "description": "Custom log forwarding profile."
     }
   },
-  "required": ["name", "scope_type", "source_zones", "destination_zones", "source_addresses", "destination_addresses", "action"]
+  "required": ["name", "scope_type", "source_zone", "source_addresses", "destination_addresses", "action"]
 }

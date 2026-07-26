@@ -51,8 +51,7 @@ resource "panos_pbf_policy_rules" "{{tfLabel name}}" {
     description           = "{{description}}"
 {{/if}}
 
-    source_zones          = {{safeArray source_zones}}
-    destination_zones     = {{safeArray destination_zones}}
+    source_zone           = "{{source_zone}}"
     source_addresses      = {{safeArray source_addresses}}
     destination_addresses = {{safeArray destination_addresses}}
     
@@ -66,13 +65,15 @@ resource "panos_pbf_policy_rules" "{{tfLabel name}}" {
 {{#eq action "forward"}}
     forwarding = {
       egress_interface = "{{egress_interface}}"
+{{#if next_hop}}
+      next_hop         = {{safeArray next_hop}}
+{{/if}}
     }
 {{/eq}}
 
     tag                   = {{safeArray tag}}
     
     disabled              = {{#if disabled}}true{{else}}false{{/if}}
-    log_end               = {{#if log_end}}true{{else}}false{{/if}}
 {{#if log_setting}}
     log_setting           = "{{log_setting}}"
 {{/if}}
