@@ -92,60 +92,51 @@
       "default": ["any"],
       "description": "Source users or user groups."
     },
-    "applications": {
+    "category": {
       "type": "array",
       "items": { "type": "string" },
-      "minItems": 1,
       "uniqueItems": true,
-      "default": ["any"],
-      "description": "Applications to match."
+      "description": "URL categories to match (Auth policies use categories, not applications)."
     },
     "services": {
       "type": "array",
       "items": { "type": "string" },
       "minItems": 1,
       "uniqueItems": true,
-      "default": ["application-default"],
+      "default": ["any"],
       "description": "Services to match."
     },
-    "action": {
+    "authentication_enforcement": {
       "type": "string",
-      "description": "Action to take (typically allow or deny).",
-      "enum": ["allow", "deny"],
-      "default": "allow"
+      "description": "Authentication Enforcement object applied by this rule (e.g., 'MFA-Portal-Profile')."
     },
-    "authentication_profile": {
-      "type": "string",
-      "description": "Reference to an Authentication Profile (e.g., 'Corp-MFA-Profile')."
+    "timeout": {
+      "type": "number",
+      "description": "Authentication expiration timer in minutes."
     },
-    "enforcement_type": {
-      "type": "string",
-      "description": "How authentication is enforced on matched traffic.",
-      "enum": ["none", "send_to", "require"],
-      "default": "none"
-    },
-    "send_to_profiles": {
-      "type": "array",
-      "items": { "type": "string" },
-      "minItems": 1,
-      "uniqueItems": true,
-      "description": "Authentication profiles to send the user to (comma-separated).",
-      "visibleWhen": { "field": "enforcement_type", "value": "send_to" }
+    "log_authentication_timeout": {
+      "type": "boolean",
+      "description": "Log when authentication times out.",
+      "default": false
     },
     "disabled": {
       "type": "boolean",
       "description": "Set to true to disable this rule.",
       "default": false
     },
-    "tag": {
+    "tags": {
       "type": "array",
       "items": { "type": "string" },
       "uniqueItems": true,
-      "description": "Administrative tags (comma-separated)."
+      "description": "Administrative tags (comma-separated). Note: Auth policies use plural 'tags'."
     },
     "group_tag": {
       "type": "string",
       "description": "Group tag for the rule."
+    },
+    "log_setting": {
+      "type": "string",
+      "description": "Custom log forwarding profile."
     }
   },
   "required": [
@@ -155,6 +146,6 @@
     "destination_zones",
     "source_addresses",
     "destination_addresses",
-    "action"
+    "authentication_enforcement"
   ]
 }

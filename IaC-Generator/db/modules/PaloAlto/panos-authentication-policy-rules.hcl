@@ -69,31 +69,25 @@ resource "panos_authentication_policy_rules" "{{tfLabel name}}" {
     negate_destination    = {{#if negate_destination}}true{{else}}false{{/if}}
     
     source_users          = {{safeArray source_users}}
-    applications          = {{safeArray applications}}
+    category              = {{safeArray category}}
     services              = {{safeArray services}}
 
-    action                = "{{action}}"
-    
-{{#if authentication_profile}}
-    authentication_profile = "{{authentication_profile}}"
+    authentication_enforcement = "{{authentication_enforcement}}"
+{{#if timeout}}
+    timeout               = {{timeout}}
 {{/if}}
-
-{{#eq enforcement_type "send_to"}}
-    authentication_enforcement = {
-      send_to = {{safeArray send_to_profiles}}
-    }
-{{/eq}}
-{{#eq enforcement_type "require"}}
-    authentication_enforcement = {
-      require = true
-    }
-{{/eq}}
+{{#if log_authentication_timeout}}
+    log_authentication_timeout = {{log_authentication_timeout}}
+{{/if}}
 
     disabled              = {{#if disabled}}true{{else}}false{{/if}}
     
-    tag                   = {{safeArray tag}}
+    tags                   = {{safeArray tags}}
 {{#if group_tag}}
     group_tag             = "{{group_tag}}"
+{{/if}}
+{{#if log_setting}}
+    log_setting           = "{{log_setting}}"
 {{/if}}
   }]
 }
