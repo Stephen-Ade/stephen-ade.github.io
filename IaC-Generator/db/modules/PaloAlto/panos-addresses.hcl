@@ -31,9 +31,6 @@ resource "panos_addresses" "{{tfLabel name}}" {
     }
   }
 {{/eq}}
-{{#eq scope_type "shared"}}
-  location = "shared"
-{{/eq}}
 {{#eq scope_type "vsys"}}
   location = {
     vsys = {
@@ -41,6 +38,35 @@ resource "panos_addresses" "{{tfLabel name}}" {
     }
   }
 {{/eq}}
+{{#eq scope_type "shared"}}
+  location = "shared"
+{{/eq}}
 
-  {{{rawOutput addresses_map_hcl}}}
+  addresses = {
+{{#each addresses}}
+    "{{name}}" = {
+{{#if description}}
+      description = "{{description}}"
+{{/if}}
+{{#eq address_type "ip_netmask"}}
+      ip_netmask = "{{ip_netmask}}"
+{{/eq}}
+{{#eq address_type "ip_range"}}
+      ip_range = "{{ip_range}}"
+{{/eq}}
+{{#eq address_type "fqdn"}}
+      fqdn = "{{fqdn}}"
+{{/eq}}
+{{#eq address_type "ip_wildcard"}}
+      ip_wildcard = "{{ip_wildcard}}"
+{{/eq}}
+{{#if disable_override}}
+      disable_override = "{{disable_override}}"
+{{/if}}
+{{#if tags}}
+      tags = {{safeArray tags}}
+{{/if}}
+    }
+{{/each}}
+  }
 }
