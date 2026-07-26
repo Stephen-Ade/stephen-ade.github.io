@@ -1,10 +1,10 @@
 {
-  "typeName": "panos_service",
-  "provider": "external",
+  "typeName": "panos/panos_service",
+  "provider": "panos",
   "vendor": "Palo Alto",
   "deviceType": "Service Object",
   "supportedPlatforms": ["terraform"],
-  "required": ["name", "location", "protocol"],
+  "description": "Manages a PAN-OS Service Object (Provider v2.0.x).",
   "properties": {
     "name": {
       "type": "string",
@@ -12,131 +12,74 @@
     },
     "description": {
       "type": "string",
-      "description": "Description of the service object"
+      "description": "Description of the service object."
     },
-    "location": {
-      "type": "object",
-      "description": "Panorama/Firewall location placement (Provider v2.x)",
-      "properties": {
-        "scope_type": {
-          "type": "string",
-          "enum": ["device_group", "shared", "vsys"],
-          "description": "The scope/location type for this object"
-        },
-        "device_group": {
-          "type": "object",
-          "description": "Device group location (Panorama only)",
-          "properties": {
-            "name": {
-              "type": "string",
-              "description": "Device group name (e.g., Corp-DMZ)",
-              "visibleWhen": { "field": "location.scope_type", "value": "device_group" }
-            },
-            "panorama_device": {
-              "type": "string",
-              "description": "Optional specific Panorama device",
-              "visibleWhen": { "field": "location.scope_type", "value": "device_group" }
-            }
-          }
-        },
-        "vsys": {
-          "type": "object",
-          "description": "Virtual system location (Firewall only)",
-          "properties": {
-            "name": {
-              "type": "string",
-              "description": "VSYS name (e.g., vsys1)",
-              "visibleWhen": { "field": "location.scope_type", "value": "vsys" }
-            },
-            "ngfw_device": {
-              "type": "string",
-              "description": "Optional specific NGFW device serial number",
-              "visibleWhen": { "field": "location.scope_type", "value": "vsys" }
-            }
-          }
-        }
-      }
+    "scope_type": {
+      "type": "string",
+      "description": "Where this object lives.",
+      "enum": ["vsys", "device_group", "shared"],
+      "default": "vsys"
     },
-    "protocol": {
-      "type": "object",
-      "description": "Protocol definition (TCP or UDP)",
-      "properties": {
-        "protocol_type": {
-          "type": "string",
-          "enum": ["tcp", "udp"],
-          "description": "The protocol type"
-        },
-        "tcp": {
-          "type": "object",
-          "description": "TCP protocol settings",
-          "visibleWhen": { "field": "protocol.protocol_type", "value": "tcp" },
-          "properties": {
-            "destination_port": {
-              "type": "string",
-              "description": "Destination port (e.g., 8443, 8000-8080, 80,443)"
-            },
-            "source_port": {
-              "type": "string",
-              "description": "Source port (usually 'any')"
-            },
-            "enable_timeout_override": {
-              "type": "boolean",
-              "description": "Enable custom session timeout override"
-            },
-            "timeout": {
-              "type": "number",
-              "description": "Session timeout in seconds",
-              "visibleWhen": { "field": "protocol.tcp.enable_timeout_override", "value": true }
-            },
-            "halfclose_timeout": {
-              "type": "number",
-              "description": "Half-close timeout in seconds (TCP only)",
-              "visibleWhen": [
-                { "field": "protocol.tcp.enable_timeout_override", "value": true },
-                { "field": "protocol.protocol_type", "value": "tcp" }
-              ]
-            },
-            "timewait_timeout": {
-              "type": "number",
-              "description": "Time-wait timeout in seconds (TCP only)",
-              "visibleWhen": [
-                { "field": "protocol.tcp.enable_timeout_override", "value": true },
-                { "field": "protocol.protocol_type", "value": "tcp" }
-              ]
-            }
-          }
-        },
-        "udp": {
-          "type": "object",
-          "description": "UDP protocol settings",
-          "visibleWhen": { "field": "protocol.protocol_type", "value": "udp" },
-          "properties": {
-            "destination_port": {
-              "type": "string",
-              "description": "Destination port (e.g., 53)"
-            },
-            "enable_timeout_override": {
-              "type": "boolean",
-              "description": "Enable custom session timeout override"
-            },
-            "timeout": {
-              "type": "number",
-              "description": "Session timeout in seconds",
-              "visibleWhen": { "field": "protocol.udp.enable_timeout_override", "value": true }
-            }
-          }
-        }
-      }
+    "vsys_name": {
+      "type": "string",
+      "description": "The VSYS name (e.g., vsys1).",
+      "visibleWhen": { "field": "scope_type", "value": "vsys" }
+    },
+    "device_group_name": {
+      "type": "string",
+      "description": "The Panorama device group name.",
+      "visibleWhen": { "field": "scope_type", "value": "device_group" }
+    },
+    "protocol_type": {
+      "type": "string",
+      "description": "The protocol type.",
+      "enum": ["tcp", "udp"]
+    },
+    "destination_port": {
+      "type": "string",
+      "description": "Destination port (e.g., 8443, 8000-8080, 80,443)"
+    },
+    "source_port": {
+      "type": "string",
+      "description": "Source port (usually 'any'). TCP only.",
+      "visibleWhen": { "field": "protocol_type", "value": "tcp" }
+    },
+    "enable_timeout_override": {
+      "type": "boolean",
+      "description": "Enable custom session timeout override."
+    },
+    "timeout": {
+      "type": "number",
+      "description": "Session timeout in seconds.",
+      "visibleWhen": { "field": "enable_timeout_override", "value": true }
+    },
+    "halfclose_timeout": {
+      "type": "number",
+      "description": "Half-close timeout in seconds (TCP only).",
+      "visibleWhen": [
+        { "field": "enable_timeout_override", "value": true },
+        { "field": "protocol_type", "value": "tcp" }
+      ]
+    },
+    "timewait_timeout": {
+      "type": "number",
+      "description": "Time-wait timeout in seconds (TCP only).",
+      "visibleWhen": [
+        { "field": "enable_timeout_override", "value": true },
+        { "field": "protocol_type", "value": "tcp" }
+      ]
+    },
+    "disable_override": {
+      "type": "string",
+      "description": "Prevent child firewalls from overriding. PAN-OS uses quoted string values (yes/no).",
+      "visibleWhen": { "field": "scope_type", "value": "device_group" }
     },
     "tags": {
       "type": "array",
       "items": { "type": "string" },
-      "description": "Comma-separated list of tags"
-    },
-    "disable_override": {
-      "type": "string",
-      "description": "Prevent child firewalls from overriding this service object. PAN-OS uses quoted string values (yes/no).",
-      "visibleWhen": { "field": "location.scope_type", "value": "device_group" }
+      "uniqueItems": true,
+      "description": "Administrative tags (comma-separated)."
     }
-  }
+  },
+  "required": ["name", "scope_type", "protocol_type", "destination_port"]
 }
