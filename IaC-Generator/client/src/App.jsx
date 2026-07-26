@@ -65,7 +65,6 @@ const parseTextToConfig = (text) => {
 };
 
 // --- HELPER: Detect PAN-OS string fields that should be yes/no dropdowns ---
-// The PAN-OS provider uses strings like "yes"/"no" instead of true/false
 const PANOS_YES_NO_FIELDS = [
   'disable_override',
   'enabled', 
@@ -109,12 +108,10 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
   const displayName = name.split('.').pop();
 
   // --- CONDITIONAL VISIBILITY (UPGRADED FOR AND LOGIC) ---
-  // Supports single object { field, value } or array of objects [ {field, value}, ... ]
   if (schema.visibleWhen) {
     const conditions = Array.isArray(schema.visibleWhen) ? schema.visibleWhen : [schema.visibleWhen];
     const isVisible = conditions.every(({ field, value }) => {
       const fieldValue = formData[field];
-      // If the parent condition field doesn't exist yet, default to hidden (safe)
       if (fieldValue === undefined) return false;
       return fieldValue === value;
     });
@@ -182,7 +179,6 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
             const newVal = e.target.value;
             const updated = { ...formData, [name]: newVal };
             
-            // Auto-clear dependent fields when scope_type changes
             if (displayName === 'scope_type') {
               const basePath = name.includes('.') 
                 ? name.substring(0, name.lastIndexOf('.')) 
@@ -190,12 +186,8 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
               const dgPath = basePath ? `${basePath}.device_group.name` : 'device_group.name';
               const vsysPath = basePath ? `${basePath}.vsys.name` : 'vsys.name';
               
-              if (newVal !== 'device_group' && updated[dgPath]) {
-                delete updated[dgPath];
-              }
-              if (newVal !== 'vsys' && updated[vsysPath]) {
-                delete updated[vsysPath];
-              }
+              if (newVal !== 'device_group' && updated[dgPath]) delete updated[dgPath];
+              if (newVal !== 'vsys' && updated[vsysPath]) delete updated[vsysPath];
             }
             
             setFormData(updated);
@@ -213,7 +205,6 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
   }
 
   // --- PAN-OS YES/NO STRING FIELD (dropdown) ---
-  // Provider uses "yes"/"no" strings instead of boolean true/false
   if (isPanosYesNoField(name, schema)) {
     return (
       <div className="form-group">
@@ -240,8 +231,115 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
     );
   }
 
-  // --- ARRAY FIELD (comma-separated input for tags, etc.) ---
+  // --- ARRAY FIELD ---
   if (schema.type === 'array') {
+    
+    // --- NEW: ARRAY OF OBJECTS (e.g., panos_addresses) ---
+    if (schema.items?.type === 'object' && schema.items.properties) {
+      const currentArray = Array.isArray(formData[name]) ? formData[name] : [];
+
+      const handleItemChange = (index, fieldKey, value) => {
+        const updatedArray = currentArray.map((item, i) => 
+          i === index ? { ...item, [fieldKey]: value } : item
+        );
+        setFormData({ ...formData, [name]: updatedArray });
+      };
+
+      const addItem = () => {
+        const newItem = {};
+        Object.keys(schema.items.properties).forEach(k => {
+           if(schema.items.properties[k].type === 'array') newItem[k] = [];
+           else newItem[k] = "";
+        });
+        setFormData({ ...formData, [name]: [...currentArray, newItem] });
+      };
+
+      const removeItem = (index) => {
+        if (currentArray.length <= 1) return; // Keep at least one
+        setFormData({ ...formData, [name]: currentArray.filter((_, i) => i !== index) });
+      };
+
+      return (
+        <div className="form-group nested-group" title={tooltipText}>
+          <label className="nested-label">
+            {displayName} {isRequired && <span className="req">*</span>} 
+            <span className="type-badge">object list</span>
+          </label>
+          {baseDescription && <span className="help-text">{baseDescription}</span>}
+          
+          {currentArray.map((item, index) => (
+            <div key={index} style={{ border: '1px solid #555', padding: '15px', marginBottom: '15px', borderRadius: '4px', background: '#2b2b2b' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', borderBottom: '1px solid #444', paddingBottom: '5px' }}>
+                <strong style={{ color: '#fff' }}>Object {index + 1}</strong>
+                {currentArray.length > 1 && (
+                  <button type="button" onClick={() => removeItem(index)} style={{ color: '#ff5555', background: 'none', border: '1px solid #ff5555', cursor: 'pointer', borderRadius: '3px', padding: '2px 6px' }}>Remove</button>
+                )}
+              </div>
+              
+              {Object.entries(schema.items.properties).map(([childKey, childSchema]) => {
+                const val = item[childKey] || '';
+                const isChildRequired = (schema.items.required || []).includes(childKey);
+                const childTooltip = `${childKey}: ${childSchema.description || ''}${isChildRequired ? ' (Required)' : ''}`;
+
+                // Handle visibleWhen inside the array item (crucial for ip_netmask hiding when fqdn is selected)
+                if (childSchema.visibleWhen) {
+                   const conditions = Array.isArray(childSchema.visibleWhen) ? childSchema.visibleWhen : [childSchema.visibleWhen];
+                   const isVisible = conditions.every(({ field, value }) => item[field] === value);
+                   if (!isVisible) return null;
+                }
+
+                // Handle Enums (e.g., address_type)
+                if (childSchema.enum) {
+                   return (
+                     <div className="form-group" key={childKey} style={{ marginTop: '5px' }}>
+                       <label title={childTooltip}>{childKey} {isChildRequired && <span className="req">*</span>}</label>
+                       <select className="select-input" value={val} onChange={(e) => handleItemChange(index, childKey, e.target.value)} title={childTooltip}>
+                         <option value="">-- Select {childKey} --</option>
+                         {childSchema.enum.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                       </select>
+                       {childSchema.description && <span className="help-text">{childSchema.description}</span>}
+                     </div>
+                   );
+                }
+
+                // Handle Arrays inside objects (e.g., tags -> comma separated)
+                if (childSchema.type === 'array') {
+                   const displayVal = Array.isArray(val) ? val.join(', ') : '';
+                   return (
+                     <div className="form-group" key={childKey} style={{ marginTop: '5px' }}>
+                       <label title={childTooltip}>{childKey} <span className="type-badge">list</span></label>
+                       <input type="text" placeholder="comma separated" value={displayVal} onChange={(e) => {
+                         const arrVal = e.target.value.split(',').map(v => v.trim()).filter(v => v);
+                         handleItemChange(index, childKey, arrVal);
+                       }} />
+                       {childSchema.description && <span className="help-text">{childSchema.description}</span>}
+                     </div>
+                   );
+                }
+
+                // Default Text Input
+                let placeholder = `(${childSchema.type || 'string'})`;
+                if (ADDRESS_TYPE_FIELDS.includes(childKey)) placeholder = getAddressPlaceholder(childKey);
+                
+                return (
+                  <div className="form-group" key={childKey} style={{ marginTop: '5px' }}>
+                    <label title={childTooltip}>{childKey} {isChildRequired && <span className="req">*</span>}</label>
+                    <input type="text" placeholder={placeholder} value={val} onChange={(e) => handleItemChange(index, childKey, e.target.value)} />
+                    {childSchema.description && <span className="help-text">{childSchema.description}</span>}
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+          
+          <button type="button" onClick={addItem} className="ingest-btn" style={{ marginTop: '10px', width: '100%' }}>
+            + Add {displayName.replace(/s$/, '')} Object
+          </button>
+        </div>
+      );
+    }
+
+    // --- DEFAULT: ARRAY OF STRINGS (comma-separated input for tags, etc.) ---
     const currentValue = formData[name];
     const displayValue = Array.isArray(currentValue) 
       ? currentValue.join(', ') 
@@ -307,7 +405,6 @@ const VENDOR_GROUPS = [
   {
     category: "Security SaaS",
     vendors: [
-      // Adjust 'matchProvider' if your DB uses a different string for Defender (e.g., 'defender')
       { id: "defender", label: "Microsoft Defender XDR", matchProvider: "microsoft" } 
     ]
   },
@@ -356,7 +453,6 @@ function App() {
     });
   }, [selectedType, ingestTrigger]);
 
-  // --- File Upload Handler ---
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -393,7 +489,9 @@ function App() {
       });
       setGeneratedCode(res.data.code);
     } catch (err) {
-      setGeneratedCode(`// Error generating code`);
+      // FIX: Display exact backend validation errors from the 3rd party auditor logic
+      const errorMsg = err.response?.data?.error || err.message || 'Unknown error generating code';
+      setGeneratedCode(`// ERROR: ${errorMsg}`);
     }
     setLoading(false);
   };
@@ -407,7 +505,6 @@ function App() {
     (schema?.provider === 'aws' ? ['terraform', 'cdk-python', 'cloudformation'] : 
     (schema?.provider === 'gcp' ? ['terraform'] : ['terraform', 'bicep']));
 
-  // --- HELPER: Get the object name from formData for label preview ---
   const getObjectLabel = () => {
     const nameValue = formData.name || formData['object.name'] || '';
     if (!nameValue) return null;
@@ -416,7 +513,6 @@ function App() {
     return `${resourceType}.${normalizeToSnakeCase(nameValue)}`;
   };
 
-  // --- HELPER: Group flat resources into vendor hierarchy ---
   const getGroupedResources = () => {
     const grouped = VENDOR_GROUPS.map(cat => ({
       ...cat,
@@ -454,9 +550,9 @@ function App() {
             <div key={cat.category} className="vendor-category">
               <div className="category-header">{cat.category}</div>
               {cat.vendors.map(vendor => {
-                if (vendor.resources.length === 0) return null; // Hide empty vendors
+                if (vendor.resources.length === 0) return null;
                 
-                const isExpanded = expandedGroups[vendor.id] === true; // Default to collapsed
+                const isExpanded = expandedGroups[vendor.id] === true;
                 
                 return (
                   <div key={vendor.id} className="vendor-group">
@@ -535,7 +631,6 @@ function App() {
               </div>
             </div>
 
-            {/* Resource Label Preview for PAN-OS resources */}
             {selectedType?.startsWith('panos_') && getObjectLabel() && (
               <div className="label-preview">
                 <span className="preview-label">Terraform Resource Label:</span>
