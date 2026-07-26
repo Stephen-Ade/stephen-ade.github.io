@@ -55,14 +55,6 @@
       "supportedPlatforms": ["terraform"],
       "schemaFile": "panos-pbf-policy-rules.schema.json",
       "templateFile": "panos-pbf-policy-rules.hcl"
-    },
-    {
-      "id": "panos_dos_policy_rules",
-      "vendor": "Palo Alto Networks",
-      "deviceType": "DoS Protection Policy Rules",
-      "supportedPlatforms": ["terraform"],
-      "schemaFile": "panos-dos-policy-rules.schema.json",
-      "templateFile": "panos-dos-policy-rules.hcl"
     }
   ]
 }
