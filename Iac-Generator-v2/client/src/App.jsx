@@ -468,13 +468,13 @@ function App() {
   const [expandedGroups, setExpandedGroups] = useState({});
 
   useEffect(() => {
-    axios.get('http://localhost:3001/api/resources').then(res => setResources(res.data));
+    axios.get('/api/resources').then(res => setResources(res.data));
   }, []);
 
   useEffect(() => {
     if (!selectedType) return;
     
-    axios.get(`http://localhost:3001/api/schema/${encodeURIComponent(selectedType)}`).then(res => {
+    axios.get(`/api/schema/${encodeURIComponent(selectedType)}`).then(res => {
       setSchema(res.data);
       setPlatform(res.data.provider === 'azure' ? 'bicep' : 'terraform');
       
@@ -518,7 +518,7 @@ function App() {
     const nestedConfig = unflattenObject(cleanConfig);
 
     try {
-      const res = await axios.post('http://localhost:3001/api/generate', { 
+      const res = await axios.post('/api/generate', { 
         typeName: selectedType, 
         platform, 
         config: nestedConfig 
@@ -579,7 +579,7 @@ function App() {
       <aside className="sidebar">
         <h3>IaC Resources</h3>
         <input type="text" placeholder="Search..." onChange={(e) => {
-          axios.get(`http://localhost:3001/api/resources?search=${e.target.value}`).then(res => setResources(res.data));
+          axios.get(`/api/resources?search=${e.target.value}`).then(res => setResources(res.data));
         }} />
         <div className="resource-list">
           {getGroupedResources().map(cat => (

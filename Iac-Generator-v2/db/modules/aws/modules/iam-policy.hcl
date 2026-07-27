@@ -1,5 +1,5 @@
 # WARNING: Do not add terraform or provider blocks here to prevent crashes in user environments.
-# DevSecOps Note: Triple-stache {{{PolicyDocument}}} is used to output raw JSON. 
+# DevSecOps Note: Triple-stache syntax is used to output raw JSON safely.
 # The backend strictly stringifies this in server.js to prevent RCE.
 
 module "{{tfLabel PolicyName}}" {

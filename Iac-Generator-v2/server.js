@@ -327,8 +327,6 @@ app.post('/api/generate', (req, res) => {
         
         if (platform === 'terraform') {
             // --- INVISIBLE UPGRADE: Intercept for Premium TF Modules ---
-            console.log("🔍 DEBUG INCOMING TYPE:", JSON.stringify(typeName));
-            console.log("🔍 DEBUG OVERRIDES MAP:", JSON.stringify(tfModuleOverrides));
             const override = tfModuleOverrides[typeName];
             
             if (override) {
@@ -343,7 +341,7 @@ app.post('/api/generate', (req, res) => {
                     // preventing Prototype Pollution/RCE vulnerabilities.
                     const safeConfig = JSON.parse(JSON.stringify(config));
                     if (safeConfig.PolicyDocument && typeof safeConfig.PolicyDocument !== 'string') {
-                        safeConfig.PolicyDocument = JSON.stringify(safeConfig.PolicyDocument);
+                        safeConfig.PolicyDocument = JSON.stringify(safeConfig.PolicyDocument, null, 2);
                     }
 
                     code = template(safeConfig);
