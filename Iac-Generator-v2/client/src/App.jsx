@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import * as yaml from 'js-yaml';
 import Editor from '@monaco-editor/react';
 import './App.css';
 
@@ -187,7 +188,7 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
               const vsysPath = basePath ? `${basePath}.vsys.name` : 'vsys.name';
               
               if (newVal !== 'device_group' && updated[dgPath]) delete updated[dgPath];
-              if (newVal !== 'vsys' && updated[vsysPath]) delete updated[vsysPath];
+              if (newVal !== 'vsys' && updated[vsysPath]) delete updated[vysPath];
             }
             
             setFormData(updated);
@@ -493,17 +494,75 @@ function App() {
     const file = event.target.files[0];
     if (!file) return;
 
+    // --- DEVSECOPS: Hostile File Validation ---
+    const validExts = ['.txt', '.json', '.yaml', '.yml', '.csv', '.cfg', '.conf'];
+    const fileExt = '.' + file.name.split('.').pop().toLowerCase();
+    
+    if (!validExts.includes(fileExt)) {
+      setGeneratedCode(`// ERROR: Invalid file extension (${fileExt}). Allowed: .json, .yaml, .yml, .txt`);
+      event.target.value = null; 
+      return;
+    }
+
+    // Prevent DoS via massive file uploads
+    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      setGeneratedCode('// ERROR: File size exceeds 5MB safety limit.');
+      event.target.value = null; 
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = (e) => {
       const text = e.target.result;
-      const { targetModule, config } = parseTextToConfig(text);
-      
-      setPendingFormData(config);
-      setSelectedType(targetModule || 'panos_security_policy_rules');
-      setIngestTrigger(prev => prev + 1); 
+
+      try {
+        let parsedData;
+
+        // 1. Parse based on file type
+        if (fileExt === '.json' || text.trim().startsWith('{')) {
+          parsedData = JSON.parse(text);
+        } 
+        else if (fileExt === '.yaml' || fileExt === '.yml') {
+          // DEVSECOPS: Use JSON_SCHEMA to prevent unsafe YAML object instantiation
+          parsedData = yaml.load(text, { schema: yaml.JSON_SCHEMA });
+        } 
+        else {
+          // Fallback to legacy custom .txt format (@module: ...)
+          const legacyData = parseTextToConfig(text);
+          setPendingFormData(legacyData.config);
+          setSelectedType(legacyData.targetModule || 'panos_security_policy_rules');
+          setIngestTrigger(prev => prev + 1); 
+          event.target.value = null;
+          return;
+        }
+
+        // 2. Validate CloudFormation Structure
+        if (!parsedData.Type || !parsedData.Properties) {
+          setGeneratedCode('// ERROR: Invalid schema. CloudFormation JSON/YAML must have root "Type" and "Properties" keys.');
+          return;
+        }
+
+        const cfnType = parsedData.Type;
+        const config = { ...parsedData.Properties };
+
+        // 3. Handle CloudFormation Quirks (Object-to-String flattening)
+        // The UI text input expects PolicyDocument as a string, not a nested object.
+        if (config.PolicyDocument && typeof config.PolicyDocument === 'object') {
+          config.PolicyDocument = JSON.stringify(config.PolicyDocument, null, 2);
+        }
+
+        // 4. Inject into UI
+        setPendingFormData(config);
+        setSelectedType(cfnType);
+        setIngestTrigger(prev => prev + 1); 
+
+      } catch (err) {
+        setGeneratedCode(`// ERROR: Failed to parse file. ${err.message}`);
+      }
     };
+    
     reader.readAsText(file);
-    event.target.value = null; 
+    event.target.value = null; // Reset input so same file can be re-uploaded
   };
 
   const handleGenerate = async (e) => {
@@ -661,7 +720,7 @@ function App() {
                   type="file" 
                   ref={fileInputRef} 
                   style={{ display: 'none' }} 
-                  accept=".txt,.csv,.cfg,.conf" 
+                  accept=".txt,.csv,.cfg,.conf,.json,.yaml,.yml" 
                   onChange={handleFileUpload} 
                 />
               </div>
