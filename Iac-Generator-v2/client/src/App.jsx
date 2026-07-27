@@ -188,7 +188,7 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
               const vsysPath = basePath ? `${basePath}.vsys.name` : 'vsys.name';
               
               if (newVal !== 'device_group' && updated[dgPath]) delete updated[dgPath];
-              if (newVal !== 'vsys' && updated[vsysPath]) delete updated[vysPath];
+              if (newVal !== 'vsys' && updated[vsysPath]) delete updated[vsysPath];
             }
             
             setFormData(updated);
@@ -551,8 +551,25 @@ function App() {
           config.PolicyDocument = JSON.stringify(config.PolicyDocument, null, 2);
         }
 
+        // 3.5 FLATTEN NESTED OBJECTS: The UI form uses dot-notation (e.g., labels.Environment)
+        // Standard JSON uses nested objects. We must flatten it for the UI to render it properly.
+        const flattenObject = (obj, parentKey = '') => {
+          let flat = {};
+          for (const [key, value] of Object.entries(obj)) {
+            const newKey = parentKey ? `${parentKey}.${key}` : key;
+            if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+              Object.assign(flat, flattenObject(value, newKey));
+            } else {
+              flat[newKey] = value;
+            }
+          }
+          return flat;
+        };
+
+        const flatConfig = flattenObject(config);
+
         // 4. Inject into UI
-        setPendingFormData(config);
+        setPendingFormData(flatConfig);
         setSelectedType(cfnType);
         setIngestTrigger(prev => prev + 1); 
 

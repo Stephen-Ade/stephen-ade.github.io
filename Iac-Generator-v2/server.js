@@ -387,6 +387,13 @@ app.post('/api/generate', (req, res) => {
                         safeConfig.Tags = hclMap;
                     }
 
+                    // SECURE JSON HANDLING: Convert GCP labels to HCL Map syntax
+                    if (safeConfig.labels && typeof safeConfig.labels === 'object') {
+                        let hclMap = JSON.stringify(safeConfig.labels, null, 2);
+                        hclMap = hclMap.replace(/"([^"]+)":/g, '$1 =');
+                        safeConfig.labels = hclMap;
+                    }
+
                     code = template({ ...safeConfig, moduleVersion: override.version });
                     language = 'hcl';
                 } catch (templateErr) {
