@@ -1,0 +1,76 @@
+{
+  "modules": [
+    {
+      "id": "panos_security_policy_rules",
+      "vendor": "Palo Alto",
+      "deviceType": "Security Policy Rules",
+      "supportedPlatforms": ["terraform"],
+      "schemaFile": "PaloAlto/panos-security-policy-rules.schema.json",
+      "templateFile": "PaloAlto/panos-security-policy-rules.hcl"
+    },
+    {
+      "id": "panos_address",
+      "vendor": "Palo Alto",
+      "deviceType": "Address Objects",
+      "supportedPlatforms": ["terraform"],
+      "schemaFile": "PaloAlto/panos-address.schema.json",
+      "templateFile": "PaloAlto/panos-address.hcl"
+    },
+    {
+      "id": "panos_addresses",
+      "vendor": "Palo Alto",
+      "deviceType": "Bulk Address Objects",
+      "supportedPlatforms": ["terraform"],
+      "schemaFile": "PaloAlto/panos-addresses.schema.json",
+      "templateFile": "PaloAlto/panos-addresses.hcl"
+    },
+    {
+      "id": "panos_service",
+      "vendor": "Palo Alto",
+      "deviceType": "Service Objects",
+      "supportedPlatforms": ["terraform"],
+      "schemaFile": "PaloAlto/panos-service.schema.json",
+      "templateFile": "PaloAlto/panos-service.hcl"
+    },
+    {
+      "id": "panos_nat_policy_rules",
+      "vendor": "Palo Alto",
+      "deviceType": "NAT Policy Rules",
+      "supportedPlatforms": ["terraform"],
+      "schemaFile": "PaloAlto/panos-nat-policy-rules.schema.json",
+      "templateFile": "PaloAlto/panos-nat-policy-rules.hcl"
+    },
+    {
+      "id": "panos_security_profile_group",
+      "vendor": "Palo Alto",
+      "deviceType": "Security Profile Groups",
+      "supportedPlatforms": ["terraform"],
+      "schemaFile": "PaloAlto/panos-security-profile-group.schema.json",
+      "templateFile": "PaloAlto/panos-security-profile-group.hcl"
+    },
+    {
+      "id": "panos_decryption_policy_rules",
+      "vendor": "Palo Alto",
+      "deviceType": "Decryption Policy Rules",
+      "supportedPlatforms": ["terraform"],
+      "schemaFile": "PaloAlto/panos-decryption-policy-rules.schema.json",
+      "templateFile": "PaloAlto/panos-decryption-policy-rules.hcl"
+    },
+    {
+      "id": "panos_pbf_policy_rules",
+      "vendor": "Palo Alto",
+      "deviceType": "PBF Policy Rules",
+      "supportedPlatforms": ["terraform"],
+      "schemaFile": "PaloAlto/panos-pbf-policy-rules.schema.json",
+      "templateFile": "PaloAlto/panos-pbf-policy-rules.hcl"
+    },
+    {
+      "id": "panos_authentication_policy_rules",
+      "vendor": "Palo Alto",
+      "deviceType": "Authentication Policy Rules",
+      "supportedPlatforms": ["terraform"],
+      "schemaFile": "PaloAlto/panos-authentication-policy-rules.schema.json",
+      "templateFile": "PaloAlto/panos-authentication-policy-rules.hcl"
+    }
+  ]
+}

@@ -1,0 +1,118 @@
+{
+  "typeName": "panos/panos_pbf_policy_rules",
+  "provider": "panos",
+  "vendor": "Palo Alto",
+  "deviceType": "PBF Policy Rules",
+  "supportedPlatforms": ["terraform"],
+  "description": "Manages positioned Policy-Based Forwarding rules for PAN-OS Provider 2.0.x.",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the PBF rule."
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional description for the rule."
+    },
+    "scope_type": {
+      "type": "string",
+      "description": "Where this rule lives.",
+      "enum": ["device_group", "shared", "vsys"]
+    },
+    "device_group_name": {
+      "type": "string",
+      "description": "The Panorama device group name.",
+      "visibleWhen": { "field": "scope_type", "value": "device_group" }
+    },
+    "vsys": {
+      "type": "string",
+      "description": "The VSYS ID (e.g., vsys1).",
+      "visibleWhen": { "field": "scope_type", "value": "vsys" }
+    },
+    "rulebase": {
+      "type": "string",
+      "description": "The Panorama rulebase.",
+      "enum": ["pre-rulebase", "post-rulebase"],
+      "visibleWhen": { "field": "scope_type", "value": "device_group" }
+    },
+    "position_where": {
+      "type": "string",
+      "description": "Positioning of the rule in the rulebase.",
+      "enum": ["first", "last", "before", "after"]
+    },
+    "source_type": {
+      "type": "string",
+      "description": "Match traffic by source zone or source interface.",
+      "enum": ["zone", "interface"]
+    },
+    "source_zone": {
+      "type": "string",
+      "description": "The source zone (used if Source Type = zone).",
+      "visibleWhen": { "field": "source_type", "value": "zone" }
+    },
+    "source_interface": {
+      "type": "string",
+      "description": "The source interface (used if Source Type = interface).",
+      "visibleWhen": { "field": "source_type", "value": "interface" }
+    },
+    "source_addresses": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Source addresses (comma-separated). Use 'any' for all."
+    },
+    "destination_addresses": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Destination addresses (comma-separated). Use 'any' for all."
+    },
+    "negate_source": {
+      "type": "boolean",
+      "description": "Match on the inverse of the source address list."
+    },
+    "negate_destination": {
+      "type": "boolean",
+      "description": "Match on the inverse of the destination address list."
+    },
+    "applications": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Applications to match (comma-separated). Use 'any' for all."
+    },
+    "services": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Services to match (comma-separated). Typically 'application-default'."
+    },
+    "action": {
+      "type": "string",
+      "description": "The action to take.",
+      "enum": ["forward", "discard", "no-pbf"]
+    },
+    "egress_interface": {
+      "type": "string",
+      "description": "The interface to forward traffic out of.",
+      "visibleWhen": { "field": "action", "value": "forward" }
+    },
+    "next_hop_type": {
+      "type": "string",
+      "description": "Type of next hop. Select 'none' to omit the next_hop block.",
+      "enum": ["none", "ip_address", "fqdn"],
+      "visibleWhen": { "field": "action", "value": "forward" }
+    },
+    "next_hop_value": {
+      "type": "string",
+      "description": "The IP address or FQDN of the next hop.",
+      "visibleWhen": { "field": "action", "value": "forward" }
+    },
+    "tag": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Administrative tags (comma-separated)."
+    },
+    "disabled": {
+      "type": "boolean",
+      "description": "Set to true to disable this rule."
+    }
+  },
+  "required": ["name", "scope_type", "source_type", "source_addresses", "destination_addresses", "action"]
+}

@@ -1,0 +1,133 @@
+{
+  "typeName": "panos/panos_decryption_policy_rules",
+  "provider": "panos",
+  "vendor": "Palo Alto",
+  "deviceType": "Decryption Policy Rule",
+  "supportedPlatforms": ["terraform"],
+  "description": "Manages a positioned Decryption policy rule for PAN-OS Provider 2.0.x.",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the decryption rule."
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional description for the rule."
+    },
+    "scope_type": {
+      "type": "string",
+      "description": "Where this rule lives.",
+      "enum": ["device_group", "shared", "vsys"]
+    },
+    "device_group_name": {
+      "type": "string",
+      "description": "The Panorama device group name.",
+      "visibleWhen": { "field": "scope_type", "value": "device_group" }
+    },
+    "vsys": {
+      "type": "string",
+      "description": "The VSYS ID (e.g., vsys1).",
+      "visibleWhen": { "field": "scope_type", "value": "vsys" }
+    },
+    "rulebase": {
+      "type": "string",
+      "description": "The Panorama rulebase.",
+      "enum": ["pre-rulebase", "post-rulebase"],
+      "visibleWhen": { "field": "scope_type", "value": "device_group" }
+    },
+    "position_where": {
+      "type": "string",
+      "description": "Positioning of the rule in the rulebase.",
+      "enum": ["first", "last", "before", "after"]
+    },
+    "source_zones": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Source zones (comma-separated)."
+    },
+    "destination_zones": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Destination zones (comma-separated)."
+    },
+    "source_addresses": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Source addresses (comma-separated). Use 'any' for all."
+    },
+    "destination_addresses": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Destination addresses (comma-separated). Use 'any' for all."
+    },
+    "negate_source": {
+      "type": "boolean",
+      "description": "Match on the inverse of the source address list."
+    },
+    "negate_destination": {
+      "type": "boolean",
+      "description": "Match on the inverse of the destination address list."
+    },
+    "source_user": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Source users (comma-separated). Use 'any' for all."
+    },
+    "services": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Services to match (comma-separated). Typically 'application-default'."
+    },
+    "category": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "URL categories to match (comma-separated). Use 'any' for all."
+    },
+    "action": {
+      "type": "string",
+      "description": "The action to take.",
+      "enum": ["no-decrypt", "decrypt", "decrypt-mirror"]
+    },
+    "profile": {
+      "type": "string",
+      "description": "Reference to a panos_decryption_profile."
+    },
+    "decryption_type": {
+      "type": "string",
+      "description": "The type of decryption block to generate.",
+      "enum": ["ssl_forward_proxy", "ssl_inbound_inspection", "ssh_proxy"]
+    },
+    "inbound_certificates": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Certificates for inbound inspection (comma-separated).",
+      "visibleWhen": { "field": "decryption_type", "value": "ssl_inbound_inspection" }
+    },
+    "tag": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Administrative tags (comma-separated)."
+    },
+    "group_tag": {
+      "type": "string",
+      "description": "Object group tag."
+    },
+    "disabled": {
+      "type": "boolean",
+      "description": "Set to true to disable this rule."
+    },
+    "log_success": {
+      "type": "boolean",
+      "description": "Log successful decrypted sessions."
+    },
+    "log_fail": {
+      "type": "boolean",
+      "description": "Log failed decryption sessions."
+    },
+    "log_setting": {
+      "type": "string",
+      "description": "Custom log forwarding profile."
+    }
+  },
+  "required": ["name", "scope_type", "source_zones", "destination_zones", "source_addresses", "destination_addresses", "action", "decryption_type"]
+}

@@ -1,0 +1,93 @@
+# Microsoft.Security @ 2022-01-01
+
+## Resource Microsoft.Security/locations/alerts@2022-01-01
+* **Readable Scope(s)**: Subscription, ResourceGroup
+* **Writable Scope(s)**: None
+### Properties
+* **apiVersion**: '2022-01-01' (ReadOnly, DeployTimeConstant): The resource api version
+* **id**: string (ReadOnly, DeployTimeConstant): The resource id
+* **name**: string (Required, DeployTimeConstant): The resource name
+* **properties**: [AlertProperties](#alertproperties) (ReadOnly): describes security alert properties.
+* **systemData**: [SystemData](#systemdata) (ReadOnly): Azure Resource Manager metadata containing createdBy and modifiedBy information.
+* **type**: 'Microsoft.Security/locations/alerts' (ReadOnly, DeployTimeConstant): The resource type
+
+## AlertEntity
+### Properties
+* **type**: string (ReadOnly): Type of entity
+### Additional Properties
+* **Additional Properties Type**: any
+
+## AlertProperties
+### Properties
+* **alertDisplayName**: string (ReadOnly): The display name of the alert.
+* **alertType**: string (ReadOnly): Unique identifier for the detection logic (all alert instances from the same detection logic will have the same alertType).
+* **alertUri**: string (ReadOnly): A direct link to the alert page in Azure Portal.
+* **compromisedEntity**: string (ReadOnly): The display name of the resource most related to this alert.
+* **correlationKey**: string (ReadOnly): Key for corelating related alerts. Alerts with the same correlation key considered to be related.
+* **description**: string (ReadOnly): Description of the suspicious activity that was detected.
+* **endTimeUtc**: string (ReadOnly): The UTC time of the last event or activity included in the alert in ISO8601 format.
+* **entities**: [AlertEntity](#alertentity)[] (ReadOnly): A list of entities related to the alert.
+* **extendedLinks**: [AlertPropertiesExtendedLinksItem](#alertpropertiesextendedlinksitem)[] (ReadOnly): Links related to the alert
+* **extendedProperties**: [AlertPropertiesExtendedProperties](#alertpropertiesextendedproperties): Custom properties for the alert.
+* **intent**: 'Collection' | 'CommandAndControl' | 'CredentialAccess' | 'DefenseEvasion' | 'Discovery' | 'Execution' | 'Exfiltration' | 'Exploitation' | 'Impact' | 'InitialAccess' | 'LateralMovement' | 'Persistence' | 'PreAttack' | 'PrivilegeEscalation' | 'Probing' | 'Unknown' | string (ReadOnly): The kill chain related intent behind the alert. For list of supported values, and explanations of Azure Security Center's supported kill chain intents.
+* **isIncident**: bool (ReadOnly): This field determines whether the alert is an incident (a compound grouping of several alerts) or a single alert.
+* **processingEndTimeUtc**: string (ReadOnly): The UTC processing end time of the alert in ISO8601 format.
+* **productComponentName**: string (ReadOnly): The name of Azure Security Center pricing tier which powering this alert. Learn more: https://docs.microsoft.com/en-us/azure/security-center/security-center-pricing
+* **productName**: string (ReadOnly): The name of the product which published this alert (Microsoft Sentinel, Microsoft Defender for Identity, Microsoft Defender for Endpoint, Microsoft Defender for Office, Microsoft Defender for Cloud Apps, and so on).
+* **remediationSteps**: string[] (ReadOnly): Manual action items to take to remediate the alert.
+* **resourceIdentifiers**: [ResourceIdentifier](#resourceidentifier)[] (ReadOnly): The resource identifiers that can be used to direct the alert to the right product exposure group (tenant, workspace, subscription etc.). There can be multiple identifiers of different type per alert.
+* **severity**: 'High' | 'Informational' | 'Low' | 'Medium' | string (ReadOnly): The risk level of the threat that was detected. Learn more: https://docs.microsoft.com/en-us/azure/security-center/security-center-alerts-overview#how-are-alerts-classified.
+* **startTimeUtc**: string (ReadOnly): The UTC time of the first event or activity included in the alert in ISO8601 format.
+* **status**: 'Active' | 'Dismissed' | 'InProgress' | 'Resolved' | string (ReadOnly): The life cycle status of the alert.
+* **subTechniques**: string[] (ReadOnly): Kill chain related sub-techniques behind the alert.
+* **supportingEvidence**: [AlertPropertiesSupportingEvidence](#alertpropertiessupportingevidence): Changing set of properties depending on the supportingEvidence type.
+* **systemAlertId**: string (ReadOnly): Unique identifier for the alert.
+* **techniques**: string[] (ReadOnly): kill chain related techniques behind the alert.
+* **timeGeneratedUtc**: string (ReadOnly): The UTC time the alert was generated in ISO8601 format.
+* **vendorName**: string (ReadOnly): The name of the vendor that raises the alert.
+* **version**: string (ReadOnly): Schema version.
+
+## AlertPropertiesExtendedLinksItem
+### Properties
+### Additional Properties
+* **Additional Properties Type**: string
+
+## AlertPropertiesExtendedProperties
+### Properties
+### Additional Properties
+* **Additional Properties Type**: string
+
+## AlertPropertiesSupportingEvidence
+### Properties
+* **type**: string (ReadOnly): Type of the supportingEvidence
+### Additional Properties
+* **Additional Properties Type**: any
+
+## ResourceIdentifier
+* **Discriminator**: type
+
+### Base Properties
+
+### AzureResourceIdentifier
+#### Properties
+* **azureResourceId**: string (ReadOnly): ARM resource identifier for the cloud resource being alerted on
+* **type**: 'AzureResource' (Required): There can be multiple identifiers of different type per alert, this field specify the identifier type.
+
+### LogAnalyticsIdentifier
+#### Properties
+* **agentId**: string (ReadOnly): (optional) The LogAnalytics agent id reporting the event that this alert is based on.
+* **type**: 'LogAnalytics' (Required): There can be multiple identifiers of different type per alert, this field specify the identifier type.
+* **workspaceId**: string (ReadOnly): The LogAnalytics workspace id that stores this alert.
+* **workspaceResourceGroup**: string (ReadOnly): The azure resource group for the LogAnalytics workspace storing this alert
+* **workspaceSubscriptionId**: string {pattern: "^[0-9A-Fa-f]{8}-([0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}$"} (ReadOnly): The azure subscription id for the LogAnalytics workspace storing this alert.
+
+
+## SystemData
+### Properties
+* **createdAt**: string: The timestamp of resource creation (UTC).
+* **createdBy**: string: The identity that created the resource.
+* **createdByType**: 'Application' | 'Key' | 'ManagedIdentity' | 'User' | string: The type of identity that created the resource.
+* **lastModifiedAt**: string: The timestamp of resource last modification (UTC)
+* **lastModifiedBy**: string: The identity that last modified the resource.
+* **lastModifiedByType**: 'Application' | 'Key' | 'ManagedIdentity' | 'User' | string: The type of identity that last modified the resource.
+

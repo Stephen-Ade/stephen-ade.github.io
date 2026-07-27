@@ -1,0 +1,151 @@
+{
+  "typeName": "panos/panos_authentication_policy_rules",
+  "provider": "panos",
+  "vendor": "Palo Alto",
+  "deviceType": "Authentication Policy Rules",
+  "supportedPlatforms": ["terraform"],
+  "description": "Manages positioned Authentication policy rules for PAN-OS Provider 2.0.x.",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the authentication rule."
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of the authentication rule."
+    },
+    "scope_type": {
+      "type": "string",
+      "description": "Where this rule lives.",
+      "enum": ["device_group", "shared", "vsys"],
+      "default": "device_group"
+    },
+    "device_group_name": {
+      "type": "string",
+      "description": "The Panorama device group name.",
+      "visibleWhen": { "field": "scope_type", "value": "device_group" }
+    },
+    "vsys_name": {
+      "type": "string",
+      "description": "The VSYS name (e.g., vsys1).",
+      "visibleWhen": { "field": "scope_type", "value": "vsys" }
+    },
+    "rulebase": {
+      "type": "string",
+      "description": "The Panorama rulebase.",
+      "enum": ["pre-rulebase", "post-rulebase"],
+      "default": "pre-rulebase"
+    },
+    "position_where": {
+      "type": "string",
+      "description": "Position of the rule in the rulebase.",
+      "enum": ["first", "last", "before", "after"],
+      "default": "last"
+    },
+    "position_pivot": {
+      "type": "string",
+      "description": "Existing rule used as the before/after positioning pivot."
+    },
+    "source_zones": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Source zones."
+    },
+    "destination_zones": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Destination zones."
+    },
+    "source_addresses": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Source addresses."
+    },
+    "destination_addresses": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Destination addresses."
+    },
+    "negate_source": {
+      "type": "boolean",
+      "description": "Match the inverse of the source address list.",
+      "default": false
+    },
+    "negate_destination": {
+      "type": "boolean",
+      "description": "Match the inverse of the destination address list.",
+      "default": false
+    },
+    "source_users": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "uniqueItems": true,
+      "default": ["any"],
+      "description": "Source users or user groups."
+    },
+    "category": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true,
+      "description": "URL categories to match (Auth policies use categories, not applications)."
+    },
+    "services": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "uniqueItems": true,
+      "default": ["any"],
+      "description": "Services to match."
+    },
+    "authentication_enforcement": {
+      "type": "string",
+      "description": "Authentication Enforcement object applied by this rule (e.g., 'MFA-Portal-Profile')."
+    },
+    "timeout": {
+      "type": "number",
+      "description": "Authentication expiration timer in minutes."
+    },
+    "log_authentication_timeout": {
+      "type": "boolean",
+      "description": "Log when authentication times out.",
+      "default": false
+    },
+    "disabled": {
+      "type": "boolean",
+      "description": "Set to true to disable this rule.",
+      "default": false
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true,
+      "description": "Administrative tags (comma-separated). Note: Auth policies use plural 'tags'."
+    },
+    "group_tag": {
+      "type": "string",
+      "description": "Group tag for the rule."
+    },
+    "log_setting": {
+      "type": "string",
+      "description": "Custom log forwarding profile."
+    }
+  },
+  "required": [
+    "name",
+    "scope_type",
+    "source_zones",
+    "destination_zones",
+    "source_addresses",
+    "destination_addresses",
+    "authentication_enforcement"
+  ]
+}
