@@ -13,5 +13,15 @@
     "source": "terraform-azurerm-modules/resource-group/azurerm",
     "version": "3.2.2",
     "template": "db/modules/azure/modules/resource-group.hcl"
+  },
+  "Microsoft.Network/virtualNetworks": {
+    "source": "terraform-azurerm-modules/vnet/azurerm",
+    "version": "4.0.0",
+    "template": "db/modules/azure/modules/vnet.hcl"
+  },
+  "Google::Storage::Bucket": {
+    "source": "terraform-google-modules/cloud-storage/google",
+    "version": "5.0.0",
+    "template": "db/modules/gcp/modules/gcs-bucket.hcl"
   }
 }
