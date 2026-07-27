@@ -186,7 +186,20 @@ function compileBicep(schema, config, safeName) {
     const propsConfig = { ...config };
     delete propsConfig.Name;
     delete propsConfig.Location;
-    delete propsConfig.Tags;
+    
+    // FIX: Extract tags to print at the resource root (Standard Bicep syntax)
+    const resourceTags = propsConfig.Tags;
+    delete propsConfig.Tags; 
+
+    // Print Tags at the root level if they exist
+    if (resourceTags) {
+        if (typeof resourceTags === 'object') {
+            bicep += `  tags: ${convertToBicep(resourceTags)}\n`;
+        } else {
+            // Fallback if someone passed a string instead of a JSON object
+            bicep += `  tags: ${convertToBicep(resourceTags)}\n`;
+        }
+    }
 
     if (Object.keys(propsConfig).length > 0) {
         bicep += `  properties: {\n`;
@@ -353,6 +366,15 @@ app.post('/api/generate', (req, res) => {
                             // If it's not valid JSON at all, fail securely instead of outputting broken Terraform
                             return res.status(400).json({ success: false, error: "PolicyDocument must be valid JSON." });
                         }
+                    }
+
+                    // SECURE JSON HANDLING: Convert JSON Tags to HCL Map syntax
+                    if (safeConfig.Tags && typeof safeConfig.Tags === 'object') {
+                        // 1. Stringify the JSON object
+                        let hclMap = JSON.stringify(safeConfig.Tags, null, 2);
+                        // 2. Use Regex to convert JSON {"Key": "Value"} to HCL { Key = "Value" }
+                        hclMap = hclMap.replace(/"([^"]+)":/g, '$1 =');
+                        safeConfig.Tags = hclMap;
                     }
 
                     code = template({ ...safeConfig, moduleVersion: override.version });
