@@ -21,7 +21,7 @@
   },
   "Google::Storage::Bucket": {
     "source": "terraform-google-modules/cloud-storage/google",
-    "version": "5.0.0",
+    "version": "12.3.0",
     "template": "db/modules/gcp/modules/gcs-bucket.hcl"
   }
 }
