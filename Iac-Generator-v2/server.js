@@ -246,6 +246,16 @@ function convertToBicep(value) {
     if (typeof value === 'boolean') return value ? 'true' : 'false';
     if (typeof value === 'number') return String(value);
     if (Array.isArray(value)) return `[${value.map(v => typeof v === 'string' ? `'${v}'` : v).join(', ')}]`;
+    
+    // FIX: Handle objects (like Tags) properly for Bicep syntax { Key: 'Value' }
+    if (typeof value === 'object' && value !== null) {
+        const entries = Object.entries(value).map(([k, v]) => {
+            const bicepValue = typeof v === 'string' ? `'${v}'` : convertToBicep(v);
+            return `${k}: ${bicepValue}`;
+        });
+        return `{\n${entries.map(e => `    ${e}`).join('\n')}\n  }`;
+    }
+    
     return '{}';
 }
 
