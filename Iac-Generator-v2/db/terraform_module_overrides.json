@@ -8,5 +8,10 @@
     "source": "terraform-azurerm-modules/managed-identity/azurerm",
     "version": "3.0.2",
     "template": "db/modules/azure/modules/managed-identity.hcl"
+  },
+  "Microsoft.Resources/resourceGroups": {
+    "source": "terraform-azurerm-modules/resource-group/azurerm",
+    "version": "3.2.2",
+    "template": "db/modules/azure/modules/resource-group.hcl"
   }
 }
