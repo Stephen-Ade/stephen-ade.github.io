@@ -4,7 +4,7 @@
 
 module "{{tfLabel PolicyName}}" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.30.0"
+    version = "{{moduleVersion}}"
 
   name        = "{{PolicyName}}"
   

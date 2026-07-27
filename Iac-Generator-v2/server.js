@@ -355,7 +355,7 @@ app.post('/api/generate', (req, res) => {
                         }
                     }
 
-                    code = template(safeConfig);
+                    code = template({ ...safeConfig, moduleVersion: override.version });
                     language = 'hcl';
                 } catch (templateErr) {
                     console.error(`[DevSecOps] Template generation failed for ${typeName}:`, templateErr);
