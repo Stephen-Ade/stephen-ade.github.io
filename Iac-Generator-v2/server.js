@@ -327,6 +327,8 @@ app.post('/api/generate', (req, res) => {
         
         if (platform === 'terraform') {
             // --- INVISIBLE UPGRADE: Intercept for Premium TF Modules ---
+            console.log("🔍 DEBUG INCOMING TYPE:", JSON.stringify(typeName));
+            console.log("🔍 DEBUG OVERRIDES MAP:", JSON.stringify(tfModuleOverrides));
             const override = tfModuleOverrides[typeName];
             
             if (override) {
