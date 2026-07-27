@@ -70,6 +70,16 @@ if (fs.existsSync(REGISTRY_PATH)) {
     moduleRegistry = JSON.parse(fs.readFileSync(REGISTRY_PATH, 'utf8'));
 }
 
+// --- v2 FEATURE: Load Terraform Module Overrides (Invisible Upgrade) ---
+const TF_OVERRIDES_PATH = path.join(__dirname, 'db/terraform_module_overrides.json');
+let tfModuleOverrides = {};
+if (fs.existsSync(TF_OVERRIDES_PATH)) {
+    tfModuleOverrides = JSON.parse(fs.readFileSync(TF_OVERRIDES_PATH, 'utf8'));
+    console.log(`[v2 Engine] Loaded ${Object.keys(tfModuleOverrides).length} Terraform module overrides.`);
+} else {
+    console.warn('[v2 Engine] WARNING: db/terraform_module_overrides.json not found. Using raw compiler.');
+}
+
 // --- 3RD PARTY AUDITOR VALIDATION: Bulk Address Objects ---
 // Prevents empty "" = {} map keys and enforces strict schema compliance
 function validateBulkAddresses(entries) {
@@ -315,7 +325,37 @@ app.post('/api/generate', (req, res) => {
         const schema = db.resources[typeName];
         const safeName = typeName.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
         
-        if (platform === 'terraform') { code = compileTerraform(schema, config, safeName); language = 'hcl'; }
+        if (platform === 'terraform') {
+            // --- INVISIBLE UPGRADE: Intercept for Premium TF Modules ---
+            const override = tfModuleOverrides[typeName];
+            
+            if (override) {
+                console.log(`[v2 Engine] Intercepted ${typeName} -> Module Template.`);
+                try {
+                    const templatePath = path.join(__dirname, override.template);
+                    const templateString = fs.readFileSync(templatePath, 'utf8');
+                    const template = handlebars.compile(templateString);
+                    
+                    // DEVSECOPS: Deep clone config to prevent mutating req.body for other formats.
+                    // We MUST stringify PolicyDocument here so Handlebars {{{}}} outputs raw JSON safely,
+                    // preventing Prototype Pollution/RCE vulnerabilities.
+                    const safeConfig = JSON.parse(JSON.stringify(config));
+                    if (safeConfig.PolicyDocument && typeof safeConfig.PolicyDocument !== 'string') {
+                        safeConfig.PolicyDocument = JSON.stringify(safeConfig.PolicyDocument);
+                    }
+
+                    code = template(safeConfig);
+                    language = 'hcl';
+                } catch (templateErr) {
+                    console.error(`[DevSecOps] Template generation failed for ${typeName}:`, templateErr);
+                    return res.status(500).json({ success: false, error: "Module template compilation failed." });
+                }
+            } else {
+                // Fallback to v1 Raw Programmatic Compiler
+                code = compileTerraform(schema, config, safeName); 
+                language = 'hcl';
+            }
+        }
         else if (platform === 'bicep') { code = compileBicep(schema, config, safeName); language = 'bicep'; }
         else if (platform === 'cdk-python') { code = compileCdkPython(schema, config, safeName); language = 'python'; }
         else if (platform === 'cloudformation') { 
@@ -351,5 +391,6 @@ app.post('/api/generate', (req, res) => {
     res.json({ success: true, code, language });
 });
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+// --- SAFE DEPLOYMENT: Isolated v2 Port ---
+const PORT = process.env.PORT || 3002;
+app.listen(PORT, () => console.log(`🚀 IaC-Generator v2 running securely on http://localhost:${PORT}`));

@@ -1,0 +1,7 @@
+{
+  "AWS::IAM::Policy": {
+    "source": "terraform-aws-modules/iam/aws//modules/iam-policy",
+    "version": "5.30.0",
+    "template": "db/modules/aws/modules/iam-policy.hcl"
+  }
+}
