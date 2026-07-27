@@ -337,11 +337,22 @@ app.post('/api/generate', (req, res) => {
                     const template = handlebars.compile(templateString);
                     
                     // DEVSECOPS: Deep clone config to prevent mutating req.body for other formats.
-                    // We MUST stringify PolicyDocument here so Handlebars {{{}}} outputs raw JSON safely,
-                    // preventing Prototype Pollution/RCE vulnerabilities.
                     const safeConfig = JSON.parse(JSON.stringify(config));
-                    if (safeConfig.PolicyDocument && typeof safeConfig.PolicyDocument !== 'string') {
-                        safeConfig.PolicyDocument = JSON.stringify(safeConfig.PolicyDocument, null, 2);
+                    
+                    // SECURE JSON HANDLING: Validate and pretty-print PolicyDocument
+                    if (safeConfig.PolicyDocument) {
+                        try {
+                            // Parse it whether it's an object or a pasted string (validates against injection)
+                            const parsedPolicy = typeof safeConfig.PolicyDocument === 'string' 
+                                ? JSON.parse(safeConfig.PolicyDocument) 
+                                : safeConfig.PolicyDocument;
+                            
+                            // Re-stringify with 2-space indentation for clean, readable HCL output
+                            safeConfig.PolicyDocument = JSON.stringify(parsedPolicy, null, 2);
+                        } catch (e) {
+                            // If it's not valid JSON at all, fail securely instead of outputting broken Terraform
+                            return res.status(400).json({ success: false, error: "PolicyDocument must be valid JSON." });
+                        }
                     }
 
                     code = template(safeConfig);
