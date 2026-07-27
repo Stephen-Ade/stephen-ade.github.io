@@ -378,14 +378,24 @@ app.post('/api/generate', (req, res) => {
                         }
                     }
 
-                    // SECURE JSON HANDLING: Convert JSON Tags to HCL Map syntax
-                    if (safeConfig.Tags && typeof safeConfig.Tags === 'object') {
-                        // 1. Stringify the JSON object
-                        let hclMap = JSON.stringify(safeConfig.Tags, null, 2);
-                        // 2. Use Regex to convert JSON {"Key": "Value"} to HCL { Key = "Value" }
-                        hclMap = hclMap.replace(/"([^"]+)":/g, '$1 =');
-                        safeConfig.Tags = hclMap;
-                    }
+                                        // SECURE JSON HANDLING: Convert Tags/Labels to HCL Map syntax
+                    // (Handles both objects from manual UI entry, and strings from File Ingestion)
+                    const convertMapToHcl = (data, key) => {
+                        if (data[key]) {
+                            try {
+                                const parsedMap = typeof data[key] === 'string' 
+                                    ? JSON.parse(data[key]) 
+                                    : data[key];
+                                
+                                let hclMap = JSON.stringify(parsedMap, null, 2);
+                                hclMap = hclMap.replace(/"([^"]+)":/g, '$1 =');
+                                data[key] = hclMap;
+                            } catch (e) { /* Fail securely, leave as is */ }
+                        }
+                    };
+
+                    convertMapToHcl(safeConfig, 'Tags');
+                    convertMapToHcl(safeConfig, 'labels');
 
                     // SECURE JSON HANDLING: Convert GCP labels to HCL Map syntax
                     if (safeConfig.labels && typeof safeConfig.labels === 'object') {

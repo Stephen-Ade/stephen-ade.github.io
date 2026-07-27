@@ -545,20 +545,16 @@ function App() {
         const cfnType = parsedData.Type;
         const config = { ...parsedData.Properties };
 
-        // 3. Handle CloudFormation Quirks (Object-to-String flattening)
-        // The UI text input expects PolicyDocument as a string, not a nested object.
-        if (config.PolicyDocument && typeof config.PolicyDocument === 'object') {
-          config.PolicyDocument = JSON.stringify(config.PolicyDocument, null, 2);
-        }
-
-        // 3.5 FLATTEN NESTED OBJECTS: The UI form uses dot-notation (e.g., labels.Environment)
-        // Standard JSON uses nested objects. We must flatten it for the UI to render it properly.
+        // 3. UNIVERSAL INGESTION FLATTENING:
+        // The UI renders generic objects (like Tags, PolicyDocument, GCP labels) as text inputs.
+        // We stringify nested objects so they safely drop into standard text inputs, 
+        // and the backend will parse them back into objects before generating IaC.
         const flattenObject = (obj, parentKey = '') => {
           let flat = {};
           for (const [key, value] of Object.entries(obj)) {
             const newKey = parentKey ? `${parentKey}.${key}` : key;
             if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-              Object.assign(flat, flattenObject(value, newKey));
+              flat[newKey] = JSON.stringify(value);
             } else {
               flat[newKey] = value;
             }
