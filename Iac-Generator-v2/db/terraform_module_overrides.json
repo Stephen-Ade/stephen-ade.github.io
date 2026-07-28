@@ -19,7 +19,7 @@
     "version": "4.0.0",
     "template": "db/modules/azure/modules/vnet.hcl"
   },
-  "Google::Storage::Bucket": {
+  "google_storage_buckets": {
     "source": "terraform-google-modules/cloud-storage/google",
     "version": "12.3.0",
     "template": "db/modules/gcp/modules/gcs-bucket.hcl"
