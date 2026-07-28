@@ -6,17 +6,17 @@
   },
   "Microsoft.ManagedIdentity/userAssignedIdentities": {
     "source": "Azure/avm-res-managedidentity-userassignedidentity/azurerm",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "template": "db/modules/azure/modules/avm-managed-identity.hcl"
   },
   "Microsoft.Resources/resourceGroups": {
     "source": "Azure/avm-res-resources-resourcegroup/azurerm",
-    "version": "0.2.0",
+    "version": "0.4.0",
     "template": "db/modules/azure/modules/avm-resource-group.hcl"
   },
   "Microsoft.Network/virtualNetworks": {
     "source": "Azure/avm-res-network-virtualnetwork/azurerm",
-    "version": "0.5.0",
+    "version": "0.19.0",
     "template": "db/modules/azure/modules/avm-vnet.hcl"
   },
   "google_storage_buckets": {

@@ -1,0 +1,34 @@
+﻿{
+  "typeName": "Microsoft.Network/virtualNetworks",
+  "provider": "azure",
+  "description": "Azure Virtual Network (AVM)",
+  "supportedPlatforms": ["terraform"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the virtual network."
+    },
+    "resource_group_name": {
+      "type": "string",
+      "description": "Name of the existing Azure resource group."
+    },
+    "location": {
+      "type": "string",
+      "description": "Azure region (e.g., eastus, westeurope)."
+    },
+    "address_space": {
+      "type": "array",
+      "description": "List of address spaces (comma separated, e.g., 10.0.0.0/16, 192.168.0.0/16)",
+      "items": { "type": "string" }
+    },
+    "tags": {
+      "type": "object",
+      "description": "Resource tags as JSON object."
+    },
+    "enable_telemetry": {
+      "type": "boolean",
+      "description": "Enable AVM telemetry."
+    }
+  },
+  "required": ["name", "resource_group_name", "location", "address_space"]
+}
