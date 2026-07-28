@@ -332,6 +332,23 @@ app.get('/api/resources', (req, res) => {
 
 app.get('/api/schema/:typeName', (req, res) => {
     const typeName = decodeURIComponent(req.params.typeName);
+    
+    // --- AZURE AVM / TERRAFORM OVERRIDE SCHEMA SWAP ---
+    // If an "Invisible Upgrade" exists, serve its dedicated schema instead of schemas.json.
+    // This prevents Azure AzAPI fields (like tenantId) from polluting AVM/TF Module forms.
+    // It also locks the UI platform dropdown to 'terraform' only, hiding Bicep/CDK which 
+    // expect the raw ARM schema from schemas.json.
+    if (tfModuleOverrides[typeName]) {
+        const override = tfModuleOverrides[typeName];
+        const overrideSchemaPath = path.join(__dirname, override.template).replace('.hcl', '.schema.json');
+        if (fs.existsSync(overrideSchemaPath)) {
+            const overrideSchema = JSON.parse(fs.readFileSync(overrideSchemaPath, 'utf8'));
+            overrideSchema.supportedPlatforms = ['terraform']; // Force UI to only show Terraform
+            return res.json(overrideSchema);
+        }
+    }
+
+    // Standard schema lookup (Used for native Bicep, CloudFormation, CDK, and un-overridden TF)
     if (db.resources[typeName]) return res.json(db.resources[typeName]);
     
     const modMeta = moduleRegistry.modules.find(m => m.id === typeName);
