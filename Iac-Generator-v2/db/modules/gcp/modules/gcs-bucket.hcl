@@ -1,16 +1,15 @@
-# WARNING: Do not add terraform or provider blocks here to prevent crashes in user environments.
+# WARNING: Do not add terraform or provider blocks here to prevent
+# conflicts in user environments.
 
 module "{{tfLabel name}}" {
-  source  = "terraform-google-modules/cloud-storage/google"
+  source  = "terraform-google-modules/cloud-storage/google//modules/simple_bucket"
   version = "{{moduleVersion}}"
 
-  # The UI doesn't always provide project_id, so we fallback to a variable
-  project_id = "var.project_id" 
-  
+  project_id = {{projectIdExpression}}
   name       = "{{name}}"
-  location   = "{{location}}"
+  location   = "{{toLower location}}"
 
-  # GCP uses "labels" instead of "tags". 
-  # Gracefully fallback to empty labels object if UI doesn't send them.
-  labels = {{#if labels}}{{{labels}}}{{else}}{}{{/if}}
+{{#if labels}}
+  labels = {{{labels}}}
+{{/if}}
 }

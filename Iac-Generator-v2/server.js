@@ -410,6 +410,13 @@ app.post('/api/generate', (req, res) => {
                     convertMapToHcl(safeConfig, 'Tags');
                     convertMapToHcl(safeConfig, 'labels', true); // true = force GCP lowercase
 
+                    // GCP: project_id fallback - use literal if provided, else reference variable
+                    if (safeConfig.project_id && safeConfig.project_id.trim()) {
+                        safeConfig.projectIdExpression = '"' + safeConfig.project_id.trim() + '"';
+                    } else {
+                        safeConfig.projectIdExpression = 'var.project_id';
+                    }
+
                     code = template({ ...safeConfig, moduleVersion: override.version });
                     language = 'hcl';
                 } catch (templateErr) {
