@@ -1,8 +1,10 @@
-﻿{
+{
   "typeName": "Microsoft.Resources/resourceGroups",
   "provider": "azure",
   "description": "Azure Resource Group (AVM)",
-  "supportedPlatforms": ["terraform"],
+  "supportedPlatforms": [
+    "terraform"
+  ],
   "properties": {
     "name": {
       "type": "string",
@@ -21,5 +23,8 @@
       "description": "Enable AVM telemetry."
     }
   },
-  "required": ["name", "location"]
+  "required": [
+    "name",
+    "location"
+  ]
 }

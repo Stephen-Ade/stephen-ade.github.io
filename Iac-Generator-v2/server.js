@@ -4,6 +4,13 @@ const path = require('path');
 const fs = require('fs');
 const handlebars = require('handlebars');
 
+// DEVSECOPS: Windows BOM Stripper
+// PowerShell Out-File adds invisible BOM characters that break JSON.parse
+const parseJsonSafe = (filePath) => {
+    let raw = fs.readFileSync(filePath, 'utf8').replace(/^\uFEFF/, '');
+    return JSON.parse(raw);
+};
+
 // --- Handlebars Helper to safely output arrays from text ingestion ---
 // BULLETPROOF: Wraps in SafeString to prevent Handlebars from HTML-escaping quotes into &quot;
 handlebars.registerHelper('safeArray', function(items) {
@@ -63,7 +70,7 @@ app.use(express.static(path.join(__dirname, 'client/dist')));
 const DB_PATH = path.join(__dirname, 'db/schemas.json');
 let db = { resources: {} };
 if (fs.existsSync(DB_PATH)) {
-    db = JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
+    db = parseJsonSafe(DB_PATH);
 } else {
     console.warn('WARNING: db/schemas.json not found. Run "npm run ingest" first.');
 }
@@ -72,14 +79,14 @@ if (fs.existsSync(DB_PATH)) {
 const REGISTRY_PATH = path.join(__dirname, 'db/modules/registry.json');
 let moduleRegistry = { modules: [] };
 if (fs.existsSync(REGISTRY_PATH)) {
-    moduleRegistry = JSON.parse(fs.readFileSync(REGISTRY_PATH, 'utf8'));
+    moduleRegistry = parseJsonSafe(REGISTRY_PATH);
 }
 
 // --- v2 FEATURE: Load Terraform Module Overrides (Invisible Upgrade) ---
 const TF_OVERRIDES_PATH = path.join(__dirname, 'db/terraform_module_overrides.json');
 let tfModuleOverrides = {};
 if (fs.existsSync(TF_OVERRIDES_PATH)) {
-    tfModuleOverrides = JSON.parse(fs.readFileSync(TF_OVERRIDES_PATH, 'utf8'));
+    tfModuleOverrides = parseJsonSafe(TF_OVERRIDES_PATH);
     console.log(`[v2 Engine] Loaded ${Object.keys(tfModuleOverrides).length} Terraform module overrides.`);
 } else {
     console.warn('[v2 Engine] WARNING: db/terraform_module_overrides.json not found. Using raw compiler.');
@@ -342,7 +349,7 @@ app.get('/api/schema/:typeName', (req, res) => {
         const override = tfModuleOverrides[typeName];
         const overrideSchemaPath = path.join(__dirname, override.template).replace('.hcl', '.schema.json');
         if (fs.existsSync(overrideSchemaPath)) {
-            const overrideSchema = JSON.parse(fs.readFileSync(overrideSchemaPath, 'utf8'));
+            const overrideSchema = parseJsonSafe(overrideSchemaPath);
             overrideSchema.supportedPlatforms = ['terraform']; // Force UI to only show Terraform
             return res.json(overrideSchema);
         }
@@ -354,7 +361,7 @@ app.get('/api/schema/:typeName', (req, res) => {
     const modMeta = moduleRegistry.modules.find(m => m.id === typeName);
     if (modMeta) {
         const schemaPath = path.join(__dirname, 'db/modules', modMeta.schemaFile);
-        const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
+        const schema = parseJsonSafe(schemaPath);
         schema.supportedPlatforms = modMeta.supportedPlatforms;
         return res.json(schema);
     }
@@ -370,6 +377,17 @@ app.post('/api/generate', (req, res) => {
         const schema = db.resources[typeName];
         const safeName = typeName.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
         
+        // --- DEVSECOPS HARDENING: Block invalid platforms for Module Overrides ---
+        // If a resource is mapped to a premium TF module (AVM/GCP/AWS), we MUST reject 
+        // Bicep/CloudFormation requests. The v1 compilers blindly shove AVM inputs into 
+        // invalid ARM/CFN syntax, generating deployable garbage.
+        if (tfModuleOverrides[typeName] && platform !== 'terraform') {
+            return res.status(400).json({ 
+                success: false, 
+                error: `This resource is configured to use a premium Terraform module. Native ${platform} generation is not supported for this resource.` 
+            });
+        }
+
         if (platform === 'terraform') {
             // --- INVISIBLE UPGRADE: Intercept for Premium TF Modules ---
             const override = tfModuleOverrides[typeName];

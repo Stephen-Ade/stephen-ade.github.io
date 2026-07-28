@@ -1,8 +1,10 @@
-﻿{
+{
   "typeName": "Microsoft.ManagedIdentity/userAssignedIdentities",
   "provider": "azure",
   "description": "Azure User Assigned Managed Identity (AVM)",
-  "supportedPlatforms": ["terraform"],
+  "supportedPlatforms": [
+    "terraform"
+  ],
   "properties": {
     "name": {
       "type": "string",
@@ -25,5 +27,9 @@
       "description": "Enable AVM telemetry."
     }
   },
-  "required": ["name", "resource_group_name", "location"]
+  "required": [
+    "name",
+    "resource_group_name",
+    "location"
+  ]
 }
