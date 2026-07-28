@@ -442,8 +442,9 @@ app.post('/api/generate', (req, res) => {
                         }
                     };
 
-                    convertMapToHcl(safeConfig, 'Tags');
-                    convertMapToHcl(safeConfig, 'labels', true); // true = force GCP lowercase
+                    convertMapToHcl(safeConfig, 'Tags');             // AWS
+                    convertMapToHcl(safeConfig, 'tags');             // Azure AVM lowercase
+                    convertMapToHcl(safeConfig, 'labels', true);     // GCP (force lowercase)
 
                     // GCP: project_id fallback - use literal if provided, else reference variable
                     if (safeConfig.project_id && safeConfig.project_id.trim()) {

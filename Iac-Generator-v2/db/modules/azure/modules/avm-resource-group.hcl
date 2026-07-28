@@ -1,4 +1,4 @@
-﻿# WARNING: Do not add terraform or provider blocks here to prevent
+# WARNING: Do not add terraform or provider blocks here to prevent
 # conflicts in user environments.
 
 module "{{tfLabel name}}" {
