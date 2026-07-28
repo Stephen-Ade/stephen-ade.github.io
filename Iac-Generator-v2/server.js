@@ -47,6 +47,11 @@ handlebars.registerHelper('eq', function(a, b, options) {
     return a === b;
 });
 
+// --- Handlebars Helper to lowercase strings (Required for GCP Locations & Labels) ---
+handlebars.registerHelper('toLower', function(str) {
+    return typeof str === 'string' ? str.toLowerCase() : str;
+});
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -378,16 +383,24 @@ app.post('/api/generate', (req, res) => {
                         }
                     }
 
-                                        // SECURE JSON HANDLING: Convert Tags/Labels to HCL Map syntax
-                    // (Handles both objects from manual UI entry, and strings from File Ingestion)
-                    const convertMapToHcl = (data, key) => {
+                    // SECURE JSON HANDLING: Convert Tags/Labels to HCL Map syntax
+                    const convertMapToHcl = (data, key, forceLowerCase = false) => {
                         if (data[key]) {
                             try {
-                                const parsedMap = typeof data[key] === 'string' 
-                                    ? JSON.parse(data[key]) 
-                                    : data[key];
+                                let parsedMap = typeof data[key] === 'string' ? JSON.parse(data[key]) : data[key];
                                 
+                                // GCP Compliance: Enforce lowercase keys/values for labels
+                                if (forceLowerCase) {
+                                    const lowerMap = {};
+                                    for (const [k, v] of Object.entries(parsedMap)) {
+                                        lowerMap[k.toLowerCase()] = typeof v === 'string' ? v.toLowerCase() : v;
+                                    }
+                                    parsedMap = lowerMap;
+                                }
+
                                 let hclMap = JSON.stringify(parsedMap, null, 2);
+                                // Strip commas for valid HCL map syntax
+                                hclMap = hclMap.replace(/,/g, ''); 
                                 hclMap = hclMap.replace(/"([^"]+)":/g, '$1 =');
                                 data[key] = hclMap;
                             } catch (e) { /* Fail securely, leave as is */ }
@@ -395,14 +408,7 @@ app.post('/api/generate', (req, res) => {
                     };
 
                     convertMapToHcl(safeConfig, 'Tags');
-                    convertMapToHcl(safeConfig, 'labels');
-
-                    // SECURE JSON HANDLING: Convert GCP labels to HCL Map syntax
-                    if (safeConfig.labels && typeof safeConfig.labels === 'object') {
-                        let hclMap = JSON.stringify(safeConfig.labels, null, 2);
-                        hclMap = hclMap.replace(/"([^"]+)":/g, '$1 =');
-                        safeConfig.labels = hclMap;
-                    }
+                    convertMapToHcl(safeConfig, 'labels', true); // true = force GCP lowercase
 
                     code = template({ ...safeConfig, moduleVersion: override.version });
                     language = 'hcl';
