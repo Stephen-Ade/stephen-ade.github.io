@@ -1,0 +1,31 @@
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "title": "Resource Name",
+      "description": "Name of the Azure Portal Dashboard"
+    },
+    "location": {
+      "type": "string",
+      "title": "Location",
+      "description": "Azure region (e.g., eastus)",
+      "default": "eastus"
+    },
+    "resource_group_name": {
+      "type": "string",
+      "title": "Resource Group Name",
+      "description": "Existing Resource Group name"
+    },
+    "tags": {
+      "type": "object",
+      "title": "Tags",
+      "description": "Resource tags (key-value pairs)"
+    }
+  },
+  "required": [
+    "name",
+    "location",
+    "resource_group_name"
+  ]
+}

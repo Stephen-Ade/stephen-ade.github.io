@@ -1,7 +1,7 @@
 {
   "AWS::IAM::Policy": {
     "source": "terraform-aws-modules/iam/aws//modules/iam-policy",
-    "version": "6.6.1",
+    "version": "6.8.0",
     "template": "db/modules/aws/modules/iam-policy.hcl"
   },
   "Microsoft.ManagedIdentity/userAssignedIdentities": {
@@ -16,12 +16,1082 @@
   },
   "Microsoft.Network/virtualNetworks": {
     "source": "Azure/avm-res-network-virtualnetwork/azurerm",
-    "version": "0.19.0",
+    "version": "0.20.0",
     "template": "db/modules/azure/modules/avm-vnet.hcl"
   },
   "google_storage_buckets": {
     "source": "terraform-google-modules/cloud-storage/google//modules/simple_bucket",
     "version": "12.3.0",
     "template": "db/modules/gcp/modules/gcs-bucket.hcl"
+  },
+  "Microsoft.ApiManagement/service": {
+    "type": "module",
+    "source": "Azure/avm-res-apimanagement-service/azurerm",
+    "schemaFile": "avm-res-apimanagement-service.schema.json",
+    "hclTemplate": "avm-res-apimanagement-service.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.9.0"
+  },
+  "Microsoft.App/containerApps": {
+    "type": "module",
+    "source": "Azure/avm-res-app-containerapp/azurerm",
+    "schemaFile": "avm-res-app-containerapp.schema.json",
+    "hclTemplate": "avm-res-app-containerapp.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.9.0"
+  },
+  "Microsoft.App/jobs": {
+    "type": "module",
+    "source": "Azure/avm-res-app-job/azurerm",
+    "schemaFile": "avm-res-app-job.schema.json",
+    "hclTemplate": "avm-res-app-job.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.2.1"
+  },
+  "Microsoft.App/managedEnvironments": {
+    "type": "module",
+    "source": "Azure/avm-res-app-managedenvironment/azurerm",
+    "schemaFile": "avm-res-app-managedenvironment.schema.json",
+    "hclTemplate": "avm-res-app-managedenvironment.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.5.0"
+  },
+  "Microsoft.ContainerInstance/containerGroups": {
+    "type": "module",
+    "source": "Azure/avm-res-containerinstance-containergroup/azurerm",
+    "schemaFile": "avm-res-containerinstance-containergroup.schema.json",
+    "hclTemplate": "avm-res-containerinstance-containergroup.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.2.0"
+  },
+  "Microsoft.ContainerRegistry/registries": {
+    "type": "module",
+    "source": "Azure/avm-res-containerregistry-registry/azurerm",
+    "schemaFile": "avm-res-containerregistry-registry.schema.json",
+    "hclTemplate": "avm-res-containerregistry-registry.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.7.0"
+  },
+  "Microsoft.ContainerService/managedClusters": {
+    "type": "module",
+    "source": "Azure/avm-res-containerservice-managedcluster/azurerm",
+    "schemaFile": "avm-res-containerservice-managedcluster.schema.json",
+    "hclTemplate": "avm-res-containerservice-managedcluster.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.7.1"
+  },
+  "Microsoft.Web/hostingEnvironments": {
+    "type": "module",
+    "source": "Azure/avm-res-web-hostingenvironment/azurerm",
+    "schemaFile": "avm-res-web-hostingenvironment.schema.json",
+    "hclTemplate": "avm-res-web-hostingenvironment.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "2.0.1"
+  },
+  "Microsoft.Web/serverfarms": {
+    "type": "module",
+    "source": "Azure/avm-res-web-serverfarm/azurerm",
+    "schemaFile": "avm-res-web-serverfarm.schema.json",
+    "hclTemplate": "avm-res-web-serverfarm.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "2.0.8"
+  },
+  "Microsoft.Web/sites": {
+    "type": "module",
+    "source": "Azure/avm-res-web-site/azurerm",
+    "schemaFile": "avm-res-web-site.schema.json",
+    "hclTemplate": "avm-res-web-site.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.22.0"
+  },
+  "Microsoft.Web/staticSites": {
+    "type": "module",
+    "source": "Azure/avm-res-web-staticsite/azurerm",
+    "schemaFile": "avm-res-web-staticsite.schema.json",
+    "hclTemplate": "avm-res-web-staticsite.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.6.2"
+  },
+  "Microsoft.Web/connections": {
+    "type": "module",
+    "source": "Azure/avm-res-web-connection/azurerm",
+    "schemaFile": "avm-res-web-connection.schema.json",
+    "hclTemplate": "avm-res-web-connection.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.0"
+  },
+  "Microsoft.Authorization/roleAssignments": {
+    "type": "module",
+    "source": "Azure/avm-res-authorization-roleassignment/azurerm",
+    "schemaFile": "avm-res-authorization-roleassignment.schema.json",
+    "hclTemplate": "avm-res-authorization-roleassignment.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.3.1"
+  },
+  "Microsoft.Management/managementGroups": {
+    "type": "module",
+    "source": "Azure/avm-res-management-servicegroup/azurerm",
+    "schemaFile": "avm-res-management-servicegroup.schema.json",
+    "hclTemplate": "avm-res-management-servicegroup.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.0"
+  },
+  "Microsoft.Features/features": {
+    "type": "module",
+    "source": "Azure/avm-res-features-feature/azurerm",
+    "schemaFile": "avm-res-features-feature.schema.json",
+    "hclTemplate": "avm-res-features-feature.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.0"
+  },
+  "Microsoft.ResourceGraph/queries": {
+    "type": "module",
+    "source": "Azure/avm-res-resourcegraph-query/azurerm",
+    "schemaFile": "avm-res-resourcegraph-query.schema.json",
+    "hclTemplate": "avm-res-resourcegraph-query.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.0"
+  },
+  "Microsoft.Compute/capacityReservationGroups": {
+    "type": "module",
+    "source": "Azure/avm-res-compute-capacityreservationgroup/azurerm",
+    "schemaFile": "avm-res-compute-capacityreservationgroup.schema.json",
+    "hclTemplate": "avm-res-compute-capacityreservationgroup.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.0"
+  },
+  "Microsoft.Compute/disks": {
+    "type": "module",
+    "source": "Azure/avm-res-compute-disk/azurerm",
+    "schemaFile": "avm-res-compute-disk.schema.json",
+    "hclTemplate": "avm-res-compute-disk.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.3.2"
+  },
+  "Microsoft.Compute/diskEncryptionSets": {
+    "type": "module",
+    "source": "Azure/avm-res-compute-diskencryptionset/azurerm",
+    "schemaFile": "avm-res-compute-diskencryptionset.schema.json",
+    "hclTemplate": "avm-res-compute-diskencryptionset.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.1"
+  },
+  "Microsoft.Compute/galleries": {
+    "type": "module",
+    "source": "Azure/avm-res-compute-gallery/azurerm",
+    "schemaFile": "avm-res-compute-gallery.schema.json",
+    "hclTemplate": "avm-res-compute-gallery.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.2.1"
+  },
+  "Microsoft.Compute/hostGroups": {
+    "type": "module",
+    "source": "Azure/avm-res-compute-hostgroup/azurerm",
+    "schemaFile": "avm-res-compute-hostgroup.schema.json",
+    "hclTemplate": "avm-res-compute-hostgroup.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.3"
+  },
+  "Microsoft.Compute/proximityPlacementGroups": {
+    "type": "module",
+    "source": "Azure/avm-res-compute-proximityplacementgroup/azurerm",
+    "schemaFile": "avm-res-compute-proximityplacementgroup.schema.json",
+    "hclTemplate": "avm-res-compute-proximityplacementgroup.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.0"
+  },
+  "Microsoft.Compute/sshPublicKeys": {
+    "type": "module",
+    "source": "Azure/avm-res-compute-sshpublickey/azurerm",
+    "schemaFile": "avm-res-compute-sshpublickey.schema.json",
+    "hclTemplate": "avm-res-compute-sshpublickey.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.0"
+  },
+  "Microsoft.Compute/virtualMachines": {
+    "type": "module",
+    "source": "Azure/avm-res-compute-virtualmachine/azurerm",
+    "schemaFile": "avm-res-compute-virtualmachine.schema.json",
+    "hclTemplate": "avm-res-compute-virtualmachine.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.21.0"
+  },
+  "Microsoft.Compute/virtualMachineScaleSets": {
+    "type": "module",
+    "source": "Azure/avm-res-compute-virtualmachinescaleset/azurerm",
+    "schemaFile": "avm-res-compute-virtualmachinescaleset.schema.json",
+    "hclTemplate": "avm-res-compute-virtualmachinescaleset.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.9.0"
+  },
+  "Microsoft.AVS/privateClouds": {
+    "type": "module",
+    "source": "Azure/avm-res-avs-privatecloud/azurerm",
+    "schemaFile": "avm-res-avs-privatecloud.schema.json",
+    "hclTemplate": "avm-res-avs-privatecloud.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.12.0"
+  },
+  "Microsoft.AzureStackHCI/clusters": {
+    "type": "module",
+    "source": "Azure/avm-res-azurestackhci-cluster/azurerm",
+    "schemaFile": "avm-res-azurestackhci-cluster.schema.json",
+    "hclTemplate": "avm-res-azurestackhci-cluster.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "2.0.2"
+  },
+  "Microsoft.AzureStackHCI/logicalNetworks": {
+    "type": "module",
+    "source": "Azure/avm-res-azurestackhci-logicalnetwork/azurerm",
+    "schemaFile": "avm-res-azurestackhci-logicalnetwork.schema.json",
+    "hclTemplate": "avm-res-azurestackhci-logicalnetwork.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "2.0.0"
+  },
+  "Microsoft.AzureStackHCI/virtualMachineInstances": {
+    "type": "module",
+    "source": "Azure/avm-res-azurestackhci-virtualmachineinstance/azurerm",
+    "schemaFile": "avm-res-azurestackhci-virtualmachineinstance.schema.json",
+    "hclTemplate": "avm-res-azurestackhci-virtualmachineinstance.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "2.1.1"
+  },
+  "Microsoft.HybridContainerService/provisionedClusterInstances": {
+    "type": "module",
+    "source": "Azure/avm-res-hybridcontainerservice-provisionedclusterinstance/azurerm",
+    "schemaFile": "avm-res-hybridcontainerservice-provisionedclusterinstance.schema.json",
+    "hclTemplate": "avm-res-hybridcontainerservice-provisionedclusterinstance.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "2.0.4"
+  },
+  "Microsoft.Edge/sites": {
+    "type": "module",
+    "source": "Azure/avm-res-edge-site/azurerm",
+    "schemaFile": "avm-res-edge-site.schema.json",
+    "hclTemplate": "avm-res-edge-site.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "3.0.0"
+  },
+  "Microsoft.Network/applicationGateways": {
+    "type": "module",
+    "source": "Azure/avm-res-network-applicationgateway/azurerm",
+    "schemaFile": "avm-res-network-applicationgateway.schema.json",
+    "hclTemplate": "avm-res-network-applicationgateway.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.5.2"
+  },
+  "Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies": {
+    "type": "module",
+    "source": "Azure/avm-res-network-applicationgatewaywebapplicationfirewallpolicy/azurerm",
+    "schemaFile": "avm-res-network-applicationgatewaywebapplicationfirewallpolicy.schema.json",
+    "hclTemplate": "avm-res-network-applicationgatewaywebapplicationfirewallpolicy.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.2.0"
+  },
+  "Microsoft.Network/applicationSecurityGroups": {
+    "type": "module",
+    "source": "Azure/avm-res-network-applicationsecuritygroup/azurerm",
+    "schemaFile": "avm-res-network-applicationsecuritygroup.schema.json",
+    "hclTemplate": "avm-res-network-applicationsecuritygroup.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.1"
+  },
+  "Microsoft.Network/azureFirewalls": {
+    "type": "module",
+    "source": "Azure/avm-res-network-azurefirewall/azurerm",
+    "schemaFile": "avm-res-network-azurefirewall.schema.json",
+    "hclTemplate": "avm-res-network-azurefirewall.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.4.0"
+  },
+  "Microsoft.Network/bastionHosts": {
+    "type": "module",
+    "source": "Azure/avm-res-network-bastionhost/azurerm",
+    "schemaFile": "avm-res-network-bastionhost.schema.json",
+    "hclTemplate": "avm-res-network-bastionhost.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.9.0"
+  },
+  "Microsoft.Network/connections": {
+    "type": "module",
+    "source": "Azure/avm-res-network-connection/azurerm",
+    "schemaFile": "avm-res-network-connection.schema.json",
+    "hclTemplate": "avm-res-network-connection.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.2.0"
+  },
+  "Microsoft.Network/ddosProtectionPlans": {
+    "type": "module",
+    "source": "Azure/avm-res-network-ddosprotectionplan/azurerm",
+    "schemaFile": "avm-res-network-ddosprotectionplan.schema.json",
+    "hclTemplate": "avm-res-network-ddosprotectionplan.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.3.0"
+  },
+  "Microsoft.Network/dnsResolvers": {
+    "type": "module",
+    "source": "Azure/avm-res-network-dnsresolver/azurerm",
+    "schemaFile": "avm-res-network-dnsresolver.schema.json",
+    "hclTemplate": "avm-res-network-dnsresolver.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.8.0"
+  },
+  "Microsoft.Network/dnsZones": {
+    "type": "module",
+    "source": "Azure/avm-res-network-dnszone/azurerm",
+    "schemaFile": "avm-res-network-dnszone.schema.json",
+    "hclTemplate": "avm-res-network-dnszone.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.2.1"
+  },
+  "Microsoft.Network/expressRouteCircuits": {
+    "type": "module",
+    "source": "Azure/avm-res-network-expressroutecircuit/azurerm",
+    "schemaFile": "avm-res-network-expressroutecircuit.schema.json",
+    "hclTemplate": "avm-res-network-expressroutecircuit.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.3.3"
+  },
+  "Microsoft.Network/firewallPolicies": {
+    "type": "module",
+    "source": "Azure/avm-res-network-firewallpolicy/azurerm",
+    "schemaFile": "avm-res-network-firewallpolicy.schema.json",
+    "hclTemplate": "avm-res-network-firewallpolicy.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.3.4"
+  },
+  "Microsoft.Network/FrontDoorWebApplicationFirewallPolicies": {
+    "type": "module",
+    "source": "Azure/avm-res-network-frontdoorwebapplicationfirewallpolicy/azurerm",
+    "schemaFile": "avm-res-network-frontdoorwebapplicationfirewallpolicy.schema.json",
+    "hclTemplate": "avm-res-network-frontdoorwebapplicationfirewallpolicy.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.0"
+  },
+  "Microsoft.Network/ipGroups": {
+    "type": "module",
+    "source": "Azure/avm-res-network-ipgroup/azurerm",
+    "schemaFile": "avm-res-network-ipgroup.schema.json",
+    "hclTemplate": "avm-res-network-ipgroup.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.2.0"
+  },
+  "Microsoft.Network/loadBalancers": {
+    "type": "module",
+    "source": "Azure/avm-res-network-loadbalancer/azurerm",
+    "schemaFile": "avm-res-network-loadbalancer.schema.json",
+    "hclTemplate": "avm-res-network-loadbalancer.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.5.0"
+  },
+  "Microsoft.Network/localNetworkGateways": {
+    "type": "module",
+    "source": "Azure/avm-res-network-localnetworkgateway/azurerm",
+    "schemaFile": "avm-res-network-localnetworkgateway.schema.json",
+    "hclTemplate": "avm-res-network-localnetworkgateway.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.2.0"
+  },
+  "Microsoft.Network/natGateways": {
+    "type": "module",
+    "source": "Azure/avm-res-network-natgateway/azurerm",
+    "schemaFile": "avm-res-network-natgateway.schema.json",
+    "hclTemplate": "avm-res-network-natgateway.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.3.2"
+  },
+  "Microsoft.Network/networkInterfaces": {
+    "type": "module",
+    "source": "Azure/avm-res-network-networkinterface/azurerm",
+    "schemaFile": "avm-res-network-networkinterface.schema.json",
+    "hclTemplate": "avm-res-network-networkinterface.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.1"
+  },
+  "Microsoft.Network/networkManagers": {
+    "type": "module",
+    "source": "Azure/avm-res-network-networkmanager/azurerm",
+    "schemaFile": "avm-res-network-networkmanager.schema.json",
+    "hclTemplate": "avm-res-network-networkmanager.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.3.0"
+  },
+  "Microsoft.Network/networkSecurityGroups": {
+    "type": "module",
+    "source": "Azure/avm-res-network-networksecuritygroup/azurerm",
+    "schemaFile": "avm-res-network-networksecuritygroup.schema.json",
+    "hclTemplate": "avm-res-network-networksecuritygroup.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.5.1"
+  },
+  "Microsoft.Network/networkWatchers": {
+    "type": "module",
+    "source": "Azure/avm-res-network-networkwatcher/azurerm",
+    "schemaFile": "avm-res-network-networkwatcher.schema.json",
+    "hclTemplate": "avm-res-network-networkwatcher.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.3.2"
+  },
+  "Microsoft.Network/privateDnsZones": {
+    "type": "module",
+    "source": "Azure/avm-res-network-privatednszone/azurerm",
+    "schemaFile": "avm-res-network-privatednszone.schema.json",
+    "hclTemplate": "avm-res-network-privatednszone.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.5.0"
+  },
+  "Microsoft.Network/privateEndpoints": {
+    "type": "module",
+    "source": "Azure/avm-res-network-privateendpoint/azurerm",
+    "schemaFile": "avm-res-network-privateendpoint.schema.json",
+    "hclTemplate": "avm-res-network-privateendpoint.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.2.0"
+  },
+  "Microsoft.Network/publicIPAddresses": {
+    "type": "module",
+    "source": "Azure/avm-res-network-publicipaddress/azurerm",
+    "schemaFile": "avm-res-network-publicipaddress.schema.json",
+    "hclTemplate": "avm-res-network-publicipaddress.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.2.1"
+  },
+  "Microsoft.Network/publicIPPrefixes": {
+    "type": "module",
+    "source": "Azure/avm-res-network-publicipprefix/azurerm",
+    "schemaFile": "avm-res-network-publicipprefix.schema.json",
+    "hclTemplate": "avm-res-network-publicipprefix.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.0"
+  },
+  "Microsoft.Network/routeTables": {
+    "type": "module",
+    "source": "Azure/avm-res-network-routetable/azurerm",
+    "schemaFile": "avm-res-network-routetable.schema.json",
+    "hclTemplate": "avm-res-network-routetable.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.5.0"
+  },
+  "Microsoft.Network/trafficManagerProfiles": {
+    "type": "module",
+    "source": "Azure/avm-res-network-trafficmanagerprofile/azurerm",
+    "schemaFile": "avm-res-network-trafficmanagerprofile.schema.json",
+    "hclTemplate": "avm-res-network-trafficmanagerprofile.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.0"
+  },
+  "Microsoft.KeyVault/vaults": {
+    "type": "module",
+    "source": "Azure/avm-res-keyvault-vault/azurerm",
+    "schemaFile": "avm-res-keyvault-vault.schema.json",
+    "hclTemplate": "avm-res-keyvault-vault.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.10.2"
+  },
+  "Microsoft.CertificateRegistration/certificateOrders": {
+    "type": "module",
+    "source": "Azure/avm-res-certificateregistration-certificateorder/azurerm",
+    "schemaFile": "avm-res-certificateregistration-certificateorder.schema.json",
+    "hclTemplate": "avm-res-certificateregistration-certificateorder.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.0"
+  },
+  "Microsoft.Insights/autoscaleSettings": {
+    "type": "module",
+    "source": "Azure/avm-res-insights-autoscalesetting/azurerm",
+    "schemaFile": "avm-res-insights-autoscalesetting.schema.json",
+    "hclTemplate": "avm-res-insights-autoscalesetting.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.2"
+  },
+  "Microsoft.Insights/components": {
+    "type": "module",
+    "source": "Azure/avm-res-insights-component/azurerm",
+    "schemaFile": "avm-res-insights-component.schema.json",
+    "hclTemplate": "avm-res-insights-component.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.4.0"
+  },
+  "Microsoft.Insights/dataCollectionEndpoints": {
+    "type": "module",
+    "source": "Azure/avm-res-insights-datacollectionendpoint/azurerm",
+    "schemaFile": "avm-res-insights-datacollectionendpoint.schema.json",
+    "hclTemplate": "avm-res-insights-datacollectionendpoint.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.2.0"
+  },
+  "Microsoft.Insights/dataCollectionRules": {
+    "type": "module",
+    "source": "Azure/avm-res-insights-datacollectionrule/azurerm",
+    "schemaFile": "avm-res-insights-datacollectionrule.schema.json",
+    "hclTemplate": "avm-res-insights-datacollectionrule.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.0"
+  },
+  "Microsoft.OperationalInsights/workspaces": {
+    "type": "module",
+    "source": "Azure/avm-res-operationalinsights-workspace/azurerm",
+    "schemaFile": "avm-res-operationalinsights-workspace.schema.json",
+    "hclTemplate": "avm-res-operationalinsights-workspace.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.5.1"
+  },
+  "Microsoft.Portal/dashboards": {
+    "type": "module",
+    "source": "Azure/avm-res-portal-dashboard/azurerm",
+    "schemaFile": "avm-res-portal-dashboard.schema.json",
+    "hclTemplate": "avm-res-portal-dashboard.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.0"
+  },
+  "Microsoft.Maintenance/maintenanceConfigurations": {
+    "type": "module",
+    "source": "Azure/avm-res-maintenance-maintenanceconfiguration/azurerm",
+    "schemaFile": "avm-res-maintenance-maintenanceconfiguration.schema.json",
+    "hclTemplate": "avm-res-maintenance-maintenanceconfiguration.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.0"
+  },
+  "Microsoft.Automation/automationAccounts": {
+    "type": "module",
+    "source": "Azure/avm-res-automation-automationaccount/azurerm",
+    "schemaFile": "avm-res-automation-automationaccount.schema.json",
+    "hclTemplate": "avm-res-automation-automationaccount.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.2.0"
+  },
+  "Microsoft.CognitiveServices/accounts": {
+    "type": "module",
+    "source": "Azure/avm-res-cognitiveservices-account/azurerm",
+    "schemaFile": "avm-res-cognitiveservices-account.schema.json",
+    "hclTemplate": "avm-res-cognitiveservices-account.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.11.1"
+  },
+  "Microsoft.MachineLearningServices/workspaces": {
+    "type": "module",
+    "source": "Azure/avm-res-machinelearningservices-workspace/azurerm",
+    "schemaFile": "avm-res-machinelearningservices-workspace.schema.json",
+    "hclTemplate": "avm-res-machinelearningservices-workspace.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.9.0"
+  },
+  "Microsoft.Search/searchServices": {
+    "type": "module",
+    "source": "Azure/avm-res-search-searchservice/azurerm",
+    "schemaFile": "avm-res-search-searchservice.schema.json",
+    "hclTemplate": "avm-res-search-searchservice.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.3.0"
+  },
+  "Microsoft.BotService/botServices": {
+    "type": "module",
+    "source": "Azure/avm-res-botservice-botservice/azurerm",
+    "schemaFile": "avm-res-botservice-botservice.schema.json",
+    "hclTemplate": "avm-res-botservice-botservice.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.4.0"
+  },
+  "Microsoft.Databricks/workspaces": {
+    "type": "module",
+    "source": "Azure/avm-res-databricks-workspace/azurerm",
+    "schemaFile": "avm-res-databricks-workspace.schema.json",
+    "hclTemplate": "avm-res-databricks-workspace.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.5.0"
+  },
+  "Microsoft.DocumentDB/databaseAccounts": {
+    "type": "module",
+    "source": "Azure/avm-res-documentdb-databaseaccount/azurerm",
+    "schemaFile": "avm-res-documentdb-databaseaccount.schema.json",
+    "hclTemplate": "avm-res-documentdb-databaseaccount.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.10.0"
+  },
+  "Microsoft.DocumentDB/mongoClusters": {
+    "type": "module",
+    "source": "Azure/avm-res-documentdb-mongocluster/azurerm",
+    "schemaFile": "avm-res-documentdb-mongocluster.schema.json",
+    "hclTemplate": "avm-res-documentdb-mongocluster.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.3.0"
+  },
+  "Microsoft.DBforMySQL/flexibleServers": {
+    "type": "module",
+    "source": "Azure/avm-res-dbformysql-flexibleserver/azurerm",
+    "schemaFile": "avm-res-dbformysql-flexibleserver.schema.json",
+    "hclTemplate": "avm-res-dbformysql-flexibleserver.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.6"
+  },
+  "Microsoft.DBforPostgreSQL/flexibleServers": {
+    "type": "module",
+    "source": "Azure/avm-res-dbforpostgresql-flexibleserver/azurerm",
+    "schemaFile": "avm-res-dbforpostgresql-flexibleserver.schema.json",
+    "hclTemplate": "avm-res-dbforpostgresql-flexibleserver.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.2.3"
+  },
+  "Microsoft.Kusto/clusters": {
+    "type": "module",
+    "source": "Azure/avm-res-kusto-cluster/azurerm",
+    "schemaFile": "avm-res-kusto-cluster.schema.json",
+    "hclTemplate": "avm-res-kusto-cluster.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.0"
+  },
+  "Microsoft.Sql/managedInstances": {
+    "type": "module",
+    "source": "Azure/avm-res-sql-managedinstance/azurerm",
+    "schemaFile": "avm-res-sql-managedinstance.schema.json",
+    "hclTemplate": "avm-res-sql-managedinstance.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.3.1"
+  },
+  "Microsoft.Sql/servers": {
+    "type": "module",
+    "source": "Azure/avm-res-sql-server/azurerm",
+    "schemaFile": "avm-res-sql-server.schema.json",
+    "hclTemplate": "avm-res-sql-server.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.2.1"
+  },
+  "Microsoft.SqlVirtualMachine/sqlVirtualMachines": {
+    "type": "module",
+    "source": "Azure/avm-res-sqlvirtualmachine-sqlvirtualmachine/azurerm",
+    "schemaFile": "avm-res-sqlvirtualmachine-sqlvirtualmachine.schema.json",
+    "hclTemplate": "avm-res-sqlvirtualmachine-sqlvirtualmachine.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.0.1"
+  },
+  "Microsoft.OracleDatabase/cloudExadataInfrastructures": {
+    "type": "module",
+    "source": "Azure/avm-res-oracledatabase-cloudexadatainfrastructure/azurerm",
+    "schemaFile": "avm-res-oracledatabase-cloudexadatainfrastructure.schema.json",
+    "hclTemplate": "avm-res-oracledatabase-cloudexadatainfrastructure.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.3.2"
+  },
+  "Microsoft.OracleDatabase/cloudVmClusters": {
+    "type": "module",
+    "source": "Azure/avm-res-oracledatabase-cloudvmcluster/azurerm",
+    "schemaFile": "avm-res-oracledatabase-cloudvmcluster.schema.json",
+    "hclTemplate": "avm-res-oracledatabase-cloudvmcluster.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.3.2"
+  },
+  "Microsoft.DataFactory/factories": {
+    "type": "module",
+    "source": "Azure/avm-res-datafactory-factory/azurerm",
+    "schemaFile": "avm-res-datafactory-factory.schema.json",
+    "hclTemplate": "avm-res-datafactory-factory.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.0"
+  },
+  "Microsoft.EventGrid/domains": {
+    "type": "module",
+    "source": "Azure/avm-res-eventgrid-domain/azurerm",
+    "schemaFile": "avm-res-eventgrid-domain.schema.json",
+    "hclTemplate": "avm-res-eventgrid-domain.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.0"
+  },
+  "Microsoft.EventGrid/namespaces": {
+    "type": "module",
+    "source": "Azure/avm-res-eventgrid-namespace/azurerm",
+    "schemaFile": "avm-res-eventgrid-namespace.schema.json",
+    "hclTemplate": "avm-res-eventgrid-namespace.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.1"
+  },
+  "Microsoft.EventGrid/topics": {
+    "type": "module",
+    "source": "Azure/avm-res-eventgrid-topic/azurerm",
+    "schemaFile": "avm-res-eventgrid-topic.schema.json",
+    "hclTemplate": "avm-res-eventgrid-topic.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.1"
+  },
+  "Microsoft.EventHub/namespaces": {
+    "type": "module",
+    "source": "Azure/avm-res-eventhub-namespace/azurerm",
+    "schemaFile": "avm-res-eventhub-namespace.schema.json",
+    "hclTemplate": "avm-res-eventhub-namespace.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.0"
+  },
+  "Microsoft.ServiceBus/namespaces": {
+    "type": "module",
+    "source": "Azure/avm-res-servicebus-namespace/azurerm",
+    "schemaFile": "avm-res-servicebus-namespace.schema.json",
+    "hclTemplate": "avm-res-servicebus-namespace.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.4.0"
+  },
+  "Microsoft.Relay/namespaces": {
+    "type": "module",
+    "source": "Azure/avm-res-relay-namespace/azurerm",
+    "schemaFile": "avm-res-relay-namespace.schema.json",
+    "hclTemplate": "avm-res-relay-namespace.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.1"
+  },
+  "Microsoft.Logic/workflows": {
+    "type": "module",
+    "source": "Azure/avm-res-logic-workflow/azurerm",
+    "schemaFile": "avm-res-logic-workflow.schema.json",
+    "hclTemplate": "avm-res-logic-workflow.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.2"
+  },
+  "Microsoft.Communication/emailServices": {
+    "type": "module",
+    "source": "Azure/avm-res-communication-emailservice/azurerm",
+    "schemaFile": "avm-res-communication-emailservice.schema.json",
+    "hclTemplate": "avm-res-communication-emailservice.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.2.0"
+  },
+  "Microsoft.Storage/storageAccounts": {
+    "type": "module",
+    "source": "Azure/avm-res-storage-storageaccount/azurerm",
+    "schemaFile": "avm-res-storage-storageaccount.schema.json",
+    "hclTemplate": "avm-res-storage-storageaccount.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.7.3"
+  },
+  "Microsoft.NetApp/netAppAccounts": {
+    "type": "module",
+    "source": "Azure/avm-res-netapp-netappaccount/azurerm",
+    "schemaFile": "avm-res-netapp-netappaccount.schema.json",
+    "hclTemplate": "avm-res-netapp-netappaccount.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.3.0"
+  },
+  "Microsoft.DataProtection/backupVaults": {
+    "type": "module",
+    "source": "Azure/avm-res-dataprotection-backupvault/azurerm",
+    "schemaFile": "avm-res-dataprotection-backupvault.schema.json",
+    "hclTemplate": "avm-res-dataprotection-backupvault.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "2.0.8"
+  },
+  "Microsoft.DataProtection/resourceGuards": {
+    "type": "module",
+    "source": "Azure/avm-res-dataprotection-resourceguard/azurerm",
+    "schemaFile": "avm-res-dataprotection-resourceguard.schema.json",
+    "hclTemplate": "avm-res-dataprotection-resourceguard.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.0"
+  },
+  "Microsoft.RecoveryServices/vaults": {
+    "type": "module",
+    "source": "Azure/avm-res-recoveryservices-vault/azurerm",
+    "schemaFile": "avm-res-recoveryservices-vault.schema.json",
+    "hclTemplate": "avm-res-recoveryservices-vault.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "1.2.0"
+  },
+  "Microsoft.DesktopVirtualization/applicationGroups": {
+    "type": "module",
+    "source": "Azure/avm-res-desktopvirtualization-applicationgroup/azurerm",
+    "schemaFile": "avm-res-desktopvirtualization-applicationgroup.schema.json",
+    "hclTemplate": "avm-res-desktopvirtualization-applicationgroup.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.2.1"
+  },
+  "Microsoft.DesktopVirtualization/hostPools": {
+    "type": "module",
+    "source": "Azure/avm-res-desktopvirtualization-hostpool/azurerm",
+    "schemaFile": "avm-res-desktopvirtualization-hostpool.schema.json",
+    "hclTemplate": "avm-res-desktopvirtualization-hostpool.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.4.0"
+  },
+  "Microsoft.DesktopVirtualization/scalingPlans": {
+    "type": "module",
+    "source": "Azure/avm-res-desktopvirtualization-scalingplan/azurerm",
+    "schemaFile": "avm-res-desktopvirtualization-scalingplan.schema.json",
+    "hclTemplate": "avm-res-desktopvirtualization-scalingplan.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.2.1"
+  },
+  "Microsoft.DesktopVirtualization/workspaces": {
+    "type": "module",
+    "source": "Azure/avm-res-desktopvirtualization-workspace/azurerm",
+    "schemaFile": "avm-res-desktopvirtualization-workspace.schema.json",
+    "hclTemplate": "avm-res-desktopvirtualization-workspace.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.2.2"
+  },
+  "Microsoft.DevCenter/devCenters": {
+    "type": "module",
+    "source": "Azure/avm-res-devcenter-devcenter/azurerm",
+    "schemaFile": "avm-res-devcenter-devcenter.schema.json",
+    "hclTemplate": "avm-res-devcenter-devcenter.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.1"
+  },
+  "Microsoft.DevOpsInfrastructure/pools": {
+    "type": "module",
+    "source": "Azure/avm-res-devopsinfrastructure-pool/azurerm",
+    "schemaFile": "avm-res-devopsinfrastructure-pool.schema.json",
+    "hclTemplate": "avm-res-devopsinfrastructure-pool.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.3.1"
+  },
+  "Microsoft.Batch/batchAccounts": {
+    "type": "module",
+    "source": "Azure/avm-res-batch-batchaccount/azurerm",
+    "schemaFile": "avm-res-batch-batchaccount.schema.json",
+    "hclTemplate": "avm-res-batch-batchaccount.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.2.0"
+  },
+  "Microsoft.Cache/redisEnterprise": {
+    "type": "module",
+    "source": "Azure/avm-res-cache-redisenterprise/azurerm",
+    "schemaFile": "avm-res-cache-redisenterprise.schema.json",
+    "hclTemplate": "avm-res-cache-redisenterprise.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.2.0"
+  },
+  "Microsoft.Cache/Redis": {
+    "type": "module",
+    "source": "Azure/avm-res-cache-redis/azurerm",
+    "schemaFile": "avm-res-cache-redis.schema.json",
+    "hclTemplate": "avm-res-cache-redis.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.4.0"
+  },
+  "Microsoft.Cdn/profiles": {
+    "type": "module",
+    "source": "Azure/avm-res-cdn-profile/azurerm",
+    "schemaFile": "avm-res-cdn-profile.schema.json",
+    "hclTemplate": "avm-res-cdn-profile.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.1.9"
+  },
+  "Microsoft.RedHatOpenShift/OpenShiftClusters": {
+    "type": "module",
+    "source": "Azure/avm-res-redhatopenshift-openshiftcluster/azurerm",
+    "schemaFile": "avm-res-redhatopenshift-openshiftcluster.schema.json",
+    "hclTemplate": "avm-res-redhatopenshift-openshiftcluster.hcl",
+    "supportedPlatforms": [
+      "terraform"
+    ],
+    "version": "0.0.2"
   }
 }

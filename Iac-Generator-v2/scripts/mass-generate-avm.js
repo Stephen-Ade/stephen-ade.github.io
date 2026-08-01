@@ -7,7 +7,7 @@ const path = require('path');
 const BASE_DIR = path.join(__dirname, '..');
 const SCHEMAS_DIR = path.join(BASE_DIR, 'backend', 'schemas', 'avm');
 const TEMPLATES_DIR = path.join(BASE_DIR, 'backend', 'templates', 'avm');
-const OVERRIDES_FILE = path.join(BASE_DIR, 'backend', 'terraform_module_overrides.json');
+const OVERRIDES_FILE = path.join(BASE_DIR, 'db', 'terraform_module_overrides.json');
 
 // Ensure output directories exist (Windows Safe: Pure Node.js)
 if (!fs.existsSync(SCHEMAS_DIR)) fs.mkdirSync(SCHEMAS_DIR, { recursive: true });
@@ -233,7 +233,7 @@ function run() {
     // 3. Build Override Object
     existingOverrides[item.azApiType] = {
       type: "module",
-      moduleSource: `Azure/${item.module}/azurerm`,
+      source: `Azure/${item.module}/azurerm`,
       schemaFile: schemaFileName,
       hclTemplate: hclFileName,
       supportedPlatforms: ["terraform"] // UI LOCK: Hides Bicep/CFN
