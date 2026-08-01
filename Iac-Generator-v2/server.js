@@ -432,7 +432,17 @@ app.post('/api/generate', (req, res) => {
                     // AWS resources use a generic template. Bypass Handlebars and dynamically
                     // convert the properties map into HCL arguments using our v1 converter.
                     if (override.type === 'resource') {
-                        const awsProps = safeConfig.properties || {};
+                        let awsProps = safeConfig.properties || {};
+                        
+                        // HANDLE INGESTION: Properties may arrive as stringified JSON from text/file import
+                        if (typeof awsProps === 'string') {
+                            try {
+                                awsProps = JSON.parse(awsProps);
+                            } catch (e) {
+                                return res.status(400).json({ success: false, error: "Properties must be valid JSON." });
+                            }
+                        }
+                        
                         // Convert all properties to HCL arguments (reuses v1 toSnakeCase + convertToHcl)
                         const convertPropsToHcl = (props, indent = '  ') => {
                             let hcl = '';
