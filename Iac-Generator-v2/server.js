@@ -135,7 +135,18 @@ function validateBulkAddresses(entries) {
 
 // --- DYNAMIC COMPILERS ---
 
-function toSnakeCase(str) { return str.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, ''); }
+// --- ENHANCED: toSnakeCase with ALL_CAPS preservation ---
+// Preserves environment variables (LOG_LEVEL, DB_TABLE) and acronyms (SSEAlgorithm)
+// Only converts PascalCase/camelCase to snake_case
+function toSnakeCase(str) { 
+    // PRESERVE ALL_CAPS strings (like LOG_LEVEL, DB_TABLE, SSEAlgorithm)
+    // Only convert PascalCase/camelCase to snake_case
+    if (typeof str !== 'string') return str;
+    if (/^[A-Z][A-Z0-9_]*$/.test(str)) {
+        return str; // Already uppercase with underscores, return as-is
+    }
+    return str.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, ''); 
+}
 
 // --- TERRAFORM (Handles deep nested blocks) ---
 function compileTerraform(schema, config, safeName) {
