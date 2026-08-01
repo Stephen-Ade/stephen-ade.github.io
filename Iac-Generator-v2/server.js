@@ -154,9 +154,18 @@ function compileTerraformProps(schemaProps, configNode, indent) {
         const propSchema = schemaProps?.[key];
 
         if (typeof value === 'object' && !Array.isArray(value)) {
-            hcl += `${indent}${tfKey} {\n`;
-            hcl += compileTerraformProps(propSchema?.properties || {}, value, indent + '  ');
-            hcl += `${indent}}\n`;
+            // ENHANCEMENT: Tags/Labels rendered as maps with preserved casing
+            const lowerKey = tfKey.toLowerCase();
+            if (lowerKey === 'tags' || lowerKey === 'labels') {
+                const mapLines = Object.entries(value).map(([k, v]) => {
+                    return `${indent}  ${k} = ${convertToHcl(v)}`;
+                });
+                hcl += `${indent}${tfKey} = {\n${mapLines.join('\n')}\n${indent}}\n`;
+            } else {
+                hcl += `${indent}${tfKey} {\n`;
+                hcl += compileTerraformProps(propSchema?.properties || {}, value, indent + '  ');
+                hcl += `${indent}}\n`;
+            }
         } else if (Array.isArray(value) && value.length > 0 && typeof value[0] === 'object') {
             value.forEach(item => {
                 hcl += `${indent}${tfKey} {\n`;
@@ -322,18 +331,19 @@ function convertToPython(value) {
 }
 
 // --- HELPER: Parse stringified JSON objects back to actual objects ---
-// Frontend stringifies objects (like Tags) for text input display
-// This reverses that for compilers that need actual objects
-function parseStringifiedObjects(config, schemaProps) {
-    if (!schemaProps || !config) return config;
+// Frontend stringifies objects (like Tags) for text input display.
+// This reverses that by parsing ANY string that looks like a JSON object.
+function parseStringifiedObjects(config) {
+    if (!config) return config;
     const parsed = { ...config };
     for (const [key, value] of Object.entries(parsed)) {
-        const propSchema = schemaProps[key];
-        // If schema says it's an object/array and value is a string, try to parse it
-        if (typeof value === 'string' && value.startsWith('{')) {
-            if (propSchema?.type === 'object' || propSchema?.items?.type === 'object') {
+        // Parse any string that looks like a JSON object or array
+        if (typeof value === 'string') {
+            const trimmed = value.trim();
+            if ((trimmed.startsWith('{') && trimmed.endsWith('}')) ||
+                (trimmed.startsWith('[') && trimmed.endsWith(']'))) {
                 try {
-                    parsed[key] = JSON.parse(value);
+                    parsed[key] = JSON.parse(trimmed);
                 } catch (e) { /* Leave as is if parse fails */ }
             }
         }
@@ -465,7 +475,7 @@ app.post('/api/generate', (req, res) => {
                             delete awsProps.properties;  // Remove empty wrapper if present
                         }
                         
-                        // Parse stringified JSON if needed
+                        // Parse stringified JSON if needed (old format)
                         if (typeof awsProps === 'string') {
                             try {
                                 awsProps = JSON.parse(awsProps);
@@ -475,7 +485,7 @@ app.post('/api/generate', (req, res) => {
                         }
                         
                         // Parse stringified objects (like Tags) back to actual objects
-                        awsProps = parseStringifiedObjects(awsProps, schema.properties);
+                        awsProps = parseStringifiedObjects(awsProps);
                         
                         // Convert all properties to HCL arguments (reuses v1 toSnakeCase + convertToHcl)
                         const convertPropsToHcl = (props, indent = '  ') => {
@@ -483,10 +493,22 @@ app.post('/api/generate', (req, res) => {
                             for (const [key, value] of Object.entries(props || {})) {
                                 if (value === null || value === undefined || value === '') continue;
                                 const tfKey = toSnakeCase(key);
+                                
                                 if (typeof value === 'object' && !Array.isArray(value)) {
-                                    hcl += `${indent}${tfKey} {\n`;
-                                    hcl += convertPropsToHcl(value, indent + '  ');
-                                    hcl += `${indent}}\n`;
+                                    // ENHANCEMENT: Tags/Labels rendered as maps with preserved casing
+                                    // Standard Terraform convention: tags = { Name = "value" }
+                                    const lowerKey = tfKey.toLowerCase();
+                                    if (lowerKey === 'tags' || lowerKey === 'labels') {
+                                        const mapLines = Object.entries(value).map(([k, v]) => {
+                                            return `${indent}  ${k} = ${convertToHcl(v)}`;
+                                        });
+                                        hcl += `${indent}${tfKey} = {\n${mapLines.join('\n')}\n${indent}}\n`;
+                                    } else {
+                                        // Standard nested block
+                                        hcl += `${indent}${tfKey} {\n`;
+                                        hcl += convertPropsToHcl(value, indent + '  ');
+                                        hcl += `${indent}}\n`;
+                                    }
                                 } else if (Array.isArray(value) && value.length > 0 && typeof value[0] === 'object') {
                                     value.forEach(item => {
                                         hcl += `${indent}${tfKey} {\n`;
@@ -554,13 +576,13 @@ app.post('/api/generate', (req, res) => {
         else if (platform === 'bicep') { code = compileBicep(schema, config, safeName); language = 'bicep'; }
         else if (platform === 'cdk-python') { 
             // Parse stringified objects (like Tags) back to actual objects for CDK
-            const parsedConfig = parseStringifiedObjects(config, schema.properties);
+            const parsedConfig = parseStringifiedObjects(config);
             code = compileCdkPython(schema, parsedConfig, safeName); 
             language = 'python'; 
         }
         else if (platform === 'cloudformation') { 
             // Parse stringified objects (like Tags) back to actual objects for CFN
-            const parsedConfig = parseStringifiedObjects(config, schema.properties);
+            const parsedConfig = parseStringifiedObjects(config);
             code = JSON.stringify({ Resources: { [safeName]: { Type: typeName, Properties: parsedConfig } } }, null, 2); 
             language = 'json'; 
         }
