@@ -543,7 +543,25 @@ function App() {
         }
 
         const cfnType = parsedData.Type;
-        const config = { ...parsedData.Properties };
+        let config = { ...parsedData.Properties };
+
+        // --- AWS INGESTION FIX: Unwrap nested { id: "...", properties: "{...}" } format ---
+        // This format comes from previous Terraform exports where properties were stringified
+        if (config.properties) {
+          let nestedProps = config.properties;
+          if (typeof nestedProps === 'string') {
+            try {
+              nestedProps = JSON.parse(nestedProps);
+            } catch (e) { /* Leave as is if parse fails */ }
+          }
+          if (typeof nestedProps === 'object' && !Array.isArray(nestedProps)) {
+            // Merge nested properties to root level
+            Object.assign(config, nestedProps);
+            delete config.properties;
+          }
+        }
+        // Remove 'id' if present - not a valid AWS CFN property
+        delete config.id;
 
         // 3. UNIVERSAL INGESTION FLATTENING:
         // The UI renders generic objects (like Tags, PolicyDocument, GCP labels) as text inputs.
