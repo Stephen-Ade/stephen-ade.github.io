@@ -396,7 +396,27 @@ app.post('/api/generate', (req, res) => {
             });
         }
 
-                    if (platform === 'terraform') {
+        // --- AWS RAW RESOURCE CONFIG NORMALIZATION ---
+        // Ingestion files may wrap properties as: { id: "...", properties: "{...}" }
+        // But v1 compilers (CFN/CDK) expect flat properties at the root level.
+        // NOTE: Skip for Terraform - it has its own dedicated properties parsing.
+        if (platform !== 'terraform' && tfModuleOverrides[typeName]?.type === 'resource' && config.properties) {
+            let parsedProps = config.properties;
+            if (typeof parsedProps === 'string') {
+                try {
+                    parsedProps = JSON.parse(parsedProps);
+                } catch (e) { /* Leave as is, compilers will handle gracefully */ }
+            }
+            if (typeof parsedProps === 'object' && !Array.isArray(parsedProps)) {
+                // Merge parsed properties into config at root level
+                Object.assign(config, parsedProps);
+                delete config.properties;
+            }
+            // Remove 'id' if present - not a valid AWS CFN property
+            delete config.id;
+        }
+
+        if (platform === 'terraform') {
             // --- INVISIBLE UPGRADE: Intercept for Premium TF Modules ---
             const override = tfModuleOverrides[typeName];
             
