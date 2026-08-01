@@ -321,6 +321,26 @@ function convertToPython(value) {
     return '{}';
 }
 
+// --- HELPER: Parse stringified JSON objects back to actual objects ---
+// Frontend stringifies objects (like Tags) for text input display
+// This reverses that for compilers that need actual objects
+function parseStringifiedObjects(config, schemaProps) {
+    if (!schemaProps || !config) return config;
+    const parsed = { ...config };
+    for (const [key, value] of Object.entries(parsed)) {
+        const propSchema = schemaProps[key];
+        // If schema says it's an object/array and value is a string, try to parse it
+        if (typeof value === 'string' && value.startsWith('{')) {
+            if (propSchema?.type === 'object' || propSchema?.items?.type === 'object') {
+                try {
+                    parsed[key] = JSON.parse(value);
+                } catch (e) { /* Leave as is if parse fails */ }
+            }
+        }
+    }
+    return parsed;
+}
+
 
 // --- API ROUTES ---
 
@@ -396,26 +416,6 @@ app.post('/api/generate', (req, res) => {
             });
         }
 
-        // --- AWS RAW RESOURCE CONFIG NORMALIZATION ---
-        // Ingestion files may wrap properties as: { id: "...", properties: "{...}" }
-        // But v1 compilers (CFN/CDK) expect flat properties at the root level.
-        // NOTE: Skip for Terraform - it has its own dedicated properties parsing.
-        if (platform !== 'terraform' && tfModuleOverrides[typeName]?.type === 'resource' && config.properties) {
-            let parsedProps = config.properties;
-            if (typeof parsedProps === 'string') {
-                try {
-                    parsedProps = JSON.parse(parsedProps);
-                } catch (e) { /* Leave as is, compilers will handle gracefully */ }
-            }
-            if (typeof parsedProps === 'object' && !Array.isArray(parsedProps)) {
-                // Merge parsed properties into config at root level
-                Object.assign(config, parsedProps);
-                delete config.properties;
-            }
-            // Remove 'id' if present - not a valid AWS CFN property
-            delete config.id;
-        }
-
         if (platform === 'terraform') {
             // --- INVISIBLE UPGRADE: Intercept for Premium TF Modules ---
             const override = tfModuleOverrides[typeName];
@@ -453,9 +453,19 @@ app.post('/api/generate', (req, res) => {
                     // AWS resources use a generic template. Bypass Handlebars and dynamically
                     // convert the properties map into HCL arguments using our v1 converter.
                     if (override.type === 'resource') {
-                        let awsProps = safeConfig.properties || {};
+                        // HANDLE BOTH INGESTION FORMATS:
+                        // Old format: { id: "...", properties: "{...}" }
+                        // New format: { CidrBlock: "...", Tags: "{...}" } (flat)
+                        let awsProps = safeConfig.properties;
                         
-                        // HANDLE INGESTION: Properties may arrive as stringified JSON from text/file import
+                        // NEW FORMAT: No nested properties wrapper - use entire config
+                        if (!awsProps || (typeof awsProps === 'object' && Object.keys(awsProps).length === 0)) {
+                            awsProps = { ...safeConfig };
+                            delete awsProps.id;  // Remove non-AWS metadata
+                            delete awsProps.properties;  // Remove empty wrapper if present
+                        }
+                        
+                        // Parse stringified JSON if needed
                         if (typeof awsProps === 'string') {
                             try {
                                 awsProps = JSON.parse(awsProps);
@@ -463,6 +473,9 @@ app.post('/api/generate', (req, res) => {
                                 return res.status(400).json({ success: false, error: "Properties must be valid JSON." });
                             }
                         }
+                        
+                        // Parse stringified objects (like Tags) back to actual objects
+                        awsProps = parseStringifiedObjects(awsProps, schema.properties);
                         
                         // Convert all properties to HCL arguments (reuses v1 toSnakeCase + convertToHcl)
                         const convertPropsToHcl = (props, indent = '  ') => {
@@ -539,9 +552,16 @@ app.post('/api/generate', (req, res) => {
             }
         }
         else if (platform === 'bicep') { code = compileBicep(schema, config, safeName); language = 'bicep'; }
-        else if (platform === 'cdk-python') { code = compileCdkPython(schema, config, safeName); language = 'python'; }
+        else if (platform === 'cdk-python') { 
+            // Parse stringified objects (like Tags) back to actual objects for CDK
+            const parsedConfig = parseStringifiedObjects(config, schema.properties);
+            code = compileCdkPython(schema, parsedConfig, safeName); 
+            language = 'python'; 
+        }
         else if (platform === 'cloudformation') { 
-            code = JSON.stringify({ Resources: { [safeName]: { Type: typeName, Properties: config } } }, null, 2); 
+            // Parse stringified objects (like Tags) back to actual objects for CFN
+            const parsedConfig = parseStringifiedObjects(config, schema.properties);
+            code = JSON.stringify({ Resources: { [safeName]: { Type: typeName, Properties: parsedConfig } } }, null, 2); 
             language = 'json'; 
         }
     } 
