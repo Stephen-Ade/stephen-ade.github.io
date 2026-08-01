@@ -340,17 +340,24 @@ app.get('/api/resources', (req, res) => {
 app.get('/api/schema/:typeName', (req, res) => {
     const typeName = decodeURIComponent(req.params.typeName);
     
-    // --- AZURE AVM / TERRAFORM OVERRIDE SCHEMA SWAP ---
+        // --- AZURE AVM / TERRAFORM OVERRIDE SCHEMA SWAP ---
     // If an "Invisible Upgrade" exists, serve its dedicated schema instead of schemas.json.
-    // This prevents Azure AzAPI fields (like tenantId) from polluting AVM/TF Module forms.
-    // It also locks the UI platform dropdown to 'terraform' only, hiding Bicep/CDK which 
-    // expect the raw ARM schema from schemas.json.
     if (tfModuleOverrides[typeName]) {
         const override = tfModuleOverrides[typeName];
-        const overrideSchemaPath = path.join(__dirname, override.template).replace('.hcl', '.schema.json');
+        
+        // Route to correct directory: AWS goes to /aws/, Azure/GCP go to /avm/
+        const schemaDir = typeName.startsWith('AWS::') ? 'aws' : 'avm';
+        const overrideSchemaPath = path.join(__dirname, 'backend', 'schemas', schemaDir, override.hclTemplate.replace('.hcl', '.schema.json'));
+        
         if (fs.existsSync(overrideSchemaPath)) {
             const overrideSchema = parseJsonSafe(overrideSchemaPath);
-            overrideSchema.supportedPlatforms = ['terraform']; // Force UI to only show Terraform
+            
+            // UI Lockdown: ONLY hide Bicep/CFN for Terraform Modules (Azure AVMs).
+            // AWS uses raw resources, so we allow CloudFormation to remain visible.
+            if (override.type === 'module') {
+                overrideSchema.supportedPlatforms = ['terraform']; 
+            }
+            
             return res.json(overrideSchema);
         }
     }
