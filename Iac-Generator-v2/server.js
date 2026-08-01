@@ -342,27 +342,27 @@ app.get('/api/schema/:typeName', (req, res) => {
     
         // --- AZURE AVM / TERRAFORM OVERRIDE SCHEMA SWAP ---
     // If an "Invisible Upgrade" exists, serve its dedicated schema instead of schemas.json.
+        // --- AZURE AVM / TERRAFORM OVERRIDE SCHEMA SWAP ---
     if (tfModuleOverrides[typeName]) {
         const override = tfModuleOverrides[typeName];
         
-        // Route to correct directory: AWS goes to /aws/, Azure/GCP go to /avm/
-        const schemaDir = typeName.startsWith('AWS::') ? 'aws' : 'avm';
-        const overrideSchemaPath = path.join(__dirname, 'backend', 'schemas', schemaDir, override.hclTemplate.replace('.hcl', '.schema.json'));
-        
-        if (fs.existsSync(overrideSchemaPath)) {
-            const overrideSchema = parseJsonSafe(overrideSchemaPath);
+        // ONLY intercept the schema for Azure Modules (prevents AzAPI pollution).
+        // AWS uses raw resources, so we let schemas.json handle the UI so it renders properly.
+        if (override.type === 'module') {
+            const overrideSchemaPath = path.join(__dirname, 'backend', 'schemas', 'avm', override.hclTemplate.replace('.hcl', '.schema.json'));
             
-            // UI Lockdown: ONLY hide Bicep/CFN for Terraform Modules (Azure AVMs).
-            // AWS uses raw resources, so we allow CloudFormation to remain visible.
-            if (override.type === 'module') {
-                overrideSchema.supportedPlatforms = ['terraform']; 
+            if (fs.existsSync(overrideSchemaPath)) {
+                const overrideSchema = parseJsonSafe(overrideSchemaPath);
+                overrideSchema.supportedPlatforms = ['terraform']; // Force UI to only show Terraform
+                return res.json(overrideSchema);
             }
-            
-            return res.json(overrideSchema);
         }
+        // If it's an AWS resource (type: "resource"), we do NOTHING here. 
+        // The UI will render beautifully using the native schemas.json.
+        // The HCL override will be applied later during the /generate route.
+    
     }
-
-    // Standard schema lookup (Used for native Bicep, CloudFormation, CDK, and un-overridden TF)
+    // Standard schema lookup (Used for native Bicep, CloudFormation, CDK, and un-overridden TF
     if (db.resources[typeName]) return res.json(db.resources[typeName]);
     
     const modMeta = moduleRegistry.modules.find(m => m.id === typeName);
@@ -395,14 +395,17 @@ app.post('/api/generate', (req, res) => {
             });
         }
 
-        if (platform === 'terraform') {
+                    if (platform === 'terraform') {
             // --- INVISIBLE UPGRADE: Intercept for Premium TF Modules ---
             const override = tfModuleOverrides[typeName];
             
             if (override) {
                 console.log(`[v2 Engine] Intercepted ${typeName} -> Module Template.`);
                 try {
-                    const templatePath = path.join(__dirname, override.template);
+                    // Route to correct directory: AWS raw resources go to /aws/, Azure/GCP modules go to /avm/
+                    const templateDir = override.type === 'resource' ? 'aws' : 'avm';
+                    const templatePath = path.join(__dirname, 'backend', 'templates', templateDir, override.hclTemplate);
+                    
                     const templateString = fs.readFileSync(templatePath, 'utf8');
                     const template = handlebars.compile(templateString);
                     
@@ -423,6 +426,38 @@ app.post('/api/generate', (req, res) => {
                             // If it's not valid JSON at all, fail securely instead of outputting broken Terraform
                             return res.status(400).json({ success: false, error: "PolicyDocument must be valid JSON." });
                         }
+                    }
+
+                    // --- AWS RAW RESOURCE DYNAMIC HCL INJECTION ---
+                    // AWS resources use a generic template. Bypass Handlebars and dynamically
+                    // convert the properties map into HCL arguments using our v1 converter.
+                    if (override.type === 'resource') {
+                        const awsProps = safeConfig.properties || {};
+                        // Convert all properties to HCL arguments (reuses v1 toSnakeCase + convertToHcl)
+                        const convertPropsToHcl = (props, indent = '  ') => {
+                            let hcl = '';
+                            for (const [key, value] of Object.entries(props || {})) {
+                                if (value === null || value === undefined || value === '') continue;
+                                const tfKey = toSnakeCase(key);
+                                if (typeof value === 'object' && !Array.isArray(value)) {
+                                    hcl += `${indent}${tfKey} {\n`;
+                                    hcl += convertPropsToHcl(value, indent + '  ');
+                                    hcl += `${indent}}\n`;
+                                } else if (Array.isArray(value) && value.length > 0 && typeof value[0] === 'object') {
+                                    value.forEach(item => {
+                                        hcl += `${indent}${tfKey} {\n`;
+                                        hcl += convertPropsToHcl(item, indent + '  ');
+                                        hcl += `${indent}}\n`;
+                                    });
+                                } else {
+                                    hcl += `${indent}${tfKey} = ${convertToHcl(value)}\n`;
+                                }
+                            }
+                            return hcl;
+                        };
+                        const dynamicHcl = convertPropsToHcl(awsProps);
+                        const finalHcl = `resource "${override.tfResourceType}" "this" {\n${dynamicHcl}}`;
+                        return res.send({ code: finalHcl, language: 'hcl' });
                     }
 
                     // SECURE JSON HANDLING: Convert Tags/Labels to HCL Map syntax
