@@ -1,0 +1,18 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "title": "Logical ID",
+      "description": "Logical ID for AWS::S3::Bucket"
+    },
+    "properties": {
+      "type": "object",
+      "title": "Resource Properties",
+      "description": "CloudFormation properties mapped directly to Terraform arguments"
+    }
+  },
+  "required": [
+    "id"
+  ]
+}
