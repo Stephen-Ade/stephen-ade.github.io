@@ -385,10 +385,11 @@ app.post('/api/generate', (req, res) => {
         const safeName = typeName.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
         
         // --- DEVSECOPS HARDENING: Block invalid platforms for Module Overrides ---
-        // If a resource is mapped to a premium TF module (AVM/GCP/AWS), we MUST reject 
+        // If a resource is mapped to a premium TF module (AVM/GCP), we MUST reject 
         // Bicep/CloudFormation requests. The v1 compilers blindly shove AVM inputs into 
         // invalid ARM/CFN syntax, generating deployable garbage.
-        if (tfModuleOverrides[typeName] && platform !== 'terraform') {
+        // NOTE: AWS raw resources (type: "resource") can still generate CFN/CDK natively.
+        if (tfModuleOverrides[typeName] && platform !== 'terraform' && tfModuleOverrides[typeName].type === 'module') {
             return res.status(400).json({ 
                 success: false, 
                 error: `This resource is configured to use a premium Terraform module. Native ${platform} generation is not supported for this resource.` 
