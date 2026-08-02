@@ -62,7 +62,10 @@ function inputToSchemaProperty(input) {
   const prop = {
     type: typeof jsonType === 'string' ? jsonType : jsonType.type,
     title: input.name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-    description: (input.description || '').replace(/\n/g, ' ').trim(),
+    // FIX 3: Add mutual requirement warning for VNet IPAM logic
+    description: (input.description || '').replace(/\n/g, ' ').trim() + 
+      (input.name === 'address_space' ? ' NOTE: Either this or ipam_pools must be specified.' : '') +
+      (input.name === 'ipam_pools' ? ' NOTE: Either this or address_space must be specified.' : ''),
   };
 
   if (input.type && !['string', 'bool', 'number'].includes(input.type)) {
@@ -110,7 +113,8 @@ function generateHclTemplate(moduleName, source, inputs, version) {
     '  required_providers {',
     '    azurerm = {',
     '      source  = "hashicorp/azurerm"',
-    '      version = ">= 3.0.0"',
+      // FIX 1: Tighten provider constraint per 3rd party audit
+      '      version = ">= 4.0.0, < 5.0.0"',
     '    }',
     '  }',
     '}',
@@ -268,7 +272,9 @@ async function main() {
     const schemaPath = path.join(SCHEMAS_DIR, schemaFile);
     fs.writeFileSync(schemaPath, JSON.stringify(schema, null, 2));
 
-    const hcl = generateHclTemplate(name, override.source, inputs, override.version);
+    // FIX 2: Sanitize module name to replace hyphens with underscores
+    const safeModuleName = name.replace(/-/g, '_');
+    const hcl = generateHclTemplate(safeModuleName, override.source, inputs, override.version);
     const templatePath = path.join(TEMPLATES_DIR, templateFile);
     fs.writeFileSync(templatePath, hcl);
 
