@@ -5,7 +5,6 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "ingest": "node scripts/ingest-schemas.js",
     "update-tf": "node scripts/update-tf-modules.js"
   },
   "dependencies": {
