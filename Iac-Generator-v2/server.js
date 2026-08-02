@@ -121,6 +121,14 @@ if (fs.existsSync(TF_OVERRIDES_PATH)) {
     console.warn('[v2 Engine] WARNING: db/terraform_module_overrides.json not found. Using raw compiler.');
 }
 
+// --- Build set of AVM override typeNames to filter from resource list ---
+const avmOverrideTypeNames = new Set(
+    Object.entries(tfModuleOverrides)
+        .filter(([, v]) => v.type === 'module' && v.source && v.source.includes('/avm-'))
+        .map(([k]) => k)
+);
+console.log(`[v2 Engine] ${avmOverrideTypeNames.size} Azure AVM resources registered in resource list.`);
+
 // --- 3RD PARTY AUDITOR VALIDATION: Bulk Address Objects ---
 // Prevents empty "" = {} map keys and enforces strict schema compliance
 function validateBulkAddresses(entries) {
@@ -396,13 +404,39 @@ function parseStringifiedObjects(config) {
 
 app.get('/api/resources', (req, res) => {
     const { search } = req.query;
-    let resources = Object.values(db.resources).map(r => ({ typeName: r.typeName, provider: r.provider }));
-    
+    let resources = [];
+
+    // Add AWS and other non-AVM resources from schemas.json
+    // Filter out any Azure resources that have AVM overrides (to avoid duplicates)
+    Object.values(db.resources).forEach(r => {
+        if (!avmOverrideTypeNames.has(r.typeName)) {
+            resources.push({ typeName: r.typeName, provider: r.provider });
+        }
+    });
+
+    // Add 3rd party modules (PANOS, etc.)
     moduleRegistry.modules.forEach(mod => {
         resources.push({ typeName: mod.id, provider: 'external', vendor: mod.vendor, deviceType: mod.deviceType, supportedPlatforms: mod.supportedPlatforms });
     });
 
-    if (search) resources = resources.filter(r => r.typeName.toLowerCase().includes(search.toLowerCase()) || (r.vendor && r.vendor.toLowerCase().includes(search.toLowerCase())));
+    // Add Azure AVM modules with proper metadata
+    avmOverrideTypeNames.forEach(typeName => {
+        const override = tfModuleOverrides[typeName];
+        resources.push({
+            typeName: typeName,
+            provider: 'azure',
+            vendor: 'Azure AVM',
+            supportedPlatforms: override.supportedPlatforms || ['terraform']
+        });
+    });
+
+    if (search) {
+        const searchLower = search.toLowerCase();
+        resources = resources.filter(r => 
+            r.typeName.toLowerCase().includes(searchLower) || 
+            (r.vendor && r.vendor.toLowerCase().includes(searchLower))
+        );
+    }
     
     res.json(resources);
 });
@@ -455,8 +489,9 @@ app.post('/api/generate', (req, res) => {
     let code = '';
     let language = 'plaintext';
 
-    if (db.resources[typeName]) {
-        const schema = db.resources[typeName];
+    if (db.resources[typeName] || tfModuleOverrides[typeName]) {
+        // Use override schema if available, otherwise fall back to schemas.json
+        const schema = db.resources[typeName] || {};
         const safeName = typeName.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
         
         // --- DEVSECOPS HARDENING: Block invalid platforms for Module Overrides ---
