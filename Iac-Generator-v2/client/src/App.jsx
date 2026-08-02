@@ -28,6 +28,7 @@ const unflattenObject = (obj) => {
 };
 
 // --- UPDATED: Parser that extracts the target module from the text file ---
+// FIX: Now handles JSON values (arrays/objects) in key:value format
 const parseTextToConfig = (text) => {
   text = text.replace(/^\uFEFF/, '');
   const lines = text.split(/\r?\n/); 
@@ -49,6 +50,19 @@ const parseTextToConfig = (text) => {
     let key = match[1].trim().replace(/^\uFEFF/, ''); 
     let value = match[2].trim();
     value = value.replace(/\s*\(.*?\)\s*/g, '').trim();
+    
+    // FIX: Detect and parse JSON values (arrays/objects)
+    // This handles: addresses: [{"name": "...", ...}]
+    const trimmedValue = value.trim();
+    if ((trimmedValue.startsWith('[') && trimmedValue.endsWith(']')) ||
+        (trimmedValue.startsWith('{') && trimmedValue.endsWith('}'))) {
+      try {
+        config[key] = JSON.parse(trimmedValue);
+        return;
+      } catch (e) {
+        // If JSON parse fails, fall through to regular handling
+      }
+    }
     
     // FIX: Convert string booleans to actual booleans so React checkboxes work correctly
     if (value.toLowerCase() === 'true') {
