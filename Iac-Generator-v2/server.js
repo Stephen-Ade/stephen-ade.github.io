@@ -239,15 +239,15 @@ function compileTerraformProps(schemaProps, configNode, indent) {
     return hcl;
 }
 
-// 3RD PARTY AUDIT FIX: Multiline arrays for terraform fmt parity
+// 3RD PARTY AUDIT FIX: Multiline arrays with terraform fmt compliant 4-space inner indentation
 function convertToHcl(value) {
     if (typeof value === 'string') return `"${value}"`;
     if (typeof value === 'number' || typeof value === 'boolean') return String(value);
     if (Array.isArray(value)) {
         if (value.length === 0) return '[]';
-        // AUDIT FIX: Force multiline arrays
-        const items = value.map(v => `  ${convertToHcl(v)}`).join(',\n');
-        return `[\n${items}\n]`;
+        // AUDIT FIX: 4 spaces for inner items, 2 spaces for closing bracket
+        const items = value.map(v => `    ${convertToHcl(v)}`).join(',\n');
+        return `[\n${items}\n  ]`;
     }
     if (typeof value === 'object') return convertObjToHclInline(value);
     return 'null';
@@ -571,7 +571,7 @@ app.post('/api/generate', (req, res) => {
                         return res.send({ code: finalHcl, language: 'hcl' });
                     }
 
-                    // 3RD PARTY AUDIT FIX: Aligned equals signs for terraform fmt parity
+                    // 3RD PARTY AUDIT FIX: Aligned equals signs with 4-space inner indentation
                     const convertMapToHcl = (data, key, forceLowerCase = false) => {
                         if (data[key]) {
                             try {
@@ -590,11 +590,12 @@ app.post('/api/generate', (req, res) => {
                                     return;
                                 }
                                 const maxKeyLen = Math.max(...entries.map(([k]) => k.length));
+                                // AUDIT FIX: 4 spaces for inner map keys, 2 spaces for closing brace
                                 const lines = entries.map(([k, v]) => {
                                     const paddedKey = k.padEnd(maxKeyLen);
-                                    return `  ${paddedKey} = ${convertToHcl(v)}`;
+                                    return `    ${paddedKey} = ${convertToHcl(v)}`;
                                 }).join('\n');
-                                data[key] = `{\n${lines}\n}`;
+                                data[key] = `{\n${lines}\n  }`;
                             } catch (e) { /* fail securely */ }
                         }
                     };
@@ -653,9 +654,9 @@ app.post('/api/generate', (req, res) => {
         }
     }
 
-    // 3RD PARTY AUDIT FIX: Normalize HCL formatting (strip empty lines from Handlebars conditionals)
+    // 3RD PARTY AUDIT FIX: Aggressively strip whitespace-only lines left by Handlebars conditionals
     if (language === 'hcl') {
-        code = code.replace(/\n{3,}/g, '\n\n').trim() + '\n';
+        code = code.split('\n').filter(line => line.trim() !== '').join('\n') + '\n';
     }
 
     res.json({ success: true, code, language });
