@@ -1,31 +1,198 @@
 {
   "type": "object",
   "properties": {
-    "name": {
-      "type": "string",
-      "title": "Resource Name",
-      "description": "Name of the Data Protection Backup Vault"
+    "permanent_delete_on_destroy": {
+      "type": "boolean",
+      "title": "Permanent Delete On Destroy",
+      "description": "Whether backup instances should be permanently deleted on destroy by setting the `permanent=true` query parameter. Set to false to use service default delete behavior.",
+      "default": true
     },
-    "location": {
+    "backup_policies": {
+      "type": "object",
+      "title": "Backup Policies",
+      "description": "Map of backup policies to create. Each policy can be referenced by backup instances. Key is used as reference identifier for backup instances.  Supported types: \"disk\", \"blob\", \"adls\", \"kubernetes\", \"postgresql\", \"postgresql_flexible\"  Common settings: - backup_repeating_time_intervals: List of ISO8601 backup schedule intervals - default_retention_duration: Default retention period in ISO8601 format - time_zone: Time zone for backup schedules - retention_rules: List of retention rules with criteria and lifecycle  Type-specific settings: - Blob: operational_default_retention_duration, vault_default_retention_duration - ADLS (Azure Data Lake Storage Gen2): operational_default_retention_duration, vault_default_retention_duration - AKS: default_retention_life_cycle with data_store_type and duration",
+      "tfType": "map(object({\n    type = string # \"disk\", \"blob\", \"adls\", \"kubernetes\", \"postgresql\", \"postgresql_flexible\"\n    name = string\n\n    # Common policy settings\n    backup_repeating_time_intervals = optional(list(string), [])\n    default_retention_duration      = optional(string, \"P30D\")\n    time_zone                       = optional(string, \"UTC\")\n\n    # Disk-specific settings\n    # (all settings are shared with other types for consistency)\n\n    # Blob-specific settings\n    operational_default_retention_duration = optional(string)\n    vault_default_retention_duration       = optional(string)\n\n    # AKS-specific settings\n    default_retention_life_cycle = optional(object({\n      data_store_type = optional(string, \"OperationalStore\")\n      duration        = optional(string, \"P14D\")\n    }))\n\n    # Retention rules (common to all types)\n    retention_rules = optional(list(object({\n      name     = string\n      priority = number\n      duration = optional(string, \"P30D\")\n      criteria = list(object({\n        absolute_criteria      = optional(string)\n        days_of_month          = optional(list(number))\n        days_of_week           = optional(list(string))\n        months_of_year         = optional(list(string))\n        scheduled_backup_times = optional(list(string))\n        weeks_of_month         = optional(list(string))\n      }))\n      # Life cycle (for blob policies)\n      life_cycle = optional(list(object({\n        data_store_type = string\n        duration        = string\n      })), [])\n    })), [])\n  }))",
+      "default": {}
+    },
+    "managed_identities": {
+      "type": "object",
+      "title": "Managed Identities",
+      "description": "Controls the Managed Identity configuration on this resource. The following properties can be specified:  - `system_assigned` - (Optional) Specifies if the System Assigned Managed Identity should be enabled. - `user_assigned_resource_ids` - (Optional) Specifies a list of User Assigned Managed Identity resource IDs to be assigned to this resource.",
+      "tfType": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+      "default": {}
+    },
+    "timeout_create": {
       "type": "string",
-      "title": "Location",
-      "description": "Azure region (e.g., eastus)",
-      "default": "eastus"
+      "title": "Timeout Create",
+      "description": "The timeout duration for creating resources.",
+      "default": "30m"
+    },
+    "timeout_delete": {
+      "type": "string",
+      "title": "Timeout Delete",
+      "description": "The timeout duration for deleting resources.",
+      "default": "30m"
     },
     "resource_group_name": {
       "type": "string",
       "title": "Resource Group Name",
-      "description": "Existing Resource Group name"
+      "description": "The resource group where the resources will be deployed."
+    },
+    "cross_subscription_restore_state": {
+      "type": "string",
+      "title": "Cross Subscription Restore State",
+      "description": "Cross-subscription restore state for the Backup Vault. Valid options: \"Enabled\", \"Disabled\", \"PermanentlyDisabled\". Defaults to null (not set)."
+    },
+    "immutability": {
+      "type": "string",
+      "title": "Immutability",
+      "description": "Immutability state: Disabled, Locked, or Unlocked.",
+      "default": "Disabled"
+    },
+    "lock": {
+      "type": "object",
+      "title": "Lock",
+      "description": "Controls the Resource Lock configuration for this resource. The following properties can be specified:  - `kind` - (Required) The type of lock. Possible values are `\\\"CanNotDelete\\\"` and `\\\"ReadOnly\\\"`. - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.",
+      "tfType": "object({\n    kind = string\n    name = optional(string, null)\n  })"
+    },
+    "resource_guard_resource_id": {
+      "type": "string",
+      "title": "Resource Guard Resource Id",
+      "description": "The resource ID of an existing Resource Guard to associate with the backup vault. When provided (with `resource_guard_enabled = true`), no new guard is created — the existing one is used directly."
+    },
+    "soft_delete": {
+      "type": "string",
+      "title": "Soft Delete",
+      "description": "The state of soft delete for this Backup Vault. API version 2025-09-01 requires AlwaysOn soft delete. Defaults to AlwaysOn and cannot be changed.",
+      "default": "AlwaysOn"
+    },
+    "backup_vault_resource_type": {
+      "type": "string",
+      "title": "Backup Vault Resource Type",
+      "description": "The resource type for the backup vault including API version. Override this if you need to match a different casing for import scenarios, e.g. `Microsoft.DataProtection/BackupVaults@2025-09-01`.",
+      "default": "Microsoft.DataProtection/backupVaults@2025-09-01"
+    },
+    "redundancy": {
+      "type": "string",
+      "title": "Redundancy",
+      "description": "Specifies the backup storage redundancy. Changing this forces a new resource to be created. Valid options: GeoRedundant, LocallyRedundant, ZoneRedundant."
+    },
+    "backup_instances": {
+      "type": "object",
+      "title": "Backup Instances",
+      "description": "Map of backup instances to create. Each instance references a backup policy via backup_policy_key.  Supported types: \"disk\", \"blob\", \"adls\", \"kubernetes\", \"postgresql\", \"postgresql_flexible\"  Common settings: - name: Display name for the backup instance - backup_policy_key: Reference to a key in backup_policies map  Type-specific settings: - Disk: disk_id, snapshot_resource_group_name - Blob: storage_account_id, storage_account_container_names - ADLS (Azure Data Lake Storage Gen2): storage_account_id, storage_account_container_names - AKS: kubernetes_cluster_id, backup_datasource_parameters - PostgreSQL: postgresql_server_id, postgresql_database_id, postgresql_key_vault_secret_id - PostgreSQL Flexible: postgresql_flexible_server_id, postgresql_flexible_database_id, postgresql_flexible_key_vault_secret_id",
+      "tfType": "map(object({\n    type              = string # \"disk\", \"blob\", \"adls\", \"kubernetes\", \"postgresql\", \"postgresql_flexible\"\n    name              = string\n    backup_policy_key = string # References key from backup_policies map\n\n    # Disk-specific settings\n    disk_id                      = optional(string)\n    snapshot_resource_group_name = optional(string)\n\n    # Blob-specific settings\n    storage_account_id              = optional(string)\n    storage_account_container_names = optional(list(string), [])\n\n    # AKS-specific settings\n    kubernetes_cluster_id = optional(string)\n    backup_datasource_parameters = optional(object({\n      excluded_namespaces              = optional(list(string), [])\n      included_namespaces              = optional(list(string), [])\n      excluded_resource_types          = optional(list(string), [])\n      included_resource_types          = optional(list(string), [])\n      label_selectors                  = optional(list(string), [])\n      cluster_scoped_resources_enabled = optional(bool, false)\n      volume_snapshot_enabled          = optional(bool, false)\n    }))\n\n    # PostgreSQL-specific settings\n    postgresql_server_id           = optional(string)\n    postgresql_database_id         = optional(string)\n    postgresql_key_vault_secret_id = optional(string)\n\n    # PostgreSQL Flexible-specific settings\n    postgresql_flexible_server_id           = optional(string)\n    postgresql_flexible_database_id         = optional(string)\n    postgresql_flexible_key_vault_secret_id = optional(string)\n  }))",
+      "default": {}
+    },
+    "cross_region_restore_enabled": {
+      "type": "boolean",
+      "title": "Cross Region Restore Enabled",
+      "description": "Whether to enable cross-region restore for the Backup Vault. Can only be enabled with GeoRedundant redundancy.",
+      "default": false
+    },
+    "enable_telemetry": {
+      "type": "boolean",
+      "title": "Enable Telemetry",
+      "description": "This variable controls whether or not telemetry is enabled for the module. For more information see <https://aka.ms/avm/telemetryinfo>. If it is set to false, then no telemetry will be collected.",
+      "default": true
+    },
+    "timeout_read": {
+      "type": "string",
+      "title": "Timeout Read",
+      "description": "The timeout duration for reading resources.",
+      "default": "5m"
+    },
+    "timeout_update": {
+      "type": "string",
+      "title": "Timeout Update",
+      "description": "The timeout duration for updating resources.",
+      "default": "30m"
+    },
+    "name": {
+      "type": "string",
+      "title": "Name",
+      "description": "The name of this resource. Must be between 5 and 50 characters long."
+    },
+    "replicated_regions": {
+      "type": "array",
+      "title": "Replicated Regions",
+      "description": "List of replicated regions for the Backup Vault. Only applicable for GeoRedundant vaults.",
+      "tfType": "list(string)",
+      "items": "string",
+      "default": []
+    },
+    "role_assignments": {
+      "type": "object",
+      "title": "Role Assignments",
+      "description": "A map of role assignments to create on resources. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.    - `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.   - `principal_id` - The ID of the principal to assign the role to.   - `scope` - (Optional) The scope at which the role assignment applies to. Defaults to the backup vault resource ID.   - `description` - (Optional) The description of the role assignment.   - `skip_service_principal_aad_check` - (Optional) If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false.   - `condition` - (Optional) The condition which will be used to scope the role assignment.   - `condition_version` - (Optional) The version of the condition syntax. Leave as `null` if you are not using a condition, if you are then valid values are '2.0'.   - `delegated_managed_identity_resource_id` - (Optional) The delegated Azure Resource Id which contains a Managed Identity.   - `principal_type` - (Optional) The type of the `principal_id`. Possible values are `User`, `Group` and `ServicePrincipal`.",
+      "tfType": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    scope                                  = optional(string)\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+      "default": {}
     },
     "tags": {
       "type": "object",
       "title": "Tags",
-      "description": "Resource tags (key-value pairs)"
+      "description": "(Optional) Tags of the resource.",
+      "tfType": "map(string)"
+    },
+    "wait_for_backup_instance_configure_duration": {
+      "type": "string",
+      "title": "Wait For Backup Instance Configure Duration",
+      "description": "Additional wait after backup instance creation to allow protection status to leave ConfiguringProtection before destroy.",
+      "default": "180s"
+    },
+    "resource_guard_name": {
+      "type": "string",
+      "title": "Resource Guard Name",
+      "description": "The name of the Resource Guard. If not specified, will use the backup vault name with '-guard' suffix. Only used when creating a new resource guard (i.e., when `resource_guard_resource_id` is null)."
+    },
+    "vault_critical_operation_exclusion_list": {
+      "type": "array",
+      "title": "Vault Critical Operation Exclusion List",
+      "description": "A list of the critical operations which are not protected by Resource Guard. By default, all critical operations are protected. Only exclude operations that you want to allow without additional protection. Possible values include: \"Delete\", \"Update\", \"DisableSoftDelete\", and \"ChangeBackupProperties\".",
+      "tfType": "list(string)",
+      "items": "string",
+      "default": []
+    },
+    "location": {
+      "type": "string",
+      "title": "Location",
+      "description": "Azure region where the resource should be deployed."
+    },
+    "alerts_for_all_job_failures": {
+      "type": "string",
+      "title": "Alerts For All Job Failures",
+      "description": "Azure Monitor alert setting for all job failures. Valid options: \"Enabled\", \"Disabled\". Defaults to null (not set). When set, configures monitoringSettings.azureMonitorAlertSettings.alertsForAllJobFailures on the vault."
+    },
+    "diagnostic_settings": {
+      "type": "object",
+      "title": "Diagnostic Settings",
+      "description": "A map of diagnostic settings to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.  - `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources. - `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`. - `log_groups` - (Optional) A set of log groups to send to the log analytics workspace. Defaults to `[\"allLogs\"]`. - `metric_categories` - (Optional) A set of metric categories to send to the log analytics workspace. Defaults to `[\"AllMetrics\"]`. - `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`. - `workspace_resource_id` - (Optional) The resource ID of the log analytics workspace to send logs and metrics to. - `storage_account_resource_id` - (Optional) The resource ID of the storage account to send logs and metrics to. - `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the event hub authorization rule to send logs and metrics to. - `event_hub_name` - (Optional) The name of the event hub. If none is specified, the default event hub will be selected. - `marketplace_partner_resource_id` - (Optional) The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.",
+      "tfType": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+      "default": {}
+    },
+    "retention_duration_in_days": {
+      "type": "number",
+      "title": "Retention Duration In Days",
+      "description": "The soft delete retention duration for this Backup Vault. Valid values are between 14 and 180. Defaults to 14.",
+      "default": 14
+    },
+    "resource_guard_enabled": {
+      "type": "boolean",
+      "title": "Resource Guard Enabled",
+      "description": "Controls whether a Resource Guard is associated with the backup vault. When true and `resource_guard_resource_id` is null, a new Resource Guard is created in the same resource group. When true and `resource_guard_resource_id` is provided, the existing external guard is associated instead.",
+      "default": false
+    },
+    "datastore_type": {
+      "type": "string",
+      "title": "Datastore Type",
+      "description": "Specifies the type of the datastore. Changing this forces a new resource to be created. Valid options: ArchiveStore, OperationalStore, SnapshotStore, VaultStore. Note: When ArchiveStore is specified, a VaultStore entry is automatically included in storageSettings as required by the Azure API."
     }
   },
   "required": [
+    "resource_group_name",
+    "redundancy",
     "name",
     "location",
-    "resource_group_name"
+    "datastore_type"
   ]
 }

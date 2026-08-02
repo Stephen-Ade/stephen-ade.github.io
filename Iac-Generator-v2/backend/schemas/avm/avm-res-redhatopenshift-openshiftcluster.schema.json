@@ -1,31 +1,130 @@
 {
   "type": "object",
   "properties": {
-    "name": {
-      "type": "string",
-      "title": "Resource Name",
-      "description": "Name of the Azure Red Hat OpenShift Cluster"
+    "cluster_profile": {
+      "type": "object",
+      "title": "Cluster Profile",
+      "description": "Cluster profile settings: domain, version, optional FIPS, managed RG and pull secret. When `managed_resource_group_name` is omitted the module derives `rg-<var.name>` and links the cluster to that managed resource group.",
+      "tfType": "object({\n    domain                      = string\n    version                     = string\n    fips_enabled                = optional(bool, false)\n    managed_resource_group_name = optional(string, null)\n    pull_secret                 = optional(string, null)\n  })"
+    },
+    "ingress_profile": {
+      "type": "object",
+      "title": "Ingress Profile",
+      "description": "Ingress profile configuration: visibility (Public or Private).",
+      "tfType": "object({\n    visibility = string\n  })"
     },
     "location": {
       "type": "string",
       "title": "Location",
-      "description": "Azure region (e.g., eastus)",
-      "default": "eastus"
+      "description": "Azure region where the resource should be deployed."
+    },
+    "name": {
+      "type": "string",
+      "title": "Name",
+      "description": "The name of the ARO cluster resource. Must be 5-50 chars, lowercase letters, numbers or hyphens, start/end with alphanumeric."
+    },
+    "platform_workload_identities": {
+      "type": "object",
+      "title": "Platform Workload Identities",
+      "description": "Defines the platform workload managed identities associated with the cluster. Keys must match the operator names expected by Azure Red Hat OpenShift (for example `cloud-controller-manager`). - `resource_id` - (Required) The resource ID of the user-assigned managed identity. - `federated_identity_client_id` - (Optional) Overrides the federated credential client ID associated with the workload identity when required. - `federated_service_account_name` - (Optional) Future-proof field to describe the service account name linked to the identity (not sent to the API). - `federated_service_account_ns` - (Optional) Future-proof field to describe the namespace of the service account linked to the identity (not sent to the API).",
+      "tfType": "map(object({\n    resource_id                    = string\n    federated_identity_client_id   = optional(string, null)\n    federated_service_account_name = optional(string, null)\n    federated_service_account_ns   = optional(string, null)\n  }))",
+      "default": {}
+    },
+    "service_principal": {
+      "type": "object",
+      "title": "Service Principal",
+      "description": "Service principal credentials used by the ARO cluster. This variable is now optional and defaults to null. If you previously relied on this being required, update your configuration to explicitly set service_principal if needed. For migration guidance, see the module documentation.",
+      "tfType": "object({\n    client_id     = string\n    client_secret = string\n  })"
+    },
+    "api_server_profile": {
+      "type": "object",
+      "title": "Api Server Profile",
+      "description": "API server profile configuration: visibility (Public or Private).",
+      "tfType": "object({\n    visibility = string\n  })"
+    },
+    "main_profile": {
+      "type": "object",
+      "title": "Main Profile",
+      "description": "Master (control plane) profile: subnet id, vm size and optional encryption settings.",
+      "tfType": "object({\n    subnet_id                  = string\n    vm_size                    = string\n    disk_encryption_set_id     = optional(string, null)\n    encryption_at_host_enabled = optional(bool, false)\n  })"
+    },
+    "private_endpoints": {
+      "type": "object",
+      "title": "Private Endpoints",
+      "description": "A map of private endpoints to create on this resource.",
+      "tfType": "map(object({\n    name = optional(string, null)\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })), {})\n    lock = optional(object({\n      kind = string\n      name = optional(string, null)\n    }), null)\n    tags                                    = optional(map(string), null)\n    subnet_resource_id                      = string\n    private_dns_zone_group_name             = optional(string, \"default\")\n    private_dns_zone_resource_ids           = optional(set(string), [])\n    application_security_group_associations = optional(map(string), {})\n    private_service_connection_name         = optional(string, null)\n    network_interface_name                  = optional(string, null)\n    location                                = optional(string, null)\n    resource_group_name                     = optional(string, null)\n    ip_configurations = optional(map(object({\n      name               = string\n      private_ip_address = string\n    })), {})\n  }))",
+      "default": {}
+    },
+    "timeouts": {
+      "type": "object",
+      "title": "Timeouts",
+      "description": "Resource operation timeouts for create, read, update, delete (e.g. 120m). Optional.",
+      "tfType": "object({\n    create = optional(string, null)\n    read   = optional(string, null)\n    update = optional(string, null)\n    delete = optional(string, null)\n  })"
+    },
+    "network_profile": {
+      "type": "object",
+      "title": "Network Profile",
+      "description": "Network profile: pod/service CIDRs, outbound type and optional preconfigured NSG flag.",
+      "tfType": "object({\n    pod_cidr                                     = string\n    service_cidr                                 = string\n    outbound_type                                = optional(string, null) # Loadbalancer | UserDefinedRouting\n    preconfigured_network_security_group_enabled = optional(bool, false)\n  })"
     },
     "resource_group_name": {
       "type": "string",
       "title": "Resource Group Name",
-      "description": "Existing Resource Group name"
+      "description": "The resource group where the resources will be deployed."
+    },
+    "worker_profile": {
+      "type": "object",
+      "title": "Worker Profile",
+      "description": "Worker node pool profile: sizing and encryption options.",
+      "tfType": "object({\n    subnet_id                  = string\n    vm_size                    = string\n    node_count                 = number\n    disk_size_gb               = number\n    disk_encryption_set_id     = optional(string, null)\n    encryption_at_host_enabled = optional(bool, false)\n  })"
+    },
+    "enable_telemetry": {
+      "type": "boolean",
+      "title": "Enable Telemetry",
+      "description": "This variable controls whether or not telemetry is enabled for the module. For more information see <https://aka.ms/avm/telemetryinfo>. If it is set to false, then no telemetry will be collected.",
+      "default": true
+    },
+    "role_assignments": {
+      "type": "object",
+      "title": "Role Assignments",
+      "description": "A map of role assignments to create on this resource.",
+      "tfType": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+      "default": {}
+    },
+    "subscription_id": {
+      "type": "string",
+      "title": "Subscription Id",
+      "description": "Optional subscription id to use for derived resource ids. When set, avoids reading subscription id during apply which can cause replacement drift."
     },
     "tags": {
       "type": "object",
       "title": "Tags",
-      "description": "Resource tags (key-value pairs)"
+      "description": "(Optional) Tags of the resource.",
+      "tfType": "map(string)"
+    },
+    "managed_identities": {
+      "type": "object",
+      "title": "Managed Identities",
+      "description": "Controls the Managed Identity configuration on this resource. The following properties can be specified:  - `system_assigned` - (Optional) Specifies if the System Assigned Managed Identity should be enabled. - `user_assigned_resource_ids` - (Optional) Specifies a list of User Assigned Managed Identity resource IDs to be assigned to this resource.",
+      "tfType": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+      "default": {}
+    },
+    "private_endpoints_manage_dns_zone_group": {
+      "type": "boolean",
+      "title": "Private Endpoints Manage Dns Zone Group",
+      "description": "Whether to manage private DNS zone groups with this module. If set to false, you must manage private DNS zone groups externally, e.g. using Azure Policy.",
+      "default": true
     }
   },
   "required": [
-    "name",
+    "cluster_profile",
+    "ingress_profile",
     "location",
-    "resource_group_name"
+    "name",
+    "api_server_profile",
+    "main_profile",
+    "network_profile",
+    "resource_group_name",
+    "worker_profile"
   ]
 }

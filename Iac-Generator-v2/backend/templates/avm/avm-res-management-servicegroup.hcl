@@ -9,10 +9,12 @@ terraform {
 
 module "avm-res-management-servicegroup" {
   source  = "Azure/avm-res-management-servicegroup/azurerm"
-  version = "x.x.x" # Version pinned by update-tf-modules.js
+  version = "0.1.0"
 
-  name                = var.name
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  tags                = var.tags
+  {{#name}}name                    = {{{name}}}{{/name}}
+  {{#display_name}}display_name            = {{{display_name}}}{{/display_name}}
+  {{#enable_telemetry}}enable_telemetry        = {{{enable_telemetry}}}{{/enable_telemetry}}
+  {{#parent_service_group_id}}parent_service_group_id = {{{parent_service_group_id}}}{{/parent_service_group_id}}
+  {{#role_assignments}}role_assignments        = {{{role_assignments}}}{{/role_assignments}}
+  {{#service_group_members}}service_group_members   = {{{service_group_members}}}{{/service_group_members}}
 }

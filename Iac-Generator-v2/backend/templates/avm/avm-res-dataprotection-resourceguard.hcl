@@ -9,10 +9,14 @@ terraform {
 
 module "avm-res-dataprotection-resourceguard" {
   source  = "Azure/avm-res-dataprotection-resourceguard/azurerm"
-  version = "x.x.x" # Version pinned by update-tf-modules.js
+  version = "0.1.0"
 
-  name                = var.name
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  tags                = var.tags
+  {{#location}}location                                = {{{location}}}{{/location}}
+  {{#name}}name                                    = {{{name}}}{{/name}}
+  {{#resource_group_id}}resource_group_id                       = {{{resource_group_id}}}{{/resource_group_id}}
+  {{#enable_telemetry}}enable_telemetry                        = {{{enable_telemetry}}}{{/enable_telemetry}}
+  {{#lock}}lock                                    = {{{lock}}}{{/lock}}
+  {{#role_assignments}}role_assignments                        = {{{role_assignments}}}{{/role_assignments}}
+  {{#tags}}tags                                    = {{{tags}}}{{/tags}}
+  {{#vault_critical_operation_exclusion_list}}vault_critical_operation_exclusion_list = {{{vault_critical_operation_exclusion_list}}}{{/vault_critical_operation_exclusion_list}}
 }

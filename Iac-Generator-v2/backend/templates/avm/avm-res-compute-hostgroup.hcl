@@ -9,10 +9,15 @@ terraform {
 
 module "avm-res-compute-hostgroup" {
   source  = "Azure/avm-res-compute-hostgroup/azurerm"
-  version = "x.x.x" # Version pinned by update-tf-modules.js
+  version = "0.1.3"
 
-  name                = var.name
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  tags                = var.tags
+  {{#dedicated_host_group_name}}dedicated_host_group_name   = {{{dedicated_host_group_name}}}{{/dedicated_host_group_name}}
+  {{#location}}location                    = {{{location}}}{{/location}}
+  {{#platform_fault_domain_count}}platform_fault_domain_count = {{{platform_fault_domain_count}}}{{/platform_fault_domain_count}}
+  {{#resource_group_name}}resource_group_name         = {{{resource_group_name}}}{{/resource_group_name}}
+  {{#automatic_placement_enabled}}automatic_placement_enabled = {{{automatic_placement_enabled}}}{{/automatic_placement_enabled}}
+  {{#dedicated_hosts}}dedicated_hosts             = {{{dedicated_hosts}}}{{/dedicated_hosts}}
+  {{#enable_telemetry}}enable_telemetry            = {{{enable_telemetry}}}{{/enable_telemetry}}
+  {{#tags}}tags                        = {{{tags}}}{{/tags}}
+  {{#zone}}zone                        = {{{zone}}}{{/zone}}
 }

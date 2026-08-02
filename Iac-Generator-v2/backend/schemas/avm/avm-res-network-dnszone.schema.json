@@ -1,31 +1,94 @@
 {
   "type": "object",
   "properties": {
-    "name": {
-      "type": "string",
-      "title": "Resource Name",
-      "description": "Name of the Public DNS Zone"
+    "cname_records": {
+      "type": "object",
+      "title": "Cname Records",
+      "description": "A map of objects where each object contains information to create a CNAME record.",
+      "tfType": "map(object({\n    name                = string\n    resource_group_name = string\n    zone_name           = string\n    ttl                 = number\n    record              = string\n    tags                = optional(map(string), null)\n    target_resource_id  = optional(string)\n  }))",
+      "default": {}
     },
-    "location": {
-      "type": "string",
-      "title": "Location",
-      "description": "Azure region (e.g., eastus)",
-      "default": "eastus"
+    "enable_telemetry": {
+      "type": "boolean",
+      "title": "Enable Telemetry",
+      "description": "This variable controls whether or not telemetry is enabled for the module. For more information see <https://aka.ms/avm/telemetryinfo>. If it is set to false, then no telemetry will be collected.",
+      "default": true
     },
-    "resource_group_name": {
-      "type": "string",
-      "title": "Resource Group Name",
-      "description": "Existing Resource Group name"
+    "srv_records": {
+      "type": "object",
+      "title": "Srv Records",
+      "description": "A map of objects where each object contains information to create a SRV record.",
+      "tfType": "map(object({\n    name                = string\n    resource_group_name = string\n    zone_name           = string\n    ttl                 = number\n    records = map(object({\n      priority = number\n      weight   = number\n      port     = number\n      target   = string\n    }))\n    tags = optional(map(string), null)\n  }))",
+      "default": {}
     },
     "tags": {
       "type": "object",
       "title": "Tags",
-      "description": "Resource tags (key-value pairs)"
+      "description": "(Optional) Tags of the resource.",
+      "tfType": "map(string)"
+    },
+    "resource_group_name": {
+      "type": "string",
+      "title": "Resource Group Name",
+      "description": "The resource group where the resources will be deployed."
+    },
+    "a_records": {
+      "type": "object",
+      "title": "A Records",
+      "description": "A map of objects where each object contains information to create a A record.",
+      "tfType": "map(object({\n    name                = string\n    resource_group_name = string\n    zone_name           = string\n    ttl                 = number\n    records             = optional(list(string))\n    target_resource_id  = optional(string)\n    tags                = optional(map(string), null)\n  }))",
+      "default": {}
+    },
+    "aaaa_records": {
+      "type": "object",
+      "title": "Aaaa Records",
+      "description": "A map of objects where each object contains information to create a AAAA record.",
+      "tfType": "map(object({\n    name                = string\n    resource_group_name = string\n    zone_name           = string\n    ttl                 = number\n    records             = optional(list(string))\n    target_resource_id  = optional(string)\n    tags                = optional(map(string), null)\n  }))",
+      "default": {}
+    },
+    "caa_records": {
+      "type": "object",
+      "title": "Caa Records",
+      "description": "A map of objects where each object contains information to create a CAA record.",
+      "tfType": "map(object({\n    name                = string\n    resource_group_name = string\n    zone_name           = string\n    ttl                 = number\n    record = map(object({\n      flags = string\n      tag   = string\n      value = string\n    }))\n    tags = optional(map(string), null)\n  }))",
+      "default": {}
+    },
+    "mx_records": {
+      "type": "object",
+      "title": "Mx Records",
+      "description": "A map of objects where each object contains information to create a MX record.",
+      "tfType": "map(object({\n    name                = optional(string, \"@\")\n    resource_group_name = string\n    zone_name           = string\n    ttl                 = number\n    records = map(object({\n      preference = number\n      exchange   = string\n    }))\n    tags = optional(map(string), null)\n  }))",
+      "default": {}
+    },
+    "ns_records": {
+      "type": "object",
+      "title": "Ns Records",
+      "description": "A map of objects where each object contains information to create a NS record.",
+      "tfType": "map(object({\n    name                = string\n    resource_group_name = string\n    zone_name           = string\n    ttl                 = number\n    records             = list(string)\n    tags                = optional(map(string), null)\n  }))",
+      "default": {}
+    },
+    "ptr_records": {
+      "type": "object",
+      "title": "Ptr Records",
+      "description": "A map of objects where each object contains information to create a PTR record.",
+      "tfType": "map(object({\n    name                = string\n    resource_group_name = string\n    zone_name           = string\n    ttl                 = number\n    records             = list(string)\n    tags                = optional(map(string), null)\n  }))",
+      "default": {}
+    },
+    "txt_records": {
+      "type": "object",
+      "title": "Txt Records",
+      "description": "A map of objects where each object contains information to create a TXT record.",
+      "tfType": "map(object({\n    name                = string\n    resource_group_name = string\n    zone_name           = string\n    ttl                 = number\n    records = map(object({\n      value = string\n    }))\n    tags = optional(map(string), null)\n  }))",
+      "default": {}
+    },
+    "name": {
+      "type": "string",
+      "title": "Name",
+      "description": "The name of the this resource."
     }
   },
   "required": [
-    "name",
-    "location",
-    "resource_group_name"
+    "resource_group_name",
+    "name"
   ]
 }

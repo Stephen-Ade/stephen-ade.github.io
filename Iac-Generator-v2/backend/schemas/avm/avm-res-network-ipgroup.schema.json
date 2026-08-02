@@ -1,31 +1,58 @@
 {
   "type": "object",
   "properties": {
-    "name": {
-      "type": "string",
-      "title": "Resource Name",
-      "description": "Name of the IP Group"
+    "ip_addresses": {
+      "type": "array",
+      "title": "Ip Addresses",
+      "description": "The list of IP addresses, IP ranges, or CIDR blocks that belong to the IP Group.",
+      "tfType": "set(string)",
+      "items": "string"
     },
     "location": {
       "type": "string",
       "title": "Location",
-      "description": "Azure region (e.g., eastus)",
-      "default": "eastus"
+      "description": "Azure region where the resource should be deployed."
+    },
+    "name": {
+      "type": "string",
+      "title": "Name",
+      "description": "The name of the IP Group."
     },
     "resource_group_name": {
       "type": "string",
       "title": "Resource Group Name",
-      "description": "Existing Resource Group name"
+      "description": "The resource group where the resources will be deployed."
+    },
+    "enable_telemetry": {
+      "type": "boolean",
+      "title": "Enable Telemetry",
+      "description": "This variable controls whether or not telemetry is enabled for the module. For more information see <https://aka.ms/avm/telemetryinfo>. If it is set to false, then no telemetry will be collected.",
+      "default": true
+    },
+    "lock": {
+      "type": "object",
+      "title": "Lock",
+      "description": "Controls the Resource Lock configuration for this resource. The following properties can be specified:  - `kind` - (Required) The type of lock. Possible values are `\\\"CanNotDelete\\\"` and `\\\"ReadOnly\\\"`. - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.",
+      "tfType": "object({\n    kind = string\n    name = optional(string, null)\n  })"
+    },
+    "role_assignments": {
+      "type": "object",
+      "title": "Role Assignments",
+      "description": "A map of role assignments to create on this resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.  - `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal. - `principal_id` - The ID of the principal to assign the role to. - `description` - The description of the role assignment. - `skip_service_principal_aad_check` - If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false. - `condition` - The condition which will be used to scope the role assignment. - `condition_version` - The version of the condition syntax. Valid values are '2.0'.  > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.",
+      "tfType": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+      "default": {}
     },
     "tags": {
       "type": "object",
       "title": "Tags",
-      "description": "Resource tags (key-value pairs)"
+      "description": "(Optional) Tags of the resource.",
+      "tfType": "map(string)"
     }
   },
   "required": [
-    "name",
+    "ip_addresses",
     "location",
+    "name",
     "resource_group_name"
   ]
 }

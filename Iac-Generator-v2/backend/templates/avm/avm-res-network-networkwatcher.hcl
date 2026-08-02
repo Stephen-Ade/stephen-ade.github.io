@@ -9,10 +9,16 @@ terraform {
 
 module "avm-res-network-networkwatcher" {
   source  = "Azure/avm-res-network-networkwatcher/azurerm"
-  version = "x.x.x" # Version pinned by update-tf-modules.js
+  version = "0.3.2"
 
-  name                = var.name
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  tags                = var.tags
+  {{#location}}location             = {{{location}}}{{/location}}
+  {{#network_watcher_id}}network_watcher_id   = {{{network_watcher_id}}}{{/network_watcher_id}}
+  {{#network_watcher_name}}network_watcher_name = {{{network_watcher_name}}}{{/network_watcher_name}}
+  {{#resource_group_name}}resource_group_name  = {{{resource_group_name}}}{{/resource_group_name}}
+  {{#condition_monitor}}condition_monitor    = {{{condition_monitor}}}{{/condition_monitor}}
+  {{#enable_telemetry}}enable_telemetry     = {{{enable_telemetry}}}{{/enable_telemetry}}
+  {{#flow_logs}}flow_logs            = {{{flow_logs}}}{{/flow_logs}}
+  {{#lock}}lock                 = {{{lock}}}{{/lock}}
+  {{#role_assignments}}role_assignments     = {{{role_assignments}}}{{/role_assignments}}
+  {{#tags}}tags                 = {{{tags}}}{{/tags}}
 }

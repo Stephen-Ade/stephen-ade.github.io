@@ -1,31 +1,272 @@
 {
   "type": "object",
   "properties": {
-    "name": {
+    "database_format": {
       "type": "string",
-      "title": "Resource Name",
-      "description": "Name of the SQL Managed Instance"
+      "title": "Database Format",
+      "description": "(Optional) Specifies the internal format of instance databases specific to the SQL engine version. This controls which SQL engine features are available and is sometimes referred to as the \"update policy\".  Possible values are: - `null` (default) - uses Azure's default database format - `\"AlwaysUpToDate\"` - always aligns with the latest SQL Server format, receiving new features as they become available - `\"SQLServer2022\"` - aligns with the SQL Server 2022 database engine - `\"SQLServer2025\"` - aligns with the SQL Server 2025 database engine (GA March 2026)  Note: Downgrading to a lower format version is not supported once set.  See: https://learn.microsoft.com/en-us/azure/azure-sql/managed-instance/update-policy  Defaults to `null`."
     },
-    "location": {
+    "minimum_tls_version": {
       "type": "string",
-      "title": "Location",
-      "description": "Azure region (e.g., eastus)",
-      "default": "eastus"
+      "title": "Minimum Tls Version",
+      "description": "(Optional) The Minimum TLS Version. Default value is `1.2` Valid values include `1.0`, `1.1`, `1.2`.",
+      "default": "1.2"
+    },
+    "security_alert_policy": {
+      "type": "object",
+      "title": "Security Alert Policy",
+      "description": "- `disabled_alerts` - (Optional) Specifies an array of alerts that are disabled. Possible values are `Sql_Injection`, `Sql_Injection_Vulnerability`, `Access_Anomaly`, `Data_Exfiltration`, `Unsafe_Action` and `Brute_Force`. - `email_account_admins_enabled` - (Optional) Boolean flag which specifies if the alert is sent to the account administrators or not. Defaults to `false`. - `email_addresses` - (Optional) Specifies an array of email addresses to which the alert is sent. - `enabled` - (Optional) Specifies the state of the Security Alert Policy, whether it is enabled or disabled. Possible values are `true`, `false`. - `retention_days` - (Optional) Specifies the number of days to keep in the Threat Detection audit logs. Defaults to `0`. - `storage_account_access_key` - (Optional) Specifies the identifier key of the Threat Detection audit storage account. This is mandatory when you use `storage_endpoint` to specify a storage account blob endpoint. - `storage_endpoint` - (Optional) Specifies the blob storage endpoint (e.g. https://example.blob.core.windows.net). This blob storage will hold all Threat Detection audit logs.  --- `timeouts` block supports the following: - `create` - (Defaults to 30 minutes) Used when creating the MS SQL Managed Instance Security Alert Policy. - `delete` - (Defaults to 30 minutes) Used when deleting the MS SQL Managed Instance Security Alert Policy. - `read` - (Defaults to 5 minutes) Used when retrieving the MS SQL Managed Instance Security Alert Policy. - `update` - (Defaults to 30 minutes) Used when updating the MS SQL Managed Instance Security Alert Policy.",
+      "tfType": "object({\n    disabled_alerts              = optional(set(string))\n    email_account_admins_enabled = optional(bool)\n    email_addresses              = optional(set(string))\n    enabled                      = optional(bool)\n    retention_days               = optional(number)\n    storage_account_access_key   = optional(string)\n    storage_endpoint             = optional(string)\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  })",
+      "default": {}
+    },
+    "zone_redundant_enabled": {
+      "type": "boolean",
+      "title": "Zone Redundant Enabled",
+      "description": "(Optional) If true, the SQL Managed Instance will be deployed with zone redundancy.  Defaults to `true`.",
+      "default": true
+    },
+    "timezone_id": {
+      "type": "string",
+      "title": "Timezone Id",
+      "description": "(Optional) The TimeZone ID that the SQL Managed Instance will be operating in. Default value is `UTC`. Changing this forces a new resource to be created."
+    },
+    "databases": {
+      "type": "object",
+      "title": "Databases",
+      "description": "- `name` - (Required) The name of the Managed Database to create. Changing this forces a new resource to be created. - `short_term_retention_days` - (Optional) The backup retention period in days. This is how many days Point-in-Time Restore will be supported. - `tags` - (Optional) A mapping of tags to assign to the managed database.  --- `long_term_retention_policy` block supports the following: - `monthly_retention` - (Optional) The monthly retention policy for an LTR backup in an ISO 8601 format. Valid value is between 1 to 120 months. e.g. `P1Y`, `P1M`, `P4W` or `P30D`. - `week_of_year` - (Optional) The week of year to take the yearly backup. Value has to be between `1` and `52`. - `weekly_retention` - (Optional) The weekly retention policy for an LTR backup in an ISO 8601 format. Valid value is between 1 to 520 weeks. e.g. `P1Y`, `P1M`, `P1W` or `P7D`. - `yearly_retention` - (Optional) The yearly retention policy for an LTR backup in an ISO 8601 format. Valid value is between 1 to 10 years. e.g. `P1Y`, `P12M`, `P52W` or `P365D`.  --- `point_in_time_restore` block supports the following: - `restore_point_in_time` - (Required) The point in time for the restore from `source_database_id`. Changing this forces a new resource to be created. - `source_database_id` - (Required) The source database id that will be used to restore from. Changing this forces a new resource to be created.  --- `timeouts` block supports the following: - `create` - (Defaults to 30 minutes) Used when creating the Mssql Managed Database. - `delete` - (Defaults to 30 minutes) Used when deleting the Mssql Managed Database. - `read` - (Defaults to 5 minutes) Used when retrieving the Mssql Managed Database. - `update` - (Defaults to 30 minutes) Used when updating the Mssql Managed Database.",
+      "tfType": "map(object({\n    name                      = string\n    short_term_retention_days = optional(number)\n    tags                      = optional(map(string))\n    long_term_retention_policy = optional(object({\n      monthly_retention = optional(string)\n      week_of_year      = optional(number)\n      weekly_retention  = optional(string)\n      yearly_retention  = optional(string)\n    }))\n    point_in_time_restore = optional(object({\n      restore_point_in_time = string\n      source_database_id    = string\n    }))\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  }))",
+      "default": {}
+    },
+    "administrator_login_password": {
+      "type": "string",
+      "title": "Administrator Login Password",
+      "description": "(Required) The password associated with the `administrator_login` user. Needs to comply with Azure's [Password Policy](https://msdn.microsoft.com/library/ms161959.aspx)"
+    },
+    "advanced_threat_protection_enabled": {
+      "type": "boolean",
+      "title": "Advanced Threat Protection Enabled",
+      "description": "(Optional) Whether to enabled Defender for SQL Advanced Threat Protection.",
+      "default": true
+    },
+    "public_data_endpoint_enabled": {
+      "type": "boolean",
+      "title": "Public Data Endpoint Enabled",
+      "description": "(Optional) Is the public data endpoint enabled? Default value is `false`."
+    },
+    "service_principal_enabled": {
+      "type": "boolean",
+      "title": "Service Principal Enabled",
+      "description": "(Optional) Whether to enable the system-assigned service principal for the SQL Managed Instance.  This is required for Windows Authentication for Microsoft Entra principals using Kerberos.  See: https://learn.microsoft.com/en-us/azure/azure-sql/managed-instance/winauth-azuread-kerberos-managed-instance  Defaults to `false`.",
+      "default": false
+    },
+    "timeouts": {
+      "type": "object",
+      "title": "Timeouts",
+      "description": "- `create` - (Defaults to 24 hours) Used when creating the Microsoft SQL Managed Instance. - `delete` - (Defaults to 24 hours) Used when deleting the Microsoft SQL Managed Instance. - `read` - (Defaults to 5 minutes) Used when retrieving the Microsoft SQL Managed Instance. - `update` - (Defaults to 24 hours) Used when updating the Microsoft SQL Managed Instance.",
+      "tfType": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })"
+    },
+    "vulnerability_assessment": {
+      "type": "object",
+      "title": "Vulnerability Assessment",
+      "description": "- `storage_account_access_key` - (Optional) Specifies the identifier key of the storage account for vulnerability assessment scan results. If `storage_container_sas_key` isn't specified, `storage_account_access_key` is required.  Set to `null` if the storage account is protected by a resource firewall. - `storage_container_path` - (Required) A blob storage container path to hold the scan results (e.g. <https://myStorage.blob.core.windows.net/VaScans/>). - `storage_container_sas_key` - (Optional) A shared access signature (SAS Key) that has write access to the blob container specified in `storage_container_path` parameter. If `storage_account_access_key` isn't specified, `storage_container_sas_key` is required.  Set to `null` if the storage account is protected by a resource firewall.  --- `recurring_scans` block supports the following: - `email_subscription_admins` - (Optional) Boolean flag which specifies if the schedule scan notification will be sent to the subscription administrators. Defaults to `true`. - `emails` - (Optional) Specifies an array of e-mail addresses to which the scan notification is sent. - `enabled` - (Optional) Boolean flag which specifies if recurring scans is enabled or disabled. Defaults to `false`.  --- `timeouts` block supports the following: - `create` - (Defaults to 60 minutes) Used when creating the Vulnerability Assessment. - `delete` - (Defaults to 60 minutes) Used when deleting the Vulnerability Assessment. - `read` - (Defaults to 5 minutes) Used when retrieving the Vulnerability Assessment. - `update` - (Defaults to 60 minutes) Used when updating the Vulnerability Assessment.",
+      "tfType": "object({\n    storage_account_access_key = optional(string)\n    storage_container_path     = optional(string)\n    storage_container_sas_key  = optional(string)\n    recurring_scans = optional(object({\n      email_subscription_admins = optional(bool)\n      emails                    = optional(list(string))\n      enabled                   = optional(bool)\n    }))\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  })"
+    },
+    "administrator_login": {
+      "type": "string",
+      "title": "Administrator Login",
+      "description": "(Required) The administrator login name for the new SQL Managed Instance. Changing this forces a new resource to be created."
+    },
+    "subnet_id": {
+      "type": "string",
+      "title": "Subnet Id",
+      "description": "(Required) The subnet resource id that the SQL Managed Instance will be associated with. Changing this forces a new resource to be created."
+    },
+    "vcores": {
+      "type": "number",
+      "title": "Vcores",
+      "description": "(Required) Number of cores that should be assigned to the SQL Managed Instance. Values can be `8`, `16`, or `24` for Gen4 SKUs, or `4`, `6`, `8`, `10`, `12`, `16`, `20`, `24`, `32`, `40`, `48`, `56`, `64`, `80`, `96` or `128` for Gen5 SKUs."
+    },
+    "active_directory_administrator": {
+      "type": "object",
+      "title": "Active Directory Administrator",
+      "description": "- `login_username` - (Required) The login name of the principal to set as the Managed Instance Administrator. - `object_id` - (Required) The Object ID of the principal to set as the Managed Instance Administrator. - `principal_type` - (Required) The type of the principal. Possible values are `Application`, `Group`, and `User`. - `tenant_id` - (Required) The Azure Active Directory Tenant ID. - `azuread_authentication_only_enabled` - (Optional) Whether Azure AD authentication only is enabled for the Managed Instance Administrator.",
+      "tfType": "object({\n    login_username                      = optional(string)\n    object_id                           = optional(string)\n    principal_type                      = optional(string)\n    azuread_authentication_only_enabled = optional(bool)\n    tenant_id                           = optional(string)\n  })",
+      "default": {}
+    },
+    "is_general_purpose_v2": {
+      "type": "boolean",
+      "title": "Is General Purpose V2",
+      "description": "(Optional) Whether or not this is a GPv2 (Next-gen General Purpose) variant of General Purpose edition.  Next-gen General Purpose offers: - Up to 500 databases per instance and max 32 TB storage - 3 free IOPS per GB of storage - Independent scaling of vCores, memory, storage, and IOPS - Uses Elastic SAN for improved performance  Note: Zone redundancy is not available for GPv2. Only available for General Purpose tier.  See: https://learn.microsoft.com/en-us/azure/azure-sql/managed-instance/service-tiers-next-gen-general-purpose-use  Defaults to `false`.",
+      "default": false
     },
     "resource_group_name": {
       "type": "string",
       "title": "Resource Group Name",
-      "description": "Existing Resource Group name"
+      "description": "The resource group where the resources will be deployed."
+    },
+    "retry": {
+      "type": "object",
+      "title": "Retry",
+      "description": "The AzAPI resource retry configuration, per resource type. Will retry up to the resource timeout, see `var.timeout`.  Each resource has the following attributes:  - `error_message_regex` - A list of regular expressions to match error messages for retrying the request. - `interval_seconds` - The interval in seconds between retry attempts. - `max_interval_seconds` - The maximum interval in seconds between retry attempts.",
+      "tfType": "object({\n    mssql_managed_instance_security_alert_policy = optional(object({\n      error_message_regex = optional(list(string), [\n        \"SqlServerAlertPolicyInProgress\", # see #54\n      ])\n      interval_seconds     = optional(number)\n      max_interval_seconds = optional(number)\n    }), null)\n    sql_managed_instance_patch_identities = optional(object({\n      error_message_regex = optional(list(string), [\n        \"ConflictingServerOperation\", # see #54\n      ])\n      interval_seconds     = optional(number)\n      max_interval_seconds = optional(number)\n    }), null)\n    sql_advanced_threat_protection = optional(object({\n      error_message_regex  = optional(list(string))\n      interval_seconds     = optional(number)\n      max_interval_seconds = optional(number)\n    }), null)\n  })",
+      "default": {}
+    },
+    "role_assignments": {
+      "type": "object",
+      "title": "Role Assignments",
+      "description": "A map of role assignments to create on this resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.  - `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal. - `principal_id` - The ID of the principal to assign the role to. - `description` - The description of the role assignment. - `skip_service_principal_aad_check` - If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false. - `condition` - The condition which will be used to scope the role assignment. - `condition_version` - The version of the condition syntax. Valid values are '2.0'.  > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.",
+      "tfType": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+      "default": {}
+    },
+    "storage_size_in_gb": {
+      "type": "number",
+      "title": "Storage Size In Gb",
+      "description": "(Required) Maximum storage space for the SQL Managed instance. This should be a multiple of 32 (GB)."
+    },
+    "dns_zone_partner_id": {
+      "type": "string",
+      "title": "Dns Zone Partner Id",
+      "description": "(Optional) The ID of the SQL Managed Instance which will share the DNS zone. This is a prerequisite for creating an `azurerm_mssql_managed_instance_failover_group`. Setting this after creation forces a new resource to be created."
+    },
+    "proxy_override": {
+      "type": "string",
+      "title": "Proxy Override",
+      "description": "(Optional) Specifies how the SQL Managed Instance will be accessed. Default value is `Default`. Valid values include `Default`, `Proxy`, and `Redirect`.",
+      "default": "Default"
+    },
+    "storage_account_resource_id": {
+      "type": "string",
+      "title": "Storage Account Resource Id",
+      "description": "(Optional) Storage Account to store vulnerability assessments.  The System Assigned Managed Identity will be granted Storage Blob Data Contributor over this storage account.  Note these limitations documented in Microsoft Learn - <https://learn.microsoft.com/en-us/azure/azure-sql/database/sql-database-vulnerability-assessment-storage?view=azuresql#store-va-scan-results-for-azure-sql-managed-instance-in-a-storage-account-that-can-be-accessed-behind-a-firewall-or-vnet>  * User Assigned MIs are not supported * The storage account firewall public network access must be allowed.  If \"Enabled from selected virtual networks and IP addresses\" is set (recommended), the SQL MI subnet ID must be added to the storage account firewall."
+    },
+    "storage_account_type": {
+      "type": "string",
+      "title": "Storage Account Type",
+      "description": "(Optional) Specifies the storage account type used to store backups for this database. Changing this forces a new resource to be created. Possible values are `GRS`, `LRS` and `ZRS`. Defaults to `GRS`.",
+      "default": "ZRS"
+    },
+    "transparent_data_encryption": {
+      "type": "object",
+      "title": "Transparent Data Encryption",
+      "description": "- `auto_rotation_enabled` - (Optional) When enabled, the SQL Managed Instance will continuously check the key vault for any new versions of the key being used as the TDE protector. If a new version of the key is detected, the TDE protector on the SQL Managed Instance will be automatically rotated to the latest key version within 60 minutes. - `key_vault_key_id` - (Optional) To use customer managed keys from Azure Key Vault, provide the AKV Key ID. To use service managed keys, omit this field.  --- `timeouts` block supports the following: - `create` - (Defaults to 30 minutes) Used when creating the MSSQL. - `delete` - (Defaults to 30 minutes) Used when deleting the MSSQL. - `read` - (Defaults to 5 minutes) Used when retrieving the MSSQL. - `update` - (Defaults to 30 minutes) Used when updating the MSSQL.",
+      "tfType": "object({\n    auto_rotation_enabled = optional(bool)\n    key_vault_key_id      = optional(string)\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  })",
+      "default": {}
+    },
+    "enable_telemetry": {
+      "type": "boolean",
+      "title": "Enable Telemetry",
+      "description": "This variable controls whether or not telemetry is enabled for the module. For more information see <https://aka.ms/avm/telemetryinfo>. If it is set to false, then no telemetry will be collected.",
+      "default": true
+    },
+    "private_endpoints": {
+      "type": "object",
+      "title": "Private Endpoints",
+      "description": "A map of private endpoints to create on this resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.  - `name` - (Optional) The name of the private endpoint. One will be generated if not set. - `role_assignments` - (Optional) A map of role assignments to create on the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time. See `var.role_assignments` for more information. - `lock` - (Optional) The lock level to apply to the private endpoint. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`. - `tags` - (Optional) A mapping of tags to assign to the private endpoint. - `subnet_resource_id` - The resource ID of the subnet to deploy the private endpoint in. - `private_dns_zone_group_name` - (Optional) The name of the private DNS zone group. One will be generated if not set. - `private_dns_zone_resource_ids` - (Optional) A set of resource IDs of private DNS zones to associate with the private endpoint. If not set, no zone groups will be created and the private endpoint will not be associated with any private DNS zones. DNS records must be managed external to this module. - `application_security_group_resource_ids` - (Optional) A map of resource IDs of application security groups to associate with the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time. - `private_service_connection_name` - (Optional) The name of the private service connection. One will be generated if not set. - `network_interface_name` - (Optional) The name of the network interface. One will be generated if not set. - `location` - (Optional) The Azure location where the resources will be deployed. Defaults to the location of the resource group. - `resource_group_name` - (Optional) The resource group where the resources will be deployed. Defaults to the resource group of this resource. - `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. If not specified the platform will create one. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.   - `name` - The name of the IP configuration.   - `private_ip_address` - The private IP address of the IP configuration.",
+      "tfType": "map(object({\n    name = optional(string, null)\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })), {})\n    lock = optional(object({\n      kind = string\n      name = optional(string, null)\n    }), null)\n    tags                                    = optional(map(string), null)\n    subnet_resource_id                      = string\n    private_dns_zone_group_name             = optional(string, \"default\")\n    private_dns_zone_resource_ids           = optional(set(string), [])\n    application_security_group_associations = optional(map(string), {})\n    private_service_connection_name         = optional(string, null)\n    network_interface_name                  = optional(string, null)\n    location                                = optional(string, null)\n    resource_group_name                     = optional(string, null)\n    ip_configurations = optional(map(object({\n      name               = string\n      private_ip_address = string\n    })), {})\n  }))",
+      "default": {}
+    },
+    "name": {
+      "type": "string",
+      "title": "Name",
+      "description": "The name of the this resource."
+    },
+    "managed_identities": {
+      "type": "object",
+      "title": "Managed Identities",
+      "description": "Controls the Managed Identity configuration on this resource. The following properties can be specified:  - `system_assigned` - (Optional) Specifies if the System Assigned Managed Identity should be enabled. - `user_assigned_resource_ids` - (Optional) Specifies a list of User Assigned Managed Identity resource IDs to be assigned to this resource.",
+      "tfType": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+      "default": {}
+    },
+    "pricing_model": {
+      "type": "string",
+      "title": "Pricing Model",
+      "description": "(Optional) The pricing model of the SQL Managed Instance.  Possible values are: - `null` (default) - uses Azure's default (`Regular`) - `\"Regular\"` - standard paid pricing - `\"Freemium\"` - Free SQL Managed Instance, available for the first 12 months after instance creation. Only one free instance is allowed per subscription. After 12 months, the instance is automatically converted to `Regular` pricing.  The free offer is available in all regions and for all subscription types that support the paid offer.  See: https://learn.microsoft.com/en-us/azure/azure-sql/managed-instance/free-offer  Defaults to `null`."
+    },
+    "diagnostic_settings": {
+      "type": "object",
+      "title": "Diagnostic Settings",
+      "description": "A map of diagnostic settings to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.  - `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources. - `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`. - `log_groups` - (Optional) A set of log groups to send to the log analytics workspace. Defaults to `[\"allLogs\"]`. - `metric_categories` - (Optional) A set of metric categories to send to the log analytics workspace. Defaults to `[\"AllMetrics\"]`. - `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`. - `workspace_resource_id` - (Optional) The resource ID of the log analytics workspace to send logs and metrics to. - `storage_account_resource_id` - (Optional) The resource ID of the storage account to send logs and metrics to. - `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the event hub authorization rule to send logs and metrics to. - `event_hub_name` - (Optional) The name of the event hub. If none is specified, the default event hub will be selected. - `marketplace_partner_resource_id` - (Optional) The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.",
+      "tfType": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+      "default": {}
+    },
+    "lock": {
+      "type": "object",
+      "title": "Lock",
+      "description": "Controls the Resource Lock configuration for this resource. The following properties can be specified:  - `kind` - (Required) The type of lock. Possible values are `\\\"CanNotDelete\\\"` and `\\\"ReadOnly\\\"`. - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.",
+      "tfType": "object({\n    kind = string\n    name = optional(string, null)\n  })"
     },
     "tags": {
       "type": "object",
       "title": "Tags",
-      "description": "Resource tags (key-value pairs)"
+      "description": "(Optional) Tags of the resource.",
+      "tfType": "map(string)"
+    },
+    "timeout": {
+      "type": "object",
+      "title": "Timeout",
+      "description": "The resource-specific timeout configuration. Values are a valid timespan, e.g. `1m`, `30s`, `5m30s`.",
+      "tfType": "object({\n    mssql_managed_instance_security_alert_policy = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }), {})\n    sql_managed_instance_patch_identities = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }), {})\n    sql_advanced_threat_protection = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }), {})\n  })",
+      "default": {}
+    },
+    "license_type": {
+      "type": "string",
+      "title": "License Type",
+      "description": "(Required) What type of license the Managed Instance will use. Possible values are `LicenseIncluded` and `BasePrice`."
+    },
+    "collation": {
+      "type": "string",
+      "title": "Collation",
+      "description": "(Optional) Specifies how the SQL Managed Instance will be collated. Default value is `SQL_Latin1_General_CP1_CI_AS`. Changing this forces a new resource to be created."
+    },
+    "maintenance_configuration_name": {
+      "type": "string",
+      "title": "Maintenance Configuration Name",
+      "description": "(Optional) The name of the Public Maintenance Configuration window to apply to the SQL Managed Instance. Valid values include `SQL_Default` or an Azure Location in the format `SQL_{Location}_MI_{Size}`(for example `SQL_EastUS_MI_1`). Defaults to `SQL_Default`."
+    },
+    "memory_size_in_gb": {
+      "type": "number",
+      "title": "Memory Size In Gb",
+      "description": "(Optional) Memory size in GB for the SQL Managed Instance.  Allows flexible memory allocation, particularly useful for Next-gen General Purpose (GPv2) instances. This is an improvement over standard General Purpose which has fixed memory allocation based on vCores.  Flexible memory is currently available to locally redundant instances on premium-series hardware.  See: https://learn.microsoft.com/en-us/azure/azure-sql/managed-instance/resource-limits#flexible-memory  Defaults to `null` (uses Azure's default based on vCores)."
+    },
+    "storage_iops": {
+      "type": "number",
+      "title": "Storage Iops",
+      "description": "(Optional) Storage IOps for the SQL Managed Instance.  Minimum value: 300. Maximum value: 80000. Increments of 1 IOps allowed. Maximum value depends on the selected hardware family and number of vCores.  For Next-gen General Purpose (GPv2), you receive 3 free IOPS per GB of reserved storage. Example: A 1,024 GB instance receives 3,072 IOPS for free.  See: https://learn.microsoft.com/en-us/azure/azure-sql/managed-instance/resource-limits  Defaults to `null` (uses Azure's default based on storage and vCores)."
+    },
+    "location": {
+      "type": "string",
+      "title": "Location",
+      "description": "Azure region where the resource should be deployed."
+    },
+    "failover_group": {
+      "type": "object",
+      "title": "Failover Group",
+      "description": "Map of failover groups.  There can only be one failover group in the map.   - `location` - (Required) The Azure Region where the Managed Instance Failover Group should exist. Changing this forces a new resource to be created.  - `name` - (Required) The name which should be used for this Managed Instance Failover Group. Changing this forces a new resource to be created.  - `partner_managed_instance_id` - (Required) The ID of the Azure SQL Managed Instance which will be replicated to. Changing this forces a new resource to be created.  - `readonly_endpoint_failover_policy_enabled` - (Optional) Failover policy for the read-only endpoint. Defaults to `true`.   ---  `read_write_endpoint_failover_policy` block supports the following:  - `grace_minutes` - (Optional) Applies only if `mode` is `Automatic`. The grace period in minutes before failover with data loss is attempted.  - `mode` - (Required) The failover mode. Possible values are `Automatic` or `Manual`.   ---  `timeouts` block supports the following:  - `create` - (Defaults to 30 minutes) Used when creating the Managed Instance Failover Group.  - `delete` - (Defaults to 30 minutes) Used when deleting the Managed Instance Failover Group.  - `read` - (Defaults to 5 minutes) Used when retrieving the Managed Instance Failover Group.  - `update` - (Defaults to 30 minutes) Used when updating the Managed Instance Failover Group.",
+      "tfType": "map(object({\n    location                                  = optional(string)\n    name                                      = optional(string)\n    partner_managed_instance_id               = optional(string)\n    readonly_endpoint_failover_policy_enabled = optional(bool)\n    read_write_endpoint_failover_policy = optional(object({\n      grace_minutes = optional(number)\n      mode          = optional(string)\n    }))\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  }))",
+      "default": {}
+    },
+    "sku_name": {
+      "type": "string",
+      "title": "Sku Name",
+      "description": "(Required) Specifies the SKU Name for the SQL Managed Instance. Valid values include `GP_Gen4`, `GP_Gen5`, `GP_Gen8IM`, `GP_Gen8IH`, `BC_Gen4`, `BC_Gen5`, `BC_Gen8IM` or `BC_Gen8IH`."
+    },
+    "private_endpoints_manage_dns_zone_group": {
+      "type": "boolean",
+      "title": "Private Endpoints Manage Dns Zone Group",
+      "description": "Whether to manage private DNS zone groups with this module. If set to false, you must manage private DNS zone groups externally, e.g. using Azure Policy.",
+      "default": true
     }
   },
   "required": [
+    "administrator_login_password",
+    "administrator_login",
+    "subnet_id",
+    "vcores",
+    "resource_group_name",
+    "storage_size_in_gb",
     "name",
+    "license_type",
     "location",
-    "resource_group_name"
+    "sku_name"
   ]
 }

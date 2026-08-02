@@ -1,31 +1,129 @@
 {
   "type": "object",
   "properties": {
-    "name": {
-      "type": "string",
-      "title": "Resource Name",
-      "description": "Name of the Data Collection Rule"
+    "diagnostic_settings": {
+      "type": "object",
+      "title": "Diagnostic Settings",
+      "description": "A map of diagnostic settings to create on the data collection rule. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.  - `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources. - `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`. - `log_groups` - (Optional) A set of log groups to send to the log analytics workspace. Defaults to `[\"allLogs\"]`. - `metric_categories` - (Optional) A set of metric categories to send to the log analytics workspace. Defaults to `[\"AllMetrics\"]`. - `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`. - `workspace_resource_id` - (Optional) The resource ID of the log analytics workspace to send logs and metrics to. - `storage_account_resource_id` - (Optional) The resource ID of the storage account to send logs and metrics to. - `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the event hub authorization rule to send logs and metrics to. - `event_hub_name` - (Optional) The name of the event hub. If none is specified, the default event hub will be selected. - `marketplace_partner_resource_id` - (Optional) The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic Logs.",
+      "tfType": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+      "default": {}
     },
-    "location": {
+    "kind": {
       "type": "string",
-      "title": "Location",
-      "description": "Azure region (e.g., eastus)",
-      "default": "eastus"
+      "title": "Kind",
+      "description": "The kind of the data collection rule. Possible values are `Linux` and `Windows`."
     },
-    "resource_group_name": {
-      "type": "string",
-      "title": "Resource Group Name",
-      "description": "Existing Resource Group name"
+    "managed_identities": {
+      "type": "object",
+      "title": "Managed Identities",
+      "description": "Controls the Managed Identity configuration on this resource. The following properties can be specified:  - `system_assigned` - (Optional) Specifies if the System Assigned Managed Identity should be enabled. - `user_assigned_resource_ids` - (Optional) Specifies a list of User Assigned Managed Identity resource IDs to be assigned to this resource.",
+      "tfType": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+      "default": {}
     },
     "tags": {
       "type": "object",
       "title": "Tags",
-      "description": "Resource tags (key-value pairs)"
+      "description": "(Optional) Tags of the resource.",
+      "tfType": "map(string)"
+    },
+    "name": {
+      "type": "string",
+      "title": "Name",
+      "description": "The name of the data collection rule."
+    },
+    "direct_data_sources": {
+      "type": "object",
+      "title": "Direct Data Sources",
+      "description": "The specification of direct data sources. This property is optional and can be omitted.  - `otel_logs` - (Optional) The list of OpenTelemetry logs direct data source configurations. - `otel_metrics` - (Optional) The list of OpenTelemetry metrics direct data source configurations. - `otel_traces` - (Optional) The list of OpenTelemetry traces direct data source configurations.",
+      "tfType": "object({\n    otel_logs = optional(list(object({\n      enrich_with_reference              = optional(string, null)\n      enrich_with_resource_attributes    = optional(list(string), null)\n      name                               = string\n      replace_resource_id_with_reference = optional(bool, null)\n      streams                            = list(string)\n    })), [])\n    otel_metrics = optional(list(object({\n      enrich_with_reference           = optional(string, null)\n      enrich_with_resource_attributes = optional(list(string), null)\n      name                            = string\n      streams                         = list(string)\n    })), [])\n    otel_traces = optional(list(object({\n      enrich_with_reference              = optional(string, null)\n      enrich_with_resource_attributes    = optional(list(string), null)\n      name                               = string\n      replace_resource_id_with_reference = optional(bool, null)\n      streams                            = list(string)\n    })), [])\n  })"
+    },
+    "lock": {
+      "type": "object",
+      "title": "Lock",
+      "description": "Controls the Resource Lock configuration for this resource. The following properties can be specified:  - `kind` - (Required) The type of lock. Possible values are `\"CanNotDelete\"` and `\"ReadOnly\"`. - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.",
+      "tfType": "object({\n    kind = string\n    name = optional(string, null)\n  })"
+    },
+    "references": {
+      "type": "object",
+      "title": "References",
+      "description": "Defines all the references that may be used in other sections of the DCR.  - `application_insights` - (Optional) Application Insights references to be used on OTel metrics/logs enrichment.   - `name` - (Required) The name of the reference used as an alias when referencing this application insights in OTel data sources.   - `resource_id` - (Required) ID of the Application Insights resource. - `enrichment_data` - (Optional) All the enrichment data sources referenced in data flows.   - `storage_blobs` - (Optional) All the storage blobs used as enrichment data sources.     - `blob_url` - (Required) URL of the storage blob.     - `lookup_type` - (Required) The type of lookup to perform on the blob. Possible values: `Cidr`, `String`.     - `name` - (Required) The name of the enrichment data source used as an alias when referencing in data flows.     - `resource_id` - (Required) Resource ID of the storage account that hosts the blob.",
+      "tfType": "object({\n    application_insights = optional(list(object({\n      name        = string\n      resource_id = string\n    })), [])\n    enrichment_data = optional(object({\n      storage_blobs = optional(list(object({\n        blob_url    = string\n        lookup_type = string\n        name        = string\n        resource_id = string\n      })), [])\n    }), null)\n  })"
+    },
+    "role_assignments": {
+      "type": "object",
+      "title": "Role Assignments",
+      "description": "A map of role assignments to create on this resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.  - `name` - (Optional) The name of the role assignment. If not set, a random UUID will be generated. Must be a valid GUID. Changing this forces the creation of a new resource. - `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal. - `principal_id` - The ID of the principal to assign the role to. - `description` - (Optional) The description of the role assignment. - `skip_service_principal_aad_check` - (Optional) If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false. - `condition` - (Optional) The condition which will be used to scope the role assignment. - `condition_version` - (Optional) The version of the condition syntax. Valid values are '2.0'. - `delegated_managed_identity_resource_id` - (Optional) The delegated Azure Resource Id which contains a Managed Identity. - `principal_type` - (Optional) The type of the `principal_id`. Possible values are `User`, `Group` and `ServicePrincipal`.  > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.",
+      "tfType": "map(object({\n    name                                   = optional(string, null)\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+      "default": {}
+    },
+    "data_collection_endpoint_id": {
+      "type": "string",
+      "title": "Data Collection Endpoint Id",
+      "description": "The resource ID of the data collection endpoint that this rule can be used with."
+    },
+    "data_flows": {
+      "type": "string",
+      "title": "Data Flows",
+      "description": "The specification of data flows for the data collection rule.  - `built_in_transform` - (Optional) The built-in transform to transform stream data. - `capture_overflow` - (Optional) Flag to enable overflow column in Log Analytics destinations. - `destinations` - (Required) List of destination names for this data flow. - `output_stream` - (Optional) The output stream of the transform. Only required if the transform changes data to a different stream. - `streams` - (Required) List of streams for this data flow. - `transform_kql` - (Optional) The KQL query to transform stream data.",
+      "tfType": "list(object({\n    built_in_transform = optional(string, null)\n    capture_overflow   = optional(bool, null)\n    destinations       = list(string)\n    output_stream      = optional(string, null)\n    streams            = list(string)\n    transform_kql      = optional(string, null)\n  }))",
+      "default": []
+    },
+    "enable_telemetry": {
+      "type": "boolean",
+      "title": "Enable Telemetry",
+      "description": "This variable controls whether or not telemetry is enabled for the module. For more information see <https://aka.ms/avm/telemetryinfo>. If it is set to false, then no telemetry will be collected.",
+      "default": true
+    },
+    "sku": {
+      "type": "object",
+      "title": "Sku",
+      "description": "The SKU of the data collection rule resource.  - `capacity` - (Optional) If the SKU supports scale out/in then the capacity integer should be included. - `family` - (Optional) If the service has different generations of hardware, for the same SKU, then that can be captured here. - `name` - (Required) The name of the SKU. E.g. P3. It is typically a letter+number code. - `size` - (Optional) The SKU size. - `tier` - (Optional) This field is required to be implemented by the Resource Provider if the service has more than one tier. Possible values: `Basic`, `Free`, `Premium`, `Standard`.",
+      "tfType": "object({\n    capacity = optional(number, null)\n    family   = optional(string, null)\n    name     = string\n    size     = optional(string, null)\n    tier     = optional(string, null)\n  })"
+    },
+    "stream_declarations": {
+      "type": "object",
+      "title": "Stream Declarations",
+      "description": "Declaration of custom streams used in this rule. The map key is the stream name (e.g., \"Custom-MyStream\").  - `columns` - (Required) List of column definitions for the custom stream.   - `name` - (Required) The name of the column.   - `type` - (Required) The type of the column data. Possible values are `boolean`, `datetime`, `dynamic`, `int`, `long`, `real`, `string`.",
+      "tfType": "map(object({\n    columns = list(object({\n      name = string\n      type = string\n    }))\n  }))",
+      "default": {}
+    },
+    "location": {
+      "type": "string",
+      "title": "Location",
+      "description": "Azure region where the resource should be deployed."
+    },
+    "data_sources": {
+      "type": "object",
+      "title": "Data Sources",
+      "description": "The specification of data sources for the data collection rule. This property is optional and can be omitted if the rule is meant to be used via direct calls to the provisioned endpoint.  - `data_imports` - (Optional) Specifications of pull based data sources.   - `event_hub` - (Optional) Event Hub data import configuration. - `extensions` - (Optional) The list of Azure VM extension data source configurations. - `etw_providers` - (Optional) The list of ETW provider data source configurations. - `iis_logs` - (Optional) The list of IIS logs source configurations. - `log_files` - (Optional) The list of log files source configurations. - `otel_logs` - (Optional) The list of OpenTelemetry logs data source configurations. - `otel_metrics` - (Optional) The list of OpenTelemetry metrics data source configurations. - `otel_traces` - (Optional) The list of OpenTelemetry traces data source configurations. - `performance_counters` - (Optional) The list of performance counter data source configurations. - `performance_counters_otel` - (Optional) The list of OpenTelemetry performance counter data source configurations. - `platform_telemetry` - (Optional) The list of platform telemetry configurations. - `prometheus_forwarder` - (Optional) The list of Prometheus forwarder data source configurations. - `syslog` - (Optional) The list of Syslog data source configurations. - `windows_event_logs` - (Optional) The list of Windows Event Log data source configurations. - `windows_firewall_logs` - (Optional) The list of Windows Firewall logs source configurations.",
+      "tfType": "object({\n    data_imports = optional(object({\n      event_hub = optional(object({\n        consumer_group = optional(string, null)\n        name           = string\n        stream         = optional(string, null)\n      }), null)\n    }), null)\n    extensions = optional(list(object({\n      extension_name     = string\n      extension_settings = optional(any, null)\n      input_data_sources = optional(list(string), null)\n      name               = string\n      streams            = list(string)\n    })), [])\n    etw_providers = optional(list(object({\n      event_ids     = optional(list(string), null)\n      keyword       = optional(string, null)\n      log_level     = optional(string, null)\n      name          = string\n      provider      = string\n      provider_type = string\n      streams       = list(string)\n    })), [])\n    iis_logs = optional(list(object({\n      log_directories = optional(list(string), null)\n      name            = string\n      streams         = list(string)\n      transform_kql   = optional(string, null)\n    })), [])\n    log_files = optional(list(object({\n      file_patterns = list(string)\n      format        = string\n      name          = string\n      settings = optional(object({\n        text = object({\n          record_start_timestamp_format = string\n        })\n      }), null)\n      streams       = list(string)\n      transform_kql = optional(string, null)\n    })), [])\n    otel_logs = optional(list(object({\n      enrich_with_reference              = optional(string, null)\n      enrich_with_resource_attributes    = optional(list(string), null)\n      name                               = string\n      replace_resource_id_with_reference = optional(bool, null)\n      resource_attribute_routing = optional(object({\n        attribute_name  = optional(string, null)\n        attribute_value = optional(string, null)\n      }), null)\n      streams = list(string)\n    })), [])\n    otel_metrics = optional(list(object({\n      enrich_with_reference           = optional(string, null)\n      enrich_with_resource_attributes = optional(list(string), null)\n      name                            = string\n      resource_attribute_routing = optional(object({\n        attribute_name  = optional(string, null)\n        attribute_value = optional(string, null)\n      }), null)\n      streams = list(string)\n    })), [])\n    otel_traces = optional(list(object({\n      enrich_with_reference              = optional(string, null)\n      enrich_with_resource_attributes    = optional(list(string), null)\n      name                               = string\n      replace_resource_id_with_reference = optional(bool, null)\n      resource_attribute_routing = optional(object({\n        attribute_name  = optional(string, null)\n        attribute_value = optional(string, null)\n      }), null)\n      streams = list(string)\n    })), [])\n    performance_counters = optional(list(object({\n      counter_specifiers            = list(string)\n      name                          = string\n      sampling_frequency_in_seconds = number\n      streams                       = list(string)\n      transform_kql                 = optional(string, null)\n    })), [])\n    performance_counters_otel = optional(list(object({\n      counter_specifiers            = list(string)\n      name                          = string\n      sampling_frequency_in_seconds = number\n      streams                       = list(string)\n    })), [])\n    platform_telemetry = optional(list(object({\n      name    = string\n      streams = list(string)\n    })), [])\n    prometheus_forwarder = optional(list(object({\n      custom_vm_scrape_config = optional(list(any), null)\n      label_include_filter    = optional(map(string), null)\n      name                    = string\n      streams                 = list(string)\n    })), [])\n    syslog = optional(list(object({\n      facility_names = list(string)\n      log_levels     = list(string)\n      name           = string\n      streams        = list(string)\n      transform_kql  = optional(string, null)\n    })), [])\n    windows_event_logs = optional(list(object({\n      name           = string\n      streams        = list(string)\n      transform_kql  = optional(string, null)\n      x_path_queries = list(string)\n    })), [])\n    windows_firewall_logs = optional(list(object({\n      name           = string\n      profile_filter = optional(list(string), null)\n      streams        = list(string)\n    })), [])\n  })"
+    },
+    "destinations": {
+      "type": "object",
+      "title": "Destinations",
+      "description": "The specification of destinations for the data collection rule.  - `azure_data_explorer` - (Optional) List of Azure Data Explorer destinations. - `azure_monitor_metrics` - (Optional) Azure Monitor Metrics destination. - `event_hubs` - (Optional) List of Event Hubs destinations. - `event_hubs_direct` - (Optional) List of Event Hubs Direct destinations. - `log_analytics` - (Optional) List of Log Analytics destinations. - `microsoft_fabric` - (Optional) List of Microsoft Fabric destinations. - `monitoring_accounts` - (Optional) List of monitoring account destinations. - `storage_accounts` - (Optional) List of storage accounts destinations. - `storage_blobs_direct` - (Optional) List of Storage Blob Direct destinations. - `storage_tables_direct` - (Optional) List of Storage Table Direct destinations.",
+      "tfType": "object({\n    azure_data_explorer = optional(list(object({\n      database_name = string\n      name          = string\n      resource_id   = string\n    })), [])\n    azure_monitor_metrics = optional(object({\n      name = string\n    }), null)\n    event_hubs = optional(list(object({\n      event_hub_resource_id = string\n      name                  = string\n    })), [])\n    event_hubs_direct = optional(list(object({\n      event_hub_resource_id = string\n      name                  = string\n    })), [])\n    log_analytics = optional(list(object({\n      name                  = string\n      workspace_resource_id = string\n    })), [])\n    microsoft_fabric = optional(list(object({\n      artifact_id   = string\n      database_name = string\n      ingestion_uri = string\n      name          = string\n      tenant_id     = optional(string, null)\n    })), [])\n    monitoring_accounts = optional(list(object({\n      account_resource_id = string\n      name                = string\n    })), [])\n    storage_accounts = optional(list(object({\n      container_name              = string\n      name                        = string\n      storage_account_resource_id = string\n    })), [])\n    storage_blobs_direct = optional(list(object({\n      container_name              = string\n      name                        = string\n      storage_account_resource_id = string\n    })), [])\n    storage_tables_direct = optional(list(object({\n      name                        = string\n      storage_account_resource_id = string\n      table_name                  = string\n    })), [])\n  })"
+    },
+    "parent_id": {
+      "type": "string",
+      "title": "Parent Id",
+      "description": "The resource ID of the resource group in which to create the data collection rule."
+    },
+    "agent_settings": {
+      "type": "object",
+      "title": "Agent Settings",
+      "description": "Agent settings used to modify agent behavior on a given host.  - `logs` - (Optional) All the settings that are applicable to the logs agent (AMA).   - `name` - (Required) The name of the setting. Supported values: `MaxDiskQuotaInMB`, `UseTimeReceivedForForwardedEvents`.   - `value` - (Required) The value of the setting.",
+      "tfType": "object({\n    logs = optional(list(object({\n      name  = string\n      value = string\n    })), [])\n  })"
+    },
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "description": "A description of the data collection rule."
     }
   },
   "required": [
     "name",
     "location",
-    "resource_group_name"
+    "parent_id"
   ]
 }

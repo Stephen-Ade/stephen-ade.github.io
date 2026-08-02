@@ -1,31 +1,107 @@
 {
   "type": "object",
   "properties": {
-    "name": {
+    "resource_group_id": {
       "type": "string",
-      "title": "Resource Name",
-      "description": "Name of the Capacity Reservation Group"
+      "title": "Resource Group Id",
+      "description": "The resource group id where the resources will be deployed."
     },
-    "location": {
-      "type": "string",
-      "title": "Location",
-      "description": "Azure region (e.g., eastus)",
-      "default": "eastus"
-    },
-    "resource_group_name": {
-      "type": "string",
-      "title": "Resource Group Name",
-      "description": "Existing Resource Group name"
+    "schema_validation_enabled": {
+      "type": "boolean",
+      "title": "Schema Validation Enabled",
+      "description": "Whether to enable schema validation for the AzAPI resource type and body. Defaults to true.",
+      "default": true
     },
     "tags": {
       "type": "object",
       "title": "Tags",
-      "description": "Resource tags (key-value pairs)"
+      "description": "(Optional) Tags of the resource.",
+      "tfType": "map(string)"
+    },
+    "subscription_id": {
+      "type": "string",
+      "title": "Subscription Id",
+      "description": "The subscription ID to use for the azurerm provider.",
+      "default": ""
+    },
+    "capacity_reservation_group_name": {
+      "type": "string",
+      "title": "Capacity Reservation Group Name",
+      "description": "The name of the capacity reservation group. This must be unique within the resource group."
+    },
+    "enable_telemetry": {
+      "type": "boolean",
+      "title": "Enable Telemetry",
+      "description": "This variable controls whether or not telemetry is enabled for the module. For more information see <https://aka.ms/avm/telemetryinfo>. If it is set to false, then no telemetry will be collected.",
+      "default": true
+    },
+    "managed_identities": {
+      "type": "object",
+      "title": "Managed Identities",
+      "description": "Controls the Managed Identity configuration on this resource. The following properties can be specified:  - `system_assigned` - (Optional) Specifies if the System Assigned Managed Identity should be enabled. - `user_assigned_resource_ids` - (Optional) Specifies a list of User Assigned Managed Identity resource IDs to be assigned to this resource.",
+      "tfType": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+      "default": {}
+    },
+    "private_endpoints": {
+      "type": "object",
+      "title": "Private Endpoints",
+      "description": "A map of private endpoints to create on this resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.  - `name` - (Optional) The name of the private endpoint. One will be generated if not set. - `role_assignments` - (Optional) A map of role assignments to create on the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time. See `var.role_assignments` for more information. - `lock` - (Optional) The lock level to apply to the private endpoint. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`. - `tags` - (Optional) A mapping of tags to assign to the private endpoint. - `subnet_resource_id` - The resource ID of the subnet to deploy the private endpoint in. - `private_dns_zone_group_name` - (Optional) The name of the private DNS zone group. One will be generated if not set. - `private_dns_zone_resource_ids` - (Optional) A set of resource IDs of private DNS zones to associate with the private endpoint. If not set, no zone groups will be created and the private endpoint will not be associated with any private DNS zones. DNS records must be managed external to this module. - `application_security_group_resource_ids` - (Optional) A map of resource IDs of application security groups to associate with the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time. - `private_service_connection_name` - (Optional) The name of the private service connection. One will be generated if not set. - `network_interface_name` - (Optional) The name of the network interface. One will be generated if not set. - `location` - (Optional) The Azure location where the resources will be deployed. Defaults to the location of the resource group. - `resource_group_name` - (Optional) The resource group where the resources will be deployed. Defaults to the resource group of this resource. - `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. If not specified the platform will create one. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.   - `name` - The name of the IP configuration.   - `private_ip_address` - The private IP address of the IP configuration.",
+      "tfType": "map(object({\n    name = optional(string, null)\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n    })), {})\n    lock = optional(object({\n      kind = string\n      name = optional(string, null)\n    }), null)\n    tags                                    = optional(map(string), null)\n    subnet_resource_id                      = string\n    private_dns_zone_group_name             = optional(string, \"default\")\n    private_dns_zone_resource_ids           = optional(set(string), [])\n    application_security_group_associations = optional(map(string), {})\n    private_service_connection_name         = optional(string, null)\n    network_interface_name                  = optional(string, null)\n    location                                = optional(string, null)\n    resource_group_name                     = optional(string, null)\n    ip_configurations = optional(map(object({\n      name               = string\n      private_ip_address = string\n    })), {})\n  }))",
+      "default": {}
+    },
+    "sharing_profile": {
+      "type": "object",
+      "title": "Sharing Profile",
+      "description": "An object representing the sharing profile for the capacity reservation group. This includes the following properties: - `subscription_ids` - A list of objects, each containing an `id` property that represents the subscription ID to share the capacity reservation group with.",
+      "tfType": "object({\n    subscription_ids = list(object({\n      id = string\n    }))\n  })"
+    },
+    "location": {
+      "type": "string",
+      "title": "Location",
+      "description": "Azure region where the resource should be deployed."
+    },
+    "diagnostic_settings": {
+      "type": "object",
+      "title": "Diagnostic Settings",
+      "description": "A map of diagnostic settings to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.  - `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources. - `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`. - `log_groups` - (Optional) A set of log groups to send to the log analytics workspace. Defaults to `[\"allLogs\"]`. - `metric_categories` - (Optional) A set of metric categories to send to the log analytics workspace. Defaults to `[\"AllMetrics\"]`. - `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`. - `workspace_resource_id` - (Optional) The resource ID of the log analytics workspace to send logs and metrics to. - `storage_account_resource_id` - (Optional) The resource ID of the storage account to send logs and metrics to. - `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the event hub authorization rule to send logs and metrics to. - `event_hub_name` - (Optional) The name of the event hub. If none is specified, the default event hub will be selected. - `marketplace_partner_resource_id` - (Optional) The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.",
+      "tfType": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+      "default": {}
+    },
+    "role_assignments": {
+      "type": "object",
+      "title": "Role Assignments",
+      "description": "A map of role assignments to create on this resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.  - `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal. - `principal_id` - The ID of the principal to assign the role to. - `description` - The description of the role assignment. - `skip_service_principal_aad_check` - If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false. - `condition` - The condition which will be used to scope the role assignment. - `condition_version` - The version of the condition syntax. Valid values are '2.0'. - `delegated_managed_identity_resource_id` - The delegated Azure Resource Id which contains a Managed Identity. Changing this forces a new resource to be created. - `principal_type` - The type of the principal_id. Possible values are `User`, `Group` and `ServicePrincipal`. Changing this forces a new resource to be created. It is necessary to explicitly set this attribute when creating role assignments if the principal creating the assignment is constrained by ABAC rules that filters on the PrincipalType attribute.  > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.",
+      "tfType": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+      "default": {}
+    },
+    "zones": {
+      "type": "array",
+      "title": "Zones",
+      "description": "A list of availability zones in which the capacity reservation group should be created.",
+      "tfType": "list(string)",
+      "items": "string",
+      "default": [
+        "1",
+        "2",
+        "3"
+      ]
+    },
+    "lock": {
+      "type": "object",
+      "title": "Lock",
+      "description": "Controls the Resource Lock configuration for this resource. The following properties can be specified:  - `kind` - (Required) The type of lock. Possible values are `\\\"CanNotDelete\\\"` and `\\\"ReadOnly\\\"`. - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.",
+      "tfType": "object({\n    kind = string\n    name = optional(string, null)\n  })"
+    },
+    "private_endpoints_manage_dns_zone_group": {
+      "type": "boolean",
+      "title": "Private Endpoints Manage Dns Zone Group",
+      "description": "Whether to manage private DNS zone groups with this module. If set to false, you must manage private DNS zone groups externally, e.g. using Azure Policy.",
+      "default": true
     }
   },
   "required": [
-    "name",
-    "location",
-    "resource_group_name"
+    "resource_group_id",
+    "capacity_reservation_group_name",
+    "location"
   ]
 }

@@ -9,10 +9,17 @@ terraform {
 
 module "avm-res-network-applicationgatewaywebapplicationfirewallpolicy" {
   source  = "Azure/avm-res-network-applicationgatewaywebapplicationfirewallpolicy/azurerm"
-  version = "x.x.x" # Version pinned by update-tf-modules.js
+  version = "0.2.0"
 
-  name                = var.name
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  tags                = var.tags
+  {{#location}}location            = {{{location}}}{{/location}}
+  {{#managed_rules}}managed_rules       = {{{managed_rules}}}{{/managed_rules}}
+  {{#name}}name                = {{{name}}}{{/name}}
+  {{#resource_group_name}}resource_group_name = {{{resource_group_name}}}{{/resource_group_name}}
+  {{#custom_rules}}custom_rules        = {{{custom_rules}}}{{/custom_rules}}
+  {{#enable_telemetry}}enable_telemetry    = {{{enable_telemetry}}}{{/enable_telemetry}}
+  {{#lock}}lock                = {{{lock}}}{{/lock}}
+  {{#policy_settings}}policy_settings     = {{{policy_settings}}}{{/policy_settings}}
+  {{#role_assignments}}role_assignments    = {{{role_assignments}}}{{/role_assignments}}
+  {{#tags}}tags                = {{{tags}}}{{/tags}}
+  {{#timeouts}}timeouts            = {{{timeouts}}}{{/timeouts}}
 }

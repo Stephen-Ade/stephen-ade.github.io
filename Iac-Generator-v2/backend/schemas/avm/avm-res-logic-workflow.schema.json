@@ -1,30 +1,122 @@
 {
   "type": "object",
   "properties": {
-    "name": {
+    "logic_app_definition": {
       "type": "string",
-      "title": "Resource Name",
-      "description": "Name of the Logic Apps Workflow"
+      "title": "Logic App Definition",
+      "description": "This variable contains the actual Logic App workflow definition. In practice, Logic app workflows   are usually created using Azure Portal or VS Code extensions.   Pre-existing workflows can be exported   into their JSON representation, which is added as input to this deployment through this variable   It is to be noted that only the Logic app definition is included here;   For example, if a Logic App uses any API connections,   that resource has to be provisioned separately.",
+      "tfType": "map",
+      "default": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "actions": {},
+        "contentVersion": "1.0.0.0",
+        "outputs": {},
+        "parameters": {},
+        "triggers": {}
+      }
     },
-    "location": {
-      "type": "string",
-      "title": "Location",
-      "description": "Azure region (e.g., eastus)",
-      "default": "eastus"
+    "managed_identities": {
+      "type": "object",
+      "title": "Managed Identities",
+      "description": "Controls the Managed Identity configuration on this resource. The following properties can be specified:  - `system_assigned` - (Optional) Specifies if the System Assigned Managed Identity should be enabled. - `user_assigned_resource_ids` - (Optional) Specifies a list of User Assigned Managed Identity resource IDs to be assigned to this resource.",
+      "tfType": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+      "default": {}
     },
-    "resource_group_name": {
-      "type": "string",
-      "title": "Resource Group Name",
-      "description": "Existing Resource Group name"
+    "role_assignments": {
+      "type": "object",
+      "title": "Role Assignments",
+      "description": "A map of role assignments to create on this resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.  - `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal. - `principal_id` - The ID of the principal to assign the role to. - `description` - The description of the role assignment. - `skip_service_principal_aad_check` - If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false. - `condition` - The condition which will be used to scope the role assignment. - `condition_version` - The version of the condition syntax. Valid values are '2.0'.  > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.",
+      "tfType": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+      "default": {}
     },
     "tags": {
       "type": "object",
       "title": "Tags",
-      "description": "Resource tags (key-value pairs)"
+      "description": "(Optional) Tags of the resource.",
+      "tfType": "map(string)"
+    },
+    "name": {
+      "type": "string",
+      "title": "Name",
+      "description": "The name of the this resource."
+    },
+    "diagnostic_settings": {
+      "type": "object",
+      "title": "Diagnostic Settings",
+      "description": "A map of diagnostic settings to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.  - `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources. - `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`. - `log_groups` - (Optional) A set of log groups to send to the log analytics workspace. Defaults to `[\"allLogs\"]`. - `metric_categories` - (Optional) A set of metric categories to send to the log analytics workspace. Defaults to `[\"AllMetrics\"]`. - `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`. - `workspace_resource_id` - (Optional) The resource ID of the log analytics workspace to send logs and metrics to. - `storage_account_resource_id` - (Optional) The resource ID of the storage account to send logs and metrics to. - `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the event hub authorization rule to send logs and metrics to. - `event_hub_name` - (Optional) The name of the event hub. If none is specified, the default event hub will be selected. - `marketplace_partner_resource_id` - (Optional) The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.",
+      "tfType": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+      "default": {}
+    },
+    "enable_telemetry": {
+      "type": "boolean",
+      "title": "Enable Telemetry",
+      "description": "This variable controls whether or not telemetry is enabled for the module. For more information see <https://aka.ms/avm/telemetryinfo>. If it is set to false, then no telemetry will be collected.",
+      "default": true
+    },
+    "lock": {
+      "type": "object",
+      "title": "Lock",
+      "description": "Controls the Resource Lock configuration for this resource. The following properties can be specified:  - `kind` - (Required) The type of lock. Possible values are `\\\"CanNotDelete\\\"` and `\\\"ReadOnly\\\"`. - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.",
+      "tfType": "object({\n    kind = string\n    name = optional(string, null)\n  })"
+    },
+    "state": {
+      "type": "string",
+      "title": "State",
+      "description": "Optional. The state. - NotSpecified, Completed, Enabled, Disabled, Deleted, Suspended.",
+      "default": "Enabled"
+    },
+    "resource_group_id": {
+      "type": "string",
+      "title": "Resource Group Id",
+      "description": "The resource group ID where the resources will be deployed."
+    },
+    "access_control": {
+      "type": "string",
+      "title": "Access Control",
+      "description": "\"Optional. The access control configuration for the workflow.\"     Refer https://learn.microsoft.com/en-us/azure/templates/microsoft.logic/workflows?pivots=deployment-language-terraform     for schema reference.  This variable is left untyped, so that adhoc openAuthenticationPolicies can be     specified. A basic example is available in the waf-aligned example.",
+      "tfType": "map",
+      "default": {}
+    },
+    "integration_service_environment_id": {
+      "type": "string",
+      "title": "Integration Service Environment Id",
+      "description": "Optional. The integration service environment id.",
+      "default": ""
+    },
+    "workflow_parameters": {
+      "type": "string",
+      "title": "Workflow Parameters",
+      "description": "Optional. A map of parameters to be passed to the workflow definition. This is useful for parameterizing the workflow definition.",
+      "tfType": "any",
+      "default": {}
+    },
+    "location": {
+      "type": "string",
+      "title": "Location",
+      "description": "Azure region where the resource should be deployed."
+    },
+    "resource_group_name": {
+      "type": "string",
+      "title": "Resource Group Name",
+      "description": "The resource group where the resources will be deployed."
+    },
+    "endpoints_configuration": {
+      "type": "string",
+      "title": "Endpoints Configuration",
+      "description": "Optional. The endpoints configuration:  Access endpoint and outgoing IP addresses for the connector and workflow.   Refer https://learn.microsoft.com/en-us/azure/templates/microsoft.logic/workflows?pivots=deployment-language-terraform   for schema reference. This variable is untyped; refer waf-aligned example for usage guidance.",
+      "tfType": "map",
+      "default": {}
+    },
+    "integration_account_id": {
+      "type": "string",
+      "title": "Integration Account Id",
+      "description": "Optional. The Integration Account ID.",
+      "default": ""
     }
   },
   "required": [
     "name",
+    "resource_group_id",
     "location",
     "resource_group_name"
   ]

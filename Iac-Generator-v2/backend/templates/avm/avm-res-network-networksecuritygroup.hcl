@@ -9,10 +9,16 @@ terraform {
 
 module "avm-res-network-networksecuritygroup" {
   source  = "Azure/avm-res-network-networksecuritygroup/azurerm"
-  version = "x.x.x" # Version pinned by update-tf-modules.js
+  version = "0.5.1"
 
-  name                = var.name
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  tags                = var.tags
+  {{#location}}location            = {{{location}}}{{/location}}
+  {{#name}}name                = {{{name}}}{{/name}}
+  {{#resource_group_name}}resource_group_name = {{{resource_group_name}}}{{/resource_group_name}}
+  {{#diagnostic_settings}}diagnostic_settings = {{{diagnostic_settings}}}{{/diagnostic_settings}}
+  {{#enable_telemetry}}enable_telemetry    = {{{enable_telemetry}}}{{/enable_telemetry}}
+  {{#lock}}lock                = {{{lock}}}{{/lock}}
+  {{#role_assignments}}role_assignments    = {{{role_assignments}}}{{/role_assignments}}
+  {{#security_rules}}security_rules      = {{{security_rules}}}{{/security_rules}}
+  {{#tags}}tags                = {{{tags}}}{{/tags}}
+  {{#timeouts}}timeouts            = {{{timeouts}}}{{/timeouts}}
 }

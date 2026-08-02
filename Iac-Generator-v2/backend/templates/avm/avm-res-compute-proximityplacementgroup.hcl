@@ -9,10 +9,14 @@ terraform {
 
 module "avm-res-compute-proximityplacementgroup" {
   source  = "Azure/avm-res-compute-proximityplacementgroup/azurerm"
-  version = "x.x.x" # Version pinned by update-tf-modules.js
+  version = "0.1.0"
 
-  name                = var.name
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  tags                = var.tags
+  {{#location}}location            = {{{location}}}{{/location}}
+  {{#name}}name                = {{{name}}}{{/name}}
+  {{#resource_group_name}}resource_group_name = {{{resource_group_name}}}{{/resource_group_name}}
+  {{#allowed_vm_sizes}}allowed_vm_sizes    = {{{allowed_vm_sizes}}}{{/allowed_vm_sizes}}
+  {{#enable_telemetry}}enable_telemetry    = {{{enable_telemetry}}}{{/enable_telemetry}}
+  {{#lock}}lock                = {{{lock}}}{{/lock}}
+  {{#tags}}tags                = {{{tags}}}{{/tags}}
+  {{#zone}}zone                = {{{zone}}}{{/zone}}
 }

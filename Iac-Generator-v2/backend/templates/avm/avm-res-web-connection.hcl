@@ -9,10 +9,15 @@ terraform {
 
 module "avm-res-web-connection" {
   source  = "Azure/avm-res-web-connection/azurerm"
-  version = "x.x.x" # Version pinned by update-tf-modules.js
+  version = "0.1.0"
 
-  name                = var.name
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  tags                = var.tags
+  {{#managed_api_id}}managed_api_id      = {{{managed_api_id}}}{{/managed_api_id}}
+  {{#name}}name                = {{{name}}}{{/name}}
+  {{#resource_group_name}}resource_group_name = {{{resource_group_name}}}{{/resource_group_name}}
+  {{#display_name}}display_name        = {{{display_name}}}{{/display_name}}
+  {{#enable_telemetry}}enable_telemetry    = {{{enable_telemetry}}}{{/enable_telemetry}}
+  {{#lock}}lock                = {{{lock}}}{{/lock}}
+  {{#parameter_values}}parameter_values    = {{{parameter_values}}}{{/parameter_values}}
+  {{#role_assignments}}role_assignments    = {{{role_assignments}}}{{/role_assignments}}
+  {{#tags}}tags                = {{{tags}}}{{/tags}}
 }

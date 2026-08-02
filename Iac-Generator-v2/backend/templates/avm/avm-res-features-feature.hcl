@@ -9,10 +9,13 @@ terraform {
 
 module "avm-res-features-feature" {
   source  = "Azure/avm-res-features-feature/azurerm"
-  version = "x.x.x" # Version pinned by update-tf-modules.js
+  version = "0.1.0"
 
-  name                = var.name
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  tags                = var.tags
+  {{#name}}name                            = {{{name}}}{{/name}}
+  {{#provider_name}}provider_name                   = {{{provider_name}}}{{/provider_name}}
+  {{#enable_telemetry}}enable_telemetry                = {{{enable_telemetry}}}{{/enable_telemetry}}
+  {{#feature_registration_timeouts}}feature_registration_timeouts   = {{{feature_registration_timeouts}}}{{/feature_registration_timeouts}}
+  {{#feature_unregistration_timeouts}}feature_unregistration_timeouts = {{{feature_unregistration_timeouts}}}{{/feature_unregistration_timeouts}}
+  {{#lock}}lock                            = {{{lock}}}{{/lock}}
+  {{#role_assignments}}role_assignments                = {{{role_assignments}}}{{/role_assignments}}
 }

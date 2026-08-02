@@ -59,6 +59,35 @@ handlebars.registerHelper('toLower', function(str) {
     return typeof str === 'string' ? str.toLowerCase() : str;
 });
 
+// --- Handlebars Helper to format values as valid HCL ---
+// Strings get quotes, booleans/numbers stay raw, JSON strings convert to HCL syntax
+// Detects pre-converted HCL maps (from convertMapToHcl) and passes through unchanged
+handlebars.registerHelper('hclVal', function(value) {
+    if (value === null || value === undefined) return 'null';
+    if (typeof value === 'boolean') return String(value);
+    if (typeof value === 'number') return String(value);
+    if (typeof value === 'string') {
+        // Pass through if already HCL-formatted (has "key =" pattern, not "key":")
+        if (/^\s*\{[^}]*=\s*["\[\{]/.test(value) || /^\s*\[/.test(value)) {
+            return value;
+        }
+        // Convert JSON strings to HCL syntax
+        const trimmed = value.trim();
+        if ((trimmed.startsWith('{') && trimmed.endsWith('}')) ||
+            (trimmed.startsWith('[') && trimmed.endsWith(']'))) {
+            try {
+                const parsed = JSON.parse(trimmed);
+                return convertToHcl(parsed);
+            } catch (e) { /* Not valid JSON, fall through to string quoting */ }
+        }
+        return `"${value}"`;
+    }
+    if (typeof value === 'object') {
+        return convertToHcl(value);
+    }
+    return String(value);
+});
+
 const app = express();
 app.use(cors());
 app.use(express.json());

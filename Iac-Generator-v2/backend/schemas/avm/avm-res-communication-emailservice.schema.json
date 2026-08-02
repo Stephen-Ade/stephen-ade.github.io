@@ -1,31 +1,70 @@
 {
   "type": "object",
   "properties": {
-    "name": {
+    "data_location": {
       "type": "string",
-      "title": "Resource Name",
-      "description": "Name of the Email Communication Service"
-    },
-    "location": {
-      "type": "string",
-      "title": "Location",
-      "description": "Azure region (e.g., eastus)",
-      "default": "eastus"
+      "title": "Data Location",
+      "description": "(Required) The location where the Email Communication service stores its data at rest. Possible values are `Africa`, `Asia Pacific`, `Australia`, `Brazil`, `Canada`, `Europe`, `France`, `Germany`, `India`, `Japan`, `Korea`, `Norway`, `Switzerland`, `UAE`, `UK` `usgov` and `United States`. Changing this forces a new resource to be created."
     },
     "resource_group_name": {
       "type": "string",
       "title": "Resource Group Name",
-      "description": "Existing Resource Group name"
+      "description": "(Required) The resource group where the resources will be deployed. Changing this forces a new resource to be created."
+    },
+    "email_communication_service_domain_sender_usernames": {
+      "type": "object",
+      "title": "Email Communication Service Domain Sender Usernames",
+      "description": "A map of Email Communication Service Domains to create on Email Communcation Service.  - `name` - The name of the Email Communication Service Domain Sender Username resource. Changing this forces a new resource to be created. - `email_communication_service_domain_name_key` - The key name of the Email Communication Service Domain resource. Changing this forces a new resource to be created. - `display_name` - The display name for the Email Communication Service Domain Sender Username resource.",
+      "tfType": "map(object({\n    name                                        = string\n    email_communication_service_domain_name_key = string\n    display_name                                = optional(string, \"\")\n  }))",
+      "default": {}
+    },
+    "email_communication_service_domains": {
+      "type": "object",
+      "title": "Email Communication Service Domains",
+      "description": "A map of Email Communication Service Domains to create on Email Communcation Service.  - `name` - The name of the Email Communication Service Domain resource. If `domain_management` is `AzureManaged`, the name must be `AzureManagedDomain`. Changing this forces a new resource to be created. - `domain_management` - Describes how a Email Communication Service Domain resource is being managed. Possible values are `AzureManaged`, `CustomerManaged`, `CustomerManagedInExchangeOnline`. Changing this forces a new resource to be created. - `user_engagement_tracking_enabled` - Describes user engagement tracking is enabled or disabled. Defaults to `false`. - `tags` - A mapping of tags which should be assigned to the Email Communication Service Domain.",
+      "tfType": "map(object({\n    name                             = string\n    domain_management                = string\n    user_engagement_tracking_enabled = optional(bool, false)\n    tags                             = optional(map(string), null)\n  }))",
+      "default": {}
+    },
+    "lock": {
+      "type": "object",
+      "title": "Lock",
+      "description": "Controls the Resource Lock configuration for this resource. The following properties can be specified:  - `kind` - (Required) The type of lock. Possible values are `\\\"CanNotDelete\\\"` and `\\\"ReadOnly\\\"`. - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.",
+      "tfType": "object({\n    kind = string\n    name = optional(string, null)\n  })"
     },
     "tags": {
       "type": "object",
       "title": "Tags",
-      "description": "Resource tags (key-value pairs)"
+      "description": "(Optional) A mapping of tags which should be assigned to the Email Communication Service.",
+      "tfType": "map(string)"
+    },
+    "location": {
+      "type": "string",
+      "title": "Location",
+      "description": "(Required) Azure region where the resource should be deployed. Changing this forces a new resource to be created."
+    },
+    "name": {
+      "type": "string",
+      "title": "Name",
+      "description": "(Required) The name of the Email Communication Service resource. Changing this forces a new resource to be created."
+    },
+    "enable_telemetry": {
+      "type": "boolean",
+      "title": "Enable Telemetry",
+      "description": "This variable controls whether or not telemetry is enabled for the module. For more information see <https://aka.ms/avm/telemetryinfo>. If it is set to false, then no telemetry will be collected.",
+      "default": true
+    },
+    "role_assignments": {
+      "type": "object",
+      "title": "Role Assignments",
+      "description": "A map of role assignments to create on this resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.  - `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal. - `principal_id` - The ID of the principal to assign the role to. - `description` - The description of the role assignment. - `skip_service_principal_aad_check` - If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false. - `condition` - The condition which will be used to scope the role assignment. - `condition_version` - The version of the condition syntax. Valid values are '2.0'. - `delegated_managed_identity_resource_id` - The delegated Azure Resource Id which contains a Managed Identity. Changing this forces a new resource to be created. - `principal_type` - The type of the principal_id. Possible values are `User`, `Group` and `ServicePrincipal`. Changing this forces a new resource to be created. It is necessary to explicitly set this attribute when creating role assignments if the principal creating the assignment is constrained by ABAC rules that filters on the PrincipalType attribute.  > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.",
+      "tfType": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+      "default": {}
     }
   },
   "required": [
-    "name",
+    "data_location",
+    "resource_group_name",
     "location",
-    "resource_group_name"
+    "name"
   ]
 }

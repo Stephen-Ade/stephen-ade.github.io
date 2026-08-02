@@ -9,10 +9,16 @@ terraform {
 
 module "avm-res-communication-emailservice" {
   source  = "Azure/avm-res-communication-emailservice/azurerm"
-  version = "x.x.x" # Version pinned by update-tf-modules.js
+  version = "0.2.0"
 
-  name                = var.name
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  tags                = var.tags
+  {{#data_location}}data_location                                       = {{{data_location}}}{{/data_location}}
+  {{#location}}location                                            = {{{location}}}{{/location}}
+  {{#name}}name                                                = {{{name}}}{{/name}}
+  {{#resource_group_name}}resource_group_name                                 = {{{resource_group_name}}}{{/resource_group_name}}
+  {{#email_communication_service_domain_sender_usernames}}email_communication_service_domain_sender_usernames = {{{email_communication_service_domain_sender_usernames}}}{{/email_communication_service_domain_sender_usernames}}
+  {{#email_communication_service_domains}}email_communication_service_domains                 = {{{email_communication_service_domains}}}{{/email_communication_service_domains}}
+  {{#enable_telemetry}}enable_telemetry                                    = {{{enable_telemetry}}}{{/enable_telemetry}}
+  {{#lock}}lock                                                = {{{lock}}}{{/lock}}
+  {{#role_assignments}}role_assignments                                    = {{{role_assignments}}}{{/role_assignments}}
+  {{#tags}}tags                                                = {{{tags}}}{{/tags}}
 }
