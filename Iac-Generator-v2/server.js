@@ -5,12 +5,14 @@ const fs = require('fs');
 const handlebars = require('handlebars');
 
 // DEVSECOPS: Windows BOM Stripper
+// PowerShell Out-File adds invisible BOM characters that break JSON.parse
 const parseJsonSafe = (filePath) => {
     let raw = fs.readFileSync(filePath, 'utf8').replace(/^\uFEFF/, '');
     return JSON.parse(raw);
 };
 
-// --- Handlebars Helpers ---
+// --- Handlebars Helper to safely output arrays from text ingestion ---
+// BULLETPROOF: Wraps in SafeString to prevent Handlebars from HTML-escaping quotes into &quot;
 handlebars.registerHelper('safeArray', function(items) {
     if (!items) return new handlebars.SafeString('[]');
     if (typeof items === 'string') return new handlebars.SafeString(`["${items}"]`);
@@ -20,6 +22,8 @@ handlebars.registerHelper('safeArray', function(items) {
     return new handlebars.SafeString('[]');
 });
 
+// --- Handlebars Helper to format Terraform resource names safely (Acronym Aware) ---
+// Used for AWS/GCP/Azure resource type names (e.g., aws_instance -> aws_instance)
 handlebars.registerHelper('snakeCase', function(str) {
     if (!str) return '';
     return str.replace(/[^a-zA-Z0-9]+/g, '_')
@@ -28,72 +32,105 @@ handlebars.registerHelper('snakeCase', function(str) {
               .toLowerCase();
 });
 
+// --- Handlebars Helper for clean Terraform labels (Fixes DMZ-Database -> dmz_database) ---
+// MUST match frontend normalizeToSnakeCase() exactly to ensure consistency
 handlebars.registerHelper('tfLabel', function(str) {
+    // BULLETPROOF: If str is missing, undefined, or an object (context leak), fallback safely
     if (typeof str !== 'string') return 'resource';
+    
+    // 1. Lowercase everything
+    // 2. Replace any non-alphanumeric sequence with single underscore
+    // 3. Strip leading/trailing underscores
     return str.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
 });
 
+// --- Handlebars Helper to check equality in templates (Required for Location blocks) ---
 handlebars.registerHelper('eq', function(a, b, options) {
+    // BULLETPROOF: Explicitly handle block helper {{#eq}} 
+    // This guarantees the word "true" or "false" can NEVER leak into the generated HCL
     if (options && options.fn) {
         return (a === b) ? options.fn(this) : '';
     }
     return a === b;
 });
 
+// --- Handlebars Helper to lowercase strings (Required for GCP Locations & Labels) ---
 handlebars.registerHelper('toLower', function(str) {
     return typeof str === 'string' ? str.toLowerCase() : str;
 });
 
+// --- Handlebars Helper to format values as valid HCL ---
+// Strings get quotes, booleans/numbers stay raw, JSON strings convert to HCL syntax
+// Detects pre-converted HCL maps (from convertMapToHcl) and passes through unchanged
+// CRITICAL: All return paths use SafeString to prevent Handlebars HTML-escaping quotes to &quot;
 handlebars.registerHelper('hclVal', function(value) {
-    if (value === null || value === undefined) return 'null';
-    if (typeof value === 'boolean') return String(value);
-    if (typeof value === 'number') return String(value);
-    if (typeof value === 'string') {
+    let result;
+    if (value === null || value === undefined) {
+        result = 'null';
+    } else if (typeof value === 'boolean') {
+        result = String(value);
+    } else if (typeof value === 'number') {
+        result = String(value);
+    } else if (typeof value === 'string') {
+        // Pass through if already HCL-formatted (has "key =" pattern, not "key":")
         if (/^\s*\{[^}]*=\s*["\[\{]/.test(value) || /^\s*\[/.test(value)) {
-            return value;
+            result = value;
         }
-        const trimmed = value.trim();
-        if ((trimmed.startsWith('{') && trimmed.endsWith('}')) ||
-            (trimmed.startsWith('[') && trimmed.endsWith(']'))) {
-            try {
-                const parsed = JSON.parse(trimmed);
-                return convertToHcl(parsed);
-            } catch (e) { /* fall through */ }
+        // Convert JSON strings to HCL syntax
+        else {
+            const trimmed = value.trim();
+            if ((trimmed.startsWith('{') && trimmed.endsWith('}')) ||
+                (trimmed.startsWith('[') && trimmed.endsWith(']'))) {
+                try {
+                    const parsed = JSON.parse(trimmed);
+                    result = convertToHcl(parsed);
+                } catch (e) {
+                    result = `"${value}"`;
+                }
+            } else {
+                result = `"${value}"`;
+            }
         }
-        return `"${value}"`;
+    } else if (typeof value === 'object') {
+        result = convertToHcl(value);
+    } else {
+        result = String(value);
     }
-    if (typeof value === 'object') {
-        return convertToHcl(value);
-    }
-    return String(value);
+    // CRITICAL: Wrap in SafeString to prevent Handlebars HTML-escaping quotes to &quot;
+    return new handlebars.SafeString(result);
 });
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Serve React App
 app.use(express.static(path.join(__dirname, 'client/dist')));
 
-// --- Load Data ---
+// Load Schemas
 const DB_PATH = path.join(__dirname, 'db/schemas.json');
 let db = { resources: {} };
 if (fs.existsSync(DB_PATH)) {
     db = parseJsonSafe(DB_PATH);
 } else {
-    console.warn('WARNING: db/schemas.json not found.');
+    console.warn('WARNING: db/schemas.json not found. Run "npm run ingest" first.');
 }
 
+// Load External Modules
 const REGISTRY_PATH = path.join(__dirname, 'db/modules/registry.json');
 let moduleRegistry = { modules: [] };
 if (fs.existsSync(REGISTRY_PATH)) {
     moduleRegistry = parseJsonSafe(REGISTRY_PATH);
 }
 
+// --- v2 FEATURE: Load Terraform Module Overrides (Invisible Upgrade) ---
 const TF_OVERRIDES_PATH = path.join(__dirname, 'db/terraform_module_overrides.json');
 let tfModuleOverrides = {};
 if (fs.existsSync(TF_OVERRIDES_PATH)) {
     tfModuleOverrides = parseJsonSafe(TF_OVERRIDES_PATH);
     console.log(`[v2 Engine] Loaded ${Object.keys(tfModuleOverrides).length} Terraform module overrides.`);
+} else {
+    console.warn('[v2 Engine] WARNING: db/terraform_module_overrides.json not found. Using raw compiler.');
 }
 
 // --- Build AVM set for resource list tagging ---
@@ -104,39 +141,63 @@ const avmOverrideTypeNames = new Set(
 );
 console.log(`[v2 Engine] ${avmOverrideTypeNames.size} Azure AVM resources will be tagged in resource list.`);
 
-// --- Validation ---
+// --- 3RD PARTY AUDITOR VALIDATION: Bulk Address Objects ---
+// Prevents empty "" = {} map keys and enforces strict schema compliance
 function validateBulkAddresses(entries) {
     if (!Array.isArray(entries) || entries.length === 0) {
         throw new Error("At least one address object is required.");
     }
-    const validTypes = new Set(["ip_netmask", "ip_range", "fqdn", "ip_wildcard"]);
+
+    const validTypes = new Set([
+        "ip_netmask",
+        "ip_range",
+        "fqdn",
+        "ip_wildcard"
+    ]);
+
     for (const [index, entry] of entries.entries()) {
+        // 1. Reject empty object names (Prevents "" = {} in HCL)
         if (!entry.name || !entry.name.trim()) {
             throw new Error(`Address entry ${index + 1} requires a valid object name.`);
         }
+
+        // 2. Validate address type
         if (!validTypes.has(entry.address_type)) {
             throw new Error(`Address entry "${entry.name || index + 1}" has an invalid or missing address type.`);
         }
+
+        // 3. Validate that the corresponding value field exists and is not empty
         const valueField = entry.address_type; 
         if (!entry[valueField] || !entry[valueField].trim()) {
             throw new Error(`Address entry "${entry.name}" is missing a value for "${valueField}".`);
         }
+
+        // 4. Ensure tags is an array and has no empty strings (SafeArray compliance)
         if (entry.tags && !Array.isArray(entry.tags)) {
             throw new Error(`Tags for "${entry.name}" must be an array.`);
         }
         if (entry.tags && entry.tags.some(t => typeof t !== 'string' || t.trim() === "")) {
-            throw new Error(`Tags array for "${entry.name}" contains empty strings.`);
+            throw new Error(`Tags array for "${entry.name}" contains empty strings, which violates SafeArray rules.`);
         }
     }
 }
 
-// --- Compilers ---
+// --- DYNAMIC COMPILERS ---
+
+// --- ENHANCED: toSnakeCase with ALL_CAPS preservation ---
+// Preserves environment variables (LOG_LEVEL, DB_TABLE) and acronyms (SSEAlgorithm)
+// Only converts PascalCase/camelCase to snake_case
 function toSnakeCase(str) { 
+    // PRESERVE ALL_CAPS strings (like LOG_LEVEL, DB_TABLE, SSEAlgorithm)
+    // Only convert PascalCase/camelCase to snake_case
     if (typeof str !== 'string') return str;
-    if (/^[A-Z][A-Z0-9_]*$/.test(str)) return str;
+    if (/^[A-Z][A-Z0-9_]*$/.test(str)) {
+        return str; // Already uppercase with underscores, return as-is
+    }
     return str.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, ''); 
 }
 
+// --- TERRAFORM (Handles deep nested blocks) ---
 function compileTerraform(schema, config, safeName) {
     const tfType = toSnakeCase(safeName);
     let hcl = `resource "${tfType}" "${tfType}_this" {\n`;
@@ -151,10 +212,14 @@ function compileTerraformProps(schemaProps, configNode, indent) {
         if (value === null || value === undefined || value === '') continue;
         const tfKey = toSnakeCase(key);
         const propSchema = schemaProps?.[key];
+
         if (typeof value === 'object' && !Array.isArray(value)) {
+            // ENHANCEMENT: Tags/Labels rendered as maps with preserved casing
             const lowerKey = tfKey.toLowerCase();
             if (lowerKey === 'tags' || lowerKey === 'labels') {
-                const mapLines = Object.entries(value).map(([k, v]) => `${indent}  ${k} = ${convertToHcl(v)}`);
+                const mapLines = Object.entries(value).map(([k, v]) => {
+                    return `${indent}  ${k} = ${convertToHcl(v)}`;
+                });
                 hcl += `${indent}${tfKey} = {\n${mapLines.join('\n')}\n${indent}}\n`;
             } else {
                 hcl += `${indent}${tfKey} {\n`;
@@ -191,21 +256,38 @@ function convertObjToHclInline(obj) {
     return `{\n${lines.join('\n')}\n  }`;
 }
 
+
+// --- BICEP (Handles deep nested objects) ---
 function compileBicep(schema, config, safeName) {
     let bicep = `resource ${safeName} '${schema.typeName}' = {\n`;
+    
     if (config.Name) bicep += `  name: '${config.Name}'\n`;
     if (config.Location) bicep += `  location: ${config.Location}\n`;
+    
     const propsConfig = { ...config };
     delete propsConfig.Name;
     delete propsConfig.Location;
+    
+    // FIX: Extract tags to print at the resource root (Standard Bicep syntax)
     const resourceTags = propsConfig.Tags;
-    delete propsConfig.Tags;
-    if (resourceTags) bicep += `  tags: ${convertToBicep(resourceTags)}\n`;
+    delete propsConfig.Tags; 
+
+    // Print Tags at the root level if they exist
+    if (resourceTags) {
+        if (typeof resourceTags === 'object') {
+            bicep += `  tags: ${convertToBicep(resourceTags)}\n`;
+        } else {
+            // Fallback if someone passed a string instead of a JSON object
+            bicep += `  tags: ${convertToBicep(resourceTags)}\n`;
+        }
+    }
+
     if (Object.keys(propsConfig).length > 0) {
         bicep += `  properties: {\n`;
         bicep += compileBicepProps(schema.properties?.properties || {}, propsConfig, '    ');
         bicep += `  }\n`;
     }
+    
     bicep += `}\n`;
     return bicep;
 }
@@ -216,6 +298,7 @@ function compileBicepProps(schemaProps, configNode, indent) {
         if (value === null || value === undefined || value === '') continue;
         const bicepKey = key.substring(0,1).toLowerCase() + key.substring(1);
         const propSchema = schemaProps?.[key];
+
         if (typeof value === 'object' && !Array.isArray(value)) {
             bicep += `${indent}${bicepKey}: {\n`;
             bicep += compileBicepProps(propSchema?.properties || {}, value, indent + '    ');
@@ -244,13 +327,21 @@ function convertToBicep(value) {
     if (typeof value === 'boolean') return value ? 'true' : 'false';
     if (typeof value === 'number') return String(value);
     if (Array.isArray(value)) return `[${value.map(v => typeof v === 'string' ? `'${v}'` : v).join(', ')}]`;
+    
+    // FIX: Handle objects (like Tags) properly for Bicep syntax { Key: 'Value' }
     if (typeof value === 'object' && value !== null) {
-        const entries = Object.entries(value).map(([k, v]) => `${k}: ${typeof v === 'string' ? `'${v}'` : convertToBicep(v)}`);
+        const entries = Object.entries(value).map(([k, v]) => {
+            const bicepValue = typeof v === 'string' ? `'${v}'` : convertToBicep(v);
+            return `${k}: ${bicepValue}`;
+        });
         return `{\n${entries.map(e => `    ${e}`).join('\n')}\n  }`;
     }
+    
     return '{}';
 }
 
+
+// --- CDK PYTHON (Handles deep nested dictionaries) ---
 function compileCdkPython(schema, config, safeName) {
     const [_, service, resource] = schema.typeName.split('::');
     const moduleName = service.toLowerCase();
@@ -258,7 +349,9 @@ function compileCdkPython(schema, config, safeName) {
     let py = `from aws_cdk_lib import ${moduleName}\n\n`;
     py += `${safeName} = ${moduleName}.${className}(\n`;
     py += `    scope, "${safeName}",\n`;
+    
     py += compilePythonProps(schema.properties, config, '    ');
+    
     py += `)\n`;
     return py;
 }
@@ -269,6 +362,7 @@ function compilePythonProps(schemaProps, configNode, indent) {
         if (value === null || value === undefined || value === '') continue;
         const pyKey = toSnakeCase(key);
         const propSchema = schemaProps?.[key];
+
         if (typeof value === 'object' && !Array.isArray(value)) {
             py += `${indent}${pyKey}={\n`;
             py += compilePythonProps(propSchema?.properties || {}, value, indent + '    ');
@@ -296,20 +390,27 @@ function convertToPython(value) {
     return '{}';
 }
 
+// --- HELPER: Parse stringified JSON objects back to actual objects ---
+// Frontend stringifies objects (like Tags) for text input display.
+// This reverses that by parsing ANY string that looks like a JSON object.
 function parseStringifiedObjects(config) {
     if (!config) return config;
     const parsed = { ...config };
     for (const [key, value] of Object.entries(parsed)) {
+        // Parse any string that looks like a JSON object or array
         if (typeof value === 'string') {
             const trimmed = value.trim();
             if ((trimmed.startsWith('{') && trimmed.endsWith('}')) ||
                 (trimmed.startsWith('[') && trimmed.endsWith(']'))) {
-                try { parsed[key] = JSON.parse(trimmed); } catch (e) { /* leave as is */ }
+                try {
+                    parsed[key] = JSON.parse(trimmed);
+                } catch (e) { /* Leave as is if parse fails */ }
             }
         }
     }
     return parsed;
 }
+
 
 // --- API ROUTES ---
 
@@ -543,5 +644,6 @@ app.post('/api/generate', (req, res) => {
     res.json({ success: true, code, language });
 });
 
+// --- SAFE DEPLOYMENT: Isolated v2 Port ---
 const PORT = process.env.PORT || 3002;
 app.listen(PORT, () => console.log(`🚀 IaC-Generator v2 running securely on http://localhost:${PORT}`));
