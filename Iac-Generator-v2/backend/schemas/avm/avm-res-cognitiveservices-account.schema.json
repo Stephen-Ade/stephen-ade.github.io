@@ -226,12 +226,6 @@
       "title": "Tags",
       "description": "(Optional) A mapping of tags to assign to the resource.",
       "tfType": "map(string)"
-    },
-    "timeouts": {
-      "type": "object",
-      "title": "Timeouts",
-      "description": "Default per-operation timeouts applied to every `azapi_resource` managed by this module (the Cognitive / AI Services account and the cascaded `deployment` and `rai_policy` submodules) as well as the `azurerm_cognitive_account_customer_managed_key` resource. Defaults to `null` (provider defaults). Each value is a Go duration string (e.g. `30m`, `1h`).  Per-item overrides may be supplied through `cognitive_deployments[*].timeouts` and `rai_policies[*].timeouts`; when set, the per-item value wins for that submodule instance.   - `create` - (Defaults to 30 minutes) Used when creating the Cognitive Service or AI Service Account.  - `delete` - (Defaults to 30 minutes) Used when deleting the Cognitive Service or AI Service Account.  - `read` - (Defaults to 5 minutes) Used when retrieving the Cognitive Service or AI Service Account.  - `update` - (Defaults to 30 minutes) Used when updating the Cognitive Service or AI Service Account.",
-      "tfType": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })"
     }
   },
   "required": [

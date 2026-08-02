@@ -74,7 +74,6 @@ module "avm_res_app_managedenvironment" {
   {{#if shared_key_version}}shared_key_version                           = {{hclVal shared_key_version}}{{/if}}
   {{#if storages}}storages                                     = {{hclVal storages}}{{/if}}
   {{#if tags}}tags                                         = {{hclVal tags}}{{/if}}
-  {{#if timeouts}}timeouts                                     = {{hclVal timeouts}}{{/if}}
   {{#if vnet_configuration}}vnet_configuration                           = {{hclVal vnet_configuration}}{{/if}}
   {{#if workload_profile}}workload_profile                             = {{hclVal workload_profile}}{{/if}}
   {{#if workload_profiles}}workload_profiles                            = {{hclVal workload_profiles}}{{/if}}

@@ -93,7 +93,6 @@ module "avm_res_web_site" {
   {{#if storage_user_assigned_identity_id}}storage_user_assigned_identity_id              = {{hclVal storage_user_assigned_identity_id}}{{/if}}
   {{#if storage_uses_managed_identity}}storage_uses_managed_identity                  = {{hclVal storage_uses_managed_identity}}{{/if}}
   {{#if tags}}tags                                           = {{hclVal tags}}{{/if}}
-  {{#if timeouts}}timeouts                                       = {{hclVal timeouts}}{{/if}}
   {{#if use_extension_bundle}}use_extension_bundle                           = {{hclVal use_extension_bundle}}{{/if}}
   {{#if virtual_network_backup_restore_enabled}}virtual_network_backup_restore_enabled         = {{hclVal virtual_network_backup_restore_enabled}}{{/if}}
   {{#if virtual_network_subnet_id}}virtual_network_subnet_id                      = {{hclVal virtual_network_subnet_id}}{{/if}}

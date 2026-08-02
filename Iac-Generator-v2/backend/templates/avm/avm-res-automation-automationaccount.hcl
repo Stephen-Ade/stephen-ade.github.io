@@ -48,5 +48,4 @@ module "avm_res_automation_automationaccount" {
   {{#if public_network_access_enabled}}public_network_access_enabled              = {{hclVal public_network_access_enabled}}{{/if}}
   {{#if role_assignments}}role_assignments                           = {{hclVal role_assignments}}{{/if}}
   {{#if tags}}tags                                       = {{hclVal tags}}{{/if}}
-  {{#if timeouts}}timeouts                                   = {{hclVal timeouts}}{{/if}}
 }

@@ -29,6 +29,7 @@ const SKIP_VARS = new Set([
   'telemetry_enabled',
   'resource_base_tags',
   'customer_managed_key',
+  'timeouts', // DEVSECOPS: Timeouts are complex nested blocks, not scalar inputs. Omitting lets AVM use safe defaults.
 ]);
 
 // --- Type Conversion: Terraform -> JSON Schema ---
@@ -136,8 +137,8 @@ function generateHclTemplate(moduleName, source, inputs, version) {
 
   for (const input of sorted) {
     const paddedName = input.name.padEnd(maxLen);
-    // FIXED: Use {{#if}} instead of {{#name}} to preserve Handlebars context
-    // FIXED: Use {{hclVal}} helper for type-aware HCL formatting
+    // Use {{#if}} to preserve Handlebars context
+    // Use {{hclVal}} helper for type-aware HCL formatting
     lines.push('  {{#if ' + input.name + '}}' + paddedName + ' = {{hclVal ' + input.name + '}}{{/if}}');
   }
 

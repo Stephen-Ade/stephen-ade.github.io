@@ -26,7 +26,6 @@ module "avm_res_network_privatednszone" {
   {{#if soa_record}}soa_record                           = {{hclVal soa_record}}{{/if}}
   {{#if srv_records}}srv_records                          = {{hclVal srv_records}}{{/if}}
   {{#if tags}}tags                                 = {{hclVal tags}}{{/if}}
-  {{#if timeouts}}timeouts                             = {{hclVal timeouts}}{{/if}}
   {{#if txt_records}}txt_records                          = {{hclVal txt_records}}{{/if}}
   {{#if virtual_network_links}}virtual_network_links                = {{hclVal virtual_network_links}}{{/if}}
 }

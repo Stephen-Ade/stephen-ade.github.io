@@ -19,12 +19,6 @@
       "description": "Tags of the resource.",
       "tfType": "map(string)"
     },
-    "timeouts": {
-      "type": "object",
-      "title": "Timeouts",
-      "description": "The timeout configuration for azapi resources. The following properties can be specified:    - `create` - (Optional) The timeout for create operations e.g. `\"30m\"`, `\"1h\"`.   - `delete` - (Optional) The timeout for delete operations e.g. `\"30m\"`, `\"1h\"`.   - `read` - (Optional) The timeout for read operations e.g. `\"30m\"`, `\"1h\"`.   - `update` - (Optional) The timeout for update operations e.g. `\"30m\"`, `\"1h\"`.",
-      "tfType": "object({\n    create = optional(string, null)\n    delete = optional(string, null)\n    read   = optional(string, null)\n    update = optional(string, null)\n  })"
-    },
     "location": {
       "type": "string",
       "title": "Location",

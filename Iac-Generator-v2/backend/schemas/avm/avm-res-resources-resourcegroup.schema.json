@@ -38,13 +38,6 @@
       "description": "(Optional) Tags of the resource.",
       "tfType": "map(string)"
     },
-    "timeouts": {
-      "type": "object",
-      "title": "Timeouts",
-      "description": "The timeouts applied to the underlying `azapi_resource` resources (resource group, lock, role assignments).  Each value must be a string parsable as a Go duration (for example `\"30s\"`, `\"5m\"`, `\"1h30m\"`). When `null`, the AzAPI provider default is used.  - `create` - (Optional) Timeout for create operations. - `delete` - (Optional) Timeout for delete operations. - `read` - (Optional) Timeout for read operations. - `update` - (Optional) Timeout for update operations.",
-      "tfType": "object({\n    create = optional(string, null)\n    delete = optional(string, null)\n    read   = optional(string, null)\n    update = optional(string, null)\n  })",
-      "default": {}
-    },
     "location": {
       "type": "string",
       "title": "Location",

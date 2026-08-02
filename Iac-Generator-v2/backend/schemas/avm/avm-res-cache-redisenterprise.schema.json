@@ -62,12 +62,6 @@
       "description": "Enable non-SSL port (6379) for Redis cache. Default: false (SSL only).",
       "default": false
     },
-    "timeouts": {
-      "type": "object",
-      "title": "Timeouts",
-      "description": "Timeouts for Redis Enterprise cluster and database operations.",
-      "tfType": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })"
-    },
     "location": {
       "type": "string",
       "title": "Location",

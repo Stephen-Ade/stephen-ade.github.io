@@ -34,5 +34,4 @@ module "avm_res_oracledatabase_cloudexadatainfrastructure" {
   {{#if shape}}shape                                = {{hclVal shape}}{{/if}}
   {{#if storage_server_type}}storage_server_type                  = {{hclVal storage_server_type}}{{/if}}
   {{#if tags}}tags                                 = {{hclVal tags}}{{/if}}
-  {{#if timeouts}}timeouts                             = {{hclVal timeouts}}{{/if}}
 }

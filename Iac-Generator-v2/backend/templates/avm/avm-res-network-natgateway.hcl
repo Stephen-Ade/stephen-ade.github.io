@@ -27,6 +27,5 @@ module "avm_res_network_natgateway" {
   {{#if role_assignments}}role_assignments                 = {{hclVal role_assignments}}{{/if}}
   {{#if sku_name}}sku_name                         = {{hclVal sku_name}}{{/if}}
   {{#if tags}}tags                             = {{hclVal tags}}{{/if}}
-  {{#if timeouts}}timeouts                         = {{hclVal timeouts}}{{/if}}
   {{#if zones}}zones                            = {{hclVal zones}}{{/if}}
 }

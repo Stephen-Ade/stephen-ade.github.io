@@ -57,5 +57,4 @@ module "avm_res_botservice_botservice" {
   {{#if streaming_endpoint_enabled}}streaming_endpoint_enabled                = {{hclVal streaming_endpoint_enabled}}{{/if}}
   {{#if tags}}tags                                      = {{hclVal tags}}{{/if}}
   {{#if tenant_id}}tenant_id                                 = {{hclVal tenant_id}}{{/if}}
-  {{#if timeouts}}timeouts                                  = {{hclVal timeouts}}{{/if}}
 }

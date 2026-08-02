@@ -33,7 +33,6 @@ module "avm_res_web_hostingenvironment" {
   {{#if retry}}retry                                  = {{hclVal retry}}{{/if}}
   {{#if role_assignments}}role_assignments                       = {{hclVal role_assignments}}{{/if}}
   {{#if tags}}tags                                   = {{hclVal tags}}{{/if}}
-  {{#if timeouts}}timeouts                               = {{hclVal timeouts}}{{/if}}
   {{#if tls_1_enabled}}tls_1_enabled                          = {{hclVal tls_1_enabled}}{{/if}}
   {{#if upgrade_preference}}upgrade_preference                     = {{hclVal upgrade_preference}}{{/if}}
   {{#if zone_redundancy_enabled}}zone_redundancy_enabled                = {{hclVal zone_redundancy_enabled}}{{/if}}

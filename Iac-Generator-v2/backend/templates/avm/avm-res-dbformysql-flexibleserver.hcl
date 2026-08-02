@@ -45,6 +45,5 @@ module "avm_res_dbformysql_flexibleserver" {
   {{#if source_server_id}}source_server_id                            = {{hclVal source_server_id}}{{/if}}
   {{#if storage}}storage                                     = {{hclVal storage}}{{/if}}
   {{#if tags}}tags                                        = {{hclVal tags}}{{/if}}
-  {{#if timeouts}}timeouts                                    = {{hclVal timeouts}}{{/if}}
   {{#if zone}}zone                                        = {{hclVal zone}}{{/if}}
 }

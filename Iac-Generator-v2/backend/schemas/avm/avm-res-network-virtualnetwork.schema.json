@@ -120,13 +120,6 @@
       "description": "Retry configuration for the resource operations",
       "tfType": "object({\n    error_message_regex  = optional(list(string), [\"ReferencedResourceNotProvisioned\"])\n    interval_seconds     = optional(number, 10)\n    max_interval_seconds = optional(number, 180)\n  })",
       "default": {}
-    },
-    "timeouts": {
-      "type": "object",
-      "title": "Timeouts",
-      "description": "Timeouts for the resource operations",
-      "tfType": "object({\n    create = optional(string, \"30m\")\n    read   = optional(string, \"5m\")\n    update = optional(string, \"30m\")\n    delete = optional(string, \"30m\")\n  })",
-      "default": {}
     }
   },
   "required": [

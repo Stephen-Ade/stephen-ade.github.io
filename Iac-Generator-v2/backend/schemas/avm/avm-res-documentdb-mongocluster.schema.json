@@ -133,12 +133,6 @@
       "description": "Whether to manage private DNS zone groups with this module. If set to false, you must manage private DNS zone groups externally, e.g. using Azure Policy.",
       "default": true
     },
-    "timeouts": {
-      "type": "object",
-      "title": "Timeouts",
-      "description": "Per-operation timeouts applied to the root azapi_resource. Defaults to null (provider defaults).",
-      "tfType": "object({\n    create = optional(string)\n    read   = optional(string)\n    update = optional(string)\n    delete = optional(string)\n  })"
-    },
     "location": {
       "type": "string",
       "title": "Location",

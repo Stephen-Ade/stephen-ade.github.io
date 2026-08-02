@@ -38,12 +38,6 @@
       "description": "(Optional) A mapping of tags to assign to the resource.",
       "tfType": "map(string)"
     },
-    "timeouts": {
-      "type": "object",
-      "title": "Timeouts",
-      "description": "- `create` - (Defaults to 30 minutes) Used when creating the Network Security Group. - `delete` - (Defaults to 30 minutes) Used when deleting the Network Security Group. - `read` - (Defaults to 5 minutes) Used when retrieving the Network Security Group. - `update` - (Defaults to 30 minutes) Used when updating the Network Security Group.",
-      "tfType": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })"
-    },
     "security_rules": {
       "type": "object",
       "title": "Security Rules",

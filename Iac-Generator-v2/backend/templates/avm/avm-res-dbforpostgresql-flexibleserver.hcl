@@ -47,7 +47,6 @@ module "avm_res_dbforpostgresql_flexibleserver" {
   {{#if storage_mb}}storage_mb                              = {{hclVal storage_mb}}{{/if}}
   {{#if storage_tier}}storage_tier                            = {{hclVal storage_tier}}{{/if}}
   {{#if tags}}tags                                    = {{hclVal tags}}{{/if}}
-  {{#if timeouts}}timeouts                                = {{hclVal timeouts}}{{/if}}
   {{#if virtual_endpoint}}virtual_endpoint                        = {{hclVal virtual_endpoint}}{{/if}}
   {{#if zone}}zone                                    = {{hclVal zone}}{{/if}}
 }

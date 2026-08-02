@@ -45,7 +45,6 @@ module "avm_res_network_applicationgateway" {
   {{#if ssl_policy}}ssl_policy                            = {{hclVal ssl_policy}}{{/if}}
   {{#if ssl_profile}}ssl_profile                           = {{hclVal ssl_profile}}{{/if}}
   {{#if tags}}tags                                  = {{hclVal tags}}{{/if}}
-  {{#if timeouts}}timeouts                              = {{hclVal timeouts}}{{/if}}
   {{#if trusted_client_certificate}}trusted_client_certificate            = {{hclVal trusted_client_certificate}}{{/if}}
   {{#if trusted_root_certificate}}trusted_root_certificate              = {{hclVal trusted_root_certificate}}{{/if}}
   {{#if url_path_map_configurations}}url_path_map_configurations           = {{hclVal url_path_map_configurations}}{{/if}}

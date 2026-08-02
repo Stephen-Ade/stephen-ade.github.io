@@ -50,5 +50,4 @@ module "avm_res_cognitiveservices_account" {
   {{#if role_assignments}}role_assignments                             = {{hclVal role_assignments}}{{/if}}
   {{#if storage}}storage                                      = {{hclVal storage}}{{/if}}
   {{#if tags}}tags                                         = {{hclVal tags}}{{/if}}
-  {{#if timeouts}}timeouts                                     = {{hclVal timeouts}}{{/if}}
 }

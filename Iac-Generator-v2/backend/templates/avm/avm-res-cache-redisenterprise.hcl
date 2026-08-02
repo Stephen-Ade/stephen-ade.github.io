@@ -31,6 +31,5 @@ module "avm_res_cache_redisenterprise" {
   {{#if redis_modules}}redis_modules                           = {{hclVal redis_modules}}{{/if}}
   {{#if role_assignments}}role_assignments                        = {{hclVal role_assignments}}{{/if}}
   {{#if tags}}tags                                    = {{hclVal tags}}{{/if}}
-  {{#if timeouts}}timeouts                                = {{hclVal timeouts}}{{/if}}
   {{#if zones}}zones                                   = {{hclVal zones}}{{/if}}
 }

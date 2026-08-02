@@ -40,7 +40,6 @@ module "avm_res_machinelearningservices_workspace" {
   {{#if storage_access_type}}storage_access_type                     = {{hclVal storage_access_type}}{{/if}}
   {{#if storage_account}}storage_account                         = {{hclVal storage_account}}{{/if}}
   {{#if tags}}tags                                    = {{hclVal tags}}{{/if}}
-  {{#if timeouts}}timeouts                                = {{hclVal timeouts}}{{/if}}
   {{#if workspace_description}}workspace_description                   = {{hclVal workspace_description}}{{/if}}
   {{#if workspace_friendly_name}}workspace_friendly_name                 = {{hclVal workspace_friendly_name}}{{/if}}
   {{#if workspace_managed_network}}workspace_managed_network               = {{hclVal workspace_managed_network}}{{/if}}

@@ -78,7 +78,6 @@ module "avm_res_compute_virtualmachine" {
   {{#if source_image_resource_id}}source_image_resource_id                               = {{hclVal source_image_resource_id}}{{/if}}
   {{#if tags}}tags                                                   = {{hclVal tags}}{{/if}}
   {{#if termination_notification}}termination_notification                               = {{hclVal termination_notification}}{{/if}}
-  {{#if timeouts}}timeouts                                               = {{hclVal timeouts}}{{/if}}
   {{#if timezone}}timezone                                               = {{hclVal timezone}}{{/if}}
   {{#if user_data}}user_data                                              = {{hclVal user_data}}{{/if}}
   {{#if virtual_machine_scale_set_resource_id}}virtual_machine_scale_set_resource_id                  = {{hclVal virtual_machine_scale_set_resource_id}}{{/if}}

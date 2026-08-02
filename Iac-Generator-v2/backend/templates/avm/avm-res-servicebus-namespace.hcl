@@ -32,6 +32,5 @@ module "avm_res_servicebus_namespace" {
   {{#if role_assignments}}role_assignments                        = {{hclVal role_assignments}}{{/if}}
   {{#if sku}}sku                                     = {{hclVal sku}}{{/if}}
   {{#if tags}}tags                                    = {{hclVal tags}}{{/if}}
-  {{#if timeouts}}timeouts                                = {{hclVal timeouts}}{{/if}}
   {{#if topics}}topics                                  = {{hclVal topics}}{{/if}}
 }

@@ -50,7 +50,6 @@ module "avm_res_sql_managedinstance" {
   {{#if storage_iops}}storage_iops                            = {{hclVal storage_iops}}{{/if}}
   {{#if tags}}tags                                    = {{hclVal tags}}{{/if}}
   {{#if timeout}}timeout                                 = {{hclVal timeout}}{{/if}}
-  {{#if timeouts}}timeouts                                = {{hclVal timeouts}}{{/if}}
   {{#if timezone_id}}timezone_id                             = {{hclVal timezone_id}}{{/if}}
   {{#if transparent_data_encryption}}transparent_data_encryption             = {{hclVal transparent_data_encryption}}{{/if}}
   {{#if vulnerability_assessment}}vulnerability_assessment                = {{hclVal vulnerability_assessment}}{{/if}}

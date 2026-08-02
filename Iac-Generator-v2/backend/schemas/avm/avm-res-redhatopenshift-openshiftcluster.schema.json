@@ -55,12 +55,6 @@
       "tfType": "map(object({\n    name = optional(string, null)\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })), {})\n    lock = optional(object({\n      kind = string\n      name = optional(string, null)\n    }), null)\n    tags                                    = optional(map(string), null)\n    subnet_resource_id                      = string\n    private_dns_zone_group_name             = optional(string, \"default\")\n    private_dns_zone_resource_ids           = optional(set(string), [])\n    application_security_group_associations = optional(map(string), {})\n    private_service_connection_name         = optional(string, null)\n    network_interface_name                  = optional(string, null)\n    location                                = optional(string, null)\n    resource_group_name                     = optional(string, null)\n    ip_configurations = optional(map(object({\n      name               = string\n      private_ip_address = string\n    })), {})\n  }))",
       "default": {}
     },
-    "timeouts": {
-      "type": "object",
-      "title": "Timeouts",
-      "description": "Resource operation timeouts for create, read, update, delete (e.g. 120m). Optional.",
-      "tfType": "object({\n    create = optional(string, null)\n    read   = optional(string, null)\n    update = optional(string, null)\n    delete = optional(string, null)\n  })"
-    },
     "network_profile": {
       "type": "object",
       "title": "Network Profile",

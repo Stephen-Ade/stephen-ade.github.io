@@ -149,12 +149,6 @@
       "tfType": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
       "default": {}
     },
-    "timeouts": {
-      "type": "object",
-      "title": "Timeouts",
-      "description": "- `create` - (Defaults to 30 minutes) Used when creating the azure resource. - `delete` - (Defaults to 30 minutes) Used when deleting the Resource Group. - `read` - (Defaults to 5 minutes) Used when retrieving the Resource Group.",
-      "tfType": "object({\n    create = optional(string, \"30m\")\n    delete = optional(string, \"30m\")\n    read   = optional(string, \"5m\")\n  })"
-    },
     "container_registry": {
       "type": "object",
       "title": "Container Registry",

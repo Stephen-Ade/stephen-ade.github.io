@@ -14,12 +14,6 @@
       "description": "(Optional) Tags of the resource.",
       "tfType": "map(string)"
     },
-    "timeouts": {
-      "type": "object",
-      "title": "Timeouts",
-      "description": "- `create` - (Defaults to 30 minutes) Used when creating the Web Application Firewall Policy.  - `delete` - (Defaults to 30 minutes) Used when deleting the Web Application Firewall Policy.  - `read` - (Defaults to 5 minutes) Used when retrieving the Web Application Firewall Policy.  - `update` - (Defaults to 30 minutes) Used when updating the Web Application Firewall Policy.",
-      "tfType": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })"
-    },
     "location": {
       "type": "string",
       "title": "Location",

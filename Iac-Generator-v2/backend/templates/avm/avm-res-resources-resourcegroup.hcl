@@ -19,5 +19,4 @@ module "avm_res_resources_resourcegroup" {
   {{#if retry}}retry            = {{hclVal retry}}{{/if}}
   {{#if role_assignments}}role_assignments = {{hclVal role_assignments}}{{/if}}
   {{#if tags}}tags             = {{hclVal tags}}{{/if}}
-  {{#if timeouts}}timeouts         = {{hclVal timeouts}}{{/if}}
 }

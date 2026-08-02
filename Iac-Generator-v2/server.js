@@ -515,6 +515,25 @@ app.post('/api/generate', (req, res) => {
                     const template = handlebars.compile(templateString);
                     const safeConfig = JSON.parse(JSON.stringify(config));
                     
+                    // 3RD PARTY AUDIT FIX: Handle AVM object-wrapped arrays (e.g., dns_servers)
+                    // If schema expects object({ key = list() }) but user provides raw array, auto-wrap it
+                    const overrideSchemaPath = path.join(__dirname, 'backend', 'schemas', 'avm', override.hclTemplate.replace('.hcl', '.schema.json'));
+                    if (fs.existsSync(overrideSchemaPath)) {
+                        const avmSchema = parseJsonSafe(overrideSchemaPath);
+                        if (avmSchema.properties) {
+                            for (const [key, value] of Object.entries(safeConfig)) {
+                                if (!value || !avmSchema.properties[key]) continue;
+                                const propDef = avmSchema.properties[key];
+                                if (propDef.tfType && propDef.tfType.startsWith('object(') && Array.isArray(value)) {
+                                    const innerKeyMatch = propDef.tfType.match(/object\(\{\s*(\w+)\s*=/);
+                                    if (innerKeyMatch) {
+                                        safeConfig[key] = { [innerKeyMatch[1]]: value };
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     if (safeConfig.PolicyDocument) {
                         try {
                             const parsedPolicy = typeof safeConfig.PolicyDocument === 'string' 
@@ -654,9 +673,12 @@ app.post('/api/generate', (req, res) => {
         }
     }
 
-    // 3RD PARTY AUDIT FIX: Aggressively strip whitespace-only lines left by Handlebars conditionals
+    // 3RD PARTY AUDIT FIX: Strip whitespace-only lines, but preserve single empty lines between blocks
     if (language === 'hcl') {
-        code = code.split('\n').filter(line => line.trim() !== '').join('\n') + '\n';
+        // 1. Convert lines containing ONLY spaces/tabs to true empty lines
+        code = code.replace(/^[ \t]+$/gm, '');
+        // 2. Collapse 3+ consecutive newlines into exactly 2 (preserves standard block spacing)
+        code = code.replace(/\n{3,}/g, '\n\n').trim() + '\n';
     }
 
     res.json({ success: true, code, language });

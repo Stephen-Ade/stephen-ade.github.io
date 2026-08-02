@@ -29,5 +29,4 @@ module "avm_res_redhatopenshift_openshiftcluster" {
   {{#if service_principal}}service_principal                       = {{hclVal service_principal}}{{/if}}
   {{#if subscription_id}}subscription_id                         = {{hclVal subscription_id}}{{/if}}
   {{#if tags}}tags                                    = {{hclVal tags}}{{/if}}
-  {{#if timeouts}}timeouts                                = {{hclVal timeouts}}{{/if}}
 }

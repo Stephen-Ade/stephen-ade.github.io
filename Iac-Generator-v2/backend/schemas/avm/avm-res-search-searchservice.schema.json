@@ -137,12 +137,6 @@
       "tfType": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
       "default": {}
     },
-    "timeouts": {
-      "type": "object",
-      "title": "Timeouts",
-      "description": "The timeouts block applied to every `azapi_*` resource declared by this module (see [TFFR7](https://azure.github.io/Azure-Verified-Modules/spec/TFFR7)). Each field is a Go duration string.  - `create` - (Optional) The timeout for creating the resource. - `delete` - (Optional) The timeout for deleting the resource. - `read` - (Optional) The timeout for reading the resource. - `update` - (Optional) The timeout for updating the resource.",
-      "tfType": "object({\n    create = optional(string, null)\n    delete = optional(string, null)\n    read   = optional(string, null)\n    update = optional(string, null)\n  })"
-    },
     "name": {
       "type": "string",
       "title": "Name",

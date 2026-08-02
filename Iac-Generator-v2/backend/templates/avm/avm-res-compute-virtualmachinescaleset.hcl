@@ -55,7 +55,6 @@ module "avm_res_compute_virtualmachinescaleset" {
   {{#if source_image_reference}}source_image_reference              = {{hclVal source_image_reference}}{{/if}}
   {{#if tags}}tags                                = {{hclVal tags}}{{/if}}
   {{#if termination_notification}}termination_notification            = {{hclVal termination_notification}}{{/if}}
-  {{#if timeouts}}timeouts                            = {{hclVal timeouts}}{{/if}}
   {{#if upgrade_policy}}upgrade_policy                      = {{hclVal upgrade_policy}}{{/if}}
   {{#if user_data_base64_version}}user_data_base64_version            = {{hclVal user_data_base64_version}}{{/if}}
   {{#if zone_balance}}zone_balance                        = {{hclVal zone_balance}}{{/if}}

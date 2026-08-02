@@ -72,5 +72,4 @@ module "avm_res_storage_storageaccount" {
   {{#if table_service_cors_propagation_wait}}table_service_cors_propagation_wait       = {{hclVal table_service_cors_propagation_wait}}{{/if}}
   {{#if tables}}tables                                    = {{hclVal tables}}{{/if}}
   {{#if tags}}tags                                      = {{hclVal tags}}{{/if}}
-  {{#if timeouts}}timeouts                                  = {{hclVal timeouts}}{{/if}}
 }

@@ -31,5 +31,4 @@ module "avm_res_network_virtualnetwork" {
   {{#if role_assignments}}role_assignments        = {{hclVal role_assignments}}{{/if}}
   {{#if subnets}}subnets                 = {{hclVal subnets}}{{/if}}
   {{#if tags}}tags                    = {{hclVal tags}}{{/if}}
-  {{#if timeouts}}timeouts                = {{hclVal timeouts}}{{/if}}
 }

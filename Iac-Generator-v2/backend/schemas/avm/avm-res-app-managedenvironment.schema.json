@@ -102,12 +102,6 @@
       "title": "Log Analytics Workspace Primary Shared Key",
       "description": "DEPRECATED: Use `shared_key` (ephemeral) + `shared_key_version` instead. Will be removed in a future major release."
     },
-    "timeouts": {
-      "type": "object",
-      "title": "Timeouts",
-      "description": "- `create` - (Defaults to 30 minutes) Used when creating the Container App Environment.  - `delete` - (Defaults to 30 minutes) Used when deleting the Container App Environment.  - `read` - (Defaults to 5 minutes) Used when retrieving the Container App Environment.  - `update` - (Defaults to 30 minutes) Used when updating the Container App Environment.",
-      "tfType": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })"
-    },
     "java_components": {
       "type": "object",
       "title": "Java Components",

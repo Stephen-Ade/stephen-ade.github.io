@@ -179,12 +179,6 @@
       "description": "(Optional) The kind of the bot resource. Allowed values: azurebot, bot, designer, function, sdk. Defaults to azurebot.",
       "default": "azurebot"
     },
-    "timeouts": {
-      "type": "object",
-      "title": "Timeouts",
-      "description": "- `create` - (Defaults to 30 minutes) Used when creating the Azure Bot Servicet. - `delete` - (Defaults to 30 minutes) Used when deleting the Azure Bot Service. - `read` - (Defaults to 5 minutes) Used when retrieving the Azure Bot Service. - `update` - (Defaults to 30 minutes) Used when updating the Azure Bot Service.",
-      "tfType": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })"
-    },
     "microsoft_app_tenant_id": {
       "type": "string",
       "title": "Microsoft App Tenant Id",

@@ -48,12 +48,6 @@
       "description": "- `max_capacity` - (Optional) Maximum capacity for autoscaling. Accepted values are in the range `2` to `125`. - `min_capacity` - (Required) Minimum capacity for autoscaling. Accepted values are in the range `0` to `100`.",
       "tfType": "object({\n    min_capacity = optional(number, 1) # Minimum in the range 0 to 100\n    max_capacity = optional(number, 2) # Maximum in the range 2 to 125\n  })"
     },
-    "timeouts": {
-      "type": "object",
-      "title": "Timeouts",
-      "description": "- `create` - (Defaults to 90 minutes) Used when creating the Application Gateway. - `delete` - (Defaults to 90 minutes) Used when deleting the Application Gateway. - `read` - (Defaults to 5 minutes) Used when retrieving the Application Gateway. - `update` - (Defaults to 90 minutes) Used when updating the Application Gateway.",
-      "tfType": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })"
-    },
     "trusted_client_certificate": {
       "type": "object",
       "title": "Trusted Client Certificate",

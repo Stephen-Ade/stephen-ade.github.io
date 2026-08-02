@@ -115,12 +115,6 @@
       "title": "Premium Messaging Partitions",
       "description": "Always set to `0` for Standard and Basic. Defaults to `1` for Premium. Specifies the number of messaging partitions.    Possible values when Premium are 1, 2, and 4. Changing this forces a new resource to be created."
     },
-    "timeouts": {
-      "type": "object",
-      "title": "Timeouts",
-      "description": "- `create` - (Defaults to 30 minutes) Used when creating the ServiceBus Namespace. - `delete` - (Defaults to 30 minutes) Used when deleting the ServiceBus Namespace. - `read` - (Defaults to 5 minutes) Used when retrieving the ServiceBus Namespace. - `update` - (Defaults to 30 minutes) Used when updating the ServiceBus Namespace.",
-      "tfType": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })"
-    },
     "lock": {
       "type": "object",
       "title": "Lock",

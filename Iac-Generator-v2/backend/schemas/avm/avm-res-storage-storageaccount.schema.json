@@ -340,12 +340,6 @@
       "description": "Whether to manage private DNS zone groups with this module. Defaults to `true`. If set to `false`, you must manage private DNS zone groups externally, e.g. using Azure Policy.",
       "default": true
     },
-    "timeouts": {
-      "type": "object",
-      "title": "Timeouts",
-      "description": "Default per-operation timeouts applied to every `azapi` resource managed by the module. Defaults to `null` (provider defaults). Each value is a Go duration string (e.g. `30m`, `1h`).  - `create` - (Optional) Timeout for create operations. Defaults to `null`. - `read` - (Optional) Timeout for read operations. Defaults to `null`. - `update` - (Optional) Timeout for update operations. Defaults to `null`. - `delete` - (Optional) Timeout for delete operations. Defaults to `null`.  The root storage account uses these values directly. Submodules (containers, queues, shares, tables, diagnostic settings, private endpoints, management policy, local users, role assignments, Data Lake Gen2 filesystems) use these as a default that can be overridden per-item via the item's own `timeouts` field.",
-      "tfType": "object({\n    create = optional(string)\n    read   = optional(string)\n    update = optional(string)\n    delete = optional(string)\n  })"
-    },
     "account_sku_name": {
       "type": "string",
       "title": "Account Sku Name",

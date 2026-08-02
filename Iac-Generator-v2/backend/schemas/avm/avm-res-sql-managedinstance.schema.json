@@ -59,12 +59,6 @@
       "description": "(Optional) Whether to enable the system-assigned service principal for the SQL Managed Instance.  This is required for Windows Authentication for Microsoft Entra principals using Kerberos.  See: https://learn.microsoft.com/en-us/azure/azure-sql/managed-instance/winauth-azuread-kerberos-managed-instance  Defaults to `false`.",
       "default": false
     },
-    "timeouts": {
-      "type": "object",
-      "title": "Timeouts",
-      "description": "- `create` - (Defaults to 24 hours) Used when creating the Microsoft SQL Managed Instance. - `delete` - (Defaults to 24 hours) Used when deleting the Microsoft SQL Managed Instance. - `read` - (Defaults to 5 minutes) Used when retrieving the Microsoft SQL Managed Instance. - `update` - (Defaults to 24 hours) Used when updating the Microsoft SQL Managed Instance.",
-      "tfType": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })"
-    },
     "vulnerability_assessment": {
       "type": "object",
       "title": "Vulnerability Assessment",

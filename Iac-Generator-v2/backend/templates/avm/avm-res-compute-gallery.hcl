@@ -21,5 +21,4 @@ module "avm_res_compute_gallery" {
   {{#if shared_image_definitions}}shared_image_definitions = {{hclVal shared_image_definitions}}{{/if}}
   {{#if sharing}}sharing                  = {{hclVal sharing}}{{/if}}
   {{#if tags}}tags                     = {{hclVal tags}}{{/if}}
-  {{#if timeouts}}timeouts                 = {{hclVal timeouts}}{{/if}}
 }

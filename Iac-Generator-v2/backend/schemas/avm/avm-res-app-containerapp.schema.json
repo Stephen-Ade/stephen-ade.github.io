@@ -134,12 +134,6 @@
       "title": "Runtime",
       "description": "Runtime configuration for the Container App.  --- `runtime` block supports the following: - `java` - (Optional) Java runtime configuration.  --- `java` block supports the following: - `enable_metrics` - (Optional) Whether to enable Java metrics collection. Defaults to `false`.",
       "tfType": "object({\n    java = optional(object({\n      enable_metrics = optional(bool, false)\n    }))\n  })"
-    },
-    "timeouts": {
-      "type": "object",
-      "title": "Timeouts",
-      "description": "- `create` - (Defaults to 30 minutes) Used when creating the Container App. Defaults to `30m`. - `delete` - (Defaults to 30 minutes) Used when deleting the Container App. Defaults to `30m`. - `read` - (Defaults to 5 minutes) Used when retrieving the Container App. Defaults to `5m`. - `update` - (Defaults to 30 minutes) Used when updating the Container App. Defaults to `30m`.",
-      "tfType": "object({\n    create = optional(string, \"30m\")\n    delete = optional(string, \"30m\")\n    read   = optional(string, \"5m\")\n    update = optional(string, \"30m\")\n  })"
     }
   },
   "required": [

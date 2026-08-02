@@ -33,6 +33,5 @@ module "avm_res_app_containerapp" {
   {{#if secrets}}secrets                               = {{hclVal secrets}}{{/if}}
   {{#if service}}service                               = {{hclVal service}}{{/if}}
   {{#if tags}}tags                                  = {{hclVal tags}}{{/if}}
-  {{#if timeouts}}timeouts                              = {{hclVal timeouts}}{{/if}}
   {{#if workload_profile_name}}workload_profile_name                 = {{hclVal workload_profile_name}}{{/if}}
 }

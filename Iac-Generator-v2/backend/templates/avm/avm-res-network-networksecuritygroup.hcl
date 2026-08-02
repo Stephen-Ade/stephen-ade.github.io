@@ -20,5 +20,4 @@ module "avm_res_network_networksecuritygroup" {
   {{#if role_assignments}}role_assignments    = {{hclVal role_assignments}}{{/if}}
   {{#if security_rules}}security_rules      = {{hclVal security_rules}}{{/if}}
   {{#if tags}}tags                = {{hclVal tags}}{{/if}}
-  {{#if timeouts}}timeouts            = {{hclVal timeouts}}{{/if}}
 }

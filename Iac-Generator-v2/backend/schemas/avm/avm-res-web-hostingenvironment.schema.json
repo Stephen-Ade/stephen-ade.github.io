@@ -118,13 +118,6 @@
       "title": "Dedicated Host Count",
       "description": "Dedicated Host Count for the App Service Environment (ASE). Possible value is 2. Setting this value will make the ASE use dedicated hosts."
     },
-    "timeouts": {
-      "type": "object",
-      "title": "Timeouts",
-      "description": "Timeouts for resource operations. App Service Environments (ASE) can take a long time to create and update.    - `create` - (Optional) The timeout for create operations. Defaults to '6h'.   - `delete` - (Optional) The timeout for delete operations. Defaults to '6h'.   - `read` - (Optional) The timeout for read operations. Defaults to '5m'.   - `update` - (Optional) The timeout for update operations. Defaults to '6h'.",
-      "tfType": "object({\n    create = optional(string, \"6h\")\n    delete = optional(string, \"6h\")\n    read   = optional(string, \"5m\")\n    update = optional(string, \"6h\")\n  })",
-      "default": {}
-    },
     "allow_new_private_endpoint_connections": {
       "type": "boolean",
       "title": "Allow New Private Endpoint Connections",

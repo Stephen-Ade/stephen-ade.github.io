@@ -25,12 +25,6 @@
       "description": "(Optional) Tags of the resource.",
       "tfType": "map(string)"
     },
-    "timeouts": {
-      "type": "object",
-      "title": "Timeouts",
-      "description": "- `create` - (Defaults to 60 minutes) Used when creating the Shared Image Gallery.  - `delete` - (Defaults to 60 minutes) Used when deleting the Shared Image Gallery.  - `read` - (Defaults to 5 minutes) Used when retrieving the Shared Image Gallery.  - `update` - (Defaults to 60 minutes) Used when updating the Shared Image Gallery.",
-      "tfType": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })"
-    },
     "location": {
       "type": "string",
       "title": "Location",

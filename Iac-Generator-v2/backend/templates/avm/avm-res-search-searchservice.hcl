@@ -35,5 +35,4 @@ module "avm_res_search_searchservice" {
   {{#if semantic_search_sku}}semantic_search_sku                      = {{hclVal semantic_search_sku}}{{/if}}
   {{#if sku}}sku                                      = {{hclVal sku}}{{/if}}
   {{#if tags}}tags                                     = {{hclVal tags}}{{/if}}
-  {{#if timeouts}}timeouts                                 = {{hclVal timeouts}}{{/if}}
 }

@@ -44,6 +44,5 @@ module "avm_res_documentdb_mongocluster" {
   {{#if storage_size_gb}}storage_size_gb                         = {{hclVal storage_size_gb}}{{/if}}
   {{#if storage_type}}storage_type                            = {{hclVal storage_type}}{{/if}}
   {{#if tags}}tags                                    = {{hclVal tags}}{{/if}}
-  {{#if timeouts}}timeouts                                = {{hclVal timeouts}}{{/if}}
   {{#if users}}users                                   = {{hclVal users}}{{/if}}
 }

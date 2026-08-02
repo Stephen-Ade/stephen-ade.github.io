@@ -33,5 +33,4 @@ module "avm_res_insights_component" {
   {{#if role_assignments}}role_assignments                      = {{hclVal role_assignments}}{{/if}}
   {{#if sampling_percentage}}sampling_percentage                   = {{hclVal sampling_percentage}}{{/if}}
   {{#if tags}}tags                                  = {{hclVal tags}}{{/if}}
-  {{#if timeouts}}timeouts                              = {{hclVal timeouts}}{{/if}}
 }

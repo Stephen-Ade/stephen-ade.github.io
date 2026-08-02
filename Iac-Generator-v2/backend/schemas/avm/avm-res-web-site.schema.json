@@ -512,12 +512,6 @@
       "tfType": "map(object({\n    app_setting_names       = optional(list(string))\n    connection_string_names = optional(list(string))\n  }))",
       "default": {}
     },
-    "timeouts": {
-      "type": "object",
-      "title": "Timeouts",
-      "description": "- `create` - (Defaults to 30 minutes) Used when creating the App Service. - `delete` - (Defaults to 30 minutes) Used when deleting the App Service. - `read` - (Defaults to 5 minutes) Used when retrieving the App Service. - `update` - (Defaults to 30 minutes) Used when updating the App Service.",
-      "tfType": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })"
-    },
     "vnet_route_all_traffic": {
       "type": "boolean",
       "title": "Vnet Route All Traffic",

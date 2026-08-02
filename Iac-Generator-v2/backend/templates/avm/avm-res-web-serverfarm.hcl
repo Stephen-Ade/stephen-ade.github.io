@@ -34,7 +34,6 @@ module "avm_res_web_serverfarm" {
   {{#if sku_name}}sku_name                        = {{hclVal sku_name}}{{/if}}
   {{#if storage_mounts}}storage_mounts                  = {{hclVal storage_mounts}}{{/if}}
   {{#if tags}}tags                            = {{hclVal tags}}{{/if}}
-  {{#if timeouts}}timeouts                        = {{hclVal timeouts}}{{/if}}
   {{#if virtual_network_subnet_id}}virtual_network_subnet_id       = {{hclVal virtual_network_subnet_id}}{{/if}}
   {{#if worker_count}}worker_count                    = {{hclVal worker_count}}{{/if}}
   {{#if zone_balancing_enabled}}zone_balancing_enabled          = {{hclVal zone_balancing_enabled}}{{/if}}

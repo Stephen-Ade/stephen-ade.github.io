@@ -20,12 +20,6 @@
       "description": "The retry configuration for azapi resources. The following properties can be specified:    - `error_message_regex` - (Required) A list of regular expressions to match against error messages. If any match, the request will be retried.   - `interval_seconds` - (Optional) The base number of seconds to wait between retries. Default is `10`.   - `max_interval_seconds` - (Optional) The maximum number of seconds to wait between retries. Default is `180`.",
       "tfType": "object({\n    error_message_regex  = optional(list(string), [\"ScopeLocked\"])\n    interval_seconds     = optional(number, null)\n    max_interval_seconds = optional(number, null)\n  })"
     },
-    "timeouts": {
-      "type": "object",
-      "title": "Timeouts",
-      "description": "The timeout configuration for azapi resources. The following properties can be specified:    - `create` - (Optional) The timeout for create operations e.g. `\"30m\"`, `\"1h\"`.   - `delete` - (Optional) The timeout for delete operations e.g. `\"30m\"`, `\"1h\"`.   - `read` - (Optional) The timeout for read operations e.g. `\"30m\"`, `\"1h\"`.   - `update` - (Optional) The timeout for update operations e.g. `\"30m\"`, `\"1h\"`.",
-      "tfType": "object({\n    create = optional(string, null)\n    delete = optional(string, null)\n    read   = optional(string, null)\n    update = optional(string, null)\n  })"
-    },
     "name": {
       "type": "string",
       "title": "Name",

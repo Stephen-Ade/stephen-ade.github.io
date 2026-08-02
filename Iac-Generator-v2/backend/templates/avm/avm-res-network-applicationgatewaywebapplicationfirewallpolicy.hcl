@@ -21,5 +21,4 @@ module "avm_res_network_applicationgatewaywebapplicationfirewallpolicy" {
   {{#if policy_settings}}policy_settings     = {{hclVal policy_settings}}{{/if}}
   {{#if role_assignments}}role_assignments    = {{hclVal role_assignments}}{{/if}}
   {{#if tags}}tags                = {{hclVal tags}}{{/if}}
-  {{#if timeouts}}timeouts            = {{hclVal timeouts}}{{/if}}
 }
