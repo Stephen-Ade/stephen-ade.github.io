@@ -28,7 +28,6 @@ const unflattenObject = (obj) => {
 };
 
 // --- UPDATED: Parser that extracts the target module from the text file ---
-// FIX: Now handles JSON values (arrays/objects) in key:value format
 const parseTextToConfig = (text) => {
   text = text.replace(/^\uFEFF/, '');
   const lines = text.split(/\r?\n/); 
@@ -51,8 +50,6 @@ const parseTextToConfig = (text) => {
     let value = match[2].trim();
     value = value.replace(/\s*\(.*?\)\s*/g, '').trim();
     
-    // FIX: Detect and parse JSON values (arrays/objects)
-    // This handles: addresses: [{"name": "...", ...}]
     const trimmedValue = value.trim();
     if ((trimmedValue.startsWith('[') && trimmedValue.endsWith(']')) ||
         (trimmedValue.startsWith('{') && trimmedValue.endsWith('}'))) {
@@ -64,7 +61,6 @@ const parseTextToConfig = (text) => {
       }
     }
     
-    // FIX: Convert string booleans to actual booleans so React checkboxes work correctly
     if (value.toLowerCase() === 'true') {
       value = true;
     } else if (value.toLowerCase() === 'false') {
@@ -119,7 +115,6 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
   const baseDescription = schema.description || '';
   const tooltipText = `${name}: ${baseDescription}${isRequired ? ' (Required)' : ''}`;
   
-  // Get display name (last part of dotted path for nested fields)
   const displayName = name.split('.').pop();
 
   // --- CONDITIONAL VISIBILITY (UPGRADED FOR AND LOGIC) ---
@@ -270,11 +265,10 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
       };
 
       const removeItem = (index) => {
-        if (currentArray.length <= 1) return; // Keep at least one
+        if (currentArray.length <= 1) return;
         setFormData({ ...formData, [name]: currentArray.filter((_, i) => i !== index) });
       };
 
-      // FIX: Calculate correct singular name for the button (e.g., "addresses" -> "Address")
       const singularDisplayName = displayName.replace(/es$/, '').charAt(0).toUpperCase() + displayName.replace(/es$/, '').slice(1);
 
       return (
@@ -291,8 +285,8 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
               padding: '15px', 
               marginBottom: '15px', 
               borderRadius: '4px', 
-              background: '#f4f4f4', // Light grey background
-              color: '#000000'      // Force dark text globally for this block
+              background: '#f4f4f4',
+              color: '#000000'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', borderBottom: '1px solid #ccc', paddingBottom: '5px' }}>
                 <strong style={{ color: '#222' }}>Object {index + 1}</strong>
@@ -308,14 +302,12 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
 
                 const lightInputStyle = { marginTop: '5px', color: '#000' };
 
-                // Handle visibleWhen inside the array item
                 if (childSchema.visibleWhen) {
                    const conditions = Array.isArray(childSchema.visibleWhen) ? childSchema.visibleWhen : [childSchema.visibleWhen];
                    const isVisible = conditions.every(({ field, value }) => item[field] === value);
                    if (!isVisible) return null;
                 }
 
-                // Handle Enums (e.g., address_type)
                 if (childSchema.enum) {
                    return (
                      <div className="form-group" key={childKey} style={lightInputStyle}>
@@ -337,7 +329,6 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
                    );
                 }
 
-                // Handle Arrays inside objects (e.g., tags -> comma separated)
                 if (childSchema.type === 'array') {
                    const displayVal = Array.isArray(val) ? val.join(', ') : '';
                    return (
@@ -360,7 +351,6 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
                    );
                 }
 
-                // Default Text Input
                 let placeholder = `(${childSchema.type || 'string'})`;
                 if (ADDRESS_TYPE_FIELDS.includes(childKey)) placeholder = getAddressPlaceholder(childKey);
                 
@@ -444,11 +434,13 @@ const FormField = ({ name, schema, requiredList, formData, setFormData }) => {
 };
 
 // --- VENDOR GROUPING CONFIGURATION ---
+// IMPORTANT: Azure AVM must come BEFORE regular Azure so it matches first
 const VENDOR_GROUPS = [
   {
     category: "Cloud Platforms",
     vendors: [
       { id: "aws", label: "AWS", matchProvider: "aws" },
+      { id: "azure-avm", label: "AZURE AVM", matchProvider: "azure", matchVendor: "Azure AVM" },
       { id: "azure", label: "AZURE", matchProvider: "azure" },
       { id: "gcp", label: "GCP", matchProvider: "gcp" }
     ]
@@ -491,7 +483,14 @@ function App() {
     
     axios.get(`/api/schema/${encodeURIComponent(selectedType)}`).then(res => {
       setSchema(res.data);
-      setPlatform(res.data.provider === 'azure' ? 'bicep' : 'terraform');
+      // AVM resources only support Terraform, force it
+      if (res.data.supportedPlatforms && res.data.supportedPlatforms.length === 1 && res.data.supportedPlatforms[0] === 'terraform') {
+        setPlatform('terraform');
+      } else if (res.data.provider === 'azure') {
+        setPlatform('bicep');
+      } else {
+        setPlatform('terraform');
+      }
       
       if (pendingFormData) {
         setFormData(pendingFormData);
@@ -508,7 +507,6 @@ function App() {
     const file = event.target.files[0];
     if (!file) return;
 
-    // --- DEVSECOPS: Hostile File Validation ---
     const validExts = ['.txt', '.json', '.yaml', '.yml', '.csv', '.cfg', '.conf'];
     const fileExt = '.' + file.name.split('.').pop().toLowerCase();
     
@@ -518,8 +516,7 @@ function App() {
       return;
     }
 
-    // Prevent DoS via massive file uploads
-    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+    if (file.size > 5 * 1024 * 1024) {
       setGeneratedCode('// ERROR: File size exceeds 5MB safety limit.');
       event.target.value = null; 
       return;
@@ -532,16 +529,13 @@ function App() {
       try {
         let parsedData;
 
-        // 1. Parse based on file type
         if (fileExt === '.json' || text.trim().startsWith('{')) {
           parsedData = JSON.parse(text);
         } 
         else if (fileExt === '.yaml' || fileExt === '.yml') {
-          // DEVSECOPS: Use JSON_SCHEMA to prevent unsafe YAML object instantiation
           parsedData = yaml.load(text, { schema: yaml.JSON_SCHEMA });
         } 
         else {
-          // Fallback to legacy custom .txt format (@module: ...)
           const legacyData = parseTextToConfig(text);
           setPendingFormData(legacyData.config);
           setSelectedType(legacyData.targetModule || 'panos_security_policy_rules');
@@ -550,7 +544,6 @@ function App() {
           return;
         }
 
-        // 2. Validate CloudFormation Structure
         if (!parsedData.Type || !parsedData.Properties) {
           setGeneratedCode('// ERROR: Invalid schema. CloudFormation JSON/YAML must have root "Type" and "Properties" keys.');
           return;
@@ -559,8 +552,6 @@ function App() {
         const cfnType = parsedData.Type;
         let config = { ...parsedData.Properties };
 
-        // --- AWS INGESTION FIX: Unwrap nested { id: "...", properties: "{...}" } format ---
-        // This format comes from previous Terraform exports where properties were stringified
         if (config.properties) {
           let nestedProps = config.properties;
           if (typeof nestedProps === 'string') {
@@ -569,18 +560,12 @@ function App() {
             } catch (e) { /* Leave as is if parse fails */ }
           }
           if (typeof nestedProps === 'object' && !Array.isArray(nestedProps)) {
-            // Merge nested properties to root level
             Object.assign(config, nestedProps);
             delete config.properties;
           }
         }
-        // Remove 'id' if present - not a valid AWS CFN property
         delete config.id;
 
-        // 3. UNIVERSAL INGESTION FLATTENING:
-        // The UI renders generic objects (like Tags, PolicyDocument, GCP labels) as text inputs.
-        // We stringify nested objects so they safely drop into standard text inputs, 
-        // and the backend will parse them back into objects before generating IaC.
         const flattenObject = (obj, parentKey = '') => {
           let flat = {};
           for (const [key, value] of Object.entries(obj)) {
@@ -596,7 +581,6 @@ function App() {
 
         const flatConfig = flattenObject(config);
 
-        // 4. Inject into UI
         setPendingFormData(flatConfig);
         setSelectedType(cfnType);
         setIngestTrigger(prev => prev + 1); 
@@ -607,7 +591,7 @@ function App() {
     };
     
     reader.readAsText(file);
-    event.target.value = null; // Reset input so same file can be re-uploaded
+    event.target.value = null;
   };
 
   const handleGenerate = async (e) => {
@@ -629,7 +613,6 @@ function App() {
       });
       setGeneratedCode(res.data.code);
     } catch (err) {
-      // FIX: Display exact backend validation errors from the 3rd party auditor logic
       const errorMsg = err.response?.data?.error || err.message || 'Unknown error generating code';
       setGeneratedCode(`// ERROR: ${errorMsg}`);
     }
@@ -717,6 +700,9 @@ function App() {
                           
                           const displayName = r.deviceType || (parts.length > 2 ? `${formatName(parts[parts.length-2])} / ${formatName(parts[parts.length-1])}` : formatName(parts[parts.length-1]));
                           
+                          // Badge logic: show vendor tag for external AND Azure AVM resources
+                          const badgeText = r.provider === 'external' ? r.vendor : (r.vendor === 'Azure AVM' ? 'Azure AVM' : r.provider.toUpperCase());
+                          
                           return (
                             <div 
                               key={r.typeName} 
@@ -726,7 +712,7 @@ function App() {
                                 setSelectedType(r.typeName);
                               }}
                             >
-                              <span className={`badge ${r.provider}`}>{r.provider === 'external' ? r.vendor : r.provider.toUpperCase()}</span>
+                              <span className={`badge ${r.vendor === 'Azure AVM' ? 'azure-avm' : r.provider}`}>{badgeText}</span>
                               {displayName}
                             </div>
                           );
