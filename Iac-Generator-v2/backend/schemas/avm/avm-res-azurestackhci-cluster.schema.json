@@ -13,11 +13,10 @@
       "default": "ZRS"
     },
     "compute_traffic_type": {
-      "type": "array",
+      "type": "string",
       "title": "Compute Traffic Type",
       "description": "Traffic type of compute.",
       "tfType": "list(string)",
-      "items": "string",
       "default": [
         "Management",
         "Compute"
@@ -212,11 +211,10 @@
       "default": false
     },
     "dns_servers": {
-      "type": "array",
+      "type": "string",
       "title": "Dns Servers",
       "description": "A list of DNS server IP addresses.",
-      "tfType": "list(string)",
-      "items": "string"
+      "tfType": "list(string)"
     },
     "default_arb_application_tags": {
       "type": "object",
@@ -416,11 +414,10 @@
       "default": false
     },
     "storage_traffic_type": {
-      "type": "array",
+      "type": "string",
       "title": "Storage Traffic Type",
       "description": "Traffic type of storage.",
       "tfType": "list(string)",
-      "items": "string",
       "default": [
         "Storage"
       ]
@@ -564,11 +561,10 @@
       "tfType": "map(string)"
     },
     "management_adapters": {
-      "type": "array",
+      "type": "string",
       "title": "Management Adapters",
       "description": "A list of management adapters.",
       "tfType": "list(string)",
-      "items": "string",
       "default": []
     },
     "role_assignments": {
@@ -609,11 +605,10 @@
       "tfType": "map(string)"
     },
     "traffic_type": {
-      "type": "array",
+      "type": "string",
       "title": "Traffic Type",
       "description": "Traffic type of intent.",
       "tfType": "list(string)",
-      "items": "string",
       "default": [
         "Management",
         "Compute",

@@ -105,11 +105,10 @@
       "tfType": "map(object({\n    source_storage_account_id     = string\n    backup_file_share_policy_name = string\n    source_file_share_name        = string\n    disable_registration          = optional(bool, false)\n    sleep_timer                   = optional(string, \"60s\")\n\n  }))"
     },
     "resource_guard_operation_requests": {
-      "type": "array",
+      "type": "string",
       "title": "Resource Guard Operation Requests",
       "description": "(Optional) A list of Resource Guard operation request IDs to associate with the Recovery Services Vault.  Each item should be a fully qualified operation request resource ID under a Microsoft.DataProtection Resource Guard, for example: `/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-guard/providers/Microsoft.DataProtection/resourceGuards/rg1/modifyEncryptionSettings/default`",
       "tfType": "list(string)",
-      "items": "string",
       "default": []
     },
     "site_recovery_replicated_vm": {

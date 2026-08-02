@@ -70,11 +70,10 @@
       "default": {}
     },
     "ssh_public_keys": {
-      "type": "array",
+      "type": "string",
       "title": "Ssh Public Keys",
       "description": "The SSH public keys of the cluster.",
-      "tfType": "list(string)",
-      "items": "string"
+      "tfType": "list(string)"
     },
     "vnet_id": {
       "type": "string",
@@ -204,11 +203,10 @@
       "description": "The data storage size in TBs."
     },
     "db_servers": {
-      "type": "array",
+      "type": "string",
       "title": "Db Servers",
       "description": "DB servers of the cluster, if not specified, the default DB servers from the Exadata Infrastructure will be used.",
       "tfType": "list(string)",
-      "items": "string",
       "default": []
     },
     "lock": {

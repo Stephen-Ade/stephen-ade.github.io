@@ -44,11 +44,10 @@
       "description": "(Required) Specifies the supported Azure location where the resource exists. Changing this forces a new resource to be created."
     },
     "fqdns": {
-      "type": "array",
+      "type": "string",
       "title": "Fqdns",
       "description": "(Optional) List of FQDNs allowed for the Cognitive Account.",
       "tfType": "list(string)",
-      "items": "string",
       "default": []
     },
     "network_injections": {
@@ -175,11 +174,10 @@
       "default": true
     },
     "associated_projects": {
-      "type": "array",
+      "type": "string",
       "title": "Associated Projects",
       "description": "(Optional) Specifies the projects, by project name, that are associated with this resource.",
       "tfType": "list(string)",
-      "items": "string",
       "default": []
     },
     "custom_question_answering_search_service_key": {

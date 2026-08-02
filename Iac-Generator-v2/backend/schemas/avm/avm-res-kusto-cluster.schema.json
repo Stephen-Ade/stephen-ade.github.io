@@ -99,11 +99,10 @@
       "description": "(Optional) Specifies if the streaming ingest is enabled."
     },
     "zones": {
-      "type": "array",
+      "type": "string",
       "title": "Zones",
       "description": "(Optional) Specifies a list of Availability Zones in which this Kusto Cluster should be located. Changing this forces a new Kusto Cluster to be created.",
-      "tfType": "set(string)",
-      "items": "string"
+      "tfType": "set(string)"
     },
     "diagnostic_settings": {
       "type": "object",
@@ -130,11 +129,10 @@
       "description": "The name of the this resource."
     },
     "language_extensions": {
-      "type": "array",
+      "type": "string",
       "title": "Language Extensions",
       "description": "(Optional) An list of language_extensions to enable.     Valid values are: PYTHON, PYTHON_3.10.8 and R.     PYTHON is used to specify Python 3.6.5 image and PYTHON_3.10.8 is used to specify Python 3.10.8 image. Note that PYTHON_3.10.8 is only available in skus which support nested virtualization.  NOTE: In v4.0.0 and later version of the AzureRM Provider,  language_extensions will be changed to a list of language_extension block.  In each block, name and image are required.  name is the name of the language extension, possible values are PYTHON, R.  image is the image of the language extension, possible values are Python3_6_5, Python3_10_8 and R.",
-      "tfType": "set(string)",
-      "items": "string"
+      "tfType": "set(string)"
     },
     "disk_encryption_enabled": {
       "type": "boolean",
@@ -149,11 +147,10 @@
       "default": false
     },
     "trusted_external_tenants": {
-      "type": "array",
+      "type": "string",
       "title": "Trusted External Tenants",
       "description": "(Optional) Specifies a list of tenant IDs that are trusted by the cluster.  New or updated Kusto Cluster will only allow your own tenant by default.   Use trusted_external_tenants = [\"*\"] to explicitly allow all other tenants,  trusted_external_tenants = [] for only your tenant or  trusted_external_tenants = [\"<tenantId1>\", \"<tenantIdx>\"] to allow specific other tenants.",
       "tfType": "set(string)",
-      "items": "string",
       "default": []
     },
     "tags": {
@@ -163,18 +160,16 @@
       "tfType": "map(string)"
     },
     "allowed_fqdns": {
-      "type": "array",
+      "type": "string",
       "title": "Allowed Fqdns",
       "description": "(Optional) List of allowed FQDNs(Fully Qualified Domain Name) for egress from Cluster.",
-      "tfType": "set(string)",
-      "items": "string"
+      "tfType": "set(string)"
     },
     "allowed_ip_ranges": {
-      "type": "array",
+      "type": "string",
       "title": "Allowed Ip Ranges",
       "description": "(Optional) The list of ips in the format of CIDR allowed to connect to the cluster.",
-      "tfType": "set(string)",
-      "items": "string"
+      "tfType": "set(string)"
     },
     "auto_stop_enabled": {
       "type": "boolean",

@@ -98,11 +98,10 @@
       "default": {}
     },
     "zones": {
-      "type": "array",
+      "type": "string",
       "title": "Zones",
       "description": "Optional set of availability zones for the Redis Enterprise cluster.",
       "tfType": "set(string)",
-      "items": "string",
       "default": []
     },
     "name": {

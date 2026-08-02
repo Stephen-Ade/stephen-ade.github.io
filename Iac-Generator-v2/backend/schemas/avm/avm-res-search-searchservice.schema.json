@@ -2,11 +2,10 @@
   "type": "object",
   "properties": {
     "allowed_ips": {
-      "type": "array",
+      "type": "string",
       "title": "Allowed Ips",
       "description": "One or more IP Addresses, or CIDR Blocks which should be able to access the AI Search service",
-      "tfType": "list(string)",
-      "items": "string"
+      "tfType": "list(string)"
     },
     "authentication_failure_mode": {
       "type": "string",

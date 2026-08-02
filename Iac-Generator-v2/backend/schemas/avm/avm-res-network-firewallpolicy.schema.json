@@ -105,11 +105,10 @@
       "default": true
     },
     "firewall_policy_private_ip_ranges": {
-      "type": "array",
+      "type": "string",
       "title": "Firewall Policy Private Ip Ranges",
       "description": "(Optional) A list of private IP ranges to which traffic will not be SNAT.",
-      "tfType": "list(string)",
-      "items": "string"
+      "tfType": "list(string)"
     },
     "firewall_policy_threat_intelligence_mode": {
       "type": "string",

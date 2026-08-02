@@ -61,11 +61,10 @@
       "tfType": "object({\n    enabled = bool\n    terms_of_service = object({\n      consent_required = bool\n      enabled          = bool\n      text             = optional(string, null)\n    })\n  })"
     },
     "zones": {
-      "type": "array",
+      "type": "string",
       "title": "Zones",
       "description": "Specifies a list of Availability Zones in which this API Management service should be located. Only supported in the Premium tier.",
-      "tfType": "list(string)",
-      "items": "string"
+      "tfType": "list(string)"
     },
     "protocols": {
       "type": "object",

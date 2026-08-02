@@ -121,11 +121,10 @@
       "tfType": "map(string)"
     },
     "zones": {
-      "type": "array",
+      "type": "string",
       "title": "Zones",
       "description": "Specifies a list of Availability Zones in which this Orchestrated Virtual Machine should be located. Changing this forces a new Orchestrated Virtual Machine to be created.  Defaulted to 3 zones as per this reliability guidance: [Deploy Virtual Machine Scale Sets across availability zones with Virtual Machine Scale Sets Flex](https://learn.microsoft.com/en-us/azure/reliability/reliability-virtual-machine-scale-sets?tabs=graph-4%2Cgraph-1%2Cgraph-2%2Cgraph-3%2Cgraph-5%2Cgraph-6%2Cportal#-deploy-virtual-machine-scale-sets-across-availability-zones-with-virtual-machine-scale-sets-flex) Removing any zones from this list will result in the Orchestrated Virtual Machine Scale Set being recreated. > Note: Due to a limitation of the Azure API at this time only one Availability Zone can be defined.",
       "tfType": "set(string)",
-      "items": "string",
       "default": [
         "1",
         "2",

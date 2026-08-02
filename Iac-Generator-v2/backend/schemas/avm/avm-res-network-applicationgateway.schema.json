@@ -2,11 +2,10 @@
   "type": "object",
   "properties": {
     "zones": {
-      "type": "array",
+      "type": "string",
       "title": "Zones",
       "description": "(Optional) Specifies a list of Availability Zones in which this Application Gateway should be located. Changing this forces a new Application Gateway to be created.",
       "tfType": "set(string)",
-      "items": "string",
       "default": [
         "1",
         "2",

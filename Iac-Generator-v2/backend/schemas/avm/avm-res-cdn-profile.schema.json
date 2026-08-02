@@ -113,11 +113,10 @@
       "default": {}
     },
     "front_door_rule_sets": {
-      "type": "array",
+      "type": "string",
       "title": "Front Door Rule Sets",
       "description": "Manages Front Door (standard/premium) Rule Sets.. The following properties can be specified:   - `name` - (Required) The name which should be used for this Front Door Rule Set.",
       "tfType": "set(string)",
-      "items": "string",
       "default": []
     },
     "name": {

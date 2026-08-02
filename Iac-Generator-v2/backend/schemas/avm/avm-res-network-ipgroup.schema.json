@@ -2,11 +2,10 @@
   "type": "object",
   "properties": {
     "ip_addresses": {
-      "type": "array",
+      "type": "string",
       "title": "Ip Addresses",
       "description": "The list of IP addresses, IP ranges, or CIDR blocks that belong to the IP Group.",
-      "tfType": "set(string)",
-      "items": "string"
+      "tfType": "set(string)"
     },
     "location": {
       "type": "string",

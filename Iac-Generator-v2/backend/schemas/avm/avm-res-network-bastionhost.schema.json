@@ -76,11 +76,10 @@
       "default": true
     },
     "zones": {
-      "type": "array",
+      "type": "string",
       "title": "Zones",
       "description": "The availability zones where the Azure Bastion Host is deployed.",
       "tfType": "set(string)",
-      "items": "string",
       "default": [
         "1",
         "2",

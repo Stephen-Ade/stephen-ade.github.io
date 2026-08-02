@@ -8,11 +8,10 @@
       "tfType": "map(string)"
     },
     "vault_critical_operation_exclusion_list": {
-      "type": "array",
+      "type": "string",
       "title": "Vault Critical Operation Exclusion List",
       "description": "Operations that will be exempted from the resource guard",
-      "tfType": "set(string)",
-      "items": "string"
+      "tfType": "set(string)"
     },
     "location": {
       "type": "string",

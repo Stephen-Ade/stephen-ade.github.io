@@ -31,11 +31,10 @@
       "tfType": "map(string)"
     },
     "zones": {
-      "type": "array",
+      "type": "string",
       "title": "Zones",
       "description": "(Optional) The availability zones in which the Public IP Prefix should be deployed. Changing this forces a new resource to be created.",
       "tfType": "set(string)",
-      "items": "string",
       "default": [
         "1",
         "2",

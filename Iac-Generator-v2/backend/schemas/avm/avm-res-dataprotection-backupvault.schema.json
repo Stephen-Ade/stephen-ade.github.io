@@ -114,11 +114,10 @@
       "description": "The name of this resource. Must be between 5 and 50 characters long."
     },
     "replicated_regions": {
-      "type": "array",
+      "type": "string",
       "title": "Replicated Regions",
       "description": "List of replicated regions for the Backup Vault. Only applicable for GeoRedundant vaults.",
       "tfType": "list(string)",
-      "items": "string",
       "default": []
     },
     "role_assignments": {
@@ -146,11 +145,10 @@
       "description": "The name of the Resource Guard. If not specified, will use the backup vault name with '-guard' suffix. Only used when creating a new resource guard (i.e., when `resource_guard_resource_id` is null)."
     },
     "vault_critical_operation_exclusion_list": {
-      "type": "array",
+      "type": "string",
       "title": "Vault Critical Operation Exclusion List",
       "description": "A list of the critical operations which are not protected by Resource Guard. By default, all critical operations are protected. Only exclude operations that you want to allow without additional protection. Possible values include: \"Delete\", \"Update\", \"DisableSoftDelete\", and \"ChangeBackupProperties\".",
       "tfType": "list(string)",
-      "items": "string",
       "default": []
     },
     "location": {

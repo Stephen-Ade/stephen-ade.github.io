@@ -75,11 +75,10 @@
       "default": {}
     },
     "zones": {
-      "type": "array",
+      "type": "string",
       "title": "Zones",
       "description": "A list of availability zones in which the capacity reservation group should be created.",
       "tfType": "list(string)",
-      "items": "string",
       "default": [
         "1",
         "2",

@@ -8,11 +8,10 @@
       "tfType": "object({\n    exec = object({\n      command = list(string)\n    })\n    period_seconds        = number\n    failure_threshold     = number\n    success_threshold     = number\n    timeout_seconds       = number\n    initial_delay_seconds = number\n    http_get = object({\n      path         = string\n      port         = number\n      http_headers = map(string)\n    })\n    tcp_socket = object({\n      port = number\n    })\n  })"
     },
     "subnet_ids": {
-      "type": "array",
+      "type": "string",
       "title": "Subnet Ids",
       "description": "The subnet IDs for the container group.",
       "tfType": "list(string)",
-      "items": "string",
       "default": []
     },
     "tags": {
@@ -22,11 +21,10 @@
       "tfType": "map(string)"
     },
     "zones": {
-      "type": "array",
+      "type": "string",
       "title": "Zones",
       "description": "A list of availability zones in which the resource should be created.",
       "tfType": "list(string)",
-      "items": "string",
       "default": []
     },
     "location": {
@@ -40,11 +38,10 @@
       "description": "The name of the resource."
     },
     "dns_name_servers": {
-      "type": "array",
+      "type": "string",
       "title": "Dns Name Servers",
       "description": "A list of DNS name servers to use for the container group.",
       "tfType": "list(string)",
-      "items": "string",
       "default": []
     },
     "enable_telemetry": {

@@ -11,14 +11,14 @@ module "avm-res-insights-autoscalesetting" {
   source  = "Azure/avm-res-insights-autoscalesetting/azurerm"
   version = "0.1.2"
 
-  {{#location}}location            = {{{location}}}{{/location}}
-  {{#name}}name                = {{{name}}}{{/name}}
-  {{#profiles}}profiles            = {{{profiles}}}{{/profiles}}
-  {{#resource_group_name}}resource_group_name = {{{resource_group_name}}}{{/resource_group_name}}
-  {{#target_resource_id}}target_resource_id  = {{{target_resource_id}}}{{/target_resource_id}}
-  {{#enable_telemetry}}enable_telemetry    = {{{enable_telemetry}}}{{/enable_telemetry}}
-  {{#enabled}}enabled             = {{{enabled}}}{{/enabled}}
-  {{#notification}}notification        = {{{notification}}}{{/notification}}
-  {{#predictive}}predictive          = {{{predictive}}}{{/predictive}}
-  {{#tags}}tags                = {{{tags}}}{{/tags}}
+  {{#if location}}location            = {{hclVal location}}{{/if}}
+  {{#if name}}name                = {{hclVal name}}{{/if}}
+  {{#if profiles}}profiles            = {{hclVal profiles}}{{/if}}
+  {{#if resource_group_name}}resource_group_name = {{hclVal resource_group_name}}{{/if}}
+  {{#if target_resource_id}}target_resource_id  = {{hclVal target_resource_id}}{{/if}}
+  {{#if enable_telemetry}}enable_telemetry    = {{hclVal enable_telemetry}}{{/if}}
+  {{#if enabled}}enabled             = {{hclVal enabled}}{{/if}}
+  {{#if notification}}notification        = {{hclVal notification}}{{/if}}
+  {{#if predictive}}predictive          = {{hclVal predictive}}{{/if}}
+  {{#if tags}}tags                = {{hclVal tags}}{{/if}}
 }

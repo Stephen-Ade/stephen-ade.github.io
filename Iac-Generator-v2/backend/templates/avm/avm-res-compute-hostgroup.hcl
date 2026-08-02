@@ -11,13 +11,13 @@ module "avm-res-compute-hostgroup" {
   source  = "Azure/avm-res-compute-hostgroup/azurerm"
   version = "0.1.3"
 
-  {{#dedicated_host_group_name}}dedicated_host_group_name   = {{{dedicated_host_group_name}}}{{/dedicated_host_group_name}}
-  {{#location}}location                    = {{{location}}}{{/location}}
-  {{#platform_fault_domain_count}}platform_fault_domain_count = {{{platform_fault_domain_count}}}{{/platform_fault_domain_count}}
-  {{#resource_group_name}}resource_group_name         = {{{resource_group_name}}}{{/resource_group_name}}
-  {{#automatic_placement_enabled}}automatic_placement_enabled = {{{automatic_placement_enabled}}}{{/automatic_placement_enabled}}
-  {{#dedicated_hosts}}dedicated_hosts             = {{{dedicated_hosts}}}{{/dedicated_hosts}}
-  {{#enable_telemetry}}enable_telemetry            = {{{enable_telemetry}}}{{/enable_telemetry}}
-  {{#tags}}tags                        = {{{tags}}}{{/tags}}
-  {{#zone}}zone                        = {{{zone}}}{{/zone}}
+  {{#if dedicated_host_group_name}}dedicated_host_group_name   = {{hclVal dedicated_host_group_name}}{{/if}}
+  {{#if location}}location                    = {{hclVal location}}{{/if}}
+  {{#if platform_fault_domain_count}}platform_fault_domain_count = {{hclVal platform_fault_domain_count}}{{/if}}
+  {{#if resource_group_name}}resource_group_name         = {{hclVal resource_group_name}}{{/if}}
+  {{#if automatic_placement_enabled}}automatic_placement_enabled = {{hclVal automatic_placement_enabled}}{{/if}}
+  {{#if dedicated_hosts}}dedicated_hosts             = {{hclVal dedicated_hosts}}{{/if}}
+  {{#if enable_telemetry}}enable_telemetry            = {{hclVal enable_telemetry}}{{/if}}
+  {{#if tags}}tags                        = {{hclVal tags}}{{/if}}
+  {{#if zone}}zone                        = {{hclVal zone}}{{/if}}
 }

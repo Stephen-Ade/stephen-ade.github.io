@@ -56,11 +56,10 @@
       "description": "The vlan id of the logical network, default means no vlan id is specified"
     },
     "dns_servers": {
-      "type": "array",
+      "type": "string",
       "title": "Dns Servers",
       "description": "A list of DNS server IP addresses.",
       "tfType": "list(string)",
-      "items": "string",
       "default": []
     },
     "logical_network_tags": {

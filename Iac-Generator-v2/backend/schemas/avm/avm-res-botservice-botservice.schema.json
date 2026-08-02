@@ -220,11 +220,10 @@
       "description": "(Optional) The name that the Azure Bot Service will be displayed as. This defaults to the value set for `name` if not specified"
     },
     "luis_app_ids": {
-      "type": "array",
+      "type": "string",
       "title": "Luis App Ids",
       "description": "(Optional) Collection of LUIS App IDs (luisAppIds).",
       "tfType": "list(string)",
-      "items": "string",
       "default": []
     },
     "storage_resource_id": {

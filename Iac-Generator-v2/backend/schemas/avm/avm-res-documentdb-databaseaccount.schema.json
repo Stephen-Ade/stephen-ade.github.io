@@ -182,11 +182,10 @@
       "default": false
     },
     "network_acl_bypass_resource_ids": {
-      "type": "array",
+      "type": "string",
       "title": "Network Acl Bypass Resource Ids",
       "description": "Defaults to `[]`. The list of resource Ids for Network Acl Bypass for this Cosmos DB account.",
       "tfType": "set(string)",
-      "items": "string",
       "default": []
     },
     "public_network_access_enabled": {
@@ -216,11 +215,10 @@
       "default": {}
     },
     "ip_range_filter": {
-      "type": "array",
+      "type": "string",
       "title": "Ip Range Filter",
       "description": "Defaults to `[]`. CosmosDB Firewall Support: This value specifies the set of IP addresses or IP address ranges in CIDR form to be included as the allowed list of client IPs for a given database account.    > Note: To enable the \"Allow access from the Azure portal\" behavior, you should add the IP addresses provided by the documentation to this list. https://learn.microsoft.com/en-us/azure/cosmos-db/how-to-configure-firewall#allow-requests-from-the-azure-portal   > Note: To enable the \"Accept connections from within public Azure datacenters\" behavior, you should add 0.0.0.0 to the list, see the documentation for more details. https://learn.microsoft.com/en-us/azure/cosmos-db/how-to-configure-firewall#allow-requests-from-global-azure-datacenters-or-other-sources-within-azure",
       "tfType": "set(string)",
-      "items": "string",
       "default": []
     },
     "capacity": {

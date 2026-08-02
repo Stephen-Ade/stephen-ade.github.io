@@ -7,11 +7,10 @@
       "description": "The name of the resource group in which to create the proximity placement group."
     },
     "allowed_vm_sizes": {
-      "type": "array",
+      "type": "string",
       "title": "Allowed Vm Sizes",
       "description": "(Optional) Specifies the supported sizes of virtual machines that can be created in the proximity placement group.",
-      "tfType": "list(string)",
-      "items": "string"
+      "tfType": "list(string)"
     },
     "enable_telemetry": {
       "type": "boolean",

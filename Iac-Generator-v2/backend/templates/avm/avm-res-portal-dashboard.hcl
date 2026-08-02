@@ -11,11 +11,11 @@ module "avm-res-portal-dashboard" {
   source  = "Azure/avm-res-portal-dashboard/azurerm"
   version = "0.1.0"
 
-  {{#location}}location                = {{{location}}}{{/location}}
-  {{#name}}name                    = {{{name}}}{{/name}}
-  {{#resource_group_name}}resource_group_name     = {{{resource_group_name}}}{{/resource_group_name}}
-  {{#template_file_path}}template_file_path      = {{{template_file_path}}}{{/template_file_path}}
-  {{#enable_telemetry}}enable_telemetry        = {{{enable_telemetry}}}{{/enable_telemetry}}
-  {{#tags}}tags                    = {{{tags}}}{{/tags}}
-  {{#template_file_variables}}template_file_variables = {{{template_file_variables}}}{{/template_file_variables}}
+  {{#if location}}location                = {{hclVal location}}{{/if}}
+  {{#if name}}name                    = {{hclVal name}}{{/if}}
+  {{#if resource_group_name}}resource_group_name     = {{hclVal resource_group_name}}{{/if}}
+  {{#if template_file_path}}template_file_path      = {{hclVal template_file_path}}{{/if}}
+  {{#if enable_telemetry}}enable_telemetry        = {{hclVal enable_telemetry}}{{/if}}
+  {{#if tags}}tags                    = {{hclVal tags}}{{/if}}
+  {{#if template_file_variables}}template_file_variables = {{hclVal template_file_variables}}{{/if}}
 }

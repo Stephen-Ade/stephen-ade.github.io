@@ -31,18 +31,16 @@
       "tfType": "object({\n    name                 = string\n    public_ip_address_id = string\n    subnet_id            = string\n  })"
     },
     "firewall_private_ip_ranges": {
-      "type": "array",
+      "type": "string",
       "title": "Firewall Private Ip Ranges",
       "description": "(Optional) A list of SNAT private CIDR IP ranges, or the special string `IANAPrivateRanges`, which indicates Azure Firewall does not SNAT when the destination IP address is a private range per IANA RFC 1918.",
-      "tfType": "set(string)",
-      "items": "string"
+      "tfType": "set(string)"
     },
     "firewall_zones": {
-      "type": "array",
+      "type": "string",
       "title": "Firewall Zones",
       "description": "(Required) Specifies a list of Availability Zones in which this Azure Firewall should be located. Changing this forces a new Azure Firewall to be created.",
       "tfType": "set(string)",
-      "items": "string",
       "default": [
         "1",
         "2",

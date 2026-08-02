@@ -7,11 +7,10 @@
       "description": "The type of connection. Must be one of 'Vnet2Vnet', 'ExpressRoute', or 'IPsec'."
     },
     "egress_nat_rule_resource_ids": {
-      "type": "array",
+      "type": "string",
       "title": "Egress Nat Rule Resource Ids",
       "description": "A list of the egress NAT Rule Ids.",
-      "tfType": "list(string)",
-      "items": "string"
+      "tfType": "list(string)"
     },
     "express_route_circuit_resource_id": {
       "type": "string",
@@ -85,11 +84,10 @@
       "description": "If `true`, data packets will bypass ExpressRoute Gateway for data forwarding This is only valid for ExpressRoute connections"
     },
     "ingress_nat_rule_resource_ids": {
-      "type": "array",
+      "type": "string",
       "title": "Ingress Nat Rule Resource Ids",
       "description": "A list of the ingress NAT Rule Ids.",
-      "tfType": "list(string)",
-      "items": "string"
+      "tfType": "list(string)"
     },
     "private_link_fast_path_enabled": {
       "type": "boolean",

@@ -165,11 +165,10 @@
       }
     },
     "ip_allowlist": {
-      "type": "array",
+      "type": "string",
       "title": "Ip Allowlist",
       "description": "The list of IPv4 addresses that are allowed to access the workspace.",
       "tfType": "set(string)",
-      "items": "string",
       "default": []
     },
     "key_vault": {

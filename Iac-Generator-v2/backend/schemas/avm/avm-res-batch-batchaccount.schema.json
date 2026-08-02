@@ -2,11 +2,10 @@
   "type": "object",
   "properties": {
     "network_profile": {
-      "type": "array",
+      "type": "string",
       "title": "Network Profile",
       "description": "Network profile settings for account and node management access.",
       "tfType": "list(map(any))",
-      "items": "object",
       "default": []
     },
     "role_assignments": {
@@ -54,11 +53,10 @@
       "default": true
     },
     "allowed_authentication_modes": {
-      "type": "array",
+      "type": "string",
       "title": "Allowed Authentication Modes",
       "description": "Specifies the allowed authentication mode for the Batch account. Possible values include AAD, SharedKey or TaskAuthenticationToken.",
-      "tfType": "list(string)",
-      "items": "string"
+      "tfType": "list(string)"
     },
     "enable_telemetry": {
       "type": "boolean",

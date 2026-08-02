@@ -41,11 +41,10 @@
       "description": "The Azure location where the network interface should exist."
     },
     "dns_servers": {
-      "type": "array",
+      "type": "string",
       "title": "Dns Servers",
       "description": "(Optional) Specifies a list of IP addresses representing DNS servers.",
-      "tfType": "list(string)",
-      "items": "string"
+      "tfType": "list(string)"
     },
     "edge_zone": {
       "type": "string",
@@ -59,11 +58,10 @@
       "default": true
     },
     "network_security_group_ids": {
-      "type": "array",
+      "type": "string",
       "title": "Network Security Group Ids",
       "description": "(Optional) List of network security group IDs.",
-      "tfType": "list(string)",
-      "items": "string"
+      "tfType": "list(string)"
     },
     "resource_group_name": {
       "type": "string",
@@ -77,11 +75,10 @@
       "default": false
     },
     "application_security_group_ids": {
-      "type": "array",
+      "type": "string",
       "title": "Application Security Group Ids",
       "description": "(Optional) List of application security group IDs.",
-      "tfType": "list(string)",
-      "items": "string"
+      "tfType": "list(string)"
     },
     "load_balancer_backend_address_pool_association": {
       "type": "object",

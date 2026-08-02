@@ -90,11 +90,10 @@
       "description": "The maximum lifetime of the agent. Maximum value is 7 days and the format must be in `d:hh:mm:ss`."
     },
     "version_control_system_project_names": {
-      "type": "array",
+      "type": "string",
       "title": "Version Control System Project Names",
       "description": "The name of the version control system project. This is optional if `organization_profile` is not supplied.",
       "tfType": "set(string)",
-      "items": "string",
       "default": []
     },
     "location": {
@@ -103,11 +102,10 @@
       "description": "Azure region where the resource should be deployed."
     },
     "managed_devops_pool_retry_on_error": {
-      "type": "array",
+      "type": "string",
       "title": "Managed Devops Pool Retry On Error",
       "description": "A list of error messages to retry creating the Managed DevOps Pool resource on. This is used to retry the resource creation if the error message matches one of the values in the list. Defaults to a list containing a regex pattern that matches the error message when the user is not found in the Azure DevOps organization.",
       "tfType": "list(string)",
-      "items": "string",
       "default": [
         "Failed to provision agent pool. Exception: The logged in user,.*, was not found in the Azure DevOps organization provided,.*"
       ]

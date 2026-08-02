@@ -14,11 +14,10 @@
       "default": "StandardV2"
     },
     "zones": {
-      "type": "array",
+      "type": "string",
       "title": "Zones",
       "description": "(Optional) A list of Availability Zones in which this NAT Gateway should be located. Changing this forces a new NAT Gateway to be created. If `sku_name` is `StandardV2`, this variable is ignored and defaults to `[\"1\", \"2\", \"3\"]`.",
-      "tfType": "set(string)",
-      "items": "string"
+      "tfType": "set(string)"
     },
     "name": {
       "type": "string",
@@ -33,11 +32,10 @@
       "default": {}
     },
     "public_ip_prefix_resource_ids": {
-      "type": "array",
+      "type": "string",
       "title": "Public Ip Prefix Resource Ids",
       "description": "(Optional) A list of existing Public IP Prefix resource IDs to associate with the NAT Gateway. These must be IPv4 prefixes.",
       "tfType": "set(string)",
-      "items": "string",
       "default": []
     },
     "public_ips": {
@@ -65,11 +63,10 @@
       "description": "(Required) The resource ID of the Resource Group in which the NAT Gateway should exist. Changing this forces a new resource to be created."
     },
     "public_ip_resource_ids": {
-      "type": "array",
+      "type": "string",
       "title": "Public Ip Resource Ids",
       "description": "(Optional) A list of existing Public IP resource IDs to associate with the NAT Gateway. These must be IPv4 addresses.",
       "tfType": "set(string)",
-      "items": "string",
       "default": []
     },
     "role_assignments": {
@@ -87,19 +84,17 @@
       "default": {}
     },
     "public_ip_prefix_v6_resource_ids": {
-      "type": "array",
+      "type": "string",
       "title": "Public Ip Prefix V6 Resource Ids",
       "description": "(Optional) A list of existing Public IP Prefix resource IDs (IPv6) to associate with the NAT Gateway. Only supported when `sku_name` is `StandardV2`.",
       "tfType": "set(string)",
-      "items": "string",
       "default": []
     },
     "public_ip_v6_resource_ids": {
-      "type": "array",
+      "type": "string",
       "title": "Public Ip V6 Resource Ids",
       "description": "(Optional) A list of existing Public IP resource IDs (IPv6) to associate with the NAT Gateway. Only supported when `sku_name` is `StandardV2`.",
       "tfType": "set(string)",
-      "items": "string",
       "default": []
     },
     "location": {

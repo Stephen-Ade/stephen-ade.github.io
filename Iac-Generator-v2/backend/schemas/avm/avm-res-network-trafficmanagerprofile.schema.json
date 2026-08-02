@@ -57,11 +57,10 @@
       "default": {}
     },
     "allowed_endpoint_record_types": {
-      "type": "array",
+      "type": "string",
       "title": "Allowed Endpoint Record Types",
       "description": "The list of allowed endpoint record types. Possible values are 'Any', 'DomainName', 'IPv4Address', 'IPv6Address'.",
-      "tfType": "list(string)",
-      "items": "string"
+      "tfType": "list(string)"
     },
     "lock": {
       "type": "object",

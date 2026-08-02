@@ -11,10 +11,10 @@ module "avm-res-management-servicegroup" {
   source  = "Azure/avm-res-management-servicegroup/azurerm"
   version = "0.1.0"
 
-  {{#name}}name                    = {{{name}}}{{/name}}
-  {{#display_name}}display_name            = {{{display_name}}}{{/display_name}}
-  {{#enable_telemetry}}enable_telemetry        = {{{enable_telemetry}}}{{/enable_telemetry}}
-  {{#parent_service_group_id}}parent_service_group_id = {{{parent_service_group_id}}}{{/parent_service_group_id}}
-  {{#role_assignments}}role_assignments        = {{{role_assignments}}}{{/role_assignments}}
-  {{#service_group_members}}service_group_members   = {{{service_group_members}}}{{/service_group_members}}
+  {{#if name}}name                    = {{hclVal name}}{{/if}}
+  {{#if display_name}}display_name            = {{hclVal display_name}}{{/if}}
+  {{#if enable_telemetry}}enable_telemetry        = {{hclVal enable_telemetry}}{{/if}}
+  {{#if parent_service_group_id}}parent_service_group_id = {{hclVal parent_service_group_id}}{{/if}}
+  {{#if role_assignments}}role_assignments        = {{hclVal role_assignments}}{{/if}}
+  {{#if service_group_members}}service_group_members   = {{hclVal service_group_members}}{{/if}}
 }

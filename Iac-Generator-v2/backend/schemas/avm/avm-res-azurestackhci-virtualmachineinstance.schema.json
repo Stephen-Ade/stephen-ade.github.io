@@ -87,11 +87,10 @@
       "default": true
     },
     "no_proxy": {
-      "type": "array",
+      "type": "string",
       "title": "No Proxy",
       "description": "URLs, which can bypass proxy. Typical examples would be [localhost,127.0.0.1,.svc,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,100.0.0.0/8]",
       "tfType": "list(string)",
-      "items": "string",
       "default": []
     },
     "tags": {

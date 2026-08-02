@@ -423,6 +423,11 @@ app.get('/api/schema/:typeName', (req, res) => {
             
             if (fs.existsSync(overrideSchemaPath)) {
                 const overrideSchema = parseJsonSafe(overrideSchemaPath);
+                // Inject required metadata that frontend expects (typeName, provider, description)
+                // Generated AVM schemas only contain type/properties/required from the Registry API
+                overrideSchema.typeName = typeName;
+                overrideSchema.provider = 'azure';
+                overrideSchema.description = override.source;
                 overrideSchema.supportedPlatforms = ['terraform']; // Force UI to only show Terraform
                 return res.json(overrideSchema);
             }

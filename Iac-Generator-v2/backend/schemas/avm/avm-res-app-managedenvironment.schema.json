@@ -229,11 +229,10 @@
       "description": "(Required) The name of the resource group in which the Container App Environment is to be created. Changing this forces a new resource to be created."
     },
     "availability_zones": {
-      "type": "array",
+      "type": "string",
       "title": "Availability Zones",
       "description": "THIS IS A VARIABLE USED FOR A PREVIEW SERVICE/FEATURE, MICROSOFT MAY NOT PROVIDE SUPPORT FOR THIS, PLEASE CHECK THE PRODUCT DOCS FOR CLARIFICATION  The list of availability zones to use for the managed environment.",
-      "tfType": "list(string)",
-      "items": "string"
+      "tfType": "list(string)"
     },
     "disk_encryption_configuration": {
       "type": "object",

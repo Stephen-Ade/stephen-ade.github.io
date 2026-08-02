@@ -154,11 +154,10 @@
       "default": true
     },
     "zones": {
-      "type": "array",
+      "type": "string",
       "title": "Zones",
       "description": "(Optional) - Specifies a list of Availability Zones in which this Redis Cache should be located.  Changing this forces a new Redis Cache to be created.",
       "tfType": "list(string)",
-      "items": "string",
       "default": [
         "1",
         "2",

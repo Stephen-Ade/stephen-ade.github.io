@@ -26,11 +26,10 @@
       "description": "The resource group Azure Resource ID for the deployment resource group. Used for the AzAPI resource that deploys the private cloud."
     },
     "default_dns_ips": {
-      "type": "array",
+      "type": "string",
       "title": "Default Dns Ips",
       "description": "A list of up to DNS IP addresses to use for the private cloud's default DNS service. If provided, these will replace the default Cloudflare DNS IPs.",
       "tfType": "list(string)",
-      "items": "string",
       "default": []
     },
     "enable_telemetry": {
@@ -82,11 +81,10 @@
       "description": "The resource group where the resources will be deployed."
     },
     "extended_network_blocks": {
-      "type": "array",
+      "type": "string",
       "title": "Extended Network Blocks",
       "description": "If using AV64 sku's in non-management Gen 1 clusters it is required to provide one /23 CIDR block or three /23 CIDR blocks. Provide a list of CIDR strings if planning to use AV64 nodes.",
       "tfType": "list(string)",
-      "items": "string",
       "default": []
     },
     "external_storage_address_block": {

@@ -11,11 +11,11 @@ module "avm-res-network-ddosprotectionplan" {
   source  = "Azure/avm-res-network-ddosprotectionplan/azurerm"
   version = "0.3.0"
 
-  {{#location}}location            = {{{location}}}{{/location}}
-  {{#name}}name                = {{{name}}}{{/name}}
-  {{#resource_group_name}}resource_group_name = {{{resource_group_name}}}{{/resource_group_name}}
-  {{#enable_telemetry}}enable_telemetry    = {{{enable_telemetry}}}{{/enable_telemetry}}
-  {{#lock}}lock                = {{{lock}}}{{/lock}}
-  {{#role_assignments}}role_assignments    = {{{role_assignments}}}{{/role_assignments}}
-  {{#tags}}tags                = {{{tags}}}{{/tags}}
+  {{#if location}}location            = {{hclVal location}}{{/if}}
+  {{#if name}}name                = {{hclVal name}}{{/if}}
+  {{#if resource_group_name}}resource_group_name = {{hclVal resource_group_name}}{{/if}}
+  {{#if enable_telemetry}}enable_telemetry    = {{hclVal enable_telemetry}}{{/if}}
+  {{#if lock}}lock                = {{hclVal lock}}{{/if}}
+  {{#if role_assignments}}role_assignments    = {{hclVal role_assignments}}{{/if}}
+  {{#if tags}}tags                = {{hclVal tags}}{{/if}}
 }

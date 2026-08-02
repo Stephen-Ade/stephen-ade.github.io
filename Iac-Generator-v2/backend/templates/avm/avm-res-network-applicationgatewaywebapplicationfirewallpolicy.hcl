@@ -11,15 +11,15 @@ module "avm-res-network-applicationgatewaywebapplicationfirewallpolicy" {
   source  = "Azure/avm-res-network-applicationgatewaywebapplicationfirewallpolicy/azurerm"
   version = "0.2.0"
 
-  {{#location}}location            = {{{location}}}{{/location}}
-  {{#managed_rules}}managed_rules       = {{{managed_rules}}}{{/managed_rules}}
-  {{#name}}name                = {{{name}}}{{/name}}
-  {{#resource_group_name}}resource_group_name = {{{resource_group_name}}}{{/resource_group_name}}
-  {{#custom_rules}}custom_rules        = {{{custom_rules}}}{{/custom_rules}}
-  {{#enable_telemetry}}enable_telemetry    = {{{enable_telemetry}}}{{/enable_telemetry}}
-  {{#lock}}lock                = {{{lock}}}{{/lock}}
-  {{#policy_settings}}policy_settings     = {{{policy_settings}}}{{/policy_settings}}
-  {{#role_assignments}}role_assignments    = {{{role_assignments}}}{{/role_assignments}}
-  {{#tags}}tags                = {{{tags}}}{{/tags}}
-  {{#timeouts}}timeouts            = {{{timeouts}}}{{/timeouts}}
+  {{#if location}}location            = {{hclVal location}}{{/if}}
+  {{#if managed_rules}}managed_rules       = {{hclVal managed_rules}}{{/if}}
+  {{#if name}}name                = {{hclVal name}}{{/if}}
+  {{#if resource_group_name}}resource_group_name = {{hclVal resource_group_name}}{{/if}}
+  {{#if custom_rules}}custom_rules        = {{hclVal custom_rules}}{{/if}}
+  {{#if enable_telemetry}}enable_telemetry    = {{hclVal enable_telemetry}}{{/if}}
+  {{#if lock}}lock                = {{hclVal lock}}{{/if}}
+  {{#if policy_settings}}policy_settings     = {{hclVal policy_settings}}{{/if}}
+  {{#if role_assignments}}role_assignments    = {{hclVal role_assignments}}{{/if}}
+  {{#if tags}}tags                = {{hclVal tags}}{{/if}}
+  {{#if timeouts}}timeouts            = {{hclVal timeouts}}{{/if}}
 }

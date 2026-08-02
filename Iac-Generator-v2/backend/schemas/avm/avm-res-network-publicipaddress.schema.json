@@ -117,11 +117,10 @@
       "default": "Standard"
     },
     "zones": {
-      "type": "array",
+      "type": "string",
       "title": "Zones",
       "description": "A set of availability zones to use.",
       "tfType": "set(number)",
-      "items": "number",
       "default": [
         1,
         2,

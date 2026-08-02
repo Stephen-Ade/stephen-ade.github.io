@@ -110,11 +110,10 @@
       "default": {}
     },
     "auth_config_allowed_modes": {
-      "type": "array",
+      "type": "string",
       "title": "Auth Config Allowed Modes",
       "description": "(Optional, 2025-09-01+) Allowed authentication modes for the cluster: 'NativeAuth' and/or 'MicrosoftEntraID'. When empty the API default (NativeAuth only) is used.",
       "tfType": "list(string)",
-      "items": "string",
       "default": []
     },
     "enable_ha": {
@@ -158,11 +157,10 @@
       "default": {}
     },
     "preview_features": {
-      "type": "array",
+      "type": "string",
       "title": "Preview Features",
       "description": "(Optional, 2025-09-01+) Preview features to opt into. Currently supported value: 'GeoReplicas'.",
       "tfType": "list(string)",
-      "items": "string",
       "default": []
     },
     "private_endpoints": {

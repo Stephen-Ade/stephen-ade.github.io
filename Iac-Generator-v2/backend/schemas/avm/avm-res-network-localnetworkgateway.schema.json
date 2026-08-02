@@ -2,11 +2,10 @@
   "type": "object",
   "properties": {
     "address_space": {
-      "type": "array",
+      "type": "string",
       "title": "Address Space",
       "description": "List of CIDR blocks representing the on-premise address space",
-      "tfType": "list(string)",
-      "items": "string"
+      "tfType": "list(string)"
     },
     "bgp_settings": {
       "type": "object",
