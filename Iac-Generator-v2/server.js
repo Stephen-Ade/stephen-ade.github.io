@@ -239,23 +239,27 @@ function compileTerraformProps(schemaProps, configNode, indent) {
     return hcl;
 }
 
-// 3RD PARTY AUDIT FIX: Multiline arrays with terraform fmt compliant 4-space inner indentation
-function convertToHcl(value) {
+// 3RD PARTY AUDIT FIX: Dynamic nested indentation for terraform fmt parity
+function convertToHcl(value, indent = '') {
     if (typeof value === 'string') return `"${value}"`;
     if (typeof value === 'number' || typeof value === 'boolean') return String(value);
     if (Array.isArray(value)) {
         if (value.length === 0) return '[]';
-        // AUDIT FIX: 4 spaces for inner items, 2 spaces for closing bracket
-        const items = value.map(v => `    ${convertToHcl(v)}`).join(',\n');
-        return `[\n${items}\n  ]`;
+        // AUDIT FIX: Calculate inner and closing indents dynamically based on parent context
+        const innerIndent = indent + '    ';
+        const closingIndent = indent + '  ';
+        const items = value.map(v => `${innerIndent}${convertToHcl(v, innerIndent)}`).join(',\n');
+        return `[\n${items}\n${closingIndent}]`;
     }
-    if (typeof value === 'object') return convertObjToHclInline(value);
+    if (typeof value === 'object') return convertObjToHclInline(value, indent);
     return 'null';
 }
 
-function convertObjToHclInline(obj) {
-    const lines = Object.entries(obj).map(([k, v]) => `    ${toSnakeCase(k)} = ${convertToHcl(v)}`);
-    return `{\n${lines.join('\n')}\n  }`;
+function convertObjToHclInline(obj, indent = '') {
+    const innerIndent = indent + '    ';
+    const closingIndent = indent + '  ';
+    const lines = Object.entries(obj).map(([k, v]) => `${innerIndent}${toSnakeCase(k)} = ${convertToHcl(v, innerIndent)}`);
+    return `{\n${lines.join('\n')}\n${closingIndent}}`;
 }
 
 
