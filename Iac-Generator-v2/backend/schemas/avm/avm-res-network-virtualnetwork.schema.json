@@ -4,7 +4,7 @@
     "address_space": {
       "type": "string",
       "title": "Address Space",
-      "description": "(Optional) The address spaces applied to the virtual network. You can supply more than one address space.   Either address_space or ipam_pools must be specified, but not both.",
+      "description": "(Optional) The address spaces applied to the virtual network. You can supply more than one address space.   Either address_space or ipam_pools must be specified, but not both. NOTE: Either this or ipam_pools must be specified.",
       "tfType": "set(string)"
     },
     "diagnostic_settings": {
@@ -111,7 +111,7 @@
     "ipam_pools": {
       "type": "string",
       "title": "Ipam Pools",
-      "description": "(Optional) Specifies the IPAM settings for requesting an address_space from an IP Pool. Only one IPv4 and one IPv6 pool can be specified.  - `id`: The ID of the IPAM pool. - `number_of_ip_addresses`: (Optional) The number of IP addresses to request from the IPAM pool. If not specified, it will be calculated based on the `prefix_length`. - `prefix_length`: (Optional) The length of the /XX CIDR range to request. for example 24 for a /24. Prefix length must be between 2 and 29 for IPv4 and 48 and 64 for IPv6.",
+      "description": "(Optional) Specifies the IPAM settings for requesting an address_space from an IP Pool. Only one IPv4 and one IPv6 pool can be specified.  - `id`: The ID of the IPAM pool. - `number_of_ip_addresses`: (Optional) The number of IP addresses to request from the IPAM pool. If not specified, it will be calculated based on the `prefix_length`. - `prefix_length`: (Optional) The length of the /XX CIDR range to request. for example 24 for a /24. Prefix length must be between 2 and 29 for IPv4 and 48 and 64 for IPv6. NOTE: Either this or address_space must be specified.",
       "tfType": "list(object({\n    id                     = string\n    number_of_ip_addresses = optional(string)\n    prefix_length          = optional(number)\n  }))"
     },
     "retry": {

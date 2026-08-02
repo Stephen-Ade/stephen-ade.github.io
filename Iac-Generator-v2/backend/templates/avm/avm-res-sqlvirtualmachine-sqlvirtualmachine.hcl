@@ -2,12 +2,12 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.0.0"
+      version = ">= 4.0.0, < 5.0.0"
     }
   }
 }
 
-module "avm-res-sqlvirtualmachine-sqlvirtualmachine" {
+module "avm_res_sqlvirtualmachine_sqlvirtualmachine" {
   source  = "Azure/avm-res-sqlvirtualmachine-sqlvirtualmachine/azurerm"
   version = "0.0.1"
 

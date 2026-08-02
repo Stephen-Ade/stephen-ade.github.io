@@ -2,12 +2,12 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.0.0"
+      version = ">= 4.0.0, < 5.0.0"
     }
   }
 }
 
-module "avm-res-dbformysql-flexibleserver" {
+module "avm_res_dbformysql_flexibleserver" {
   source  = "Azure/avm-res-dbformysql-flexibleserver/azurerm"
   version = "0.1.6"
 

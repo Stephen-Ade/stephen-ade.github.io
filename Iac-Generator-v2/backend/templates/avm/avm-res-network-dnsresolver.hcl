@@ -2,12 +2,12 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.0.0"
+      version = ">= 4.0.0, < 5.0.0"
     }
   }
 }
 
-module "avm-res-network-dnsresolver" {
+module "avm_res_network_dnsresolver" {
   source  = "Azure/avm-res-network-dnsresolver/azurerm"
   version = "0.8.0"
 

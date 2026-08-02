@@ -239,13 +239,15 @@ function compileTerraformProps(schemaProps, configNode, indent) {
     return hcl;
 }
 
+// 3RD PARTY AUDIT FIX: Multiline arrays for terraform fmt parity
 function convertToHcl(value) {
     if (typeof value === 'string') return `"${value}"`;
     if (typeof value === 'number' || typeof value === 'boolean') return String(value);
     if (Array.isArray(value)) {
         if (value.length === 0) return '[]';
-        if (typeof value[0] === 'string') return `["${value.join('", "')}"]`;
-        return `[${value.map(v => typeof v === 'object' ? convertObjToHclInline(v) : v).join(', ')}]`;
+        // AUDIT FIX: Force multiline arrays
+        const items = value.map(v => `  ${convertToHcl(v)}`).join(',\n');
+        return `[\n${items}\n]`;
     }
     if (typeof value === 'object') return convertObjToHclInline(value);
     return 'null';
@@ -569,6 +571,7 @@ app.post('/api/generate', (req, res) => {
                         return res.send({ code: finalHcl, language: 'hcl' });
                     }
 
+                    // 3RD PARTY AUDIT FIX: Aligned equals signs for terraform fmt parity
                     const convertMapToHcl = (data, key, forceLowerCase = false) => {
                         if (data[key]) {
                             try {
@@ -580,10 +583,18 @@ app.post('/api/generate', (req, res) => {
                                     }
                                     parsedMap = lowerMap;
                                 }
-                                let hclMap = JSON.stringify(parsedMap, null, 2);
-                                hclMap = hclMap.replace(/,/g, ''); 
-                                hclMap = hclMap.replace(/"([^"]+)":/g, '$1 =');
-                                data[key] = hclMap;
+                                
+                                const entries = Object.entries(parsedMap);
+                                if (entries.length === 0) {
+                                    data[key] = '{}';
+                                    return;
+                                }
+                                const maxKeyLen = Math.max(...entries.map(([k]) => k.length));
+                                const lines = entries.map(([k, v]) => {
+                                    const paddedKey = k.padEnd(maxKeyLen);
+                                    return `  ${paddedKey} = ${convertToHcl(v)}`;
+                                }).join('\n');
+                                data[key] = `{\n${lines}\n}`;
                             } catch (e) { /* fail securely */ }
                         }
                     };
@@ -641,6 +652,12 @@ app.post('/api/generate', (req, res) => {
             return res.status(404).json({ error: 'Resource type not found' });
         }
     }
+
+    // 3RD PARTY AUDIT FIX: Normalize HCL formatting (strip empty lines from Handlebars conditionals)
+    if (language === 'hcl') {
+        code = code.replace(/\n{3,}/g, '\n\n').trim() + '\n';
+    }
+
     res.json({ success: true, code, language });
 });
 

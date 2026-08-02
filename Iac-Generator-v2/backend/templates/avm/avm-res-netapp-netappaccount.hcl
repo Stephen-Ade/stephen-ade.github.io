@@ -2,12 +2,12 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.0.0"
+      version = ">= 4.0.0, < 5.0.0"
     }
   }
 }
 
-module "avm-res-netapp-netappaccount" {
+module "avm_res_netapp_netappaccount" {
   source  = "Azure/avm-res-netapp-netappaccount/azurerm"
   version = "0.3.0"
 

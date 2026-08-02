@@ -2,12 +2,12 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.0.0"
+      version = ">= 4.0.0, < 5.0.0"
     }
   }
 }
 
-module "avm-res-azurestackhci-cluster" {
+module "avm_res_azurestackhci_cluster" {
   source  = "Azure/avm-res-azurestackhci-cluster/azurerm"
   version = "2.0.2"
 

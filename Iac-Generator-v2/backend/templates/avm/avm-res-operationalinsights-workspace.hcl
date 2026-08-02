@@ -2,12 +2,12 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.0.0"
+      version = ">= 4.0.0, < 5.0.0"
     }
   }
 }
 
-module "avm-res-operationalinsights-workspace" {
+module "avm_res_operationalinsights_workspace" {
   source  = "Azure/avm-res-operationalinsights-workspace/azurerm"
   version = "0.5.1"
 

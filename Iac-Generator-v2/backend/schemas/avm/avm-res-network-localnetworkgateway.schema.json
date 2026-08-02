@@ -4,7 +4,7 @@
     "address_space": {
       "type": "string",
       "title": "Address Space",
-      "description": "List of CIDR blocks representing the on-premise address space",
+      "description": "List of CIDR blocks representing the on-premise address space NOTE: Either this or ipam_pools must be specified.",
       "tfType": "list(string)"
     },
     "bgp_settings": {

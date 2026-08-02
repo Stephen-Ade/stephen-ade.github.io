@@ -2,12 +2,12 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.0.0"
+      version = ">= 4.0.0, < 5.0.0"
     }
   }
 }
 
-module "avm-res-network-networkwatcher" {
+module "avm_res_network_networkwatcher" {
   source  = "Azure/avm-res-network-networkwatcher/azurerm"
   version = "0.3.2"
 

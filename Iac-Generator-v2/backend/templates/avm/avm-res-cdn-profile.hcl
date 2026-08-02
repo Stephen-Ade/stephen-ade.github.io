@@ -2,12 +2,12 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.0.0"
+      version = ">= 4.0.0, < 5.0.0"
     }
   }
 }
 
-module "avm-res-cdn-profile" {
+module "avm_res_cdn_profile" {
   source  = "Azure/avm-res-cdn-profile/azurerm"
   version = "0.1.9"
 

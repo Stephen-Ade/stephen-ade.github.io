@@ -2,12 +2,12 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.0.0"
+      version = ">= 4.0.0, < 5.0.0"
     }
   }
 }
 
-module "avm-res-network-privateendpoint" {
+module "avm_res_network_privateendpoint" {
   source  = "Azure/avm-res-network-privateendpoint/azurerm"
   version = "0.2.0"
 

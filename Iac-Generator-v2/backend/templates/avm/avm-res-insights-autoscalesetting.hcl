@@ -2,12 +2,12 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.0.0"
+      version = ">= 4.0.0, < 5.0.0"
     }
   }
 }
 
-module "avm-res-insights-autoscalesetting" {
+module "avm_res_insights_autoscalesetting" {
   source  = "Azure/avm-res-insights-autoscalesetting/azurerm"
   version = "0.1.2"
 

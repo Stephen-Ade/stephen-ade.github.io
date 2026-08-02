@@ -2,12 +2,12 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.0.0"
+      version = ">= 4.0.0, < 5.0.0"
     }
   }
 }
 
-module "avm-res-eventgrid-topic" {
+module "avm_res_eventgrid_topic" {
   source  = "Azure/avm-res-eventgrid-topic/azurerm"
   version = "0.1.1"
 
