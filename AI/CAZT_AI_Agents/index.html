@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Conditional Access and Zero Trust for AI Agents</title>
+  <title>Conditional Access and Zero Trust for AI Agents — SPIFFE Edition v2.7</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -154,12 +154,6 @@
     .constraint-notice strong{color:var(--text-dark)}
 
     /* Override toggle */
-    .override-toggle{
-      display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted-dark);
-      cursor:pointer;user-select:none;
-    }
-    .override-toggle input{margin:0;cursor:pointer}
-    .override-toggle:hover{color:var(--text-dark)}
     .wizard-nav{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
     .wizard-btn{
       appearance:none;border:0;cursor:pointer;font-family:inherit;font-weight:600;font-size:13px;
@@ -183,6 +177,8 @@
       display:flex;align-items:center;gap:14px;padding:14px 16px;margin-bottom:10px;
       border:1px solid var(--line-light);border-radius:12px;background:#fff;
     }
+    .scope-label{display:block;margin:0 0 12px;}
+    .dt-panel[hidden]{display:none!important;}
     .outcome-rank .pct{
       flex-shrink:0;width:64px;text-align:center;
       font-size:18px;font-weight:800;color:var(--accent);letter-spacing:-.03em;
@@ -478,6 +474,54 @@
       .box{background:#fff;border-color:#ccc;color:#111}
       footer{background:#fff;color:#333;border-top:1px solid #ccc}
     }
+
+    /* Consistent dark screen theme, including interactive result states. */
+    @media screen {
+      :root {color-scheme:dark;--surface:#07111f;--card:#0f2239;--text-dark:#e8f0fb;--muted-dark:#b9cbe0;--line-light:#34516c;--good:#66ddb0;--warn:#ffd080;--bad:#ff9aad;}
+      body,main {background:#07111f; color:var(--text);}
+      section {background:#07111f;}
+      a {color:#86c4ff;}
+      .card,.wizard,.decision,.table-wrap,.outcome-rank,.answers-summary,.dt-tab.active,.export-btn {background:#0f2239;color:var(--text);}
+      .hero-card {background:#0f2239;}
+      th {background:#18334f;color:var(--text);}
+      td {color:#c5d6e9;}
+      .box {background:#18334f;color:var(--text);border-color:#446988;}
+      .note,.union-controls {background:#112c47;color:#c6dfff;border-color:#365e83;}
+      .warnbox,.constraint-notice,.mismatch-warning {background:#30271b;color:#ffdfaa;border-color:#806437;}
+      .dangerbox {background:#341f2c;color:#ffc0ce;border-color:#874256;}
+      .augmented-controls {background:#102e2a;border-color:#386e5e;}
+      .wb-back,.wb-restart {background:#203b55;color:var(--text);}
+      .wb-back:hover:not(:disabled),.wb-restart:hover,.export-btn:hover {background:#2b4b69;color:var(--text);}
+      .wizard-bar {background:#28435f;}
+      .wizard-opt .dot {background:#0b1a2c;border-color:#809bb7;}
+      .wizard-opt.disabled,.wizard-opt.disabled:hover {background:#152539;}
+      .wizard-opt.disabled .dot {background:#152539;}
+      .wizard-opt:hover,.wizard-opt:has(input:checked) {background:#183b5d;}
+      .answer-item {border-bottom-color:#34516c;}
+      .pill.blue,.layer-title,.arrow {color:#86c4ff;}
+      .wb-next,.export-btn.primary {background:#2764c9;color:#fff;}
+      :focus-visible {outline:3px solid #86c4ff;outline-offset:3px;}
+    }
+
+    /* Wrap the complete menu instead of clipping it in a hidden scroll area. */
+    @media screen {
+      .nav-inner {display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding-top:12px;padding-bottom:12px;}
+      .nav-links {display:flex;flex-wrap:wrap;gap:6px 10px;width:100%;min-width:0;overflow:visible;}
+      .nav-links a {display:inline-flex;align-items:center;padding:6px 8px;border-radius:6px;line-height:1.35;white-space:normal;}
+      .nav-links a:hover,.nav-links a:focus-visible {background:#203b55;text-decoration:none;color:#fff;}
+      .nav-links a.home-link {margin-right:0;padding-right:12px;}
+      section[id] {scroll-margin-top:var(--nav-offset,180px);}
+    }
+    @media screen and (max-width:640px) {
+      nav {position:relative;}
+      .nav-links {flex-wrap:wrap;overflow:visible;}
+      .nav-links a {font-size:12px;padding:7px 8px;}
+      section[id] {scroll-margin-top:var(--nav-offset,16px);}
+    }
+    .outcome-rank .pct{width:82px;font-size:16px;}
+    .card > .pill + h3{display:block;margin-top:12px;}
+    #restore-notice[hidden]{display:none;}
+    [id]{scroll-margin-top:var(--nav-offset,180px);}
   </style>
 </head>
 <body>
@@ -485,60 +529,53 @@
     <div class="wrap nav-inner">
       <div class="brand"><div class="brand-mark">AI</div>CAZT for AI Agents</div>
       <div class="nav-links">
-        <a href="https://stephen-ade.github.io/" class="home-link">&larr; Back to Home</a>
-        <a href="#overview">Overview</a>
-        <a href="#identity">Identity</a>
-        <a href="#semantic">Semantic</a>
-        <a href="#execution">Execution</a>
-        <a href="#governance">Governance</a>
-        <a href="#cross-cloud">Cross-Cloud</a>
-        <a href="#comparison">Comparison</a>
-        <a href="#decision-tree">Decision Tree</a>
-        <a href="#compliance">Compliance</a>
+<a href="https://stephen-ade.github.io/" class="home-link">&larr; Home</a>
+<a href="#layers">Four Layers</a><a href="#identity">Identity</a><a href="#semantic">Semantic</a><a href="#execution">Execution</a><a href="#governance">Governance</a><a href="#spiffe">SPIFFE/SPIRE</a><a href="#ciba">CIBA &amp; Approval</a><a href="#protocol-requirements">Protocol Requirements</a><a href="#cross-cloud">Cross-Cloud</a><a href="#comparison">Comparison</a><a href="#deployments">Deployment Patterns</a><a href="#decision-tree">Decision Tree</a><a href="#compliance">Compliance</a>
       </div>
     </div>
   </nav>
 
   <header class="hero" id="overview">
     <div class="wrap">
-      <div class="eyebrow">Version 1.0 &middot; Last reviewed <span id="rev-date"></span></div>
+      <div class="eyebrow">Version 2.8 &middot; Last reviewed <span id="rev-date"></span></div>
       <h1>Conditional Access and Zero Trust for AI Agents</h1>
       <div class="sub">
-        A practical security architecture for enterprise AI agents built on current Azure and AWS capabilities.<br>
-        This framework separates what organizations can deploy now from what remains preview, emerging, or design-pattern guidance.
+        Secure enterprise AI agents running on <strong>AWS or Azure</strong>, with human identity services from <strong>Entra ID, Okta, Auth0, Curity, Ping Identity or another validated enterprise identity provider</strong>.<br>
+        Use SPIFFE/SPIRE to verify workloads on supported systems, supported cloud identities for managed services, and CIBA or another secure workflow when a human must approve an action. Each deployment must verify its product capabilities and trust boundaries.
       </div>
       <div class="hero-grid">
         <div class="hero-card">
           <h3>Core idea</h3>
-          <p>
-            Secure AI agents by combining <strong>workload identity</strong>, <strong>semantic safety</strong>, <strong>execution containment</strong>,
-            and <strong>governance controls</strong>. The goal is not to invent a wholly new IAM stack; it is to apply Zero Trust principles
-            to agents using cloud-native identity, scoped authorization, strong mediation, and auditable approval paths.
-          </p>
+          <p>Before an AI agent acts, establish <strong>who it is</strong>, assess <strong>what it intends to do</strong>, limit <strong>what it can execute</strong>, and apply <strong>the organization’s approval rules</strong>. These are the identity, semantic, execution and governance layers of CAZT.</p>
+          <p>The agent’s cloud host and the enterprise human identity provider are separate choices. SPIFFE/SPIRE gives supported workloads short-lived, attested identities; managed cloud services use their documented native identities. AWS IAM or Azure authorization controls access to cloud resources.</p>
+          <p>When a high-risk action exceeds the agent’s permissions, an authorized person must approve the exact operation. CIBA can support human authentication and consent through a compatible identity product; a secure alternative workflow can also work. The tool gateway must validate and enforce that approval before execution.</p>
           <div class="chips">
-            <span class="chip">Azure managed identities</span>
-            <span class="chip">Service principals</span>
-            <span class="chip">AWS IAM roles</span>
-            <span class="chip">STS temporary credentials</span>
-            <span class="chip">Prompt defenses</span>
-            <span class="chip">Human approval</span>
+            <span class="chip">AWS or Azure hosting</span>
+            <span class="chip">Enterprise IdP choice</span>
+            <span class="chip">SPIFFE/SPIRE attestation</span>
+            <span class="chip">Native cloud identities</span>
+            <span class="chip">Semantic risk checks</span>
+            <span class="chip">CIBA / human approval</span>
+            <span class="chip">Exact-action enforcement</span>
+            <span class="chip">Governance and audit</span>
           </div>
         </div>
         <div class="hero-card">
-          <h3>What this guide assumes</h3>
-          <ul>
-            <li>Most enterprise agents today are still semi-autonomous, not unconstrained autonomous actors.</li>
-            <li>Runtime identity is usually cloud-native: managed identity, service principal, federation, or IAM role.</li>
-            <li>Conditional Access and CAE have defined product limits and should not be generalized beyond documented scope.</li>
-            <li>Cross-cloud trust is usually implemented with federation and short-lived credentials, not bespoke identity bridges.</li>
-          </ul>
+          <h3>What this guide assumes</h3><ul>
+<li><strong>Choose where the agent runs and who manages user identities.</strong> Your agent can run on AWS or Azure, while Entra ID, Okta or another identity provider manages human sign-in. Cloud services separately control which resources the agent can access.</li>
+<li><strong>Use the identity method your hosting environment supports.</strong> SPIFFE/SPIRE verifies agents on supported systems you control. Managed services, such as Foundry Agent Service, use their supported platform identities. A gateway’s verified identity proves who the gateway is; it does not prove the identity of every agent calling it.</li>
+<li><strong>Ask an authorized person before a high-risk action goes beyond the agent’s permissions.</strong> CIBA can help authenticate that person and obtain consent. Your application must check that the approval covers the exact action, target and details before allowing it to run.</li>
+<li><strong>Check that your identity provider supports the approval method.</strong> See the <a href="#microsoft-ciba-status">dated Microsoft CIBA support assessment</a>; use a supported alternative approval workflow or a separately integrated CIBA provider. Okta, Auth0, Curity and Ping offer documented CIBA options that require the right setup and enrolled users. A secure approval workflow without CIBA can also meet the requirement.</li>
+<li><strong>Protect the systems that issue identities and enforce approvals.</strong> Temporary credentials still depend on trusted issuers and protected signing keys. Secure those systems and make sure the agent cannot reach sensitive tools through a route that skips approval.</li>
+<li><strong>Verify the complete setup before using it in production.</strong> Features such as Conditional Access and identity federation work within specific product limits. Check availability, configuration and any preview restrictions. A matching decision-tree result suggests a suitable design; it does not certify that your deployment is secure or ready.</li>
+</ul>
         </div>
       </div>
     </div>
   </header>
 
   <main>
-    <section style="background:var(--bg);color:var(--text);">
+<section id="layers" style="background:var(--bg);color:var(--text);">
       <div class="wrap">
         <h2 class="section-title white-title">Four security layers for enterprise AI agents</h2>
         <p class="section-sub" style="color:var(--muted);">A useful agent security model separates the problem into four layers. Each one solves a different class of failure.</p>
@@ -546,7 +583,7 @@
           <div class="card third">
             <div class="layer-title">Layer 1</div>
             <h3>Identity</h3>
-            <p>Give every agent a unique non-human identity with least privilege and short-lived credentials.</p>
+            <p>Use attested workload identity, trustworthy instance/run attribution, least privilege and short-lived credentials. Instance-unique SPIFFE IDs require explicit registration policy.</p>
           </div>
           <div class="card third">
             <div class="layer-title">Layer 2</div>
@@ -577,10 +614,9 @@
         </div>
       </div>
     </section>
-
-    <section id="identity">
+<section id="identity">
       <div class="wrap">
-        <h2 class="section-title">Identity layer</h2>
+        <h2 class="section-title">Layer 1: Identity layer</h2>
         <p class="section-sub">
           The identity layer should be grounded in existing cloud workload identity, not in overstated assumptions about agent-specific control planes.
         </p>
@@ -596,16 +632,31 @@
             </ul>
           </div>
           <div class="card">
-            <span class="pill warn">Position carefully</span>
-            <h3>Agent-specific identity capabilities</h3>
+            <div class="scope-label"><span class="pill warn">Microsoft-specific caveats:</span></div>
+            <h3>Microsoft Entra agent identity capabilities</h3>
+            <p>This guidance applies to Microsoft Entra identities and policies. It does not describe AWS IAM, Okta, Curity or Ping controls; workload hosting alone does not determine which identity policies apply.</p>
             <ul>
-              <li><strong>Microsoft Entra Agent ID</strong> reached general availability at Ignite 2025 (November 2025) and is a real Microsoft capability for governing and securing agent identities.</li>
+              <li><strong>Microsoft Entra Agent ID</strong> is a Microsoft-specific agent governance capability. Verify current availability, licensing and supported controls for the target tenant before deployment.</li>
               <li>It is <strong>Microsoft-specific</strong> and <strong>license-gated</strong> &mdash; not the universal identity baseline for all enterprise AI agents across platforms.</li>
-              <li>Conditional Access for agent identities is currently limited to <strong>Block Access only</strong>. MFA, authentication strength, device compliance, and session controls are <strong>not supported</strong> for agent identities.</li>
-              <li>Agent Risk detection in Conditional Access remains in <strong>preview</strong>.</li>
+              <li>Separate application-only agent identity policies, agent-user policies and delegated-user policies. Do not apply human MFA to a workload. For supported managed-endpoint agent-user sessions, Microsoft documents device compliance and compliant-network controls using the Agent execution environments (Preview) condition. These are not application-only workload MFA controls. <a href="https://learn.microsoft.com/en-us/entra/identity/conditional-access/agent-id">Microsoft scope documentation (updated September 30, 2026)</a>.</li>
+              <li>Application-only agent policies use documented block controls, including exclusions for approved identities/blueprints or security attributes; agent-risk blocking has its own feature status. <a href="https://learn.microsoft.com/en-us/entra/identity/conditional-access/policy-autonomous-agents">Microsoft autonomous-agent policy guidance</a>.</li>
+              <li><strong>Endpoint prerequisites:</strong> the documented device-compliance scenario requires an Intune-managed Windows 365 Cloud PC for Agents; compliant-network controls additionally require the Global Secure Access client. Scope the preview execution-environment condition to endpoint sessions; these controls do not cover arbitrary AWS/Azure hosted agents.</li>
+<li><strong>Licensing:</strong> Microsoft’s October 6, 2026 reviewed documentation lists Microsoft 365 E7, or Agent 365 paired with at least Entra P1 or Microsoft 365 E3. Verify current tenant entitlement. <a href="https://learn.microsoft.com/en-us/entra/identity/conditional-access/policy-agent-user">Agent-user prerequisites and limitations</a>.</li>
+<li>Verify the current agent-risk feature status and license for the target tenant; preview/GA status must be dated and feature-specific.</li>
               <li>Managed identities remain strong runtime identities, but they are <strong>not covered by Conditional Access for workload identities</strong>.</li>
             </ul>
           </div>
+          <div class="card full">
+<div class="scope-label"><span class="pill warn">AWS-specific caveats:</span></div><h3>AWS agent identities and resource access</h3><ul>
+<li><strong>Separate the AWS products and identities.</strong> An IAM role, a Bedrock Agents service role and an AgentCore workload identity have different jobs. A role does not automatically identify each agent instance or task; maintain trusted run attribution.</li>
+<li><strong>AgentCore Identity is AWS-specific.</strong> It provides workload identity and credential management, including OAuth tokens and API-key providers. It is not automatically SPIFFE attestation or an end-to-end secretless solution. Scope credential-provider access to the intended workload and user context.</li>
+<li><strong>Separate caller, runtime and tool permissions.</strong> Permission to invoke an agent must not imply permission for every tool action. Restrict service-role trust, iam:PassRole and action-group/tool roles; apply supported confused-deputy conditions for the actual AWS service.</li>
+<li><strong>Temporary AWS credentials are not per-action approvals.</strong> Task completion or a human denial does not automatically end an STS session. Enforce task expiry and approval at the tool PEP; test IAM deny/revocation and emergency containment paths.</li>
+<li><strong>IAM has its own policy model.</strong> Entra Conditional Access can evaluate the human Entra sign-in used to federate into AWS. It does not evaluate subsequent AWS API calls made with IAM role credentials; AWS IAM governs workload role assumptions and resource authorization. External IdP sign-in and CIBA consent do not automatically authorize AWS actions. Preserve least-privilege IAM and exact-operation approval independently.</li>
+<li><strong>Managed AWS hosting does not establish SPIFFE support.</strong> Verify the runtime before installing SPIRE. A gateway SVID identifies the gateway; managed agents require documented native credentials and verified caller/run context.</li>
+<li><strong>Check the selected AWS feature.</strong> Confirm region, API version, quotas and availability for Bedrock or AgentCore features. Do not assume native CIBA support merely because OAuth integration is available.</li>
+</ul><p><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/agents-permissions.html">Bedrock Agents service roles</a> · <a href="https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/understanding-agent-identities.html">AgentCore workload identities</a> · <a href="https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/scope-credential-provider-access.html">Credential-provider access</a> · <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_control-access_disable-perms.html">Temporary credential containment</a></p></div>
+<div class="card full"><h3>Common identity requirements across vendors</h3><p>Choose the enterprise human IdP separately from AWS/Azure hosting. Verify workload identity, issuer/audience and trust mapping, least privilege, human approver eligibility, and exact-action enforcement. Product-specific controls complement these requirements. Neither Microsoft agent identity features nor AWS agent identity services replace semantic checks, execution containment or governance.</p></div>
           <div class="card full">
             <h3>Recommended identity hierarchy</h3>
             <div class="table-wrap">
@@ -641,15 +692,14 @@
                 </tbody>
               </table>
             </div>
-            <div class="note">The practical design rule is simple: <strong>one logical agent, one workload identity, one auditable trust boundary.</strong></div>
+            <div class="note">Separate the governed agent definition, attested workload, verified instance and task/run. Replicas may share a service SPIFFE ID; per-instance IDs need trusted registration lifecycle. Each consequential action must remain attributable.</div>
           </div>
         </div>
       </div>
     </section>
-
-    <section id="semantic">
+<section id="semantic">
       <div class="wrap">
-        <h2 class="section-title">Semantic layer</h2>
+        <h2 class="section-title">Layer 2: Semantic layer</h2>
         <p class="section-sub">
           Identity does not prevent an agent from being manipulated through language. The semantic layer is the defense against prompt injection, context poisoning, and unsafe tool selection.
         </p>
@@ -679,7 +729,7 @@
               <div class="arrow">&rarr;</div>
               <div class="box">Safety / Injection Inspection</div>
               <div class="arrow">&rarr;</div>
-              <div class="box">Policy Decision<br/>Allow &middot; Challenge &middot; Block</div>
+              <div class="box">Policy Decision<br/>Permit &middot; Deny &middot; Approval required</div>
               <div class="arrow">&rarr;</div>
               <div class="box">Tool Invocation or Response Generation</div>
             </div>
@@ -688,12 +738,11 @@
         </div>
       </div>
     </section>
-
-    <section id="execution">
+<section id="execution">
       <div class="wrap">
-        <h2 class="section-title">Execution layer</h2>
+        <h2 class="section-title">Layer 3: Execution layer</h2>
         <p class="section-sub">
-          Even a well-identified and semantically screened agent can still cause damage if runtime permissions, network paths, and tool access are too broad.
+          The execution layer is the final gate before an agent calls a tool or changes a resource. The tool service/gateway acts as the Policy Enforcement Point (PEP), consulting the authorization engine or Policy Decision Point (PDP). It enforces identity, task scope, policy decisions and any required human approval on AWS or Azure—even after prompts have passed semantic checks.
         </p>
         <div class="grid">
           <div class="card">
@@ -714,7 +763,7 @@
               <li>They should not be presented as though a single cloud-native &ldquo;TBAC&rdquo; feature already exists universally across platforms.</li>
               <li>Use them as a design pattern: scope identity, tool access, transaction range, and time window to the active task.</li>
             </ul>
-            <div class="note"><strong>TBAC (Task-Based Authorization Controls)</strong> originates from Sandhu &amp; Thomas, IFIP WG11.3, 1997 &mdash; it is an academic access-control model, not a NIST/ISO standard or productized cloud feature. Note: &ldquo;TBAC&rdquo; is also used in industry for &ldquo;Time-Based Access Control&rdquo; (JIT, time-boxed grants) &mdash; a distinct concept sharing the acronym.</div>
+            <div class="note"><strong>TBAC (Task-Based Authorization Controls)</strong> originates from Thomas &amp; Sandhu, IFIP WG11.3, 1997 &mdash; it is an academic access-control model, not a NIST/ISO standard or productized cloud feature. Note: &ldquo;TBAC&rdquo; is also used in industry for &ldquo;Time-Based Access Control&rdquo; (JIT, time-boxed grants) &mdash; a distinct concept sharing the acronym.</div>
           </div>
           <div class="card full">
             <h3>Execution authorization envelope</h3>
@@ -741,8 +790,13 @@
                   <tr>
                     <td>Transaction</td>
                     <td>Which exact action is allowed right now?</td>
-                    <td>Rate limits, value limits, object scoping, and time-bounded credentials.</td>
+                    <td>Validate the exact operation, target and canonicalized arguments; enforce value/rate limits and any required human approval.</td>
                   </tr>
+<tr><td>Workload identity</td><td>Who is actually calling the tool?</td><td>Validate an SVID at supported boundaries or the documented native cloud token; check issuer/trust domain, audience, expiry and authorized principal. A gateway identity does not attest its caller.</td></tr>
+<tr><td>Human approval</td><td>Was this exact high-risk operation approved?</td><td>Validate a tamper-protected approval bound to workload principal, trusted task/run, eligible human issuer/subject, operation, target, argument digest, policy version and expiry.</td></tr>
+<tr><td>Replay and change</td><td>Has the operation changed or already run?</td><td>Atomically consume a single-use approval nonce. Changed parameters require a new decision/approval. Use idempotency and reconciliation so retries do not duplicate side effects.</td></tr>
+<tr><td>Lifetime and cancellation</td><td>Is the task still authorized now?</td><td>Check task status, current policy, approval expiry and emergency deny immediately before execution. Credential validity alone does not permit the task.</td></tr>
+<tr><td>Enforcement boundary</td><td>Can the agent skip the gateway?</td><td>Keep consequential permissions on the gated executor; restrict agent roles, network paths and alternate endpoints. Validate all independently reachable tool paths.</td></tr>
                 </tbody>
               </table>
             </div>
@@ -750,36 +804,62 @@
           </div>
           <div class="card">
             <span class="pill blue">Cloud-native</span>
-            <h3>AWS STS &mdash; ephemeral task-scoped credentials</h3>
+            <h3>AWS STS &mdash; temporary credentials with task restrictions</h3>
             <p>AWS STS <code>AssumeRoleWithWebIdentity</code> vends temporary credentials with a minimum duration of <strong>900 seconds (15 minutes)</strong>. Session policies (inline <code>Policy</code> parameter or managed <code>PolicyArns</code>) can further restrict the assumed role&rsquo;s permissions to only what the current task requires &mdash; session policies can only reduce, not grant.</p>
-            <p>This is the primary cloud-native mechanism for ephemeral, task-scoped agent access in AWS.</p>
+            <p>Use STS for validated role-assumption profiles. Task authorization may expire before the cloud session; enforce task deadlines independently at the PEP.</p>
           </div>
           <div class="card">
             <span class="pill warn">Emerging standard</span>
-            <h3>Model Context Protocol (MCP)</h3>
-            <p>The Model Context Protocol (MCP, donated to the Linux Foundation&rsquo;s AAIF in December 2025) is emerging as the standard for exposing Tools, Resources, and Prompts to AI models.</p>
-            <p>Every MCP tool invocation is an <strong>authorization decision point</strong> &mdash; the execution layer should enforce per-tool allow-lists, argument validation, and policy-engine authorization before any tool executes.</p>
-            <p>MCP security uses <strong>OAuth 2.1</strong> (IETF draft) with mandatory PKCE; Dynamic Client Registration and Protected Resource Metadata are defined in the specification.</p>
-          </div>
+            <h3>Model Context Protocol (MCP)</h3><p>Use the pinned HTTP authorization profile described in <a href="#protocol-requirements">Protocol and deployment requirements</a>: flow-specific OAuth, protected resource metadata, audience binding and no token passthrough. Local STDIO requires separate process and credential controls.</p></div>
+<div class="card full"><h3>CIBA-backed execution: pause, approve, enforce</h3><ol>
+<li><strong>Pause:</strong> a semantic policy decision of “approval required” creates a durable pending operation. Do not execute while awaiting human intervention.</li>
+<li><strong>Authenticate and obtain consent:</strong> the approval service uses the selected provider’s supported CIBA integration, or a secure alternative human workflow. For Entra, follow the <a href="#microsoft-ciba-status">dated CIBA support assessment</a> and choose a supported alternative or separately integrated CIBA provider.</li>
+<li><strong>Bind:</strong> record authorization for the exact requested operation. A successful human login or CIBA token alone is insufficient.</li>
+<li><strong>Revalidate:</strong> verify approver eligibility, current policy, workload/run identity, parameter digest, task status and expiry immediately before the tool acts. Denial, timeout or missing evidence blocks execution.</li>
+<li><strong>Execute once:</strong> consume the approval atomically and execute with the tool’s least-privilege identity. Audit completion/failure; recovery requires safe retries, reconciliation and any renewed approval.</li>
+</ol><p>CIBA calls belong in a protected approval service, not in this browser SPA. Pending approval must not require an agent process to wait indefinitely; resume through an authenticated task handle and recheck all controls.</p></div>
+<div class="card"><h3>SPIFFE/SPIRE at execution boundaries</h3><ul>
+<li>Verify SVIDs and authorize the SPIFFE ID for the specific tool operation; mTLS establishes peer identity, not permission for every action.</li>
+<li>Protect the Workload API socket, isolate workloads and registrations, support credential rotation and trusted bundle updates, and reject untrusted domains/audiences.</li>
+<li>Keep service identity separate from instance/run attribution. Bind approval to independently verified run context, especially when replicas share a SPIFFE ID.</li>
+<li>Across gateways, propagate integrity-protected identity/context with explicit trust mapping. Never accept agent-supplied identity headers as proof or claim the gateway’s SVID attests a managed agent.</li>
+</ul></div>
+<div class="card"><h3>AWS and Azure enforcement</h3><ul>
+<li><strong>AWS:</strong> constrain agent invocation roles, runtime roles and tool/service roles separately. IAM/STS resource permissions complement exact-action approval; an Okta or Entra human token does not replace AWS credentials.</li>
+<li><strong>Azure:</strong> use documented Entra workload tokens and least-privilege Azure RBAC for Azure resources, even when Okta or another vendor provides human identity. OAuth consent does not grant unrestricted tool access.</li>
+<li><strong>Managed agents:</strong> route consequential Foundry, Bedrock or AgentCore tool actions through an enforceable gateway/tool PEP using supported authentication. Disable high-risk actions if trusted identity/run correlation or approval enforcement cannot be established.</li>
+<li><strong>Cloud sessions:</strong> test emergency IAM deny/revocation or Azure containment paths. Enforce shorter application task deadlines independently; do not rely on token expiry or stopping a process to undo completed actions.</li>
+</ul></div>
+<div class="card full"><h3>Execution evidence and acceptance checks</h3><p>Correlate the workload principal, trusted run/task identifier, policy decision, human approver, approval identifier and actual tool result. Join application evidence with CloudTrail or Azure resource logs where available; do not log tokens, private keys or sensitive payloads.</p><p>Before enabling high-risk tools, test wrong identity/audience, expired approval, wrong approver, changed arguments, replay, concurrent consumption, provider timeout, task cancellation, direct bypass and failures after partial execution. Set transaction limits, circuit breakers, kill switches and compensating actions appropriate to the tool.</p></div>
           <div class="card full">
             <span class="pill good">Tooling</span>
-            <h3>Policy-as-Code authorization engines</h3>
+            <h3>Policy-as-Code authorization engines — the PDP</h3>
+<p>Policy-as-Code expresses authorization rules in a form software can evaluate. The authorization engine normally acts as the <strong>Policy Decision Point (PDP)</strong>. It decides whether a specific operation is permitted. The <strong>Policy Enforcement Point (PEP)</strong>, usually the tool service or tool gateway, enforces that decision before execution. These roles can share an application, but they remain distinct responsibilities.</p>
+<div class="table-wrap"><table><thead><tr><th>Term</th><th>Implementation in this guide</th><th>Responsibility</th></tr></thead><tbody>
+<tr><td>PDP — Policy Decision Point</td><td>Authorization engine / policy service</td><td>Evaluate verified identity, action, resource, task context and approval evidence against current policy.</td></tr>
+<tr><td>PEP — Policy Enforcement Point</td><td>Tool service / tool gateway / executor authorization boundary</td><td>Request and enforce the decision before side effects; reject missing or invalid evidence and prevent bypass.</td></tr>
+<tr><td>PIP — Policy Information Point</td><td>Trusted context sources</td><td>Supply verified attributes such as workload/run identity, resource ownership, risk classification and approver eligibility. Agent-supplied assertions alone are not trusted evidence.</td></tr>
+<tr><td>PAP — Policy Administration Point</td><td>Governed policy management and deployment process</td><td>Author, review, version, test and distribute rules. CI/CD can support this role; runtime evaluation does not take place only in the pipeline.</td></tr>
+<tr><td>Approval service</td><td>Human approval orchestrator</td><td>Initiate CIBA or an alternative workflow, validate the human result and create/store exact-operation approval evidence. It is not automatically the PDP or PEP.</td></tr>
+</tbody></table></div>
+<p><strong>Runtime example:</strong> an agent requests a firewall change from the tool service (PEP). The PEP asks the authorization engine (PDP), using verified context from trusted sources (PIP). If application policy requires human approval, the approval service obtains it; the PEP requests a fresh decision and executes only the approved change. Some engines return permit/deny only; the application implements the “approval required” workflow around those decisions.</p>
+<p><strong>Deployment:</strong> on AWS, host a compatible policy service on EKS/ECS/EC2 or embed it in the tool application; on Azure, use AKS/VMs or supported application hosting. Place the PEP in the actual tool execution path. An API gateway may perform some enforcement, but model-endpoint access control alone does not govern downstream tool actions. Validate the chosen engine’s runtime support.</p>
+<p><strong>CI/CD versus runtime:</strong> the pipeline tests and deploys policy; the PDP evaluates requests and the PEP enforces decisions while the agent runs. Failed or unavailable required authorization checks must block consequential execution. Cache decisions only within explicit limits tied to identity, action, parameters, policy version and expiry.</p>
             <p>Policy-as-Code tools for agent authorization include:</p>
             <ul>
               <li><strong>Cerbos</strong> &mdash; YAML policies with CEL expressions.</li>
               <li><strong>OPA / Rego</strong> &mdash; general-purpose policy engine widely adopted in Kubernetes and service-mesh deployments.</li>
-              <li><strong>Cedar</strong> &mdash; Amazon Verified Permissions, AWS-native.</li>
-              <li><strong>Polar</strong> &mdash; Oso&rsquo;s logic-based policy language.</li>
+              <li><strong>Cedar</strong> &mdash; open-source policy language/engine; Amazon Verified Permissions is an AWS managed service using Cedar.</li>
+              <li><strong>Polar</strong> &mdash; Oso&rsquo;s logic-based policy language; the original library is deprecated, while Oso Cloud is a separate service.</li>
             </ul>
             <p>These tools evaluate authorization requests in real-time against declarative policies that encode <strong>ABAC</strong>, <strong>ReBAC</strong>, and <strong>TBAC</strong> rules.</p>
           </div>
         </div>
       </div>
     </section>
-
-    <section id="governance">
+<section id="governance">
       <div class="wrap">
-        <h2 class="section-title">Governance layer</h2>
+        <h2 class="section-title">Layer 4: Governance layer</h2>
         <p class="section-sub">
           High-impact agent actions should not be described as if there is a single turnkey &ldquo;step-up token&rdquo; feature for every case. Governance is usually implemented as a composed workflow.
         </p>
@@ -803,7 +883,7 @@
               <li>Ensure approval grants are time-bound and tied to a narrow action set.</li>
             </ul>
             <div class="dangerbox">
-              <strong>Important caveat:</strong> authentication context, PIM-style elevation, and MFA-based step-up apply to <strong>USER identities</strong>, not to agent/workload identities. Service principals cannot satisfy interactive authentication challenges. For agents, governance is implemented through conditional access policies scoped to service principals (Block Access only), custom approval workflows in orchestration logic, time-bound scoped credential issuance via STS, and policy-engine-driven authorization gates.
+              <strong>Important caveat:</strong> authentication context, PIM-style elevation, and MFA-based step-up apply to <strong>USER identities</strong>, not to agent/workload identities. Service principals cannot satisfy interactive authentication challenges. For workloads, use provider-supported identity policy, custom approval workflows, scoped short-lived credentials and independent policy-engine gates. Entra service-principal workload policies, Agent ID application-only policies, delegated-user policies and agent-user policies have distinct scopes; managed identities are outside workload Conditional Access.
             </div>
           </div>
           <div class="card full">
@@ -822,8 +902,71 @@
         </div>
       </div>
     </section>
+<section id="spiffe"><div class="wrap"><h2 class="section-title">SPIFFE/SPIRE workload identity foundation</h2><p class="section-sub">Attested workload identity: purpose, trust boundaries and integration with enterprise identity and cloud authorization.</p><div class="grid"><div class="card full">
+<h3>What SPIFFE and SPIRE provide</h3><p>SPIFFE defines workload identities and verifiable identity documents (SVIDs). SPIRE implements node/workload attestation and short-lived SVID issuance through the Workload API. Use X.509-SVIDs for mTLS and audience-bound JWT-SVIDs where the recipient supports them. Deploy on supported AWS EKS/EC2 or Azure AKS/VM environments; use native identities at managed service boundaries. Enterprise human IdPs, cloud authorization and exact-action approval remain separate controls.</p>
+<h3>Resolving the bottom turtle</h3><p>Use independently verified platform/node evidence and local workload selectors to obtain identity through the Workload API, without an application-held bootstrap password. Protect the signing authority, administrative registry, authentic bootstrap bundle, node OS and orchestrator. SVID private keys and bearer tokens remain secrets. Hardware protection is optional and configured explicitly; production join tokens are not the preferred bootstrap.</p>
+<h3>Authentication and action authorization</h3><p>Use X.509-SVIDs for SPIFFE-aware mTLS; verify certificate chain, expiry, exactly one SPIFFE URI SAN and expected peer. For JWT-SVIDs, verify signature, permitted algorithm, trusted issuer/keys, SPIFFE subject, narrow audience and expiry. Bind the authenticated principal to trusted instance, run, tenant, task, parent/delegating user and approval context. Model intent and confidence cannot grant authority.</p>
+<p>At the tool boundary, intersect workload permissions, task grant, applicable user authority, resource policy and conditions. Use Permit, Deny and Approval required consistently. If policy requires narrower parameters, return obligations and evaluate the revised operation again before permitting it. Bind approval to exact operation/resource/argument digest, principal, task, expiry and a single-use nonce. Child delegation may only narrow scope. Block alternate tool/cloud credential paths.</p>
+<h3>AWS deployment and cloud federation</h3><p>For supported EKS/EC2 execution, deploy SPIRE Server with protected keys and durable storage, node Agents, narrow registration selectors and restricted local sockets; use SDK/SDS credential refresh. Validate platform attestation and plugin support for the pinned release. Do not assume managed/serverless runtimes can host a SPIRE node Agent.</p>
+<p>Choose federation according to the target resource. For AWS-hosted workloads accessing Entra-protected APIs, a documented federation pattern to validate is SPIRE JWT-SVID → Entra workload federation → Entra-issued resource token. For AWS resources, use native IAM roles or configured SPIRE OIDC → AWS STS federation. An Entra federated identity credential does not establish AWS STS compatibility. Azure-hosted applications similarly use supported native identity or verified workload federation for Azure APIs. Enterprise human IdP selection is independent of these workload paths. <a href="https://learn.microsoft.com/en-us/entra/workload-id/workload-identity-federation">Microsoft workload federation</a> · <a href="https://spiffe.io/docs/latest/keyless/">SPIFFE federation guidance</a>. Product documentation does not establish that this deployment has passed integration testing.</p>
+<h3>Lifecycle, containment and acceptance</h3><p>Choose measured SVID lifetimes; test live rotation, bundle/key rollover, HA, clock skew and recovery. Removing registration prevents future issuance but does not instantly revoke issued SVIDs or cloud sessions. Deny affected identities/tasks at PEPs, terminate connections and isolate compromised nodes. Fail closed for expired identity or unavailable required policy/approval services.</p>
+<ul><li>Reject wrong node, selectors, peer, trust domain, audience and expired or forged SVIDs.</li><li>Reject valid identities with unauthorized actions, widened delegation or replayed/changed approval.</li><li>Test cloud exchange negative cases, workload isolation, renewal/outage behavior and end-to-end containment delay.</li><li>Revoke replaced passwords/API keys and prove no bypass path remains; record legacy broker exceptions.</li></ul>
+<p><a href="https://spiffe.io/docs/latest/spire-about/spire-concepts/">SPIRE architecture</a> · <a href="https://spiffe.io/docs/latest/spiffe-specs/x509-svid/">X.509-SVID</a> · <a href="https://spiffe.io/docs/latest/spiffe-specs/jwt-svid/">JWT-SVID</a> · <a href="https://spiffe.io/docs/latest/keyless/oidc-federation-aws/">AWS OIDC tutorial</a></p>
+<h3>Enterprise IdP options and SPIFFE integration</h3>
+<p>AWS or Azure can host the agent; Entra ID, Okta, Auth0, Curity or PingFederate can provide enterprise human identity. SPIRE remains the attestation and SVID signing authority on supported customer-controlled runtimes. Select each federation relationship for its actual recipient.</p>
+<table><thead><tr><th>Provider</th><th>Role / supported integration basis</th><th>Deployment acceptance requirement</th></tr></thead><tbody>
+<tr><td>Microsoft Entra ID</td><td>External SPIFFE workload federation into an application or supported user-assigned managed identity, with issuer/subject/audience binding.</td><td>Validate SPIRE discovery/JWKS and exact claims; separately validate any Entra-to-AWS STS token profile. <a href="https://learn.microsoft.com/en-us/entra/workload-id/workload-identity-federation">Microsoft documentation</a>.</td></tr>
+<tr><td>Okta</td><td>OAuth/OIDC enterprise authentication and machine-to-machine API token services. <a href="https://developer.okta.com/docs/guides/implement-grant-type/clientcreds/main/">Okta client credentials documentation</a>.</td><td>Confirm the exact Okta product, authorization server, licensing and supported client authentication. Do not assume native JWT-SVID acceptance. A static client secret or stored signing key does not solve the bottom turtle; any SPIFFE-aware broker must have a documented, tested trust mapping and residual credential inventory.</td></tr>
+<tr><td>Curity Identity Server</td><td>Vendor documents client authentication with SPIFFE JWT-SVIDs and X.509-SVIDs. <a href="https://curity.io/resources/learn/oauth-client-credentials-spiffe-jwt-svids/">JWT-SVID integration</a> · <a href="https://curity.io/resources/learn/oauth-client-credentials-spiffe-x509-svids/">X.509-SVID integration</a>. <a href="https://curity.io/docs/identity-server/profiles/token-profile/lifecycle/supported-authorization-flows/">Official product reference</a> (checked October 5, 2026).</td><td>Configure trusted issuer/keys, expected SPIFFE subject and audience, or the trusted CA and URI SAN. Verify token scopes, lifecycle and proof-of-possession where configured.</td></tr>
+<tr><td>PingFederate</td><td>Enterprise federation and OAuth authorization-server roles. <a href="https://docs.pingidentity.com/pingfederate/13.0/introduction_to_pingfederate/pf_fed_roles.html">Ping federation roles</a>.</td><td>Validate product/version-specific workload assertion or certificate authentication support; native SPIFFE support is not asserted here. Broker/plugin trust and AWS token compatibility require separate tests.</td></tr>
+<tr><td>Auth0</td><td>Enterprise application authentication and OAuth token services; a separate Okta product. <a href="https://auth0.com/docs/get-started/authentication-and-authorization-flow/client-credentials-flow">Auth0 workload flow documentation</a>.</td><td>Validate the supported client-authentication method, issuer/audience and broker mapping. Native SVID acceptance is not established by CIBA support. Record any residual credential exception.</td></tr></tbody></table>
+<p><strong>Common controls:</strong> pin the chosen issuer, expected subject/audience and permitted algorithms; verify discovery/JWKS rollover, tenant boundaries, workload enrollment and API authorization. Human SSO federation, workload federation, SPIFFE bundle federation and AWS role assumption are separate trust relationships. Do not apply Entra-specific Conditional Access claims to Okta, Curity or Ping.</p></div></div></div></section>
+<section id="ciba"><div class="wrap">
+<h2 class="section-title">CIBA and human step-up authorization</h2>
+<p class="section-sub">Client-Initiated Backchannel Authentication (CIBA) enables a backend client to initiate human authentication and consent on a separate authentication device. It is defined by OpenID CIBA Core 1.0, an OpenID Foundation specification, not a standalone IETF RFC. It is an optional protocol choice for the required approval workflow.</p>
+<div class="card"><h3>Policy for high-risk agent actions</h3><p>In this CAZT profile, a high-risk action exceeding the agent’s existing authority requires explicit approval by an eligible human before execution. Any pre-authorized exception requires an explicit governance policy. Approval does not confer broad administrative authority. Human step-up authentication, action authorization and workload authentication are separate controls.</p>
+<table><thead><tr><th>CAZT layer</th><th>Responsibility</th></tr></thead><tbody>
+<tr><td>Governance</td><td>Define risk thresholds, approver roles, separation of duties, exceptions, retention and assurance requirements.</td></tr>
+<tr><td>Semantic</td><td>Evaluate the actual tool operation, target, parameters and context. Return permit, deny or approval required; reassess if the proposed action changes.</td></tr>
+<tr><td>Identity</td><td>SPIFFE/SPIRE attests the workload. The CIBA provider authenticates the designated human and obtains consent using its supported authenticator. Validate human identity, assurance and approver eligibility.</td></tr>
+<tr><td>Execution</td><td>The PEP suspends the operation and the approval service orchestrates CIBA. Validate a narrowly bound approval, current policy and agent identity before execution; reject denial, timeout, replay or changed parameters.</td></tr>
+</tbody></table></div>
+<div class="card"><h3>Common approval sequence across deployment patterns</h3><ol>
+<li>The agent presents a valid SVID on an attested runtime, or its documented native workload credential to the tool gateway/PEP. The gateway verifies the applicable issuer/trust domain, identity and audience; native callers are not represented as SVID holders.</li>
+<li>The semantic policy decision requires approval. The approval service creates a pending operation with a digest of canonicalized action parameters.</li>
+<li>Use the deployment’s enterprise human IdP: Okta, Curity, PingFederate or Auth0 can supply their documented CIBA flow. With Entra enterprise identity, integrate a separately verified CIBA service or a supported non-CIBA approval workflow. Enrollment/federation must work for the chosen authenticator; cloud hosting does not determine the CIBA provider.</li>
+<li>The approval service acts as the registered CIBA client, identifies the eligible approver and initiates the request. The human sees the exact operation in a trusted approval UI and authenticates/consents. The service retrieves and validates the result using the provider’s supported delivery mode.</li>
+<li>The approval service issues or stores a tamper-protected, short-lived, single-use authorization bound to the verified workload principal (SPIFFE ID or native identity), verified run/task identity, human subject/issuer, operation, resource, parameter digest, policy version, expiry and nonce.</li>
+<li>The AWS- or Azure-side tool PEP atomically consumes the approval only for that operation, rechecks policy and records the decision/execution audit correlation. No execution occurs on failure or expiry.</li>
+</ol><p>Authenticating the user is not proof that the user approved these exact parameters. A CIBA binding_message helps correlate the interaction; it is not by itself a cryptographic transaction authorization artifact. Prevent approval fatigue, enforce request limits and apply dual approval where governance requires it.</p></div>
+<div class="card" id="microsoft-ciba-status"><h3>Microsoft CIBA support status — October 5, 2026</h3><p><strong>As of October 5, 2026, Microsoft Entra ID and Microsoft Entra External ID do not support native CIBA.</strong> This guide treats CIBA as unsupported for both services because Microsoft’s published supported OAuth/OIDC flow references do not document it. This is an assessment of published product support, not an explicit Microsoft denial of all private-preview capabilities or a tenant-level protocol test.</p><p>Microsoft’s .NET IdentityModel Ciba constant is a library definition, not evidence of an Entra CIBA endpoint. Entra MFA, device authorization and External ID native authentication are different mechanisms. Use a supported Entra sign-in plus application approval workflow, or integrate a documented external CIBA provider.</p><p><a href="https://learn.microsoft.com/en-us/entra/identity-platform/authentication-flows-app-scenarios">Microsoft identity platform supported authentication flows</a> · <a href="https://learn.microsoft.com/en-us/entra/external-id/customers/concept-supported-features-customers">Workforce and External ID OAuth/OIDC feature comparison</a></p></div><div class="card"><h3>Documented product capabilities</h3><p>Documentation reviewed 5 October 2026 (America/Chicago). Confirm product version, licensing, availability and enrolled authenticators before production.</p>
+<table><thead><tr><th>Identity product</th><th>CIBA support</th><th>SPIFFE/SPIRE integration status</th></tr></thead><tbody>
+<tr><td>Curity Identity Server</td><td>Documented native CIBA; poll result-delivery mode, with configured backchannel authenticators.</td><td>Can participate through an application/broker integration. CIBA support alone does not verify direct SVID client authentication.</td></tr>
+<tr><td>PingFederate (Ping Identity)</td><td>Documented CIBA poll and ping flows (<a href="https://docs.pingidentity.com/pingfederate/13.0/developers_reference_guide/pf_oauth_client_manage_service.html">delivery-mode metadata reference</a>); CIBA authenticator/request policy, including PingOne MFA integration or custom authenticator. <a href="https://docs.pingidentity.com/pingfederate/13.0/administrators_reference_guide/pf_ciba.html">Official product reference</a> (checked October 5, 2026).</td><td>Verify the exact client-authentication method and trust mapping. No automatic native SVID acceptance asserted.</td></tr>
+<tr><td>Okta Identity Engine</td><td>Documented transactional CIBA with a Custom Authenticator/Devices SDK and polling. The documented client integration is a Web Application; verify tenant eligibility. <a href="https://developer.okta.com/docs/guides/configure-ciba/main/">Official product reference</a> (checked October 5, 2026).</td><td>Documented private_key_jwt support is not equivalent to accepting an unmodified JWT-SVID. Broker/adapter acceptance must be tested.</td></tr>
+<tr><td>Auth0 (Okta company)</td><td>Documented CIBA for confidential, first-party, OIDC-conformant clients. Guardian/custom mobile app notification; email requires the paid Auth0 for AI Agents add-on. <a href="https://auth0.com/docs/get-started/applications/configure-client-initiated-backchannel-authentication">Official product reference</a> (checked October 5, 2026).</td><td>Application/broker composition is possible; native SPIFFE-to-CIBA client authentication has not been verified here.</td></tr>
+<tr><td>Microsoft Entra ID / Microsoft Entra External ID</td><td>See the <a href="#microsoft-ciba-status">dated Microsoft CIBA support assessment</a>. Use supported human sign-in plus application approval, or a separately integrated CIBA provider.</td><td>Entra can provide enterprise human identity and Azure resource tokens; SPIRE identifies supported AWS or Azure workloads. Validate any federation independently.</td></tr>
+</tbody></table><p>Mobile push notifications are not the CIBA “push” token-delivery mode. Poll/ping/push describe how the client receives the result, not human approval frequency or authentication strength.</p></div>
+<div class="card"><h3>Does SPIFFE/SPIRE support CIBA?</h3><p>SPIFFE/SPIRE does not implement human CIBA authentication or issue CIBA user tokens. The protocols are architecturally complementary: use SVID-authenticated connections between the agent, gateway and approval service; use CIBA between the approval service and the human identity provider. This is a proposed composition, not a vendor-certified interoperability claim.</p><p>Direct X.509-SVID OAuth mTLS client authentication requires explicit authorization-server certificate trust, client registration, identity mapping and rotation support. A JWT-SVID is not automatically a private_key_jwt client assertion: its subject, audience and claims have different semantics. SPIRE OIDC discovery exposes verification metadata; it does not transform an SVID into a user login or CIBA assertion.</p><p>For the secretless objective, require tested asymmetric client authentication or a supported identity broker for the CIBA client, with protected keys and rotation. Do not silently introduce a static client secret because a vendor tutorial uses one. If unsupported, record the residual credential exception and migration plan. SPIRE still needs protected trust roots and signing keys; secretless agents do not mean an architecture without cryptographic keys.</p></div>
+<div class="card"><h3>Primary references</h3><ul>
+<li><a href="https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html">OpenID CIBA Core 1.0</a></li>
+<li><a href="https://curity.io/docs/identity-server/profiles/token-profile/lifecycle/supported-authorization-flows/">Curity supported authorization flows</a></li>
+<li><a href="https://docs.pingidentity.com/pingfederate/13.0/administrators_reference_guide/pf_ciba.html">PingFederate CIBA</a></li>
+<li><a href="https://developer.okta.com/docs/guides/configure-ciba/main/">Okta transactional CIBA</a></li>
+<li><a href="https://auth0.com/docs/get-started/applications/configure-client-initiated-backchannel-authentication">Auth0 CIBA configuration</a></li>
+<li><a href="https://spiffe.io/docs/latest/spiffe-specs/jwt-svid/">JWT-SVID specification</a> and <a href="https://spiffe.io/docs/latest/spiffe-specs/spiffe_workload_api/">Workload API</a></li>
+</ul></div></div></section>
+<section id="protocol-requirements"><div class="wrap"><h2 class="section-title">Protocol and deployment requirements</h2><div class="grid"><div class="card full">
+<h3>Human approval and identity-policy scope</h3><p>CIBA poll/ping/push specify client notification/token delivery. They do not define biometrics, autonomy or approval volume. FAPI CIBA excludes push. CIBA authentication does not itself bind approval to a transaction. Entra, Okta, Curity and Ping require their own supported authentication and approval integration; see the <a href="#microsoft-ciba-status">dated Microsoft CIBA assessment</a>.</p>
+<h3>MCP authorization — pinned baseline 2025-11-25</h3><p>Authorization is optional in the protocol. Where enabled for HTTP transports, use protected resource metadata (RFC 9728), resource indicators (RFC 8707), token audience validation and no token passthrough. Apply authorization-code PKCE to user-delegated code flows; use supported workload authentication for app-only access. Existing pre-registration comes first, supported Client ID Metadata Documents next, then supported DCR fallback. STDIO uses a separately secured local credential/process boundary.</p>
+<h3>Federation acceptance gates</h3><p>Expose the SPIRE OIDC Discovery Provider via authentic HTTPS with discovery/JWKS reachable by Entra, not SPIRE administrative APIs. Validate key rollover and availability. Match Entra FIC issuer, subject and audience exactly, including case; typically request the api://AzureADTokenExchange audience. Check current per-application FIC limits before adopting per-instance subjects. AWS OIDC role trust must pin issuer/provider and expected aud/sub. ExternalId applies to appropriate third-party AssumeRole profiles, not AssumeRoleWithWebIdentity.</p>
+<h3>Task duration and policy engines</h3><p>Enforce task deadlines at the PEP even while cloud credentials remain valid. AssumeRoleWithWebIdentity has a 900-second minimum; its credentials are not automatically bound to a single tool call. Cedar is a language/engine; Verified Permissions is the AWS managed service. Polar is a policy language; the original Oso library is deprecated, while Oso Cloud is a separate service.</p>
 
-    <section id="cross-cloud">
+
+<p><a href="https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html">CIBA Core</a> · <a href="https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization">MCP authorization</a> · <a href="https://learn.microsoft.com/en-us/entra/identity/conditional-access/agent-id">Entra agent policy</a> · <a href="https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=OJ:L_202601744">EU amendment</a></p>
+<p>TBAC attribution: Roshan K. Thomas and Ravi S. Sandhu (1997), <em>Task-Based Authorization Controls: A Family of Models for Active and Enterprise-Oriented Authorization Management</em>.</p>
+</div></div></div></section>
+<section id="cross-cloud">
       <div class="wrap">
         <h2 class="section-title">Cross-cloud security</h2>
         <p class="section-sub">
@@ -862,81 +1005,88 @@
             <ul>
               <li><strong>W3C Decentralized Identifiers (DIDs v1.0)</strong> &mdash; self-sovereign identifiers decoupled from any single provider.</li>
               <li><strong>Verifiable Credentials (VC Data Model v2.0)</strong> &mdash; cryptographically signed claims exchangeable across trust boundaries.</li>
-              <li><strong>Zero-Knowledge Proofs</strong> (BBS+ cryptosuite) &mdash; selective disclosure of attributes without revealing the underlying claim set.</li>
+              <li><strong>Zero-Knowledge Proofs</strong> (Data Integrity BBS Cryptosuites) &mdash; selective disclosure of attributes without revealing the underlying claim set.</li>
             </ul>
-            <div class="warnbox">These are <strong>research-stage as of 2025</strong> and not production-ready alternatives to federation. They may, however, become relevant for decentralized agent ecosystems where bilateral federation is impractical or where no single trust anchor is acceptable to all parties.</div>
+            <div class="warnbox">DID Core and the VC Data Model are W3C Recommendations. Their suitability for autonomous agent-to-agent trust still requires implementation-specific assurance; they do not automatically replace federation. They may, however, become relevant for decentralized agent ecosystems where bilateral federation is impractical or where no single trust anchor is acceptable to all parties.</div>
           </div>
         </div>
       </div>
     </section>
-
-    <section id="comparison">
+<section id="comparison">
       <div class="wrap">
-        <h2 class="section-title">Implementation comparison</h2>
+        <h2 class="section-title">Deployment profile comparison</h2>
         <p class="section-sub">
-          A useful comparison should stay architectural and avoid unsupported precision in cost, time-to-production, or compliance outcomes unless assumptions are explicitly defined.
+          Compare workload hosting, enterprise human identity, step-up workflows and resource authorization. Each profile requires deployment-specific validation; these are not cost or compliance scores.
         </p>
         <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Pattern</th>
-                <th>Strengths</th>
-                <th>Constraints</th>
-                <th>Best fit</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Azure-first</td>
-                <td>Strong Entra integration, native managed identity, authentication context, Microsoft control-plane visibility.</td>
-                <td>Agent-specific features may include preview capabilities; external runtime integration still needs careful design.</td>
-                <td>Enterprises centered on Microsoft identity and Azure-hosted workloads.</td>
-              </tr>
-              <tr>
-                <td>AWS-first</td>
-                <td>Strong runtime identity scoping with IAM roles, STS, and service-role boundaries; mature logging and resource policy model.</td>
-                <td>Agent-specific human-approval and semantic control workflows may require more explicit composition.</td>
-                <td>Serverless or containerized agents operating primarily inside AWS.</td>
-              </tr>
-              <tr>
-                <td>Hybrid / multi-cloud</td>
-                <td>Resilience and portability; avoids single-cloud lock-in.</td>
-                <td>Highest governance overhead, strongest need for federation design, policy consistency, and observability discipline.</td>
-                <td>Organizations with hard regulatory, geographic, or platform-diversity requirements.</td>
-              </tr>
-            </tbody>
-          </table>
+          <table><thead><tr><th>Deployment</th><th>Workload foundation</th><th>Human step-up</th><th>Resource authorization / boundary</th></tr></thead><tbody><tr><td>AWS-1 · Entra human IdP</td><td>EKS/EC2 SPIRE or supported native AWS identity</td><td>Entra sign-in plus application approval, or separate CIBA provider</td><td>AWS IAM/STS; tool PEP prevents direct bypass</td></tr>
+<tr><td>AWS-2 · Okta / Auth0 / Curity / Ping</td><td>EKS/EC2 SPIRE or supported native AWS identity</td><td>Selected product’s documented CIBA integration or verified alternative</td><td>AWS IAM/STS; validate vendor-specific client authentication</td></tr>
+<tr><td>AZ-1 · customer-managed AKS/VM</td><td>SPIRE on supported nodes or native workload identity</td><td>Entra alternative workflow or external-provider CIBA</td><td>Entra resource tokens + Azure RBAC; enforce tool PEP</td></tr>
+<tr><td>AZ-2 · managed application</td><td>Documented native managed identity; gateway SVID identifies gateway only</td><td>Same human IdP choices as AZ-1</td><td>Trusted caller/run context and gated tool service</td></tr>
+<tr><td>AZ-3 · managed Foundry agent</td><td>Documented service agent/project identity; no assumed SPIRE installation</td><td>Same human IdP choices; durable approval service where needed</td><td>Supported tool authentication and PEP; disable tools without enforceable integration</td></tr></tbody></table>
         </div>
         <div class="warnbox">Do not publish exact cost, timeline, or compliance scores without explicit scope assumptions. Those values become misleading very quickly.</div>
       </div>
     </section>
-
-    <section id="decision-tree">
-      <div class="wrap">
-        <h2 class="section-title">Decision tree</h2>
-        <p class="section-sub">Use this decision tree to choose the right control emphasis for an agent deployment. Walk forks 1&ndash;12 in order; the answers converge on one of nine terminal outcomes. The recommended outcome provides a baseline control set, which the wizard then augments with additional controls based on your specific answers.</p>
-
+<section id="deployments"><div class="wrap"><h2 class="section-title">Deployment patterns</h2><p class="section-sub">Select runtime and enterprise human IdP independently. Compare AWS-1, AWS-2 and Azure profiles AZ-1 through AZ-3 below; each Azure runtime can use Entra or an external enterprise human IdP.</p></div>
+<section id="aws-entra"><div class="wrap"><h3 class="section-title">AWS-1: AWS workloads with Entra enterprise identity</h3><div class="card"><p>Microsoft Entra ID provides enterprise human identity; AWS hosts the agent and tools. SPIRE attests supported EKS/EC2 workloads and issues SVIDs. AWS IAM/STS authorizes AWS resources using separately configured native runtime roles or SPIRE OIDC federation. Entra user tokens do not directly replace workload credentials.</p><p>For high-risk step-up, the semantic layer requires approval. Use a supported Entra human sign-in plus application approval workflow, or integrate a separately verified CIBA provider; see the <a href="#microsoft-ciba-status">dated Microsoft CIBA assessment</a>. The execution PEP validates exact-operation approval and prevents direct resource bypass. Governance defines approvers, assurance and audit retention. Managed AWS runtimes require their own documented identity path.</p></div></div></section>
+<section id="aws-external-idp"><div class="wrap"><h3 class="section-title">AWS-2: AWS workloads with an external enterprise IdP</h3><p class="section-sub">AWS-2: AWS hosts the agent, orchestration and tool services; Okta is the worked example for enterprise human identity and CIBA. Auth0, Curity or PingFederate can fill that role with their own documented integration. Microsoft Entra ID is not required in this pattern. SPIRE issues workload SVIDs; AWS IAM/STS governs AWS resource access.</p>
+<div class="card"><h4>Deployment and trust boundaries</h4><table><thead><tr><th>Component</th><th>Identity and responsibility</th></tr></thead><tbody>
+<tr><td>Enterprise users and approvers</td><td>Okta Identity Engine provides application sign-in and the documented CIBA transactional verification flow. Configure a registered Web Application client, authorization policy, Custom Authenticator and enrolled eligible approvers.</td></tr>
+<tr><td>Customer-managed agent runtime</td><td>Run the agent on EKS or EC2 with validated SPIRE node/workload attestation and narrow registrations. Use X.509-SVID mTLS for controlled gateway/tool connections or audience-bound JWT-SVIDs where explicitly supported. The agent can call an AWS-hosted model service using appropriate AWS permissions.</td></tr>
+<tr><td>AWS resource credentials</td><td>Choose either supported native IAM runtime identity or a configured SPIRE OIDC Discovery Provider plus AWS IAM OIDC role trust and STS AssumeRoleWithWebIdentity. Pin provider, subject and audience; issue least-privilege temporary credentials. Okta human federation is a separate trust configuration.</td></tr>
+<tr><td>Policy and approval service</td><td>Run the PDP, approval orchestration and PEP on customer-controlled AWS services. Authenticate their workloads, validate Okta human results and issue/store exact-operation approvals. Verify supported asymmetric CIBA client authentication; record any credential exception.</td></tr>
+<tr><td>Managed AWS runtimes</td><td>For Lambda, managed ECS/Fargate or managed agent services, use the documented native identity path and validate runtime support. Do not assume host access for a SPIRE node daemon. A separately attested gateway identifies itself and retains the managed caller identity/run correlation.</td></tr>
+</tbody></table></div>
+<div class="card"><h4>High-risk action sequence</h4><ol><li>The AWS agent authenticates to the tool PEP with its verified workload identity. The PEP resolves trusted task/run context.</li><li>The authorization engine (PDP) evaluates the proposed operation and semantic risk context against governance rules to determine whether eligible human approval is required.</li><li>The approval service initiates CIBA with Okta. The approver reviews the exact action on the trusted approval interface and authenticates/consents using the enrolled Custom Authenticator. The service polls and validates the CIBA result.</li><li>The service binds authorization to workload identity, human issuer/subject, task, operation, target, parameter digest, policy version, expiry and single-use nonce.</li><li>The execution PEP rechecks policy and consumes that authorization only for the approved operation. The tool executor uses its own narrow AWS role; the agent lacks permissions to bypass the tool gate.</li></ol><p>A CIBA user token is neither an AWS access key nor an automatic permission to assume a workload role. A SPIRE JWT-SVID is not an Okta user token. Keep Okta user identity, SPIFFE workload attestation, AWS role credentials and application approval artifacts distinct.</p></div>
+<div class="card"><h4>Four-layer mapping</h4><p><strong>Governance</strong> defines risk and eligible approvers. <strong>Semantic</strong> returns approval required for the concrete action. <strong>Identity</strong> combines separately verified SPIFFE/native workload identity and Okta human authentication. <strong>Execution</strong> pauses, validates and enforces the exact approval before side effects.</p><p>Use CloudTrail for AWS API activity and correlate it with application decision/execution records and Okta authentication events. Record trusted identifiers and approval status without logging credentials or tokens. Test denied/expired approval, wrong approver, changed arguments, replay, issuer/audience mismatch, key rotation and direct-resource bypass.</p><p>Curity, PingFederate or Auth0 can occupy the external enterprise human IdP/CIBA role using their own documented configuration; this is not a claim of interchangeable vendor capabilities or certified end-to-end interoperability.</p></div>
+<div class="card"><h4>Primary implementation references</h4><ul><li><a href="https://developer.okta.com/docs/guides/configure-ciba/main/">Okta transactional CIBA</a></li><li><a href="https://spiffe.io/docs/latest/keyless/oidc-federation-aws/">SPIRE OIDC federation to AWS</a></li><li><a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_oidc.html">AWS IAM OIDC role trust</a></li><li><a href="https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithWebIdentity.html">AWS STS AssumeRoleWithWebIdentity</a></li></ul></div></div></section>
+<section id="azure-deployments"><div class="wrap"><h3 class="section-title">Azure workloads with Entra or an external enterprise IdP</h3>
+<p class="section-sub">Entra ID, Okta Identity Engine, Auth0, Curity or PingFederate provides enterprise human identity/approval services; Azure hosts the AI application or agent. Microsoft Entra remains the issuer for Azure-managed workload identities and Azure resource authorization. External enterprise IdP and Azure workload identity are separate roles.</p>
+<div class="card"><h4>Azure + Entra enterprise identity</h4><p>Use the same AZ-1, AZ-2 or AZ-3 runtime boundaries below. Entra provides enterprise human sign-in and separately issues workload tokens for Azure resources; Azure RBAC controls resource permissions. On supported AKS/VM runtimes, SPIRE can attest customer-managed workloads. Managed applications and Foundry agents use their documented native identity path. Human approval uses supported Entra sign-in plus an application approval service, or a separately integrated CIBA provider; see the <a href="#microsoft-ciba-status">dated CIBA assessment</a>. Enforce exact-action approval at the tool PEP and prevent direct bypass.</p></div><div class="card"><h4>Deployment choices</h4><table><thead><tr><th>Profile</th><th>Agent execution and model</th><th>Workload identity</th><th>Human step-up</th></tr></thead><tbody>
+<tr><td>AZ-1: customer-managed agent</td><td>Agent/orchestrator on AKS or Azure VMs; Azure OpenAI/Foundry model endpoint supplies inference.</td><td>Deploy SPIRE on supported nodes; verify Kubernetes or Azure VM attestation and workload selectors. Use SVIDs on controlled service/tool connections. Access Azure APIs using supported Entra workload federation or a native managed identity with least-privilege RBAC.</td><td>Use the selected provider’s verified CIBA integration, or supported Entra sign-in plus application approval. The tool gateway blocks high-risk operations until exact-action approval is valid.</td></tr>
+<tr><td>AZ-2: Azure application with managed hosting</td><td>Agent application on App Service, Functions or another managed Azure runtime calls Azure OpenAI. The model endpoint is not the application's agent runtime.</td><td>Use supported managed identity for keyless Azure access. Do not assume a SPIRE node daemon/Workload API can be installed in this runtime. A separately hosted SPIFFE-enabled gateway authenticates with its own SVID, not an invented SVID for the calling app.</td><td>The selected IdP authenticates the human: use verified external-provider CIBA or supported Entra sign-in plus application approval. Preserve verified caller/run context across the gateway and enforce approval before tools execute.</td></tr>
+<tr><td>AZ-3: managed Foundry Agent Service</td><td>Foundry hosts/orchestrates the agent and invokes configured tools. Validate the exact agent type, region, API version and feature status.</td><td>Use the service's documented Entra agent identity or project managed identity path, as applicable to the selected feature. No native SPIRE installation or SVID issuance inside the managed service is assumed.</td><td>Route consequential tools through an independently enforced PEP/approval service. The selected external CIBA provider or supported Entra alternative authenticates the approver. SPIFFE can identify customer-operated gateway/tool services after the boundary, without relabelling the managed agent as SPIFFE-attested.</td></tr>
+</tbody></table></div>
+<div class="card"><h4>Okta enterprise identity and Azure workload identity</h4><p>Configure enterprise sign-in to the application using validated Okta OIDC/SAML integration. The application validates issuer, audience, subject and entitlement mappings. Do not forward an Okta token to an Azure OpenAI endpoint expecting an Entra token, or assume a user federation configuration establishes workload federation. Azure RBAC grants resource permissions to the actual Entra workload principal.</p><p>For CIBA, register a dedicated confidential approval-service client with Okta, configure the documented authorization policy and Custom Authenticator, enroll eligible approvers and verify the supported asymmetric client-authentication method. An Okta user push notification can coexist with CIBA poll result delivery. Auth0 is a separate product/integration; Curity and PingFederate require their own authenticator and policy configuration.</p></div>
+<div class="card"><h4>CAZT placement and bypass prevention</h4><ul>
+<li><strong>Governance:</strong> approve vendor trust, identity mappings, eligible approvers, data residency and any preview or credential exceptions.</li>
+<li><strong>Semantic:</strong> evaluate each proposed tool operation; require human approval when a high-risk action exceeds existing authority.</li>
+<li><strong>Identity:</strong> validate the external human identity separately from the Azure native workload identity or attested SPIFFE identity. Correlate run/task identity without trusting agent-supplied claims.</li>
+<li><strong>Execution:</strong> enforce an exact-operation, expiring, single-use approval at the tool service. Restrict direct resource access so the agent cannot bypass the gate. A model-inference gateway alone does not govern downstream tool side effects.</li>
+</ul><p>For managed Foundry tool calls, use the supported tool authentication path to reach the PEP. If that path cannot carry a trusted run identity or enforce approval, disable the high-risk tool until an enforceable integration is implemented. Do not assume a paused agent run can wait indefinitely; use a durable pending operation and revalidate policy before resuming.</p></div>
+<div class="card"><h4>Acceptance checks and primary references</h4><p>Test valid/invalid issuer and audience, expired workload credentials, unavailable approval provider, wrong approver, changed parameters, approval replay and direct tool bypass. Verify SVID/key rotation and Entra resource permissions independently. The profiles are architectural patterns, not claims of certified Okta–SPIRE–Foundry interoperability.</p><ul>
+<li><a href="https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/agent-identity">Foundry agent identity</a></li>
+<li><a href="https://learn.microsoft.com/azure/ai-foundry/openai/how-to/managed-identity">Azure OpenAI Entra authentication</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/api-management/api-management-authenticate-authorize-ai-apis">API Management authentication to AI APIs</a></li>
+<li><a href="https://spiffe.io/docs/latest/deploying/spire_agent/">SPIRE agent and Azure node attestation</a></li>
+<li><a href="https://developer.okta.com/docs/guides/configure-ciba/main/">Okta CIBA integration</a></li>
+</ul></div></div></section>
+<section id="cross-org-deployment"><div class="wrap"><h3 class="section-title">Cross-organization overlay for AWS or Azure</h3><div class="card"><p>Apply this overlay to any hosting pattern when agents act across enterprise boundaries. Establish explicit partner trust, issuer/audience/subject and tenant mappings, resource-side least privilege and eligible approver authority. SPIFFE bundle federation authenticates workloads; it does not grant partner resource permissions or authorize human approvers. Evaluate both organizations’ applicable policies at the tool PEP. Keep approvals bound to the exact operation and correlate partner decision, approval and execution records. Unknown partner trust blocks production readiness.</p></div></div></section>
+</section>
+<section id="decision-tree"><div class="wrap">
+<h2 class="section-title">Decision tree</h2>
+<p class="section-sub">Complete all 15 questions to select a control profile. Readiness failures block deployment; a provisional target profile explains the controls needed after remediation. Profile selection is not deployment approval.</p>
+<div class="card"><h3>Identity and human approval decisions</h3><p>Choose AWS, Azure or external hosting separately from enterprise human IdP and workload bootstrap. Supported customer-controlled runtimes can use SPIFFE/SPIRE; managed runtimes use documented native identities. Select verified CIBA, a verified alternative, no approval workflow or unknown readiness. CIBA support does not establish native SVID client authentication.</p><p>Every high-risk deployment requires effective stop controls, rollback or appropriate compensating actions, a runtime PDP/tool PEP and auditable exact-action approval when existing authority is exceeded. Human supervision alone does not replace stop controls. Legacy credentials require a reviewed, time-limited exception with an owner, restricted permissions, broker protection and migration plan; choosing that option is not evidence of exception approval. Approval cadence affects workflow timing, not risk classification.</p></div>
         <div class="dt-tabs" role="tablist">
-          <button class="dt-tab active" role="tab" data-target="dt-interactive">Interactive</button>
-          <button class="dt-tab" role="tab" data-target="dt-reference">Reference</button>
+          <button class="dt-tab active" role="tab" id="tab-interactive" aria-controls="dt-interactive" aria-selected="true" tabindex="0" data-target="dt-interactive">Interactive</button>
+          <button class="dt-tab" role="tab" id="tab-reference" aria-controls="dt-reference" aria-selected="false" tabindex="-1" data-target="dt-reference">Reference</button>
         </div>
 
         <!-- Interactive tab -->
-        <div class="dt-panel active" id="dt-interactive" role="tabpanel">
+        <div class="dt-panel active" id="dt-interactive" role="tabpanel" aria-labelledby="tab-interactive">
           <div class="wizard" id="wizard">
             <div class="wizard-progress">
-              <span id="wiz-step-label">Question 1 of 12</span>
+              <span id="wiz-step-label">Question 1 of 15</span>
               <div class="wizard-bar"><span id="wiz-bar-fill"></span></div>
               <button class="wb-restart" id="wiz-restart" type="button" title="Start over">Restart</button>
             </div>
+            <p id="restore-notice" class="warnbox" role="status" hidden></p>
+            <noscript><p class="warnbox">Enable JavaScript to use the interactive assessment and generated reference definitions. The architectural guidance above remains available.</p></noscript>
             <div id="wiz-question">
               <!-- Question content injected by JS -->
             </div>
             <div class="wizard-nav">
-              <label class="override-toggle" title="Disable answer restrictions so you can pick any combination. The wizard will still score outcomes, but inconsistent combinations may produce low match percentages.">
-                <input type="checkbox" id="wiz-override"> Allow unusual combinations
-              </label>
               <div style="display:flex;gap:10px;">
                 <button class="wizard-btn wb-back" id="wiz-back" type="button" disabled>&larr; Back</button>
                 <button class="wizard-btn wb-next" id="wiz-next" type="button" disabled>Next &rarr;</button>
@@ -949,308 +1099,28 @@
         </div>
 
         <!-- Reference tab -->
-        <div class="dt-panel" id="dt-reference" role="tabpanel">
-        <h3 style="margin:2.5rem 0 1rem;font-size:20px;color:var(--text-dark);letter-spacing:-.02em;">Decision forks</h3>
-        <div class="decision-grid">
-          <div class="decision">
-            <h4>1. Where does the agent run?</h4>
-            <p>Azure-native, AWS-native, or external / SaaS-hosted?</p>
-            <ul>
-              <li>Azure-native &rarr; managed identity first</li>
-              <li>AWS-native &rarr; IAM role first</li>
-              <li>External &rarr; service principal or federation</li>
-            </ul>
-          </div>
-          <div class="decision">
-            <h4>2. Does the agent perform high-risk actions?</h4>
-            <p>If yes, add explicit approval workflows and evidence collection.</p>
-            <ul>
-              <li>Financial transfer</li>
-              <li>Privilege grant</li>
-              <li>Destructive change</li>
-              <li>Bulk export</li>
-              <li>Security or network policy modification</li>
-            </ul>
-          </div>
-          <div class="decision">
-            <h4>3. Does it access cross-boundary data?</h4>
-            <p>If yes, emphasize retrieval-time authorization, segmentation, and cross-cloud federation hygiene.</p>
-            <ul>
-              <li>RAG over sensitive data</li>
-              <li>Partner data access</li>
-              <li>Cross-cloud APIs</li>
-            </ul>
-          </div>
-          <div class="decision">
-            <h4>4. Is the agent fully autonomous?</h4>
-            <p>If autonomy increases, so must mediation, kill switches, and containment.</p>
-            <ul>
-              <li>Semi-autonomous &rarr; scoped approvals</li>
-              <li>Broad autonomy &rarr; strong runtime containment</li>
-            </ul>
-          </div>
-          <div class="decision">
-            <h4>5. Are preview capabilities acceptable?</h4>
-            <p>If not, avoid designing core security dependencies around preview-only features.</p>
-            <ul>
-              <li>Use GA IAM baselines</li>
-              <li>Treat preview controls as additive</li>
-            </ul>
-          </div>
-          <div class="decision">
-            <h4>6. Can you observe and stop the agent quickly?</h4>
-            <p>If no, your architecture is not ready for broad production autonomy.</p>
-            <ul>
-              <li>Need logs, alerts, kill switch, and rollback</li>
-              <li>Need clear ownership and incident playbooks</li>
-            </ul>
-          </div>
-          <div class="decision">
-            <h4>7. Identity type &mdash; delegated or workload?</h4>
-            <p>Is the agent acting on behalf of a user, or as an autonomous workload? This is a bigger fork than hosting location.</p>
-            <ul>
-              <li>Delegated &rarr; user-bound tokens, authentication-context step-up available</li>
-              <li>Workload &rarr; managed identity / IAM role / federation; no interactive MFA</li>
-            </ul>
-          </div>
-          <div class="decision">
-            <h4>8. Does the agent invoke external tools or MCP servers?</h4>
-            <p>Every MCP tool invocation is an authorization decision point.</p>
-            <ul>
-              <li>Per-tool allow-list + argument validation</li>
-              <li>OAuth 2.1 + PKCE for MCP servers</li>
-              <li>Policy-engine gate (OPA / Cedar / Cerbos) before each call</li>
-            </ul>
-          </div>
-          <div class="decision">
-            <h4>9. What data sensitivity tier does it touch?</h4>
-            <p>Tier drives the governance burden by an order of magnitude.</p>
-            <ul>
-              <li>Public / internal &rarr; baseline RBAC + light semantic screening</li>
-              <li>PII / PHI &rarr; DLP, retrieval-time authorization, redaction, audit trail</li>
-              <li>Secret / regulated &rarr; tightest containment, JIT elevation, biometric re-auth</li>
-            </ul>
-          </div>
-          <div class="decision">
-            <h4>10. What is the approval latency profile?</h4>
-            <p>Choose the CIBA delivery mode that matches the workflow cadence.</p>
-            <ul>
-              <li>Background / batch &rarr; CIBA Poll (async, non-blocking)</li>
-              <li>Interactive &rarr; CIBA Ping (callback on decision)</li>
-              <li>Real-time / high-velocity &rarr; CIBA Push + biometric step-up</li>
-            </ul>
-          </div>
-          <div class="decision">
-            <h4>11. Does the agent cross organizational trust boundaries?</h4>
-            <p>Cross-org agents need federation hygiene distinct from cross-cloud.</p>
-            <ul>
-              <li>Same org, multi-cloud &rarr; federation + STS in each cloud</li>
-              <li>Cross-org &rarr; bilateral federation; consider DIDs / Verifiable Credentials</li>
-              <li>Unknown / dynamic trust &rarr; defer; not production-ready</li>
-            </ul>
-          </div>
-          <div class="decision">
-            <h4>12. What regulatory tier applies?</h4>
-            <p>Regulation shifts minimum obligations, not just best practice.</p>
-            <ul>
-              <li>EU AI Act high-risk &rarr; strict obligations, evidence retention</li>
-              <li>GDPR-scope personal data &rarr; data minimisation, purpose limitation</li>
-              <li>NIST AI RMF voluntary &rarr; governance scaffolding, no binding force</li>
-            </ul>
-          </div>
-        </div>
-
-        <h3 style="margin:2.5rem 0 1rem;font-size:20px;color:var(--text-dark);letter-spacing:-.02em;">Terminal outcomes</h3>
-        <p class="section-sub" style="margin-bottom:1.5rem;">Compose controls from the forks above. The nine canonical outcomes below cover the most common combinations. The wizard augments each baseline with controls based on your specific answers.</p>
-        <div class="grid">
-          <div class="card">
-            <span class="pill good">Outcome A</span>
-            <h3>Lightweight internal agent</h3>
-            <p><strong>When:</strong> workload identity, no MCP, internal data, async, single-org, minimal-risk.</p>
-            <ul>
-              <li>Cloud-native managed identity or IAM role</li>
-              <li>Scoped RBAC, short-lived credentials</li>
-              <li>Light semantic screening (Prompt Shields or Bedrock Guardrails)</li>
-              <li>Standard logging; no human-in-loop required</li>
-            </ul>
-          </div>
-          <div class="card">
-            <span class="pill blue">Outcome B</span>
-            <h3>Interactive delegated agent</h3>
-            <p><strong>When:</strong> delegated identity, MCP tools, internal + PII, interactive Ping, single-org, GDPR-scope.</p>
-            <ul>
-              <li>User-bound tokens with authentication-context step-up</li>
-              <li>Per-tool allow-list + OAuth 2.1 PKCE for MCP</li>
-              <li>DLP + retrieval-time authorization + redaction</li>
-              <li>CIBA Ping callback for human consent</li>
-              <li>Conditional Access (Block Access) on the workload identity</li>
-            </ul>
-          </div>
-          <div class="card">
-            <span class="pill warn">Outcome C</span>
-            <h3>High-risk autonomous agent</h3>
-            <p><strong>When:</strong> workload, MCP, PHI / secret, real-time Push, single-org, EU AI Act high-risk.</p>
-            <ul>
-              <li>Workload identity + PIM-style elevation for sensitive actions</li>
-              <li>Per-tool policy-engine gate (OPA / Cedar)</li>
-              <li>Strict containment: ephemeral compute, egress control, read-only FS</li>
-              <li>CIBA Push + biometric re-auth for high-velocity actions</li>
-              <li>Evidence retention per EU AI Act; kill switch + rollback</li>
-            </ul>
-          </div>
-          <div class="card">
-            <span class="pill warn">Outcome D</span>
-            <h3>Cross-org federated agent</h3>
-            <p><strong>When:</strong> workload, MCP, partner data, async or interactive, cross-org, mixed regulatory.</p>
-            <ul>
-              <li>Bilateral federation + STS in each cloud</li>
-              <li>Confused-deputy protection (aws:SourceArn / SourceAccount)</li>
-              <li>Per-tool allow-list scoped to partner resources</li>
-              <li>DIDs / Verifiable Credentials if no central trust anchor</li>
-              <li>Cross-cloud audit (CloudTrail + Azure Monitor)</li>
-            </ul>
-          </div>
-          <div class="card">
-            <span class="pill good">Outcome F</span>
-            <h3>Hardened internal agent</h3>
-            <p><strong>When:</strong> workload identity, no MCP, no high-risk, same-org &mdash; but with sensitive data, broader autonomy, partial observability, or interactive latency that requires hardening beyond the lightweight baseline.</p>
-            <ul>
-              <li>Cloud-native managed identity or IAM role</li>
-              <li>Scoped RBAC, short-lived credentials</li>
-              <li>Light semantic screening (Prompt Shields or Bedrock Guardrails)</li>
-              <li>Standard logging + audit trail</li>
-            </ul>
-            <p style="font-size:12px;color:var(--muted-dark);margin-top:8px;"><em>Baseline only. The wizard augments with additional controls (DLP, kill switch, CIBA mode, containment) based on your specific answers.</em></p>
-          </div>
-          <div class="card">
-            <span class="pill blue">Outcome G</span>
-            <h3>Delegated lightweight agent</h3>
-            <p><strong>When:</strong> delegated identity, no MCP, no high-risk, same-org &mdash; a user-bound agent that drafts content, summarizes, or fills forms without invoking external tools or performing sensitive actions.</p>
-            <ul>
-              <li>User-bound tokens with Conditional Access (Block Access) on auth context</li>
-              <li>Light semantic screening (Prompt Shields or Bedrock Guardrails)</li>
-              <li>Standard logging + user activity audit trail</li>
-              <li>No human-in-loop required for routine actions</li>
-            </ul>
-            <p style="font-size:12px;color:var(--muted-dark);margin-top:8px;"><em>Baseline only. The wizard augments with additional controls based on your specific answers.</em></p>
-          </div>
-          <div class="card">
-            <span class="pill blue">Outcome J</span>
-            <h3>Workload integration agent</h3>
-            <p><strong>When:</strong> workload identity, MCP tools, no high-risk, same-org &mdash; a workload bot that calls SaaS APIs (Salesforce, ServiceNow, Jira) for data enrichment without performing sensitive actions.</p>
-            <ul>
-              <li>Cloud-native managed identity or IAM role</li>
-              <li>Per-tool allow-list + OAuth 2.1 PKCE for MCP servers</li>
-              <li>Light semantic screening (Prompt Shields or Bedrock Guardrails)</li>
-              <li>Standard logging + per-tool invocation audit</li>
-            </ul>
-            <p style="font-size:12px;color:var(--muted-dark);margin-top:8px;"><em>Baseline only. The wizard augments with additional controls based on your specific answers.</em></p>
-          </div>
-          <div class="card">
-            <span class="pill warn">Outcome K</span>
-            <h3>Assisted high-risk agent</h3>
-            <p><strong>When:</strong> high-risk actions, semi-autonomous &mdash; a co-pilot that drafts financial transfers, privilege grants, or destructive changes but waits for explicit human approval before executing.</p>
-            <ul>
-              <li>Workload identity + PIM-style elevation for sensitive actions</li>
-              <li>Per-action human approval workflow (CIBA Ping)</li>
-              <li>Evidence collection: who approved, what context, what changed, for how long</li>
-              <li>Per-action audit trail + kill switch + rollback</li>
-            </ul>
-            <p style="font-size:12px;color:var(--muted-dark);margin-top:8px;"><em>Baseline only. The wizard augments with additional controls based on your specific answers.</em></p>
-          </div>
-          <div class="card">
-            <span class="pill warn">Outcome L</span>
-            <h3>High-risk workload agent</h3>
-            <p><strong>When:</strong> high-risk actions, broadly autonomous, workload identity, same-org &mdash; a workload agent that performs sensitive actions autonomously (e.g., cloud resource scalers, credential rotators, batch financial processors) without the extreme-C characteristics (secret data, real-time biometric re-auth, EU AI Act).</p>
-            <ul>
-              <li>Workload identity + PIM-style elevation for sensitive actions</li>
-              <li>Per-tool policy-engine gate (OPA / Cedar) when MCP is invoked</li>
-              <li>Standard containment: ephemeral compute, egress control</li>
-              <li>Kill switch + rollback</li>
-              <li>Standard audit trail + evidence collection</li>
-            </ul>
-            <p style="font-size:12px;color:var(--muted-dark);margin-top:8px;"><em>Baseline only. The wizard augments with additional controls based on your specific answers.</em></p>
-          </div>
-          <div class="card full">
-            <span class="pill bad">Outcome E</span>
-            <h3>Not production-ready</h3>
-            <p><strong>When:</strong> fully autonomous + high-risk + no observability + no kill switch + cross-org with no trust anchor.</p>
-            <ul>
-              <li>Do not deploy to production</li>
-              <li>Pilot only in sandbox with synthetic data</li>
-              <li>Re-architect: add containment, kill switch, audit, governance</li>
-              <li>Re-evaluate against forks 1&ndash;12 before promotion</li>
-            </ul>
-          </div>
-        </div>
-
-        <h3 style="margin:2.5rem 0 1rem;font-size:20px;color:var(--text-dark);letter-spacing:-.02em;">Constraint matrix</h3>
-        <p class="section-sub" style="margin-bottom:1.5rem;">
-          To keep recommendations decisive, the wizard restricts later answers based on earlier ones.
-          When a constraint applies, the unavailable options appear grayed out with a tooltip explaining why.
-          If you have an unusual combination that the constraints disallow, toggle <strong>"Allow unusual combinations"</strong>
-          at the bottom of the wizard to lift all restrictions.
-        </p>
-        <div class="table-wrap" style="margin-bottom:1.5rem;">
-          <table>
-            <thead>
-              <tr>
-                <th>If you answer&hellip;</th>
-                <th>Then these options become restricted&hellip;</th>
-                <th>Why</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Q4 autonomy = <strong>Broadly autonomous</strong></td>
-                <td>Q10 latency: <em>Ping</em> unavailable &middot; Q6 observe: <em>Partial</em> and <em>No</em> unavailable</td>
-                <td>Broad autonomy requires full observability + kill switch (no per-action human oversight), and cannot use Ping (which requires human callback).</td>
-              </tr>
-              <tr>
-                <td>Q4 autonomy = <strong>Semi-autonomous</strong></td>
-                <td>Q10 latency: <em>Push</em> unavailable &middot; Q6 observe: <em>No</em> unavailable</td>
-                <td>Human-in-the-loop provides oversight, so some observability is required; Push (biometric re-auth) is only relevant without a human in the loop.</td>
-              </tr>
-              <tr>
-                <td>Q2 high-risk = <strong>Yes</strong></td>
-                <td>Q9 data tier: <em>Public / internal</em> unavailable</td>
-                <td>High-risk actions imply sensitive impact &mdash; public data with high-risk actions is contradictory.</td>
-              </tr>
-              <tr>
-                <td>Q7 identity type = <strong>Delegated</strong></td>
-                <td>Q1 hosting: <em>AWS-native</em> unavailable</td>
-                <td>Delegated identity requires Entra auth context &mdash; AWS-native hosting does not support this natively.</td>
-              </tr>
-              <tr>
-                <td>Q11 cross-org = <strong>Cross-org</strong></td>
-                <td>Q1 hosting: <em>AWS-native</em> unavailable</td>
-                <td>Cross-org agents should be externally hosted or Azure-native for federation hygiene.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="warnbox" style="margin-top:1.5rem;">
-          <strong>How to use this tree:</strong> Walk forks 1&ndash;12 in order. The answers converge on one of outcomes A&ndash;K (excluding I). The recommended outcome provides a baseline control set; the wizard then augments with additional controls based on your specific answers (e.g., DLP for PII data, kill switch for partial observability). Treat Outcome E as a hard stop: if any of its conditions are true, do not promote the agent to production.
-        </div>
+        <div class="dt-panel" id="dt-reference" hidden role="tabpanel" aria-labelledby="tab-reference">
+        <p>These definitions are generated from the same questions and rules as the interactive assessment. Every answer remains selectable; readiness failures appear as findings.</p>
+        <h3>Decision questions</h3><div class="decision-grid" id="reference-forks"></div>
+        <h3>Outcome rules and baseline controls</h3><div class="decision-grid" id="reference-outcomes"></div>
+        <div class="warnbox"><strong>How to use this tree:</strong> Complete all 15 questions. Outcome E takes precedence if any readiness failure applies. Other outcomes select a control baseline; answer-specific controls follow. A matching profile is not deployment approval.</div>
         </div><!-- /dt-reference -->
       </div>
     </section>
-
-    <section id="compliance">
+<section id="compliance">
       <div class="wrap">
         <h2 class="section-title">Compliance &amp; regulatory considerations</h2>
         <p class="section-sub">
           Agent architectures operate inside an emerging and uneven regulatory landscape. The frameworks below are the most commonly cited; treat them as design inputs, not as product checklists.
         </p>
-        <div class="grid">
+        <div class="grid"><div class="card full" id="regulatory-review"><h3>Regulatory review — 2026-10-05</h3><p>Regulation (EU) 2024/1689 as amended by 2026/1744 sets the specified Chapter III high-risk provisions to 2 December 2027 for Article 6(2)/Annex III systems and 2 August 2028 for Article 6(1)/Annex I systems. The Article 50(2) transition to 2 December 2026 is limited to covered systems placed on the market before 2 August 2026; it is not a blanket transparency delay. <a href="https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=OJ:L_202601744">Official amendment</a> · <a href="https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai">Commission application timeline</a>.</p></div>
           <div class="card">
             <span class="pill bad">Binding &middot; phased</span>
             <h3>EU AI Act</h3>
             <ul>
               <li>Risk-tiered framework: <strong>Unacceptable</strong> (prohibited), <strong>High</strong> (strict obligations), <strong>Limited</strong> (transparency), <strong>Minimal</strong> (voluntary).</li>
               <li><strong>Article 50</strong> imposes transparency obligations for AI systems, including disclosure when users interact with AI and labelling of deepfakes and AI-generated content.</li>
-              <li>Phased application through <strong>August 2027</strong>, with earlier milestones for prohibited practices and GPAI obligations.</li>
+              <li>Specified Chapter III high-risk provisions apply from <strong>2 December 2027</strong> (Article 6(2)/Annex III) and <strong>2 August 2028</strong> (Article 6(1)/Annex I), under the 2026 amendment. Article 50 transparency obligations apply from 2 August 2026; the Article 50(2) marking transition to 2 December 2026 is limited to covered pre-existing systems. See the <a href="#regulatory-review">dated regulatory review</a>.</li>
             </ul>
           </div>
           <div class="card">
@@ -1277,7 +1147,7 @@
         </div>
       </div>
     </section>
-  </main>
+</main>
 
   <footer>
     <div class="wrap">
@@ -1292,17 +1162,19 @@
         Maintained by Stephen A. Adebowale &mdash; Senior Information Security Architect / vCISO &nbsp;&middot;&nbsp;
         <a href="https://www.linkedin.com/in/stephen-ade-0ba27110" target="_blank">LinkedIn</a> &nbsp;&middot;&nbsp;
         <a href="https://x.com/SteveInfosec" target="_blank">X @SteveInfosec</a> &nbsp;&middot;&nbsp;
-        &copy; 2025 Stephen A. Adebowale.
+        &copy; 2025–2026 Stephen A. Adebowale.
       </div>
     </div>
   </footer>
 
   <script>
     (function(){
-      var d = new Date();
-      var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      var nav=document.querySelector("nav");
+      function updateOffset(){var sticky=getComputedStyle(nav).position!=="relative";document.documentElement.style.setProperty("--nav-offset",(sticky?nav.getBoundingClientRect().height+16:16)+"px");}
+      if(window.ResizeObserver)new ResizeObserver(updateOffset).observe(nav);
+      window.addEventListener("resize",updateOffset);updateOffset();
       var el = document.getElementById('rev-date');
-      if(el){ el.textContent = months[d.getMonth()] + ' ' + d.getFullYear(); }
+      if(el){ el.textContent = '2026-10-06'; }
     })();
   </script>
 
@@ -1323,9 +1195,9 @@
         id: 'hosting', title: 'Where does the agent run?',
         desc: 'Hosting determines the native identity primitive available.',
         options: [
-          { label: 'Azure-native', detail: 'Use managed identity first', value: 'azure' },
-          { label: 'AWS-native', detail: 'Use IAM role first', value: 'aws' },
-          { label: 'External / SaaS', detail: 'Service principal or federation', value: 'external' }
+          { label: 'Azure-native', detail: 'AKS/VM SPIFFE or managed runtime identity; external enterprise IdP supported', value: 'azure' },
+          { label: 'AWS-native', detail: 'AWS execution; IdP is chosen separately', value: 'aws' },
+          { label: 'External / SaaS', detail: 'Supported provider identity or verified federation; SPIFFE only on runtimes with validated attestation', value: 'external' }
         ]
       },
       {
@@ -1373,15 +1245,15 @@
         id: 'identitytype', title: 'Identity type — delegated or workload?',
         desc: 'Is the agent acting on behalf of a user, or as an autonomous workload? Bigger fork than hosting location.',
         options: [
-          { label: 'Delegated (user-bound)', detail: 'User tokens; auth-context step-up available', value: 'delegated' },
-          { label: 'Workload (autonomous)', detail: 'Managed identity / IAM role / federation; no interactive MFA', value: 'workload' }
+          { label: 'Delegated (user-bound)', detail: 'User-bound tokens; provider-supported human step-up when required', value: 'delegated' },
+          { label: 'Workload (autonomous)', detail: 'SPIFFE/SPIRE or supported managed identity / IAM role / federation; no human MFA on workloads', value: 'workload' }
         ]
       },
       {
         id: 'mcp', title: 'Does the agent invoke external tools or MCP servers?',
-        desc: 'Every MCP tool invocation is an authorization decision point.',
+        desc: 'Every tool invocation is an application authorization decision point; MCP protocol authorization is optional and transport-specific.',
         options: [
-          { label: 'Yes — external tools / MCP', detail: 'Per-tool allow-list, OAuth 2.1 PKCE, policy-engine gate', value: 'yes' },
+          { label: 'Yes — external tools / MCP', detail: 'Per-tool PEP; supported flow-specific authentication; PKCE for delegated code flows', value: 'yes' },
           { label: 'No — internal only', detail: 'Standard tool mediation; no external authorization surface', value: 'no' }
         ]
       },
@@ -1391,23 +1263,23 @@
         options: [
           { label: 'Public / internal', detail: 'Baseline RBAC + light semantic screening', value: 'public' },
           { label: 'PII / PHI', detail: 'DLP, retrieval-time authorization, redaction, audit trail', value: 'pii' },
-          { label: 'Secret / regulated', detail: 'Tightest containment, JIT elevation, biometric re-auth', value: 'secret' }
+          { label: 'Secret / regulated', detail: 'Tightest containment, scoped access and eligible-human approval where required', value: 'secret' }
         ]
       },
       {
         id: 'latency', title: 'What is the approval latency profile?',
-        desc: 'Choose the CIBA delivery mode that matches the workflow cadence.',
+        desc: 'Approval cadence matters only for policy-gated actions. For routine agents without an approval workflow, this answer has no effect. CIBA poll/ping/push are protocol delivery modes, not approval cadence or assurance.',
         options: [
-          { label: 'Background / batch', detail: 'CIBA Poll — async, non-blocking', value: 'poll' },
-          { label: 'Interactive', detail: 'CIBA Ping — callback on decision', value: 'ping' },
-          { label: 'Real-time / high-velocity', detail: 'CIBA Push + biometric step-up', value: 'push' }
+          { label: 'Background / batch', detail: 'Asynchronous approval queue and bounded deadline', value: 'batch' },
+          { label: 'Interactive', detail: 'Interactive approval before execution', value: 'interactive' },
+          { label: 'Real-time / high-velocity', detail: 'Policy-defined approval cadence; human assurance chosen separately', value: 'realtime' }
         ]
       },
       {
         id: 'crossorg', title: 'Does the agent cross organizational trust boundaries?',
         desc: 'Cross-org agents need federation hygiene distinct from cross-cloud.',
         options: [
-          { label: 'Same org, multi-cloud', detail: 'Federation + STS in each cloud', value: 'sameorg' },
+          { label: 'Same org, multi-cloud', detail: 'Provider-specific federation and token issuance', value: 'sameorg' },
           { label: 'Cross-org', detail: 'Bilateral federation; consider DIDs / VCs', value: 'crossorg' },
           { label: 'Unknown / dynamic trust', detail: 'Defer; not production-ready', value: 'unknown' }
         ]
@@ -1430,288 +1302,109 @@
     var OUTCOMES = [
       {
         key: 'A', name: 'Lightweight internal agent',
-        when: 'workload identity, no MCP, internal data, async, single-org, minimal-risk.',
+        when: 'Routine internal workload; see shared selection rule below.',
         controls: [
-          'Cloud-native managed identity or IAM role',
+          'Authenticate the workload using the selected SPIFFE, native identity or reviewed exception; independently authorize each task/action',
           'Scoped RBAC, short-lived credentials',
           'Light semantic screening (Prompt Shields or Bedrock Guardrails)',
-          'Standard logging; no human-in-loop required'
-        ],
-        match: function(a){
-          var s = 0;
-          if (a.identitytype === 'workload') s += 0.25;
-          if (a.mcp === 'no') s += 0.25;
-          if (a.datatier === 'public') s += 0.25;
-          if (a.highrisk === 'no' && a.crossdata === 'no' && a.crossorg === 'sameorg' && a.regulatory === 'none') s += 0.25;
-          return s;
-        }
+          'Standard logging; no mandatory human approval for routine actions'
+        ]
       },
       {
         key: 'B', name: 'Interactive delegated agent',
-        when: 'delegated identity, MCP tools, internal + PII, interactive Ping, single-org, GDPR-scope.',
+        when: 'Routine delegated access to external tools; see shared rule below.',
         controls: [
-          'User-bound tokens with authentication-context step-up',
-          'Per-tool allow-list + OAuth 2.1 PKCE for MCP',
-          'DLP + retrieval-time authorization + redaction',
-          'CIBA Ping callback for human consent',
-          'Conditional Access (Block Access) on the workload identity'
-        ],
-        match: function(a){
-          var s = 0;
-          if (a.identitytype === 'delegated') s += 0.25;
-          if (a.mcp === 'yes') s += 0.2;
-          if (a.datatier === 'pii') s += 0.2;
-          if (a.latency === 'ping') s += 0.2;
-          if (a.crossorg === 'sameorg' && (a.regulatory === 'gdpr' || a.regulatory === 'euai')) s += 0.15;
-          return s;
-        }
+          'User-bound tokens with provider-supported step-up when required',
+          'Per-tool allowlist; flow-specific OAuth authentication and audience-bound tokens',
+          'Authenticated human approval bound to the exact task and action',
+          'Provider-specific identity policy only where supported; independent runtime action authorization'
+        ]
       },
       {
         key: 'C', name: 'High-risk autonomous agent',
-        when: 'workload, MCP, PHI / secret, real-time Push, single-org, EU AI Act high-risk.',
+        when: 'Broad autonomous high-risk actions with enhanced control drivers; cadence is independent.',
         controls: [
-          'Workload identity + PIM-style elevation for sensitive actions',
+          'Authorize only the exact approved action with scoped, time-bound permissions; preserve workload and applicable delegated-user boundaries',
           'Per-tool policy-engine gate (OPA / Cedar)',
           'Strict containment: ephemeral compute, egress control, read-only FS',
-          'CIBA Push + biometric re-auth for high-velocity actions',
+          'Bounded autonomous execution; pause for named human approval when policy requires it',
           'Evidence retention per EU AI Act; kill switch + rollback'
-        ],
-        match: function(a){
-          var s = 0;
-          if (a.highrisk === 'yes') s += 0.25;
-          if (a.datatier === 'secret') s += 0.25;
-          if (a.latency === 'push') s += 0.2;
-          if (a.autonomy === 'broad') s += 0.15;
-          if (a.regulatory === 'euai') s += 0.15;
-          return s;
-        }
+        ]
       },
       {
         key: 'D', name: 'Cross-org federated agent',
-        when: 'workload, MCP, partner data, async or interactive, cross-org, mixed regulatory.',
+        when: 'Established cross-organization trust; apply risk-specific controls.',
         controls: [
-          'Bilateral federation + STS in each cloud',
-          'Confused-deputy protection (aws:SourceArn / SourceAccount)',
+          'Bilateral provider-specific federation and token issuance',
+          'Trust binding: OIDC issuer/aud/sub; ExternalId for applicable third-party AssumeRole; tenant/task binding at PEP',
           'Per-tool allow-list scoped to partner resources',
           'DIDs / Verifiable Credentials if no central trust anchor',
           'Cross-cloud audit (CloudTrail + Azure Monitor)'
-        ],
-        match: function(a){
-          var s = 0;
-          if (a.crossorg === 'crossorg') s += 0.4;
-          if (a.crossdata === 'yes') s += 0.2;
-          if (a.mcp === 'yes') s += 0.2;
-          if (a.identitytype === 'workload') s += 0.2;
-          return s;
-        }
+        ]
       },
       {
         key: 'G', name: 'Delegated lightweight agent',
         when: 'delegated identity, no MCP, no high-risk, same-org — a user-bound agent that drafts content, summarizes, or fills forms without invoking external tools or performing sensitive actions.',
         controls: [
-          'User-bound tokens with Conditional Access (Block Access) on auth context',
+          'User-bound tokens with provider-supported user access policy',
           'Light semantic screening (Prompt Shields or Bedrock Guardrails)',
           'Standard logging + user activity audit trail',
-          'No human-in-loop required for routine actions'
-        ],
-        match: function(a){
-          // Defining constraints
-          if (a.identitytype !== 'delegated') return 0;
-          if (a.mcp === 'yes') return 0;
-          if (a.highrisk === 'yes') return 0;
-          if (a.crossorg !== 'sameorg') return 0;
-          // Base score for meeting the defining constraints
-          var s = 0.7;
-          // Higher fit when truly lightweight
-          if (a.datatier === 'public') s += 0.15;
-          if (a.autonomy === 'semi') s += 0.15;
-          return Math.min(s, 1);
-        }
+          'No mandatory human approval for routine actions'
+        ]
       },
       {
         key: 'J', name: 'Workload integration agent',
         when: 'workload identity, MCP tools, no high-risk, same-org — a workload bot that calls SaaS APIs (Salesforce, ServiceNow, Jira) for data enrichment without performing sensitive actions.',
         controls: [
-          'Cloud-native managed identity or IAM role',
-          'Per-tool allow-list + OAuth 2.1 PKCE for MCP servers',
+          'Authenticate the workload using the selected SPIFFE, native identity or reviewed exception; independently authorize each task/action',
+          'Per-tool allowlist; delegated authorization-code PKCE or supported workload authentication, according to the flow',
           'Light semantic screening (Prompt Shields or Bedrock Guardrails)',
           'Standard logging + per-tool invocation audit'
-        ],
-        match: function(a){
-          // Defining constraints
-          if (a.identitytype !== 'workload') return 0;
-          if (a.mcp !== 'yes') return 0;
-          if (a.highrisk === 'yes') return 0;
-          if (a.crossorg !== 'sameorg') return 0;
-          // Base score for meeting the defining constraints
-          var s = 0.7;
-          // Higher fit when routine operations
-          if (a.datatier === 'public' || a.datatier === 'pii') s += 0.15;
-          if (a.autonomy === 'semi') s += 0.15;
-          return Math.min(s, 1);
-        }
+        ]
       },
       {
         key: 'K', name: 'Assisted high-risk agent',
         when: 'high-risk actions, semi-autonomous — a co-pilot that drafts financial transfers, privilege grants, or destructive changes but waits for explicit human approval before executing.',
         controls: [
-          'Workload identity + PIM-style elevation for sensitive actions',
-          'Per-action human approval workflow (CIBA Ping)',
+          'Authorize only the exact approved action with scoped, time-bound permissions; preserve workload and applicable delegated-user boundaries',
+          'Per-action human approval workflow, independent of token-delivery mode',
           'Evidence collection: who approved, what context, what changed, for how long',
           'Per-action audit trail + kill switch + rollback'
-        ],
-        match: function(a){
-          // Defining constraints
-          if (a.highrisk !== 'yes') return 0;
-          if (a.autonomy !== 'semi') return 0;
-          // Base score for meeting the defining constraints
-          var s = 0.7;
-          // Higher fit with specific high-risk signals
-          if (a.datatier === 'secret' || a.datatier === 'pii') s += 0.15;
-          if (a.latency === 'ping') s += 0.15;
-          return Math.min(s, 1);
-        }
+        ]
       },
       {
         key: 'L', name: 'High-risk workload agent',
-        when: 'high-risk actions, broadly autonomous, workload identity, same-org — a workload agent that performs sensitive actions autonomously (e.g., cloud resource scalers, credential rotators, batch financial processors) without the extreme-C characteristics (secret data, real-time biometric re-auth, EU AI Act).',
+        when: 'Broad autonomous high-risk workload without the enhanced-C drivers; cadence is independent.',
         controls: [
-          'Workload identity + PIM-style elevation for sensitive actions',
-          'Per-tool policy-engine gate (OPA / Cedar) when MCP is invoked',
-          'Standard containment: ephemeral compute, egress control',
+          'Authorize only the exact approved action with scoped, time-bound permissions; preserve workload and applicable delegated-user boundaries',
+          'Per-action policy-engine PDP and tool-service PEP for all consequential tool operations',
+          'Strict containment: ephemeral compute, egress control, read-only FS',
           'Kill switch + rollback',
           'Standard audit trail + evidence collection'
-        ],
-        match: function(a){
-          // Defining constraints — all four must be met
-          if (a.highrisk !== 'yes') return 0;
-          if (a.autonomy !== 'broad') return 0;
-          if (a.identitytype !== 'workload') return 0;
-          if (a.crossorg !== 'sameorg') return 0;
-          // Base score for meeting the defining constraints
-          var s = 0.7;
-          // Higher fit with specific high-risk signals (but NOT requiring them —
-          // L is for the moderate case, C is for the extreme case)
-          if (a.datatier === 'pii') s += 0.15;
-          if (a.observe === 'yes') s += 0.15;
-          return Math.min(s, 1);
-        }
+        ]
       },
       {
         key: 'F', name: 'Hardened internal agent',
-        when: 'workload identity, no MCP, no high-risk, same-org — but with sensitive data, broader autonomy, partial observability, or interactive latency that requires hardening beyond the lightweight baseline.',
+        when: 'Routine internal workload with additional hardening requirements.',
         controls: [
-          'Cloud-native managed identity or IAM role',
+          'Authenticate the workload using the selected SPIFFE, native identity or reviewed exception; independently authorize each task/action',
           'Scoped RBAC, short-lived credentials',
           'Light semantic screening (Prompt Shields or Bedrock Guardrails)',
           'Standard logging + audit trail'
-        ],
-        match: function(a){
-          // Must meet the defining constraints of an internal workload agent
-          if (a.identitytype !== 'workload') return 0;
-          if (a.mcp === 'yes') return 0;
-          if (a.highrisk === 'yes') return 0;
-          if (a.crossorg !== 'sameorg') return 0;
-          // Base score for meeting the defining constraints
-          var s = 0.5;
-          // Hardening triggers — each indicates F is more appropriate than A
-          if (a.datatier === 'pii' || a.datatier === 'secret') s += 0.15;
-          if (a.autonomy === 'broad') s += 0.15;
-          if (a.observe === 'partial' || a.observe === 'no') s += 0.15;
-          if (a.latency === 'ping' || a.latency === 'push') s += 0.15;
-          return Math.min(s, 1);
-        }
+        ]
       },
       {
         key: 'E', name: 'Not production-ready',
-        when: 'fully autonomous + high-risk + no observability + no kill switch + cross-org with no trust anchor.',
+        when: 'Any readiness failure; the readinessFailures function lists exact blocking criteria.',
         controls: [
           'Do not deploy to production',
           'Pilot only in sandbox with synthetic data',
           'Re-architect: add containment, kill switch, audit, governance',
-          'Re-evaluate against forks 1–12 before promotion'
+          'Re-evaluate against all 15 questions before promotion'
         ],
-        hardStop: true,
-        match: function(a){
-          var triggers = 0;
-          if (a.observe === 'no') triggers++;
-          if (a.crossorg === 'unknown') triggers++;
-          if (a.autonomy === 'broad' && a.highrisk === 'yes' && a.observe !== 'yes') triggers++;
-          if (a.datatier === 'secret' && a.observe === 'no') triggers++;
-          // Hard-stop fires when 2+ red flags present
-          return triggers >= 2 ? 1 : 0;
-        }
+        hardStop: true
       }
     ];
-
-    /* --- Expected answers per outcome (for mismatch reporting) ---
-       Design principle: only list answers that ACTIVELY DISQUALIFY from this
-       outcome (the defining constraints). Answers not listed are flexible —
-       they drive additional controls but don't disqualify the outcome.
-
-       This way, mismatches fire only when the user's answer is fundamentally
-       incompatible with the recommended outcome, not when it merely suggests
-       extra controls are needed.
-    */
-    var EXPECTED = {
-      A: {
-        // Lightweight internal agent — defining constraints:
-        identitytype: ['workload'],  // delegated → routes to B
-        mcp:          ['no'],         // external tools → routes to B/C
-        highrisk:     ['no'],         // high-risk → routes to C
-        crossorg:     ['sameorg']     // cross-org → routes to D
-        // Flexible: autonomy, observe, datatier, latency, regulatory, hosting, preview, crossdata
-      },
-      B: {
-        // Interactive delegated agent — defining constraints:
-        identitytype: ['delegated'],
-        mcp:          ['yes'],
-        latency:      ['ping']
-      },
-      C: {
-        // High-risk autonomous agent — defining constraints:
-        highrisk:     ['yes'],
-        autonomy:     ['broad']
-      },
-      D: {
-        // Cross-org federated agent — defining constraints:
-        crossorg:     ['crossorg']
-      },
-      G: {
-        // Delegated lightweight agent — defining constraints:
-        identitytype: ['delegated'],
-        mcp:          ['no'],
-        highrisk:     ['no'],
-        crossorg:     ['sameorg']
-      },
-      J: {
-        // Workload integration agent — defining constraints:
-        identitytype: ['workload'],
-        mcp:          ['yes'],
-        highrisk:     ['no'],
-        crossorg:     ['sameorg']
-      },
-      K: {
-        // Assisted high-risk agent — defining constraints:
-        highrisk:     ['yes'],
-        autonomy:     ['semi']
-      },
-      L: {
-        // High-risk workload agent — defining constraints:
-        highrisk:     ['yes'],
-        autonomy:     ['broad'],
-        identitytype: ['workload'],
-        crossorg:     ['sameorg']
-      },
-      F: {
-        // Hardened internal agent — same defining constraints as A:
-        identitytype: ['workload'],
-        mcp:          ['no'],
-        highrisk:     ['no'],
-        crossorg:     ['sameorg']
-      }
-      // E is hard-stop; no expected-answers table
-    };
 
     /* --- Augmentation rules (Option 3) ---
        Each rule fires when the user's answer to a specific fork matches one
@@ -1731,7 +1424,7 @@
         control: 'DLP + retrieval-time authorization + redaction',
         reason: 'PII / PHI data' },
       { forkId: 'datatier', values: ['secret'],
-        control: 'Tightest containment + JIT elevation + biometric re-auth',
+        control: 'Strict containment + policy-authorized scoped access + named-human approval where required',
         reason: 'Secret / regulated data' },
       // Autonomy
       { forkId: 'autonomy', values: ['broad'],
@@ -1743,17 +1436,17 @@
         reason: 'Partial observability — no kill switch' },
       { forkId: 'observe', values: ['no'],
         control: 'Re-architect observability + add kill switch before production',
-        reason: 'No observability gaps closed' },
-      // Latency / CIBA mode
-      { forkId: 'latency', values: ['ping'],
-        control: 'CIBA Ping callback for human consent',
+        reason: 'Observability gaps not closed' },
+      // Approval cadence (independent of CIBA delivery)
+      { forkId: 'latency', values: ['interactive'],
+        control: 'Authenticated human approval bound to the exact task and action',
         reason: 'Interactive latency profile' },
-      { forkId: 'latency', values: ['push'],
-        control: 'CIBA Push + biometric re-auth',
+      { forkId: 'latency', values: ['realtime'],
+        control: 'Policy-triggered pause and named-human approval; assurance selected separately',
         reason: 'Real-time / high-velocity latency' },
       // MCP / external tools
       { forkId: 'mcp', values: ['yes'],
-        control: 'Per-tool allow-list + OAuth 2.1 PKCE for MCP servers',
+        control: 'Per-tool allowlist; delegated authorization-code PKCE or supported workload authentication, according to the flow',
         reason: 'External tools / MCP servers' },
       // Cross-boundary data
       { forkId: 'crossdata', values: ['yes'],
@@ -1761,7 +1454,7 @@
         reason: 'Cross-boundary data access' },
       // Cross-org
       { forkId: 'crossorg', values: ['crossorg'],
-        control: 'Bilateral federation + STS in each cloud',
+        control: 'Bilateral provider-specific federation and token issuance',
         reason: 'Cross-org trust boundary' },
       // Regulatory
       { forkId: 'regulatory', values: ['euai'],
@@ -1772,53 +1465,66 @@
         reason: 'GDPR-scope personal data' }
     ];
 
-    /* --- Constraint rules (cascading restrictions) ---
-       Each rule: when triggerFork=triggerValue, the targetFork can only accept
-       the listed allowedValues. Other options become disabled in the UI.
+    FORKS.push({id:'idp',title:'Which enterprise IdP provides identity services?',desc:'IdP choice is independent of hosting. AWS or Azure execution can use Entra or an external enterprise human IdP. Validate each integration.',options:[{label:'Microsoft Entra ID',detail:'Enterprise human identity; supported approval workflow chosen separately',value:'entra'},{label:'Okta',detail:'Verify product and workload authentication support',value:'okta'},{label:'Auth0',detail:'Separate Okta product; documented CIBA with its own configuration',value:'auth0'},{label:'Curity Identity Server',detail:'Enterprise identity and documented CIBA; workload federation verified separately',value:'curity'},{label:'PingFederate',detail:'Validate version-specific workload integration',value:'ping'}]});
+    FORKS.push({id:'workloadauth',title:'How does the workload bootstrap its identity?',desc:'SPIFFE attestation, native short-lived identity or a reviewed legacy exception. This does not replace human delegation.',options:[{label:'SPIFFE / SPIRE',detail:'Attestation and short-lived SVIDs',value:'spiffe'},{label:'Native cloud identity',detail:'Runtime-supported short-lived credentials',value:'native'},{label:'Legacy credential exception',detail:'Isolated broker, owner and migration deadline',value:'legacy'}]});
 
-       This makes the wizard a true decision tree — answers are structurally
-       consistent by construction, so users land on one outcome at 90-100%
-       instead of straddling several at 40-50%.
-    */
-    var CONSTRAINTS = [
-      // Autonomy → Latency
-      { triggerFork: 'autonomy', triggerValue: 'broad',
-        targetFork: 'latency', allowedValues: ['poll', 'push'],
-        reason: 'Broadly autonomous agents cannot use CIBA Ping — Ping requires per-action human callback, which contradicts broad autonomy.' },
-      { triggerFork: 'autonomy', triggerValue: 'semi',
-        targetFork: 'latency', allowedValues: ['ping', 'poll'],
-        reason: 'Semi-autonomous agents cannot use CIBA Push — Push is for real-time biometric re-auth, only relevant when no human is in the loop.' },
-
-      // Autonomy → Observability
-      { triggerFork: 'autonomy', triggerValue: 'broad',
-        targetFork: 'observe', allowedValues: ['yes'],
-        reason: 'Broadly autonomous agents must have full observability + kill switch — partial or no observability is unsafe without per-action human oversight.' },
-      { triggerFork: 'autonomy', triggerValue: 'semi',
-        targetFork: 'observe', allowedValues: ['yes', 'partial'],
-        reason: 'Semi-autonomous agents cannot have zero observability — human oversight exists, so some observability is required.' },
-
-      // High-risk → Data tier
-      { triggerFork: 'highrisk', triggerValue: 'yes',
-        targetFork: 'datatier', allowedValues: ['pii', 'secret'],
-        reason: 'High-risk actions imply sensitive impact — public/internal data with high-risk actions is contradictory.' },
-
-      // Delegated → Hosting (AWS has no native Entra auth context equivalent)
-      { triggerFork: 'identitytype', triggerValue: 'delegated',
-        targetFork: 'hosting', allowedValues: ['azure', 'external'],
-        reason: 'Delegated identity requires Entra auth context — AWS-native hosting does not support this natively.' },
-
-      // Cross-org + Delegated → Hosting
-      { triggerFork: 'crossorg', triggerValue: 'crossorg',
-        targetFork: 'hosting', allowedValues: ['external', 'azure'],
-        reason: 'Cross-org agents should be externally hosted or Azure-native for federation hygiene.' }
-    ];
-
+    FORKS.push({id:'approvalflow',title:'How is human step-up approval implemented?',desc:'CIBA authenticates/obtains human consent; an approval service must still bind the exact action and the tool PEP must enforce it. Choose the actual implementation, independently of hosting and approval cadence.',options:[{label:'CIBA with verified provider integration',detail:'Registered confidential client, enrolled approvers, supported client authentication and exact-action enforcement',value:'ciba'},{label:'Verified alternative approval workflow',detail:'Supported human sign-in plus bound, expiring, single-use authorization',value:'alternative'},{label:'No human approval workflow',detail:'High-risk actions requiring step-up cannot proceed',value:'none'},{label:'Not yet verified',detail:'Resolve provider, enrollment and enforcement before high-risk deployment',value:'unknown'}]});
+    // Shared rule metadata drives classification and Reference.
+    var RULES = {
+      A:{identitytype:['workload'],mcp:['no'],highrisk:['no'],crossorg:['sameorg'],datatier:['public'],crossdata:['no'],regulatory:['none'],autonomy:['semi'],observe:['yes']},
+      B:{identitytype:['delegated'],mcp:['yes'],highrisk:['no'],crossorg:['sameorg']},
+      C:{highrisk:['yes'],autonomy:['broad'],crossorg:['sameorg']},
+      D:{crossorg:['crossorg']},
+      G:{identitytype:['delegated'],mcp:['no'],highrisk:['no'],crossorg:['sameorg']},
+      J:{identitytype:['workload'],mcp:['yes'],highrisk:['no'],crossorg:['sameorg']},
+      K:{highrisk:['yes'],autonomy:['semi'],crossorg:['sameorg']},
+      L:{identitytype:['workload'],highrisk:['yes'],autonomy:['broad'],crossorg:['sameorg']},
+      F:{identitytype:['workload'],mcp:['no'],highrisk:['no'],crossorg:['sameorg']}
+    };
+    function meetsRule(key,a){return Object.keys(RULES[key]).every(function(id){return RULES[key][id].indexOf(a[id])!==-1;});}
+    function enhancedRisk(a){return a.identitytype==='delegated'||a.datatier==='secret'||a.regulatory==='euai';}
+    function readinessFailures(a){
+      var failures=[];
+      if(a.observe==='no')failures.push('Observability or stop controls are missing.');
+      if((a.autonomy==='broad'||a.highrisk==='yes')&&a.observe!=='yes')failures.push('High-risk actions or broad autonomy require full observability and effective stop controls.');
+      if(a.crossorg==='unknown')failures.push('Cross-organization trust is not established.');
+      if(a.highrisk==='yes'&&['ciba','alternative'].indexOf(a.approvalflow)===-1)failures.push('High-risk step-up lacks a verified human approval workflow.');
+      return failures;
+    }
+    OUTCOMES.forEach(function(o){
+      if(o.key==='E'){
+        o.when='Any readiness failure: missing observability/stop controls, high-risk actions or broad autonomy without full stop controls, unknown organizational trust, or high-risk step-up without a verified approval workflow.';
+        o.match=function(a){return readinessFailures(a).length?1:0;};return;
+      }
+      o.match=function(a){
+        if(!meetsRule(o.key,a))return 0;
+        if(o.key==='C')return enhancedRisk(a)?1:0;
+        if(o.key==='L')return enhancedRisk(a)?0:1;
+        if(o.key==='A')return 1;
+        if(o.key==='F')return meetsRule('A',a)?0:1;
+        return 1;
+      };
+      if(o.key==='C'){o.name='High-risk autonomous agent — enhanced controls';o.when='Same-organization, broadly autonomous, high-risk agent with delegated identity, secret data or EU AI Act high-risk classification. Approval cadence does not change the risk class.';o.controls[o.controls.length-1]='Retain decision, approval and execution evidence under applicable obligations; kill switch + rollback';}
+      if(o.key==='L')o.when='Same-organization, broadly autonomous, high-risk workload agent without the enhanced-C drivers. Cadence does not reduce required action authorization or containment.';
+      if(o.key==='A')o.when='Routine same-organization workload, internal tools and public/internal data, limited autonomy, full observability, no cross-boundary data and no selected regulatory tier; cadence is independent.';
+      if(o.key==='B'){o.when='Delegated identity, external tools, routine actions and same-organization access; apply data and approval controls only where required.';o.controls=o.controls.filter(function(c){return c!=='Authenticated human approval bound to the exact task and action';});}
+      if(o.key==='D')o.when='Established cross-organization trust, with any supported identity or runtime; add the applicable high-risk, data and regulatory controls.';
+      if(o.key==='F')o.when='Routine internal same-organization workload requiring controls beyond A because of data, autonomy, observability or regulatory context.';
+    });
+    function targetProfile(a){
+      if(a.crossorg==='unknown')return null;
+      var ready=Object.assign({},a,{observe:'yes'});
+      return OUTCOMES.find(function(o){return !o.hardStop&&o.match(ready)>0;})||null;
+    }
+    function renderReference(){
+      document.getElementById('reference-forks').innerHTML=FORKS.map(function(f,i){return '<div class="decision"><h4>'+(i+1)+'. '+escapeAttr(f.title)+'</h4><p>'+escapeAttr(f.desc)+'</p><ul>'+f.options.map(function(o){return '<li><strong>'+escapeAttr(o.label)+'</strong>: '+escapeAttr(o.detail)+'</li>';}).join('')+'</ul></div>';}).join('');
+      document.getElementById('reference-outcomes').innerHTML=OUTCOMES.map(function(o){return '<div class="decision"><h4>Outcome '+o.key+' — '+escapeAttr(o.name)+'</h4><p>'+escapeAttr(o.when)+'</p><ul>'+o.controls.map(function(c){return '<li>'+escapeAttr(c)+'</li>';}).join('')+'</ul></div>';}).join('');
+    }
     /* --- State --- */
     var state = {
       step: 0,                 // 0..FORKS.length-1, or FORKS.length when on result
       answers: {},             // {forkId: value}
-      finished: false,
-      allowOverride: false     // when true, constraints are relaxed (escape hatch)
+      finished: false
     };
 
     /* --- DOM refs --- */
@@ -1830,170 +1536,48 @@
     var $restart= document.getElementById('wiz-restart');
     var $result = document.getElementById('wiz-result');
 
-    /* --- URL persistence ---
-       Format: #decision-tree?a=ABCD... where each char is the option index (0-based)
-       or '-' for skipped. Kept short so links are shareable.
-    */
-    var PARAM = 'a';
-
-    function answersToCode(){
-      var code = '';
-      for (var i = 0; i < FORKS.length; i++){
-        var f = FORKS[i];
-        var v = state.answers[f.id];
-        if (v === undefined){ code += '-'; continue; }
-        var idx = -1;
-        for (var j = 0; j < f.options.length; j++){
-          if (f.options[j].value === v){ idx = j; break; }
-        }
-        code += (idx >= 0) ? String(idx) : '-';
-      }
-      return code;
-    }
-
+    /* Versioned URL state. Migrate legacy cadence names without changing answers. */
+    var PARAM='a', restoreNotice='';
+    function answersToCode(){return 'v27:'+JSON.stringify(state.answers);}
     function codeToAnswers(code){
-      var a = {};
-      if (!code) return a;
-      for (var i = 0; i < FORKS.length && i < code.length; i++){
-        var ch = code.charAt(i);
-        if (ch === '-' || ch === '?') continue;
-        var idx = parseInt(ch, 10);
-        if (isNaN(idx) || idx < 0 || idx >= FORKS[i].options.length) continue;
-        a[FORKS[i].id] = FORKS[i].options[idx].value;
+      var a={},raw={},invalid=false;restoreNotice='';if(!code)return a;
+      var cadence={poll:'batch',ping:'interactive',push:'realtime'};
+      if(/^v(?:21|27):/.test(code)){
+        try{raw=JSON.parse(code.slice(code.indexOf(':')+1));if(!raw||typeof raw!=='object'||Array.isArray(raw))throw Error('invalid');}catch(e){restoreNotice='This saved link is invalid. Please complete the assessment again.';return a;}
+        if(cadence[raw.latency])raw.latency=cadence[raw.latency];
+        FORKS.forEach(function(f){if(raw[f.id]!==undefined){if(f.options.some(function(o){return o.value===raw[f.id];}))a[f.id]=raw[f.id];else invalid=true;}});
+        if(Object.keys(raw).some(function(id){return !FORKS.some(function(f){return f.id===id;});}))invalid=true;
+        if(invalid)restoreNotice='Some saved answers are unsupported. Review restored answers and complete missing questions.';
+        else if(code.indexOf('v21:')===0)restoreNotice='Saved answers were migrated. Review the current rules before using this recommendation.';
+        return a;
       }
-      return a;
+      if(/^v/.test(code)){restoreNotice='This link uses an unsupported assessment version. No answers were restored; complete the current assessment.';return a;}
+      if(!/^[0-9-]{1,14}$/.test(code)){restoreNotice='This saved link is invalid. Complete the current assessment.';return a;}
+      var legacy=[['azure','aws','external'],['yes','no'],['yes','no'],['semi','broad'],['ga','preview'],['yes','partial','no'],['delegated','workload'],['yes','no'],['public','pii','secret'],['batch','interactive','realtime'],['sameorg','crossorg','unknown'],['euai','gdpr','nist','none'],['entra','okta','curity','ping'],['spiffe','native','legacy']];
+      FORKS.forEach(function(f,i){var n=parseInt(code.charAt(i),10);if(legacy[i]&&legacy[i][n])a[f.id]=legacy[i][n];});
+      restoreNotice='This older link was migrated. Review all answers and complete the identity and approval questions.';return a;
     }
-
-    function writeURL(){
-      var code = answersToCode();
-      var hash = '#decision-tree?a=' + code;
-      if (history.replaceState){
-        history.replaceState(null, '', hash);
-      } else {
-        window.location.hash = hash;
-      }
-    }
-
-    function readURL(){
-      var hash = window.location.hash || '';
-      var m = hash.match(new RegExp('[?&]' + PARAM + '=([^&]+)'));
-      if (!m) return null;
-      return decodeURIComponent(m[1]);
-    }
-
-    /* --- Constraint helpers --- */
-
-    /* Returns the set of allowed values for targetFork given current answers.
-       If no constraint applies, returns null (meaning all values are allowed). */
-    function getActiveConstraints(targetForkId, answers){
-      var active = [];
-      for (var i = 0; i < CONSTRAINTS.length; i++){
-        var c = CONSTRAINTS[i];
-        if (c.targetFork !== targetForkId) continue;
-        if (answers[c.triggerFork] !== c.triggerValue) continue;
-        active.push(c);
-      }
-      return active;
-    }
-
-    /* Returns the union of allowed values across all active constraints.
-       If no constraints are active, returns null (all values allowed).
-       Also returns the most relevant reason for restricting each excluded value. */
-    function computeAllowedValues(targetForkId, answers){
-      var active = getActiveConstraints(targetForkId, answers);
-      if (active.length === 0) return { allowed: null, reasons: {} };
-
-      // The first active constraint determines the allowed set.
-      // (Constraints are designed so that only one applies per target fork
-      // per answer combination. If multiple somehow apply, we take the
-      // intersection.)
-      var allowed = null;
-      var reasons = {};
-      for (var i = 0; i < active.length; i++){
-        var c = active[i];
-        if (allowed === null){
-          // Clone the array
-          allowed = c.allowedValues.slice();
-          // Initialize reasons for excluded values
-          for (var j = 0; j < c.allowedValues.length; j++){
-            // allowed values have no reason
-          }
-        } else {
-          // Intersection
-          allowed = allowed.filter(function(v){ return c.allowedValues.indexOf(v) !== -1; });
-        }
-      }
-      // For values not in allowed, attach the first applicable reason
-      return { allowed: allowed, reasons: reasons, active: active };
-    }
-
-    /* When an earlier answer changes, check all later answers and clear any
-       that are now invalid under the new constraints. Returns the list of
-       cleared fork IDs (for UI feedback). */
-    function validateAndClearInvalidAnswers(changedForkId){
-      var cleared = [];
-      for (var i = 0; i < FORKS.length; i++){
-        var f = FORKS[i];
-        if (f.id === changedForkId) continue;
-        var ans = state.answers[f.id];
-        if (ans === undefined) continue;
-        var result = computeAllowedValues(f.id, state.answers);
-        if (result.allowed !== null && result.allowed.indexOf(ans) === -1){
-          delete state.answers[f.id];
-          cleared.push(f.id);
-        }
-      }
-      return cleared;
-    }
-
+    function writeURL(){var hash='#decision-tree?a='+encodeURIComponent(answersToCode());if(history.replaceState)history.replaceState(null,'',hash);else window.location.hash=hash;}
+    function readURL(){var m=(window.location.hash||'').match(/[?&]a=([^&]+)/);if(!m)return null;try{return decodeURIComponent(m[1]);}catch(e){return 'invalid';}}
+    function showRestoreNotice(){var el=document.getElementById('restore-notice');el.textContent=restoreNotice;el.hidden=!restoreNotice;}
     /* --- Rendering --- */
     function renderQuestion(){
       var f = FORKS[state.step];
-      var constraintResult = computeAllowedValues(f.id, state.answers);
-      var allowedValues = constraintResult.allowed;
-      var activeConstraints = constraintResult.active || [];
-
       var html = '';
       html += '<div class="wizard-q-num">Question ' + (state.step + 1) + ' of ' + FORKS.length + '</div>';
       html += '<h3 class="wizard-q-title">' + f.title + '</h3>';
       html += '<p class="wizard-q-desc">' + f.desc + '</p>';
 
-      // If constraints are active, show a notice
-      if (allowedValues !== null && !state.allowOverride && activeConstraints.length > 0){
-        html += '<div class="constraint-notice">';
-        html += '<strong>Some options are restricted</strong> based on your earlier answers. ';
-        html += 'Hover over a grayed-out option to see why.';
-        html += '</div>';
-      }
-
       html += '<div class="wizard-options" role="radiogroup">';
       for (var i = 0; i < f.options.length; i++){
         var opt = f.options[i];
         var checked = (state.answers[f.id] === opt.value) ? 'checked' : '';
-        var isDisabled = false;
-        var disableReason = '';
-
-        if (allowedValues !== null && !state.allowOverride){
-          if (allowedValues.indexOf(opt.value) === -1){
-            isDisabled = true;
-            // Find the reason from the first active constraint
-            disableReason = activeConstraints[0].reason;
-          }
-        }
-
-        if (isDisabled){
-          html += '<label class="wizard-opt disabled" title="' + escapeAttr(disableReason) + '">';
-          html += '<input type="radio" name="fork-' + f.id + '" value="' + opt.value + '" disabled>';
-        } else {
-          html += '<label class="wizard-opt">';
-          html += '<input type="radio" name="fork-' + f.id + '" value="' + opt.value + '" ' + checked + '>';
-        }
+        html += '<label class="wizard-opt">';
+        html += '<input type="radio" name="fork-' + f.id + '" value="' + opt.value + '" ' + checked + '>';
         html += '<span class="dot"></span>';
         html += '<span class="opt-text"><span class="opt-title">' + opt.label + '</span>';
         html += '<span class="opt-detail">' + opt.detail + '</span></span>';
-        if (isDisabled){
-          html += '<span class="opt-restricted">Restricted</span>';
-        }
+
         html += '</label>';
       }
       html += '</div>';
@@ -2004,12 +1588,9 @@
       for (var k = 0; k < radios.length; k++){
         radios[k].addEventListener('change', function(){
           state.answers[f.id] = this.value;
-          // Re-validate later answers — clear any that are now invalid
-          var cleared = validateAndClearInvalidAnswers(f.id);
+          if(restoreNotice){var remaining=FORKS.filter(function(q){return state.answers[q.id]===undefined;}).length;restoreNotice=remaining?'Saved answers changed. Review the restored answers and complete '+remaining+' remaining questions.':'';showRestoreNotice();}
           writeURL();
           $next.disabled = false;
-          // If we cleared answers, the user may need to re-walk later questions
-          // (we don't auto-advance — they'll see the cleared state when they navigate)
         });
       }
 
@@ -2052,7 +1633,7 @@
       } else if (ranked.length > 0){
         html += '<p>Based on your answers, the recommended control emphasis is the single outcome below. Apply the baseline controls, plus any additional controls called out by your specific answers.</p>';
       } else {
-        html += '<p>Your answers did not match any defined outcome. Review the Reference tab or revisit your answers.</p>';
+        html += '<p>Architecture review required: the supplied answers do not form a supported profile. Review the answer summary, identity type, risk, autonomy and organizational trust before deployment.</p>';
       }
       html += '</div>';
 
@@ -2063,11 +1644,14 @@
         html += '<div class="body"><h4>Outcome ' + hs.key + ' &mdash; ' + hs.name + '</h4>';
         html += '<p><strong>When:</strong> ' + hs.when + '</p></div>';
         html += '</div>';
-        html += unionBlock(hs.controls, 'Immediate actions');
+        html += unionBlock(readinessFailures(state.answers).concat(hs.controls), 'Immediate actions');
+        var target=targetProfile(state.answers);
+        if(target){html+='<div class="union-controls"><h4>Provisional target: Outcome '+target.key+' — '+escapeAttr(target.name)+'</h4><p>Assuming the listed readiness failures are cleared, this is the target control profile. This does not authorize deployment.</p></div>';html+=unionBlock(target.controls,'Target baseline after remediation');html+=augmentedControlsBlock(computeAugmentations(state.answers,target.controls));}
+        else html+='<p>Target profile is pending: establish the organizational trust relationship before classifying the deployment.</p>';
       } else if (ranked.length > 0){
         var top = ranked[0];
         html += '<div class="outcome-rank primary">';
-        html += '<div class="pct">' + Math.round(top.score * 100) + '%<small>MATCH</small></div>';
+        html += '<div class="pct">PROFILE<small>SELECTED</small></div>';
         html += '<div class="body"><h4>Outcome ' + top.o.key + ' &mdash; ' + top.o.name + '</h4>';
         html += '<p><strong>When:</strong> ' + top.o.when + '</p></div>';
         html += '</div>';
@@ -2077,11 +1661,6 @@
         var augmentations = computeAugmentations(state.answers, top.o.controls);
         if (augmentations.length > 0){
           html += augmentedControlsBlock(augmentations);
-        }
-        // Option C: mismatch warning fires only when there are actual mismatches
-        var mismatches = computeMismatches(top.o.key, state.answers);
-        if (mismatches.length > 0){
-          html += mismatchWarningBlock(top.o, top.score, mismatches);
         }
       }
 
@@ -2137,70 +1716,6 @@
       return html;
     }
 
-    /* --- Option C: mismatch reporting ---
-       Compares the user's answers against the expected answers for the winning
-       outcome. Returns a list of mismatches with the question text, the user's
-       label, and the acceptable expected labels.
-    */
-    function computeMismatches(outcomeKey, answers){
-      var expected = EXPECTED[outcomeKey];
-      if (!expected) return [];
-      var mismatches = [];
-      for (var i = 0; i < FORKS.length; i++){
-        var f = FORKS[i];
-        if (!expected[f.id]) continue;          // fork not constrained by this outcome
-        var userVal = answers[f.id];
-        if (userVal === undefined) continue;    // unanswered — don't flag
-        var acceptable = expected[f.id];
-        if (acceptable.indexOf(userVal) === -1){
-          // Resolve user's label
-          var userLabel = '(not answered)';
-          for (var j = 0; j < f.options.length; j++){
-            if (f.options[j].value === userVal){ userLabel = f.options[j].label; break; }
-          }
-          // Resolve expected labels
-          var expectedLabels = acceptable.map(function(v){
-            for (var k = 0; k < f.options.length; k++){
-              if (f.options[k].value === v) return f.options[k].label;
-            }
-            return v;
-          });
-          mismatches.push({
-            forkId: f.id,
-            forkIndex: i,
-            question: f.title.replace(/\?$/, ''),
-            userLabel: userLabel,
-            expectedLabels: expectedLabels
-          });
-        }
-      }
-      return mismatches;
-    }
-
-    function mismatchWarningBlock(outcome, score, mismatches){
-      var pct = Math.round(score * 100);
-      var html = '<div class="mismatch-warning">';
-      html += '<div class="mw-head">';
-      html += '<strong>Answers that conflict with this outcome</strong>';
-      html += '<p>The following answers are fundamentally incompatible with Outcome ' + outcome.key + ' (' + pct + '% match). ';
-      html += 'Consider revisiting them, or weighing a different outcome.</p>';
-      html += '</div>';
-      html += '<ul class="mw-list">';
-      for (var i = 0; i < mismatches.length; i++){
-        var m = mismatches[i];
-        html += '<li>';
-        html += '<span class="mw-q">Q' + (m.forkIndex + 1) + '. ' + m.question + '</span>';
-        html += '<span class="mw-answers">';
-        html += '<span class="mw-user">Your answer: ' + m.userLabel + '</span>';
-        html += '<span class="mw-expected">Expected: ' + m.expectedLabels.join(' or ') + '</span>';
-        html += '</span>';
-        html += '</li>';
-      }
-      html += '</ul>';
-      html += '</div>';
-      return html;
-    }
-
     /* --- Augmentation (Option 3) ---
        Computes the list of augmented controls based on the user's answers.
        Skips any control whose text already appears in the outcome's baseline
@@ -2208,8 +1723,46 @@
     */
     function computeAugmentations(answers, outcomeControls){
       var result = [];
+      function identityControl(control,reason,id){if((outcomeControls||[]).indexOf(control)!==-1||result.some(function(r){return r.control===control;}))return;var idx=FORKS.findIndex(function(f){return f.id===id});result.push({control:control,reason:reason,forkId:id,forkIndex:idx});}
+      var workloadNames={spiffe:'SPIFFE/SPIRE attestation and SVIDs',native:'documented native cloud identity',legacy:'governed legacy credential exception'};
+      if(workloadNames[answers.workloadauth])identityControl('Selected workload identity: '+workloadNames[answers.workloadauth]+'. Enterprise human IdP and delegated-user authority are evaluated separately.','Actual runtime bootstrap selection.','workloadauth');
+      var approvalNeeded=answers.highrisk==='yes'||['ciba','alternative'].indexOf(answers.approvalflow)!==-1;
+      if(answers.approvalflow==='ciba')identityControl('CIBA selected: verify the actual provider/client authentication, approver enrollment and assurance, human result validation and exact-operation approval enforcement. If Entra supplies enterprise sign-in, CIBA needs a separately supported provider integration.','Protocol selection is not evidence of implementation readiness.','approvalflow');
+      if(answers.approvalflow==='alternative')identityControl('Alternative approval selected: authenticate eligible human approvers and enforce tamper-protected, expiring, single-use exact-operation authorization; CIBA is not required for this path.','The same authorization guarantees apply to all workflows.','approvalflow');
+      if(approvalNeeded)identityControl('Approval: authenticate a named approver and bind approval to principal, task, operation/resource/argument digest, policy version, expiry and single-use nonce. Use the chosen provider’s supported human workflow; authentication alone does not authorize the transaction.','Authentication is not transaction approval.','approvalflow');
+      if(answers.highrisk==='yes'){
+        identityControl('High-risk runtime authorization: a policy decision point (PDP) evaluates each consequential operation; the tool-service policy enforcement point (PEP) enforces it and prevents direct bypass.','Required across same-organization and partner trust boundaries.','highrisk');
+        identityControl('High-risk stop and recovery: verify an effective kill switch, bounded execution, rollback or tested compensating actions before production. Human supervision does not replace these controls.','All high-risk deployments require stop and recovery controls.','highrisk');
+        identityControl('High-risk evidence: retain correlated policy decisions, approver identity/authority, exact-operation approval and actual execution results under applicable retention rules.','Auditability across identity providers and cloud/partner boundaries.','highrisk');
+      }
+      if(answers.highrisk==='yes')identityControl('High-risk step-up: semantic policy returns approval required; governance selects eligible human approvers; identity authenticates the human through CIBA or a supported alternative; execution suspends and permits only the exact approved operation. Reject timeout, denial, replay and changed parameters.','Explicit human approval is required when the action exceeds existing authority.','highrisk');
+      var cibaProfiles={entra:'Entra CIBA capability: consult the dated Microsoft assessment in the CIBA section; use supported human sign-in plus application approval or a separately integrated CIBA provider.',auth0:'Auth0: documented CIBA for first-party confidential OIDC clients; verify notification channel, licensing and enrolled approvers.',okta:'Okta Identity Engine: CIBA transactional verification uses Custom Authenticator/Devices SDK and a documented Web Application client; verify tenant availability. Auth0 is a separate Okta product with its own CIBA configuration and licensing.',curity:'Curity: documented CIBA with poll result delivery and a configured backchannel authenticator.',ping:'PingFederate: documented CIBA poll/ping with a CIBA request policy and PingOne MFA or custom authenticator.'};
+      if(answers.approvalflow==='ciba'&&cibaProfiles[answers.idp])identityControl(cibaProfiles[answers.idp],'Confirm the selected product’s CIBA client authentication, human enrollment and availability.','idp');
+      if(answers.workloadauth==='spiffe'&&answers.approvalflow==='ciba')identityControl('SPIFFE/CIBA composition: SVIDs authenticate workloads to the approval service; CIBA authenticates/obtains human consent. Verify broker or asymmetric OAuth client authentication separately: an SVID is not automatically a private_key_jwt assertion, and CIBA support does not establish native SVID acceptance.','Keep human identity and workload identity separate without silently adding static agent secrets.','workloadauth');
+      if(answers.hosting==='aws' && answers.idp && answers.idp!=='entra'){
+        identityControl('AWS-2 external enterprise IdP: selected Okta/Auth0/Curity/Ping product provides human identity and its supported CIBA approval integration; AWS hosts agents/tools, SPIRE identifies supported workloads, and IAM/STS grants AWS resource permissions. Entra is not required.','Separate enterprise human identity from AWS workload/resource identity.','idp');
+        identityControl('AWS-2 role trust: use a documented native runtime role or separately configured SPIRE OIDC-to-STS federation with pinned issuer/provider, aud and sub. A human CIBA token is not an AWS credential and does not itself authorize a workload role.','Validate each credential issuer and recipient independently.','hosting');
+        identityControl('AWS-2 tool enforcement: keep consequential permissions on the gated tool executor, enforce policy-required exact-operation human approval, prevent direct agent bypass and correlate CloudTrail with policy/approval events. Managed runtimes need documented native identity and trusted run context; do not invent SVID attestation.','Authorization must govern actual AWS side effects.','highrisk');
+      }
+      if(answers.hosting==='azure'){
+        identityControl('Azure deployment profiles: AZ-1 customer-managed AKS/VM agent using Azure OpenAI/Foundry models; AZ-2 managed-host application with native identity; AZ-3 managed Foundry Agent Service using its documented platform identity. Select and validate the actual runtime before deployment.','Model hosting and agent execution are different decisions.','hosting');
+        identityControl('Azure resource access: use documented Entra-issued workload tokens and least-privilege Azure RBAC. An external enterprise IdP token or CIBA user token does not directly replace the Azure resource token.','Separate enterprise human identity from Azure workload authorization.','hosting');
+        if(answers.idp && answers.idp!=='entra')identityControl('External IdP on Azure: selected vendor provides enterprise human identity and supported approval/CIBA integration; Entra still issues native Azure workload identities. Validate issuer/subject mappings and approver entitlements without token passthrough.','External IdP does not eliminate Azure platform identity dependencies.','idp');
+        if(answers.workloadauth==='spiffe')identityControl('Azure SPIFFE boundary: directly attest only supported customer-managed nodes/workloads. Managed Foundry/App Service/Functions do not automatically receive SVIDs; use a separately attested gateway where appropriate and retain verified native caller/run identity.','A gateway SVID identifies the gateway, not the upstream managed agent.','workloadauth');
+        identityControl('Azure tool execution: enforce policy-required exact-action approval at the tool PEP and prevent direct bypass. For managed Foundry tools, validate supported authentication and trusted run correlation; disable high-risk tools when enforcement is unavailable.','Human intervention must govern actual side effects.','highrisk');
+      }
+      identityControl('Hosting '+(answers.hosting||'unspecified')+': '+(answers.hosting==='aws'?'Validate EKS/EC2 attestation or native runtime identity; do not assume Lambda/ECS managed runtimes can run a SPIRE node daemon.':answers.hosting==='azure'?'Validate AKS/VM SPIRE integration or native managed identity; restrict metadata/socket access.':'Require documented provider attestation or an isolated gateway; identify residual credential exceptions.'),'Execution environment determines bootstrap support.','hosting');
+      identityControl(answers.preview==='ga'?'GA-only policy: no preview feature may be a required security dependency; verify dated provider support and use independently enforced fallback controls.':'Preview features require owner acceptance, tested fallback and dependency review.','Availability preference changes deployment acceptance.','preview');
+      if(answers.idp==='entra')identityControl('Entra policy scope: distinguish service-principal workload Conditional Access, managed identities (out of workload CA scope), delegated-user policy, and Agent ID/agent-user policy; validate the actual token subject and resource.','Selected Microsoft policy mapping.','idp');
+      if(answers.idp){var names={entra:'Microsoft Entra ID',okta:'Okta',auth0:'Auth0',curity:'Curity Identity Server',ping:'PingFederate'};identityControl('Enterprise IdP: '+names[answers.idp]+'; workload hosting: '+(answers.hosting||'unspecified')+'. Pin issuer, subject and audience; verify provider-specific federation and token support.','IdP and execution location are separate trust decisions.','idp');}
+      if(answers.workloadauth==='spiffe')identityControl('SPIFFE/SPIRE: verified node/workload attestation, narrow registrations, X.509 mTLS or audience-bound JWT-SVIDs, protected Workload API, live rotation and trusted instance/task binding.','Attestation replaces application bootstrap passwords; CAZT still authorizes every action.','workloadauth');
+      if(answers.workloadauth==='native')identityControl('Native identity: use supported short-lived runtime credentials; retain task/action checks and independently verified run attribution.','Confirm native identity scope and bypass prevention.','workloadauth');
+      if(answers.workloadauth==='legacy'&&answers.highrisk==='yes')identityControl('High-risk legacy exception acceptance: require documented governance approval, named owner, expiry, protected broker, least privilege, rotation and migration deadline; block production if exception evidence or controls are missing.','The questionnaire selection does not prove the exception is approved.','workloadauth');
+      if(answers.workloadauth==='legacy')identityControl('Legacy exception: isolated credential broker, named owner, restricted scope, rotation and migration deadline; not end-to-end secretless.','Residual secrets must be explicit.','workloadauth');
+      if(['okta','auth0','ping'].indexOf(answers.idp)!==-1)identityControl('Do not assume native SPIFFE assertion acceptance; validate the exact product/version and any broker trust mapping without reintroducing agent-held static secrets.','Vendor capability acceptance gate.','idp');
       for (var i = 0; i < AUGMENTATIONS.length; i++){
         var aug = AUGMENTATIONS[i];
+        if(aug.forkId==='latency'&&!approvalNeeded)continue;
         var v = answers[aug.forkId];
         if (v === undefined) continue;
         if (aug.values.indexOf(v) === -1) continue;
@@ -2220,12 +1773,7 @@
         for (var j = 0; j < FORKS.length; j++){
           if (FORKS[j].id === aug.forkId){ forkIndex = j; break; }
         }
-        result.push({
-          control: aug.control,
-          reason: aug.reason,
-          forkId: aug.forkId,
-          forkIndex: forkIndex
-        });
+        identityControl(aug.control,aug.reason,aug.forkId);
       }
       return result;
     }
@@ -2270,12 +1818,16 @@
         lines.push('  When: ' + hs.when);
         lines.push('');
         lines.push('  Immediate actions:');
-        for (var i = 0; i < hs.controls.length; i++){
-          lines.push('    - ' + hs.controls[i]);
+        var target=targetProfile(state.answers);
+        lines.push(target?'  Provisional target after remediation: Outcome '+target.key+' — '+target.name:'  Target pending: establish organizational trust.');
+        var actions=readinessFailures(state.answers).concat(hs.controls);
+        for (var i = 0; i < actions.length; i++){
+          lines.push('    - ' + actions[i]);
         }
+        if(target){lines.push('  TARGET CONTROLS — deployment remains blocked:');target.controls.concat(computeAugmentations(state.answers,target.controls).map(function(x){return x.control;})).forEach(function(x){lines.push('    - '+x);});}
       } else if (ranked.length > 0){
         var top = ranked[0];
-        lines.push('  Outcome ' + top.o.key + ' — ' + top.o.name + ' (' + Math.round(top.score * 100) + '% match)');
+        lines.push('  Outcome ' + top.o.key + ' — ' + top.o.name + ' (selected profile)');
         lines.push('  When: ' + top.o.when);
         lines.push('');
         lines.push('  Baseline controls:');
@@ -2295,20 +1847,8 @@
           }
         }
 
-        // Option C: mismatch warning in text export (fires only when mismatches exist)
-        var mismatches = computeMismatches(top.o.key, state.answers);
-        if (mismatches.length > 0){
-          lines.push('');
-          lines.push('  ANSWERS THAT CONFLICT WITH THIS OUTCOME:');
-          for (var mi = 0; mi < mismatches.length; mi++){
-            var m = mismatches[mi];
-            lines.push('    Q' + (m.forkIndex + 1) + '. ' + m.question);
-            lines.push('      Your answer: ' + m.userLabel);
-            lines.push('      Expected:    ' + m.expectedLabels.join(' or '));
-          }
-        }
       } else {
-        lines.push('  (No outcome matched.)');
+        lines.push('  Architecture review required: inspect risk, autonomy, identity and trust in the answer summary before deployment.');
       }
 
       lines.push('');
@@ -2341,11 +1881,6 @@
       }
     }
 
-    function exportShareLink(){
-      // Removed: "Copy share link" button was removed per request.
-      // Answers still persist in the URL hash, so the URL itself remains shareable.
-    }
-
     /* Print only the result panel — opens a new window with just the result
        HTML + minimal styling, then triggers print. This avoids printing the
        entire SPA. */
@@ -2368,7 +1903,7 @@
         +     'margin-bottom:8px;border:1px solid #d9e3ef;border-radius:10px;background:#fff;}'
         +   '.outcome-rank.primary{border-color:#4ea4ff;background:#f5f9ff;}'
         +   '.outcome-rank.hard-stop{border-color:#dc4c64;background:#fff1f4;}'
-        +   '.pct{flex-shrink:0;width:60px;text-align:center;font-size:18px;font-weight:800;'
+        +   '.pct{flex-shrink:0;width:82px;text-align:center;font-size:14px;font-weight:800;'
         +     'color:#4ea4ff;letter-spacing:-.03em;}'
         +   '.pct small{display:block;font-size:9px;font-weight:600;color:#51667e;'
         +     'letter-spacing:.04em;margin-top:2px;}'
@@ -2495,9 +2030,7 @@
       state.step = 0;
       state.answers = {};
       state.finished = false;
-      state.allowOverride = false;
-      var $override = document.getElementById('wiz-override');
-      if ($override) $override.checked = false;
+      restoreNotice=""; showRestoreNotice();
       $next.style.display = '';
       $result.classList.remove('shown');
       $result.innerHTML = '';
@@ -2507,24 +2040,20 @@
 
     /* --- Tab switching --- */
     function initTabs(){
-      var tabs = document.querySelectorAll('.dt-tab');
-      for (var i = 0; i < tabs.length; i++){
-        tabs[i].addEventListener('click', function(){
-          var target = this.getAttribute('data-target');
-          for (var j = 0; j < tabs.length; j++){
-            tabs[j].classList.toggle('active', tabs[j] === this);
-          }
-          var panels = document.querySelectorAll('.dt-panel');
-          for (var k = 0; k < panels.length; k++){
-            panels[k].classList.toggle('active', panels[k].id === target);
-          }
-        });
+      var tabs=Array.from(document.querySelectorAll('.dt-tab'));
+      function activate(tab,focus){
+        tabs.forEach(function(t){var active=t===tab;t.classList.toggle('active',active);t.setAttribute('aria-selected',String(active));t.tabIndex=active?0:-1;var panel=document.getElementById(t.getAttribute('data-target'));panel.classList.toggle('active',active);panel.hidden=!active;});
+        if(focus)tab.focus();
       }
+      tabs.forEach(function(tab,i){
+        tab.addEventListener('click',function(){activate(tab,false);});
+        tab.addEventListener('keydown',function(e){var n;if(e.key==='ArrowRight')n=(i+1)%tabs.length;else if(e.key==='ArrowLeft')n=(i+tabs.length-1)%tabs.length;else if(e.key==='Home')n=0;else if(e.key==='End')n=tabs.length-1;else return;e.preventDefault();activate(tabs[n],true);});
+      });activate(tabs.find(function(t){return t.classList.contains('active');})||tabs[0],false);
     }
-
     /* --- Init --- */
     function init(){
       initTabs();
+      renderReference();
 
       // Restore from URL
       var code = readURL();
@@ -2551,38 +2080,12 @@
         renderQuestion();
       }
 
+      showRestoreNotice();
       $next.addEventListener('click', next);
       $back.addEventListener('click', back);
       $restart.addEventListener('click', restart);
 
-      // Override toggle — when checked, constraints are relaxed
-      var $override = document.getElementById('wiz-override');
-      if ($override){
-        $override.addEventListener('change', function(){
-          state.allowOverride = this.checked;
-          // Re-render current question so options update
-          if (!state.finished){
-            renderQuestion();
-          }
-        });
-      }
 
-      // Keyboard nav (Enter = next, Esc = back)
-      document.addEventListener('keydown', function(e){
-        // Only when wizard is in viewport
-        var wizard = document.getElementById('wizard');
-        if (!wizard) return;
-        var rect = wizard.getBoundingClientRect();
-        var inView = rect.top < window.innerHeight && rect.bottom > 0;
-        if (!inView) return;
-        if (e.key === 'Enter' && !$next.disabled && !$next.style.display.endsWith('none')){
-          next();
-          e.preventDefault();
-        } else if (e.key === 'Backspace' && !$back.disabled && document.activeElement.tagName !== 'INPUT'){
-          back();
-          e.preventDefault();
-        }
-      });
     }
 
     if (document.readyState === 'loading'){
