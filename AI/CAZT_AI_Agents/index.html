@@ -530,14 +530,14 @@
       <div class="brand"><div class="brand-mark">AI</div>CAZT for AI Agents</div>
       <div class="nav-links">
 <a href="https://stephen-ade.github.io/" class="home-link">&larr; Home</a>
-<a href="#layers">Four Layers</a><a href="#identity">Identity</a><a href="#semantic">Semantic</a><a href="#execution">Execution</a><a href="#governance">Governance</a><a href="#spiffe">SPIFFE/SPIRE</a><a href="#ciba">CIBA &amp; Approval</a><a href="#protocol-requirements">Protocol Requirements</a><a href="#cross-cloud">Cross-Cloud</a><a href="#comparison">Comparison</a><a href="#deployments">Deployment Patterns</a><a href="#decision-tree">Decision Tree</a><a href="#compliance">Compliance</a>
+<a href="#layers">Four Layers</a><a href="#atf-mapping">ATF Mapping</a><a href="#identity">Identity</a><a href="#semantic">Semantic</a><a href="#execution">Execution</a><a href="#governance">Governance</a><a href="#spiffe">SPIFFE/SPIRE</a><a href="#ciba">CIBA &amp; Approval</a><a href="#protocol-requirements">Protocol Requirements</a><a href="#cross-cloud">Cross-Cloud</a><a href="#comparison">Comparison</a><a href="#deployments">Deployment Patterns</a><a href="#decision-tree">Decision Tree</a><a href="#compliance">Compliance</a>
       </div>
     </div>
   </nav>
 
   <header class="hero" id="overview">
     <div class="wrap">
-      <div class="eyebrow">Version 2.8 &middot; Last reviewed <span id="rev-date"></span></div>
+      <div class="eyebrow">Version 2.9 &middot; Last reviewed <span id="rev-date"></span></div>
       <h1>Conditional Access and Zero Trust for AI Agents</h1>
       <div class="sub">
         Secure enterprise AI agents running on <strong>AWS or Azure</strong>, with human identity services from <strong>Entra ID, Okta, Auth0, Curity, Ping Identity or another validated enterprise identity provider</strong>.<br>
@@ -578,39 +578,39 @@
 <section id="layers" style="background:var(--bg);color:var(--text);">
       <div class="wrap">
         <h2 class="section-title white-title">Four security layers for enterprise AI agents</h2>
-        <p class="section-sub" style="color:var(--muted);">A useful agent security model separates the problem into four layers. Each one solves a different class of failure.</p>
+        <p class="section-sub" style="color:var(--muted);">The four CAZT layers work together throughout an agent’s task. They are complementary responsibilities, not checkpoints passed once. ATF’s five zero-trust elements describe protection objectives that span these layers.</p>
         <div class="grid">
           <div class="card third">
             <div class="layer-title">Layer 1</div>
             <h3>Identity</h3>
-            <p>Use attested workload identity, trustworthy instance/run attribution, least privilege and short-lived credentials. Instance-unique SPIFFE IDs require explicit registration policy.</p>
+            <p>Establish workload and applicable human identity, ownership, trusted run/task attribution and least privilege. Use SPIFFE/SPIRE on supported runtimes or documented native identities; govern enrollment, rotation and retirement. Identity proves who is acting, not whether an action is authorized.</p>
           </div>
           <div class="card third">
             <div class="layer-title">Layer 2</div>
             <h3>Semantic controls</h3>
-            <p>Filter prompts, retrieved content, and outputs so the agent is harder to hijack through language or poisoned context.</p>
+            <p>Assess proposed actions, prompts, retrieved content and outputs for manipulation, policy violations and data leakage. Combine intent validation with trusted behavioral signals; reassess changed actions. Semantic screening reduces risk and cannot grant authority.</p>
           </div>
           <div class="card third">
             <div class="layer-title">Layer 3</div>
             <h3>Execution controls</h3>
-            <p>Contain what the agent can do at runtime through tool mediation, sandboxing, network boundaries, and scoped transactions.</p>
+            <p>Enforce PDP decisions at the tool PEP, segment resources, tools and networks, and constrain each operation. Monitor execution, block bypass paths and support effective stop controls, containment and rollback or compensating actions.</p>
           </div>
           <div class="card third">
             <div class="layer-title">Layer 4</div>
             <h3>Governance</h3>
-            <p>Apply approvals, evidence collection, and lifecycle accountability to high-risk actions and privileged agent operations.</p>
+            <p>Define risk policy, data classification/provenance requirements, eligible approvers, identity lifecycle and evidence retention. Assign incident-response ownership and recovery criteria. Require exact-action human approval when high-risk actions exceed existing authority.</p>
           </div>
-          <div class="card full">
-            <div class="flow">
-              <div class="box">Identity<br/>Who is acting?</div>
-              <div class="arrow">&rarr;</div>
-              <div class="box">Semantic<br/>What is the agent being asked to do?</div>
-              <div class="arrow">&rarr;</div>
-              <div class="box">Execution<br/>What can it actually invoke?</div>
-              <div class="arrow">&rarr;</div>
-              <div class="box">Governance<br/>Should this proceed without human approval?</div>
-            </div>
-          </div>
+          <div class="card full" id="atf-mapping">
+<h3>ATF zero-trust elements mapped to CAZT</h3><p><a href="https://agentictrustframework.ai/">Agentic Trust Framework (ATF)</a> identifies five zero-trust elements: Identity, Behavior, Data Governance, Segmentation and Incident Response. These elements define protection objectives that span the four CAZT security layers described in this guide: Identity, Semantic, Execution and Governance. The mapping below shows how each ATF element is addressed across those layers.</p>
+<div class="table-wrap"><table><thead><tr><th>ATF element</th><th>CAZT responsibility</th><th>Controls and evidence</th></tr></thead><tbody>
+<tr><td>Identity</td><td>Identity, Governance and Execution</td><td>Authenticate workloads and applicable users; record owners and trusted run/task attribution; authorize each action; govern enrollment, renewal, suspension and retirement.</td></tr>
+<tr><td>Behavior</td><td>Semantic, Execution, Identity and Governance</td><td>Validate intent, correlate observed tool actions with the authorized task, detect deviations and feed trusted risk signals into policy reassessment and containment.</td></tr>
+<tr><td>Data Governance</td><td>Governance, Semantic and Execution</td><td>Track provenance and classification; validate retrieved material; enforce resource-level retrieval permissions, purpose limits, DLP, output controls and retention.</td></tr>
+<tr><td>Segmentation</td><td>Execution and Identity, under Governance policy</td><td>Separate tenants, environments, resources, tools and networks; isolate agent/runtime/tool permissions; deny unauthorized paths and lateral movement.</td></tr>
+<tr><td>Incident Response</td><td>Execution and Governance, informed by Identity and Semantic signals</td><td>Detect and triage incidents, contain activity, invalidate pending approvals, restrict credentials/sessions, stop agents and tools, recover safely and preserve evidence.</td></tr>
+</tbody></table></div>
+<p><strong>Continuous evaluation:</strong> on each consequential operation and relevant change in context, validate current identity, task scope, policy, risk and approval. Behavioral monitoring supplies evidence to these checks. SPIFFE/SPIRE supplies workload identity; CIBA supports human authentication/consent. Neither replaces the other zero-trust elements.</p>
+</div>
         </div>
       </div>
     </section>
@@ -694,6 +694,7 @@
             </div>
             <div class="note">Separate the governed agent definition, attested workload, verified instance and task/run. Replicas may share a service SPIFFE ID; per-instance IDs need trusted registration lifecycle. Each consequential action must remain attributable.</div>
           </div>
+<div class="card full"><h3>Ownership, identity lifecycle and attribution</h3><p>Assign an accountable business owner and technical operator to each agent deployment. Maintain its permitted tasks, enterprise human IdP, runtime identity, tool permissions and retirement criteria. Establish trusted agent/run/task and tenant attribution outside model-generated text; distinguish a shared SPIFFE service identity from an instance-unique identity.</p><p>Review registrations and role trust, test credential/key rotation, remove retired identity bindings and revoke replaced credentials. On suspension, also stop execution and restrict resource access: short-lived SVIDs or cloud tokens do not guarantee immediate revocation of existing sessions.</p></div>
         </div>
       </div>
     </section>
@@ -735,6 +736,7 @@
             </div>
             <div class="warnbox">The semantic layer should be treated as <strong>risk reduction</strong>, not as proof that the agent is now safe. It must be paired with execution constraints.</div>
           </div>
+<div class="card full"><h3>Continuous behavior and intent assessment</h3><p>Compare proposed and observed operations with the authorized task, expected tools, resources, destinations, transaction limits and delegation scope. Detect patterns such as repeated denied calls, unusual privilege requests, unexpected data exports, tool sequences or activity outside the task window. Derive signals from verified execution records and trusted services, not solely from the agent’s description of its intent.</p><p>Send relevant signals to the runtime policy decision process. Depending on policy, deny the action, require eligible-human approval, narrow the request or initiate containment. Re-evaluate changed parameters and approval context before execution. Anomaly scores and model confidence cannot create authority; define thresholds, ownership and handling of false positives.</p></div>
         </div>
       </div>
     </section>
@@ -854,6 +856,7 @@
             </ul>
             <p>These tools evaluate authorization requests in real-time against declarative policies that encode <strong>ABAC</strong>, <strong>ReBAC</strong>, and <strong>TBAC</strong> rules.</p>
           </div>
+<div class="card full"><h3>Segmentation and incident containment</h3><p>Separate production from test, tenants from one another, and agent runtime permissions from tool-executor permissions. Apply resource, network/egress and tool allowlists with argument validation. Ensure sensitive resources cannot be reached through alternate credentials, tools or network paths that bypass the PEP.</p><p>On an incident signal, the execution service can suspend new tool calls, cancel queued operations and invalidate unconsumed approvals. Apply tested AWS IAM/session restrictions or Azure access/network containment as appropriate, and isolate affected workloads. Confirm containment at the resource side; stopping a process or waiting for token expiry is insufficient. Use rollback or compensating actions for completed side effects.</p></div>
         </div>
       </div>
     </section>
@@ -899,6 +902,8 @@
             </div>
             <div class="dangerbox">Do not imply that every governance flow is natively cryptographic and automatic. In many enterprises, the secure implementation is a <strong>composite of IAM, approval workflow, orchestration logic, and logging</strong>.</div>
           </div>
+<div class="card full"><h3>Data governance across retrieval, execution and output</h3><p>Define data owners, authoritative sources, provenance metadata, classifications and permitted purposes. Validate source integrity and access rights before retrieval; treat retrieved instructions as untrusted content. Carry trusted sensitivity and tenant context into policy decisions, minimizing data sent to models, tools and other organizations.</p><p>The execution PEP enforces resource and destination permissions; semantic checks inspect content and outputs for leakage and unsafe instructions. Apply appropriate redaction, DLP, output review, retention and deletion controls. Provenance supports traceability but does not prove content is truthful or safe. Record necessary evidence without logging credentials or unnecessary sensitive payloads.</p></div>
+<div class="card full"><h3>Incident response and safe recovery</h3><ol><li><strong>Detect and triage:</strong> correlate identity, run/task, policy, tool, cloud and human-approval events; identify the affected agent, resources and accountable responders.</li><li><strong>Contain:</strong> block consequential execution at the PEP, invalidate pending approvals, restrict resource access and isolate affected runtimes. Verify the actual stop and containment effect.</li><li><strong>Investigate and remediate:</strong> preserve controlled-access evidence, inspect compromised identities, policy, source content and tool behavior; rotate or retire affected credentials and trust bindings where necessary.</li><li><strong>Recover:</strong> restore known-good policy/runtime state, roll back or compensate for side effects, revalidate permissions and require fresh approval for resumed gated operations.</li><li><strong>Review:</strong> document impact and lessons, improve detection and runbooks, and meet applicable notification and retention obligations.</li></ol><p>Assign incident commander, technical responders, data owners and recovery approvers. Define escalation thresholds, response targets and separation of duties; exercise denial, replay, credential compromise, approval-service outage and resource-bypass scenarios. Human approval is an authorization control, not a substitute for incident response.</p></div>
         </div>
       </div>
     </section>
