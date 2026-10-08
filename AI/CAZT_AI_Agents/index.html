@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Conditional Access and Zero Trust for AI Agents — SPIFFE Edition v2.7</title>
+  <title>Conditional Access and Zero Trust for AI Agents — SPIFFE Edition v3.0</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -404,6 +404,8 @@
     th,td{padding:14px 12px;border-bottom:1px solid var(--line-light);text-align:left;vertical-align:top;font-size:14px}
     th{background:#eef4fb;color:#203247}
     tr:last-child td{border-bottom:none}
+    .claim-status{font-weight:700;white-space:nowrap}
+    .claim-status.ok{color:#5fd68a}.claim-status.soon{color:#ffcf66}.claim-status.stale{color:#ff7b7b}
     .flow{
       display:grid;grid-template-columns:repeat(7,1fr);gap:12px;align-items:center
     }
@@ -531,13 +533,14 @@
       <div class="nav-links">
 <a href="https://stephen-ade.github.io/" class="home-link">&larr; Home</a>
 <a href="#layers">Four Layers</a><a href="#atf-mapping">ATF Mapping</a><a href="#identity">Identity</a><a href="#semantic">Semantic</a><a href="#execution">Execution</a><a href="#governance">Governance</a><a href="#spiffe">SPIFFE/SPIRE</a><a href="#ciba">CIBA &amp; Approval</a><a href="#protocol-requirements">Protocol Requirements</a><a href="#cross-cloud">Cross-Cloud</a><a href="#comparison">Comparison</a><a href="#deployments">Deployment Patterns</a><a href="#decision-tree">Decision Tree</a><a href="#compliance">Compliance</a>
+      <a href="#claims-register">Claims Register</a>
       </div>
     </div>
   </nav>
 
   <header class="hero" id="overview">
     <div class="wrap">
-      <div class="eyebrow">Version 2.9 &middot; Last reviewed <span id="rev-date"></span></div>
+      <div class="eyebrow">Version 3.0 &middot; Last reviewed <span id="rev-date"></span></div>
       <h1>Conditional Access and Zero Trust for AI Agents</h1>
       <div class="sub">
         Secure enterprise AI agents running on <strong>AWS or Azure</strong>, with human identity services from <strong>Entra ID, Okta, Auth0, Curity, Ping Identity or another validated enterprise identity provider</strong>.<br>
@@ -601,7 +604,7 @@
             <p>Define risk policy, data classification/provenance requirements, eligible approvers, identity lifecycle and evidence retention. Assign incident-response ownership and recovery criteria. Require exact-action human approval when high-risk actions exceed existing authority.</p>
           </div>
           <div class="card full" id="atf-mapping">
-<h3>ATF zero-trust elements mapped to CAZT</h3><p><a href="https://agentictrustframework.ai/">Agentic Trust Framework (ATF)</a> identifies five zero-trust elements: Identity, Behavior, Data Governance, Segmentation and Incident Response. These elements define protection objectives that span the four CAZT security layers described in this guide: Identity, Semantic, Execution and Governance. The mapping below shows how each ATF element is addressed across those layers.</p>
+<h3>ATF zero-trust elements mapped to CAZT</h3><p><a href="https://agentictrustframework.ai/">Agentic Trust Framework (ATF)</a> identifies five zero-trust elements: Identity, Behavior, Data Governance, Segmentation and Incident Response. These elements define protection objectives that span the four CAZT security layers described in this guide: Identity, Semantic, Execution and Governance. The mapping below is a high-level element mapping, not an ATF conformance crosswalk. ATF is an open specification published through the Cloud Security Alliance (specification v0.9.1, public review draft, April 2026; licensed CC BY 4.0; author Josh Woodruff, MassiveScale.AI). Its distinguishing mechanism is earned autonomy: four maturity levels (Intern, Junior, Senior, Principal) with five promotion gates and demotion criteria. Question 16 in the decision tree applies the maturity level alongside the autonomy and approval answers.</p>
 <div class="table-wrap"><table><thead><tr><th>ATF element</th><th>CAZT responsibility</th><th>Controls and evidence</th></tr></thead><tbody>
 <tr><td>Identity</td><td>Identity, Governance and Execution</td><td>Authenticate workloads and applicable users; record owners and trusted run/task attribution; authorize each action; govern enrollment, renewal, suspension and retirement.</td></tr>
 <tr><td>Behavior</td><td>Semantic, Execution, Identity and Governance</td><td>Validate intent, correlate observed tool actions with the authorized task, detect deviations and feed trusted risk signals into policy reassessment and containment.</td></tr>
@@ -1071,7 +1074,7 @@
 </section>
 <section id="decision-tree"><div class="wrap">
 <h2 class="section-title">Decision tree</h2>
-<p class="section-sub">Complete all 15 questions to select a control profile. Readiness failures block deployment; a provisional target profile explains the controls needed after remediation. Profile selection is not deployment approval.</p>
+<p class="section-sub">Complete all 16 questions to select a control profile. Readiness failures block deployment; a provisional target profile explains the controls needed after remediation. Profile selection is not deployment approval.</p>
 <div class="card"><h3>Identity and human approval decisions</h3><p>Choose AWS, Azure or external hosting separately from enterprise human IdP and workload bootstrap. Supported customer-controlled runtimes can use SPIFFE/SPIRE; managed runtimes use documented native identities. Select verified CIBA, a verified alternative, no approval workflow or unknown readiness. CIBA support does not establish native SVID client authentication.</p><p>Every high-risk deployment requires effective stop controls, rollback or appropriate compensating actions, a runtime PDP/tool PEP and auditable exact-action approval when existing authority is exceeded. Human supervision alone does not replace stop controls. Legacy credentials require a reviewed, time-limited exception with an owner, restricted permissions, broker protection and migration plan; choosing that option is not evidence of exception approval. Approval cadence affects workflow timing, not risk classification.</p></div>
         <div class="dt-tabs" role="tablist">
           <button class="dt-tab active" role="tab" id="tab-interactive" aria-controls="dt-interactive" aria-selected="true" tabindex="0" data-target="dt-interactive">Interactive</button>
@@ -1108,7 +1111,7 @@
         <p>These definitions are generated from the same questions and rules as the interactive assessment. Every answer remains selectable; readiness failures appear as findings.</p>
         <h3>Decision questions</h3><div class="decision-grid" id="reference-forks"></div>
         <h3>Outcome rules and baseline controls</h3><div class="decision-grid" id="reference-outcomes"></div>
-        <div class="warnbox"><strong>How to use this tree:</strong> Complete all 15 questions. Outcome E takes precedence if any readiness failure applies. Other outcomes select a control baseline; answer-specific controls follow. A matching profile is not deployment approval.</div>
+        <div class="warnbox"><strong>How to use this tree:</strong> Complete all 16 questions. Outcome E takes precedence if any readiness failure applies. Other outcomes select a control baseline; answer-specific controls follow. A matching profile is not deployment approval.</div>
         </div><!-- /dt-reference -->
       </div>
     </section>
@@ -1152,6 +1155,13 @@
         </div>
       </div>
     </section>
+
+<section id="claims-register"><div class="wrap"><h2 class="section-title">Claims register</h2>
+<p class="section-sub">Time-sensitive statements in this guide, with their sources and review dates. Status is computed against the date on your device: statements past their review date are flagged for re-verification before you rely on them.</p>
+<div id="claims-summary" class="warnbox" role="status"></div>
+<div class="table-wrap"><table><thead><tr><th>Claim</th><th>Area</th><th>Source</th><th>Checked</th><th>Re-review by</th><th>Status</th></tr></thead><tbody id="claims-body"></tbody></table></div>
+<noscript><p>The claims register requires JavaScript.</p></noscript>
+</div></section>
 </main>
 
   <footer>
@@ -1179,7 +1189,7 @@
       if(window.ResizeObserver)new ResizeObserver(updateOffset).observe(nav);
       window.addEventListener("resize",updateOffset);updateOffset();
       var el = document.getElementById('rev-date');
-      if(el){ el.textContent = '2026-10-06'; }
+      if(el){ el.textContent = '2026-10-07'; }
     })();
   </script>
 
@@ -1405,7 +1415,7 @@
           'Do not deploy to production',
           'Pilot only in sandbox with synthetic data',
           'Re-architect: add containment, kill switch, audit, governance',
-          'Re-evaluate against all 15 questions before promotion'
+          'Re-evaluate against all 16 questions before promotion'
         ],
         hardStop: true
       }
@@ -1474,6 +1484,7 @@
     FORKS.push({id:'workloadauth',title:'How does the workload bootstrap its identity?',desc:'SPIFFE attestation, native short-lived identity or a reviewed legacy exception. This does not replace human delegation.',options:[{label:'SPIFFE / SPIRE',detail:'Attestation and short-lived SVIDs',value:'spiffe'},{label:'Native cloud identity',detail:'Runtime-supported short-lived credentials',value:'native'},{label:'Legacy credential exception',detail:'Isolated broker, owner and migration deadline',value:'legacy'}]});
 
     FORKS.push({id:'approvalflow',title:'How is human step-up approval implemented?',desc:'CIBA authenticates/obtains human consent; an approval service must still bind the exact action and the tool PEP must enforce it. Choose the actual implementation, independently of hosting and approval cadence.',options:[{label:'CIBA with verified provider integration',detail:'Registered confidential client, enrolled approvers, supported client authentication and exact-action enforcement',value:'ciba'},{label:'Verified alternative approval workflow',detail:'Supported human sign-in plus bound, expiring, single-use authorization',value:'alternative'},{label:'No human approval workflow',detail:'High-risk actions requiring step-up cannot proceed',value:'none'},{label:'Not yet verified',detail:'Resolve provider, enrollment and enforcement before high-risk deployment',value:'unknown'}]});
+    FORKS.push({id:'atflevel',title:'What ATF maturity level has the agent earned?',desc:'The Agentic Trust Framework treats autonomy as earned: agents start at Intern and are promoted through five gates. This answer must be consistent with the autonomy, action-risk and approval answers. ATF thresholds are illustrative in the specification; calibrate them to your risk tolerance.',options:[{label:'Level 1 \u2014 Intern',detail:'Observe and report; read-only; continuous human oversight',value:'intern'},{label:'Level 2 \u2014 Junior',detail:'Recommends; a human approves every action',value:'junior'},{label:'Level 3 \u2014 Senior',detail:'Acts within guardrails; humans are notified after the action',value:'senior'},{label:'Level 4 \u2014 Principal',detail:'Autonomous within an approved domain; strategic oversight',value:'principal'},{label:'Not assessed',detail:'No maturity level or promotion process yet; treat as Level 1 until assessed',value:'none'}]});
     // Shared rule metadata drives classification and Reference.
     var RULES = {
       A:{identitytype:['workload'],mcp:['no'],highrisk:['no'],crossorg:['sameorg'],datatier:['public'],crossdata:['no'],regulatory:['none'],autonomy:['semi'],observe:['yes']},
@@ -1494,6 +1505,12 @@
       if((a.autonomy==='broad'||a.highrisk==='yes')&&a.observe!=='yes')failures.push('High-risk actions or broad autonomy require full observability and effective stop controls.');
       if(a.crossorg==='unknown')failures.push('Cross-organization trust is not established.');
       if(a.highrisk==='yes'&&['ciba','alternative'].indexOf(a.approvalflow)===-1)failures.push('High-risk step-up lacks a verified human approval workflow.');
+      var lv=a.atflevel,verified=['ciba','alternative'].indexOf(a.approvalflow)!==-1;
+      if(lv==='none'&&(a.autonomy==='broad'||a.highrisk==='yes'))failures.push('No ATF maturity level has been assessed for an agent with broad autonomy or high-risk actions, so autonomy has not been earned. Start at Intern (read-only) and promote through the ATF gates.');
+      if(lv==='intern'&&a.highrisk==='yes')failures.push('ATF Intern agents are read-only, which conflicts with a high-risk action profile. Correct the level or the action-risk answer.');
+      if((lv==='intern'||lv==='junior')&&a.autonomy==='broad')failures.push('ATF Intern and Junior agents cannot act without human involvement, which conflicts with broad autonomy.');
+      if(lv==='junior'&&!verified)failures.push('ATF Junior agents need human approval of every action, but no verified approval workflow is selected.');
+      if((lv==='senior'||lv==='principal')&&a.workloadauth==='legacy')failures.push('ATF Senior and Principal agents expect strong workload identity (mutual TLS or hardware-bound identity); a legacy credential exception is inconsistent with that level.');
       return failures;
     }
     OUTCOMES.forEach(function(o){
@@ -1543,17 +1560,18 @@
 
     /* Versioned URL state. Migrate legacy cadence names without changing answers. */
     var PARAM='a', restoreNotice='';
-    function answersToCode(){return 'v27:'+JSON.stringify(state.answers);}
+    function answersToCode(){return 'v30:'+JSON.stringify(state.answers);}
     function codeToAnswers(code){
       var a={},raw={},invalid=false;restoreNotice='';if(!code)return a;
       var cadence={poll:'batch',ping:'interactive',push:'realtime'};
-      if(/^v(?:21|27):/.test(code)){
+      if(/^v(?:21|27|30):/.test(code)){
         try{raw=JSON.parse(code.slice(code.indexOf(':')+1));if(!raw||typeof raw!=='object'||Array.isArray(raw))throw Error('invalid');}catch(e){restoreNotice='This saved link is invalid. Please complete the assessment again.';return a;}
         if(cadence[raw.latency])raw.latency=cadence[raw.latency];
         FORKS.forEach(function(f){if(raw[f.id]!==undefined){if(f.options.some(function(o){return o.value===raw[f.id];}))a[f.id]=raw[f.id];else invalid=true;}});
         if(Object.keys(raw).some(function(id){return !FORKS.some(function(f){return f.id===id;});}))invalid=true;
         if(invalid)restoreNotice='Some saved answers are unsupported. Review restored answers and complete missing questions.';
         else if(code.indexOf('v21:')===0)restoreNotice='Saved answers were migrated. Review the current rules before using this recommendation.';
+        if(!invalid&&code.indexOf('v30:')!==0&&raw.atflevel===undefined)restoreNotice='This link predates the ATF maturity question (Question 16). Answer it to see the result.';
         return a;
       }
       if(/^v/.test(code)){restoreNotice='This link uses an unsupported assessment version. No answers were restored; complete the current assessment.';return a;}
@@ -1729,6 +1747,11 @@
     function computeAugmentations(answers, outcomeControls){
       var result = [];
       function identityControl(control,reason,id){if((outcomeControls||[]).indexOf(control)!==-1||result.some(function(r){return r.control===control;}))return;var idx=FORKS.findIndex(function(f){return f.id===id});result.push({control:control,reason:reason,forkId:id,forkIndex:idx});}
+      var atfText={intern:'ATF Level 1 (Intern): read-only access, no actions that modify external systems, no credential or secret access; comprehensive action logging, strict allowlists, circuit breaker and kill switch.',junior:'ATF Level 2 (Junior): recommendations only; execute an action only after explicit human approval, with an approval-queue pause, transaction and rate limits, and a behavioral baseline.',senior:'ATF Level 3 (Senior): act within approved action types with real-time post-action notification; require just-in-time privileges, mutual TLS, policy-as-code, isolation capability, checkpoint/resume and degradation to Junior on issues.',principal:'ATF Level 4 (Principal): autonomy only inside an approved domain; require hardware-bound identity, privilege attestation, continuous behavioral scoring, automated containment, risk-committee approval and automatic demotion after a significant incident.'};
+      if(atfText[answers.atflevel])identityControl(atfText[answers.atflevel],'selected ATF maturity level (Q16).','atflevel');
+      if(answers.atflevel==='none')identityControl('No ATF level assessed: start the agent at Level 1 (Intern, read-only) and record promotion evidence for performance, security validation, business value, incident record and governance sign-off before granting more autonomy.','no maturity level or promotion process (Q16).','atflevel');
+      if(answers.atflevel==='senior'||answers.atflevel==='principal')identityControl('ATF promotion and demotion: keep gate evidence (performance, security validation, business value, incident record, governance sign-off). Treat a critical incident as immediate demotion to Intern and re-promote only through all gates.','higher autonomy must be earned and revocable (Q16).','atflevel');
+      if((answers.atflevel==='senior'||answers.atflevel==='principal')&&answers.highrisk==='yes')identityControl('Post-action notification or strategic oversight does not replace exact-action approval when a high-risk action exceeds the authority already granted.','ATF level and CAZT step-up answer different questions (Q16).','atflevel');
       var workloadNames={spiffe:'SPIFFE/SPIRE attestation and SVIDs',native:'documented native cloud identity',legacy:'governed legacy credential exception'};
       if(workloadNames[answers.workloadauth])identityControl('Selected workload identity: '+workloadNames[answers.workloadauth]+'. Enterprise human IdP and delegated-user authority are evaluated separately.','Actual runtime bootstrap selection.','workloadauth');
       var approvalNeeded=answers.highrisk==='yes'||['ciba','alternative'].indexOf(answers.approvalflow)!==-1;
@@ -2058,6 +2081,7 @@
     /* --- Init --- */
     function init(){
       initTabs();
+      renderClaims();
       renderReference();
 
       // Restore from URL
@@ -2093,6 +2117,28 @@
 
     }
 
+    var CLAIMS=[
+      {id:'entra-ciba',claim:'Entra ID and Entra External ID do not support native CIBA',area:'Identity / approval',source:'#microsoft-ciba-status',label:'Dated assessment in this guide',checked:'2026-10-05',days:30},
+      {id:'agent-ca',claim:'Conditional Access for agents: block control, agent-risk and agent-execution-environment conditions (Preview)',area:'Entra Agent ID',source:'https://learn.microsoft.com/en-us/entra/identity/conditional-access/policy-autonomous-agents',label:'Microsoft Learn',checked:'2026-10-06',days:30},
+      {id:'agent-licence',claim:'Agent identity policy licensing: Microsoft 365 E7, or Agent 365 with Entra P1 or Microsoft 365 E3',area:'Entra Agent ID',source:'https://learn.microsoft.com/en-us/entra/identity/conditional-access/howto-target-agent-identities',label:'Microsoft Learn',checked:'2026-10-06',days:30},
+      {id:'ai-act-dates',claim:'EU AI Act as amended by Regulation (EU) 2026/1744: Annex III high-risk 2 Dec 2027, Annex I 2 Aug 2028',area:'Compliance',source:'https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=OJ:L_202601744',label:'EUR-Lex',checked:'2026-10-05',days:60},
+      {id:'ai-act-art50',claim:'Article 50(2) marking transition to 2 Dec 2026 for systems placed on the market before 2 Aug 2026',area:'Compliance',source:'https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=OJ:L_202601744',label:'EUR-Lex',checked:'2026-10-05',days:55},
+      {id:'vendor-ciba',claim:'Okta, Auth0, Curity and PingFederate CIBA support details (vendor-asserted; not independently verified)',area:'Identity / approval',source:'https://developer.okta.com/docs/guides/configure-ciba/main/',label:'Vendor documentation',checked:'2026-10-05',days:30},
+      {id:'mcp-auth',claim:'MCP authorization baseline: revision 2025-11-25 (optional, HTTP transports)',area:'Execution',source:'https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization',label:'MCP specification',checked:'2026-10-05',days:45},
+      {id:'atf-spec',claim:'ATF specification v0.9.1 (public review draft): five elements, four maturity levels, five promotion gates; thresholds are illustrative',area:'Governance',source:'https://github.com/massivescale-ai/agentic-trust-framework/blob/main/MATURITY_MODEL.md',label:'ATF specification',checked:'2026-10-07',days:45},
+      {id:'spire-aws',claim:'SPIRE OIDC federation to AWS STS is a documented pattern (not integration-tested here)',area:'Federation',source:'https://spiffe.io/docs/latest/keyless/oidc-federation-aws/',label:'SPIFFE documentation',checked:'2026-10-05',days:90},
+      {id:'aws-oidc',claim:'AWS web-identity trust: condition on provider aud and sub; ExternalId applies to third-party AssumeRole',area:'Federation',source:'https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_oidc.html',label:'AWS documentation',checked:'2026-10-05',days:90},
+      {id:'entra-wif',claim:'Entra workload identity federation accepts external OIDC issuers',area:'Federation',source:'https://learn.microsoft.com/en-us/entra/workload-id/workload-identity-federation',label:'Microsoft Learn',checked:'2026-10-05',days:90}
+    ];
+    function claimDue(c){var d=new Date(c.checked+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+c.days);return d;}
+    function claimStatus(c,now){var due=claimDue(c),ms=due.getTime()-now.getTime(),day=86400000;if(ms<0)return 'stale';if(ms<=14*day)return 'soon';return 'ok';}
+    function renderClaims(){
+      var body=document.getElementById('claims-body');if(!body)return;
+      var now=new Date(),labels={ok:'Current',soon:'Due soon',stale:'Stale: re-verify'},count={ok:0,soon:0,stale:0};
+      body.innerHTML=CLAIMS.map(function(c){var s=claimStatus(c,now);count[s]++;var link=c.source.charAt(0)==='#'?'<a href="'+c.source+'">'+c.label+'</a>':'<a href="'+c.source+'" rel="noopener">'+c.label+'</a>';return '<tr><td>'+c.claim+'</td><td>'+c.area+'</td><td>'+link+'</td><td>'+c.checked+'</td><td>'+claimDue(c).toISOString().slice(0,10)+'</td><td><span class="claim-status '+s+'">'+labels[s]+'</span></td></tr>';}).join('');
+      var sum=document.getElementById('claims-summary');if(sum)sum.textContent=count.ok+' current, '+count.soon+' due soon, '+count.stale+' stale as of '+now.toISOString().slice(0,10)+'.';
+    }
+    window.CAZT={FORKS:FORKS,OUTCOMES:OUTCOMES,RULES:RULES,readinessFailures:readinessFailures,targetProfile:targetProfile,computeAugmentations:computeAugmentations,answersToCode:answersToCode,codeToAnswers:codeToAnswers,setAnswers:function(a){state.answers=a;},getNotice:function(){return restoreNotice;},CLAIMS:CLAIMS,claimStatus:claimStatus,claimDue:claimDue};
     if (document.readyState === 'loading'){
       document.addEventListener('DOMContentLoaded', init);
     } else {
