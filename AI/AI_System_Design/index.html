@@ -7,7 +7,7 @@
 <!-- Public static SPA hardening: strict CSP, no external script dependencies, no network connections, DOM output escaping, referrer minimization, anti-framing fallback. Server-side auth/CORS/rate-limiting are not applicable to this GitHub Pages-only artifact. -->
 <meta name="referrer" content="strict-origin"/>
 <meta name="robots" content="index,follow,noarchive"/>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-txDRW+Ox7Y5bJD5i2npqRV4n1tBzKFC6FqGs28/GsOI=' 'sha256-Hxfk9kiU74nQrZESYgX1vZRj2KT7FM3VC9615qr6oX4='; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'none'; object-src 'none'; frame-src 'none'; child-src 'none'; worker-src 'none'; media-src 'none'; base-uri 'none'; form-action 'none'; manifest-src 'none'; upgrade-insecure-requests"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-txDRW+Ox7Y5bJD5i2npqRV4n1tBzKFC6FqGs28/GsOI=' 'sha256-PAOh1hia2YFyJDptxirgYMIIz/d4rHJxkfEIUMf4iDo='; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'none'; object-src 'none'; frame-src 'none'; child-src 'none'; worker-src 'none'; media-src 'none'; base-uri 'none'; form-action 'none'; manifest-src 'none'; upgrade-insecure-requests"/>
 <script>(function(){if(window.top===window.self){document.documentElement.classList.add('frame-ok');}})();</script>
 <style>
 :root{
@@ -198,7 +198,7 @@ html::-webkit-scrollbar-thumb:hover{background:#1a5496}
   <div class="aside-title">Workspace Navigation</div>
   <div class="navgrid">
     <button class="cardnav active" data-nav-target="intent"><span class="num">01</span><span><span class="navlabel">Architecture Intent</span><span class="navdesc">Design principles and secure posture</span></span></button>
-<button class="cardnav" data-nav-target="factors"><span class="num">02</span><span><span class="navlabel">AI Design Factors</span><span class="navdesc">Model/data, runtime, trust, operations, assurance</span></span></button>
+<button class="cardnav" data-nav-target="factors"><span class="num">02</span><span><span class="navlabel">AI Design Factors</span><span class="navdesc">Model architecture/data, runtime, trust, operations, assurance</span></span></button>
 <button class="cardnav" data-nav-target="governance"><span class="num">03</span><span><span class="navlabel">AI Risk Governance</span><span class="navdesc">AI RMF, NIST AI 600-1, EU AI Act</span></span></button>
 <button class="cardnav" data-nav-target="questionnaire"><span class="num">04</span><span><span class="navlabel">AI Design Questionnaire</span><span class="navdesc">Workload, model, data, agent, risk inputs</span></span></button>
 <button class="cardnav" data-nav-target="assessment"><span class="num">05</span><span><span class="navlabel">Generated Assessment</span><span class="navdesc">Scale, risk, and architecture guidance</span></span></button>
@@ -225,7 +225,7 @@ html::-webkit-scrollbar-thumb:hover{background:#1a5496}
 <!-- 01 INTENT -->
 <section id="intent" class="page">
   <div class="sec-header"><h2>Architecture Intent</h2><button class="print-btn" data-print-section="intent"><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 6 2 18 2 18 9'/><path d='M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2'/><rect x='6' y='14' width='12' height='8'/></svg> Print / Export PDF</button></div>
-  <div class="banner"><strong>Version 5c:</strong> places AI Design Factors immediately after Architecture Intent so the architectural considerations are established before downstream design and architecture outputs. The factors remain organized into Model & Data, Agent Runtime, Identity & Trust, Security & Operations, and Governance & Assurance.</div>
+  <div class="banner"><strong>Version 5d:</strong> places AI Design Factors immediately after Architecture Intent so the architectural considerations are established before downstream design and architecture outputs. The factors remain organized into Model & Data, Agent Runtime, Identity & Trust, Security & Operations, and Governance & Assurance.</div>
   <div class="banner">Purpose: design an AI system by first defining the operating model, risk boundary, data posture, agent authority, and design trade-offs before selecting cloud services or model providers.</div>
   <div class="cards">
     <div class="smallcard"><h4>Model-Aware Architecture</h4><p>The model is a capability inside a distributed system, not the whole system. Design identity, data flow, retrieval, orchestration, observability, and fallback around it.</p></div>
@@ -248,10 +248,20 @@ html::-webkit-scrollbar-thumb:hover{background:#1a5496}
 
   <h3>Model &amp; Data</h3>
   <div class="cards">
-    <div class="smallcard"><h4>Model &amp; Inference</h4><ul><li>Provider/model class, hosting, region, context window, latency, routing, fallback, throughput, and cost controls.</li><li>Trade-off: quality and reasoning depth versus latency, cost, resilience, and data-handling restrictions.</li></ul></div>
+    <div class="smallcard"><h4>Model Architecture &amp; Inference Strategy</h4><ul><li>Define the model by independent dimensions rather than a single label: role/capability, internal architecture, modality, representation, composition, hosting, routing, fallback, latency, throughput, and cost.</li><li>Examples may combine dimensions: a reasoning-optimized model can also be MoE, vision-language, small/edge-deployed, or part of a routed specialist architecture.</li><li>Trade-off: capability and reasoning depth versus latency, cost, resilience, deployment complexity, and data-handling restrictions.</li></ul></div>
     <div class="smallcard"><h4>Retrieval &amp; Grounding</h4><ul><li>RAG architecture, source ingestion, chunking, embeddings, ranking/reranking, graph relationships, citations, provenance, and freshness.</li><li>Authorization must occur before protected content enters model context.</li><li>Trade-off: grounded evidence versus retrieval latency, complexity, and leakage risk.</li></ul></div>
     <div class="smallcard"><h4>Memory &amp; State</h4><ul><li>Working, episodic, semantic, procedural, enterprise/shared, audit, workflow, and checkpoint state.</li><li>Govern writes, provenance, retention, deletion, tenant isolation, integrity, and poisoning controls.</li><li>Trade-off: continuity and personalization versus privacy and state-management risk.</li></ul></div>
   </div>
+
+  <h4>Model Architecture Dimensions</h4>
+  <div class="tablewrap"><table><thead><tr><th>Dimension</th><th>Representative Choices</th><th>Architectural Meaning</th></tr></thead><tbody>
+    <tr><td>Role / capability</td><td>General-purpose LLM; reasoning-optimized model / LRM; action-oriented model / LAM; embedding; reranker; classifier; segmentation / perception; code-specialized; audio/speech-specialized; multiple specialized roles</td><td>What the model is expected to do in the system. Role does not itself grant authority to execute actions.</td></tr>
+    <tr><td>Internal architecture / topology</td><td>Dense transformer; Mixture-of-Experts (MoE); encoder-only / masked-language-model style; decoder-only; encoder-decoder; diffusion / latent architecture; other / undecided</td><td>How inference capacity is internally organized. This affects serving, routing, observability, cost, and assurance.</td></tr>
+    <tr><td>Modality</td><td>Text; Image; Code; Vision-Language; Audio / Speech; Video; Multimodal</td><td>The input/output media the model processes. Each modality introduces distinct ingestion, validation, provenance, safety, and evaluation requirements.</td></tr>
+    <tr><td>Representation</td><td>Token-level; concept / semantic-level (LCM-style); mixed / hybrid; not yet determined</td><td>The representational level used for inference. Concept-level architectures are treated as emerging unless validated for the selected implementation.</td></tr>
+    <tr><td>Composition</td><td>Single model; primary + fallback; router to specialist models; cascade; ensemble; hierarchical / composite; edge + cloud; multiple independent specialists</td><td>How multiple models cooperate, fail over, specialize, or escalate. Composition must preserve policy, data-class, and trust boundaries.</td></tr>
+  </tbody></table></div>
+
   <h4>RAG Architecture Strategy</h4>
   <div class="tablewrap"><table><thead><tr><th>Architecture</th><th>Primary Pattern</th><th>Best Fit</th><th>Key Trade-Off</th></tr></thead><tbody>
     <tr><td>Hybrid RAG</td><td>Dense/vector + sparse/BM25 + rank fusion + reranking</td><td>Enterprise corpora with semantic and exact-match needs</td><td>Higher retrieval complexity and latency</td></tr>
@@ -264,6 +274,7 @@ html::-webkit-scrollbar-thumb:hover{background:#1a5496}
   <h3>Agent Runtime</h3>
   <div class="cards">
     <div class="smallcard"><h4>Agent Orchestration</h4><ul><li>Topology, planner/workflow graph, state machine, handoffs, supervisor-worker coordination, parallel/sequential execution, retries, checkpoints, and completion control.</li><li>Orchestration styles include graph/stateful workflow, role/team, workflow-first enterprise, handoff/delegation, hybrid agent+workflow, and tool-centric loops.</li><li>Implementation examples: LangGraph, CrewAI, Microsoft Agent Framework, OpenAI Agents SDK, Google ADK, Claude Agent SDK, or equivalent/custom orchestration.</li><li>Trade-off: flexibility and autonomy versus determinism, state complexity, observability, and control.</li></ul></div>
+    <div class="smallcard"><h4>Agent Type / Operational Pattern</h4><ul><li>Classify what the agent actually does at runtime: deterministic/reflex, general LLM, tool-using, planning, memory-enabled, RAG/knowledge, code, web-browsing, computer-use, autonomous, multi-agent, hierarchical/supervisor, or adaptive/learning.</li><li>Agent type is separate from topology and orchestration: it describes operational behavior, while topology describes arrangement and orchestration describes coordination.</li><li>Security controls must scale with the operational type, especially for code, browser/computer-use, autonomous, learning, and multi-agent patterns.</li></ul></div>
     <div class="smallcard"><h4>Decision Plane</h4><ul><li>Bounded routing, classification, prioritization, tool/agent selection, and escalation.</li><li>Mechanisms: deterministic rules, classifiers, structured LLM decisions, specialized decision models such as Jev/equivalent, hybrids, and human decisions.</li><li>Decision output proposes what should happen; policy/authorization independently determines whether it may happen.</li></ul></div>
     <div class="smallcard"><h4>Tool &amp; Action Surface</h4><ul><li>Read-only, write, customer-facing, financial, privileged, cloud-admin, code-execution, browser/computer-use, and external side-effect actions.</li><li>Model tool registry, schemas, scopes, action criticality, transaction boundaries, and completion evidence.</li><li>Trade-off: operational leverage versus blast radius and misuse risk.</li></ul></div>
     <div class="smallcard"><h4>Runtime &amp; Containment</h4><ul><li>Sandboxing, network/egress boundaries, runtime credentials, resource quotas, loop/time/token budgets, kill switches, pause/resume, rollback/compensation, and quarantine.</li><li>Containment must stop unsafe execution without depending on the compromised reasoning path.</li></ul></div>
@@ -439,6 +450,10 @@ html::-webkit-scrollbar-thumb:hover{background:#1a5496}
     <div class="field"><label>Average Output Tokens</label><input id="outputTokens" type="number" value="800" min="1"/></div>
     <div class="field"><label>Model Hosting Preference</label><select id="modelHosting"><option selected>Managed foundation model service</option><option>Private cloud-hosted model endpoint</option><option>Self-hosted open model</option><option>Hybrid provider routing</option><option>Not yet decided</option></select></div>
     <div class="field"><label>Model Selection Priority</label><select id="modelPriority"><option>Lowest latency</option><option>Lowest cost</option><option selected>Balanced quality, cost, and latency</option><option>Highest reasoning quality</option><option>Strict data residency</option></select></div>
+    <div class="field"><label>Primary Model Role / Capability</label><select id="modelRole"><option selected>General-purpose generative LLM</option><option>Reasoning-optimized model / LRM</option><option>Action-oriented model / LAM</option><option>Embedding / retrieval model</option><option>Reranker</option><option>Classification / prediction model</option><option>Segmentation / perception model</option><option>Code-specialized model</option><option>Audio / speech-specialized model</option><option>Multiple specialized model roles</option><option>Not yet determined</option></select></div>
+    <div class="field"><label>Model Internal Architecture / Topology</label><select id="modelTopology"><option selected>Dense transformer</option><option>Mixture-of-Experts (MoE)</option><option>Encoder-only / masked-language-model style</option><option>Decoder-only</option><option>Encoder-decoder</option><option>Diffusion / latent architecture</option><option>Other / undecided</option></select></div>
+    <div class="field"><label>Model Representation Architecture</label><select id="modelRepresentation"><option selected>Token-level representation</option><option>Concept / semantic-level representation (LCM-style / emerging)</option><option>Mixed / hybrid representation</option><option>Not yet determined</option></select></div>
+    <div class="field"><label>Model Composition Strategy</label><select id="modelComposition"><option selected>Single primary model</option><option>Primary + fallback model</option><option>Router to specialist models</option><option>Model cascade</option><option>Ensemble</option><option>Hierarchical / composite model system</option><option>Edge + cloud model combination</option><option>Multiple independent specialist models</option></select></div>
     <div class="field"><label>RAG Required</label><select id="rag"><option>No</option><option selected>Yes — enterprise documents</option><option>Yes — product or support knowledge</option><option>Yes — code or technical repositories</option><option>Yes — regulated records</option></select></div>
     <div class="field"><label>Knowledge Update Frequency</label><select id="knowledgeFreq"><option>Static / quarterly</option><option>Daily</option><option selected>Hourly</option><option>Near-real-time</option><option>Streaming / event-driven</option></select></div>
     <div class="field"><label>Retrieval Authorization</label><select id="retrievalAuth"><option>Public corpus only</option><option selected>User / role-level document access</option><option>Tenant-isolated corpus</option><option>Record-level authorization</option><option>Mixed public and confidential corpus</option></select></div>
@@ -460,7 +475,7 @@ html::-webkit-scrollbar-thumb:hover{background:#1a5496}
     <div class="field"><label>Security Framework Mapping</label><select id="aiFramework"><option selected>MITRE ATLAS + OWASP Top 10 for LLM Applications 2025 + NIST AI RMF + NIST AI 100-2e2025</option><option>MITRE ATLAS + OWASP Top 10 for LLM Applications 2025 + NIST AI RMF</option><option>NIST AI RMF and NIST CSF 2.0</option><option>OWASP LLM 2025 and agentic risk focus</option><option>Enterprise cloud security baseline only</option><option>Custom governance mapping</option></select></div>
     <div class="field"><label>AI Risk Governance Mapping</label><select id="riskGovernance"><option selected>NIST AI RMF + NIST AI 600-1 + EU AI Act</option><option>NIST AI RMF + NIST AI 600-1</option><option>NIST AI RMF only</option><option>EU AI Act + enterprise governance baseline</option><option>Regulated model risk management mapping</option></select></div>
     <div class="field"><label>Primary GenAI Risk Emphasis</label><select id="genaiRiskEmphasis"><option selected>Confabulation, data privacy, and information security</option><option>Information integrity and harmful content</option><option>Bias, human-AI configuration, and transparency</option><option>IP, provenance, and value-chain integration</option><option>CBRN or high-harm misuse prevention</option><option>EU AI Act prohibited practices and high-risk obligations</option></select></div>
-    <div class="field"><label>Multimodal Scope</label><select id="multimodal"><option selected>Text only</option><option>Text and documents with tables</option><option>Text, image, and document understanding</option><option>Audio or speech pipeline</option><option>Video or rich media pipeline</option></select></div>
+    <div class="field"><label>Model Modality</label><select id="multimodal"><option selected>Text</option><option>Image</option><option>Code</option><option>Vision-Language</option><option>Audio / Speech</option><option>Video</option><option>Multimodal</option></select></div>
     <div class="field"><label>Inference Optimization Need</label><select id="inferenceOptimization"><option>Low</option><option selected>Medium — streaming and caching</option><option>High — batching, routing, and fallback</option><option>Very high — GPU serving and scheduler tuning</option><option>Edge / on-device optimization</option></select></div>
     <div class="field"><label>Provider and Model Fallback</label><select id="providerFallback"><option>No fallback</option><option selected>Fallback model in same provider</option><option>Multi-provider routing</option><option>Self-hosted fallback</option><option>Degraded non-AI workflow</option></select></div>
   </div>
@@ -506,6 +521,7 @@ html::-webkit-scrollbar-thumb:hover{background:#1a5496}
   <h3 style="margin-top:16px">Agent Runtime Harness & Execution Inputs <span class="badge new">v5</span></h3>
   <div class="grid">
     <div class="field"><label>Agent Necessity</label><select id="agentNecessity"><option>LLM response only — no agent needed</option><option>Deterministic workflow with AI assistance</option><option selected>Agent justified — dynamic planning and tools required</option><option>Multi-agent coordination required</option></select></div>
+    <div class="field"><label>Agent Type / Operational Pattern</label><select id="agentType"><option>Deterministic / Reflex Agent</option><option selected>General LLM Agent</option><option>Tool-Using Agent</option><option>Planning Agent</option><option>Memory-Enabled Agent</option><option>RAG / Knowledge Agent</option><option>Code Agent</option><option>Web-Browsing Agent</option><option>Computer-Use Agent</option><option>Autonomous Agent</option><option>Multi-Agent System</option><option>Hierarchical / Supervisor Agent</option><option>Adaptive / Learning Agent</option><option>Not yet determined</option></select></div>
     <div class="field"><label>Direct Response vs Agent Routing</label><select id="routingMode"><option>Always direct model response</option><option selected>Route simple requests directly; escalate complex requests to agent workflow</option><option>Always use agent workflow</option><option>Policy/risk-based routing by task class</option></select></div>
     <div class="field"><label>Reasoning / Planning Strategy</label><select id="reasoningStrategy"><option>Direct response</option><option>ReAct-style iterative tool use</option><option selected>Plan-and-execute with explicit task state</option><option>Reflection / critic loop</option><option>Supervisor-worker decomposition</option><option>Hierarchical / delegated planning</option></select></div>
     <div class="field"><label>Completion Verification</label><select id="completionVerification"><option>Model self-declares completion</option><option>Basic schema / format validation</option><option selected>Independent deterministic checks against task acceptance criteria</option><option>Human approval plus deterministic checks</option><option>Regulated evidence-based verification</option></select></div>
@@ -939,6 +955,122 @@ function applyCompatibilityRules(triggerId=''){
       restrictOptions('toolCalls',['No tool calls','Read-only internal APIs','Read-only plus workflow lookups'],'Read-only internal APIs','Decision-support mode is restricted to non-state-changing tools.');
     }
 
+    // Model-architecture conflict avoidance.
+    const mr=v('modelRole'), mt=v('modelTopology'), mrep=v('modelRepresentation'), mc=v('modelComposition'), mm=v('multimodal');
+
+    // Specialized model roles require compatible modalities.
+    if(mr==='Code-specialized model')
+      restrictOptions('multimodal',['Code','Multimodal'],'Code','A code-specialized model requires Code or Multimodal input/output handling.');
+    else if(mr==='Audio / speech-specialized model')
+      restrictOptions('multimodal',['Audio / Speech','Multimodal'],'Audio / Speech','An audio/speech-specialized model requires Audio / Speech or Multimodal handling.');
+    else if(mr==='Segmentation / perception model')
+      restrictOptions('multimodal',['Image','Video','Multimodal'],'Image','A segmentation/perception model requires Image, Video, or Multimodal handling.');
+
+    // Multiple model roles cannot be represented as one primary model.
+    if(mr==='Multiple specialized model roles')
+      restrictOptions('modelComposition',['Router to specialist models','Model cascade','Ensemble','Hierarchical / composite model system','Edge + cloud model combination','Multiple independent specialist models'],'Router to specialist models','Multiple specialized model roles require a multi-model composition strategy.');
+
+    // A single-primary-model composition cannot simultaneously declare an AI-model fallback.
+    if(mc==='Single primary model')
+      restrictOptions('providerFallback',['No fallback','Degraded non-AI workflow'],'No fallback','Single primary model cannot declare a second AI model as fallback; choose Primary + fallback model or another multi-model composition.');
+    else if(mc==='Primary + fallback model')
+      restrictOptions('providerFallback',['Fallback model in same provider','Multi-provider routing','Self-hosted fallback'],'Fallback model in same provider','Primary + fallback composition requires an actual model fallback strategy.');
+    else if(mc==='Edge + cloud model combination')
+      lockValue('inferenceOptimization','Edge / on-device optimization','Edge + cloud composition requires explicit edge/on-device inference optimization.');
+
+    // Internal architecture constraints where the selected role is explicitly generative/action-oriented.
+    if(['General-purpose generative LLM','Action-oriented model / LAM'].includes(mr))
+      restrictOptions('modelTopology',allValues('modelTopology').filter(x=>x!=='Encoder-only / masked-language-model style'),'Dense transformer','A generative/action-oriented primary model cannot use an encoder-only masked-language-model topology as its sole generation architecture.');
+
+    // Runtime LAMs imply an agent/action execution context, but training platforms may train them without runtime controls.
+    if(mr==='Action-oriented model / LAM'&&st!=='Model Training or Fine-Tuning Platform'){
+      if(st==='Basic LLM Application'){
+        restrictOptions('modelRole',allValues('modelRole').filter(x=>x!=='Action-oriented model / LAM'),'General-purpose generative LLM','Basic LLM Application does not provide an agent/action runtime for an action-oriented model.');
+      }else if(!isMultiAgentSystem()){
+        lockValue('agentNecessity',oneAgent,'A runtime action-oriented model requires an agent harness with explicit planning/execution controls.');
+      }
+    }
+
+    // Multimodal model selection must not remain Text-only.
+    if(mm==='Multimodal'&&mr==='Audio / speech-specialized model'){} // valid multi-capability case
+
+    // Agent Type / Operational Pattern conflict avoidance.
+    const at=v('agentType');
+    const agentTypeNA = noAgent===v('agentNecessity');
+    if(agentTypeNA){
+      disableNA('agentType','Agent Type is not applicable when the design has no agent runtime.');
+    }else{
+      // Deterministic/reflex is the only agent-like operational pattern allowed without dynamic planning.
+      if(at==='Deterministic / Reflex Agent'){
+        lockValue('agentNecessity',det,'Deterministic / Reflex Agent uses fixed rules/event-response logic rather than dynamic agent planning.');
+        lockValue('autonomy','No autonomous behavior','Deterministic / Reflex Agent cannot claim autonomous agent behavior.');
+        restrictOptions('reasoningStrategy',['Direct response'],'Direct response','Deterministic / Reflex Agent does not use open-ended planning loops.');
+      }
+      if(at==='Tool-Using Agent'){
+        restrictOptions('toolCalls',allValues('toolCalls').filter(x=>x!=='No tool calls'),'Read-only internal APIs','Tool-Using Agent requires at least one governed tool capability.');
+        if(v('agentNecessity')===det)lockValue('agentNecessity',oneAgent,'Tool-Using Agent requires an agent runtime with tool selection/execution controls.');
+      }
+      if(at==='Planning Agent'){
+        restrictOptions('reasoningStrategy',allValues('reasoningStrategy').filter(x=>x!=='Direct response'),'Plan-and-execute with explicit task state','Planning Agent requires an explicit planning strategy.');
+        if(v('agentNecessity')===det)lockValue('agentNecessity',oneAgent,'Planning Agent requires a dynamic agent runtime.');
+      }
+      if(at==='Memory-Enabled Agent'){
+        restrictOptions('memory',allValues('memory').filter(x=>x!=='No memory'),'Session memory only','Memory-Enabled Agent requires application/agent memory.');
+        restrictOptions('memoryTaxonomy',allValues('memoryTaxonomy').filter(x=>x!=='No persistent memory'),'Working / short-term only','Memory-Enabled Agent requires an explicit memory architecture.');
+        if(v('agentNecessity')===det)lockValue('agentNecessity',oneAgent,'Memory-Enabled Agent requires an agent runtime.');
+      }
+      if(at==='RAG / Knowledge Agent'){
+        restrictOptions('rag',allValues('rag').filter(x=>x!=='No'),'Yes — enterprise documents','RAG / Knowledge Agent requires retrieval.');
+        restrictOptions('ragArchitecture',allValues('ragArchitecture').filter(x=>x!=='No RAG'),'Hybrid RAG — dense + sparse/BM25 + fusion/reranking','RAG / Knowledge Agent requires a concrete RAG architecture.');
+        if(v('agentNecessity')===det)lockValue('agentNecessity',oneAgent,'RAG / Knowledge Agent requires an agent runtime.');
+      }
+      if(at==='Code Agent'){
+        restrictOptions('multimodal',['Code','Multimodal'],'Code','Code Agent requires Code or Multimodal model handling.');
+        lockValue('protocolBoundary','Code execution interface','Code Agent requires an explicit governed code-execution boundary.');
+        restrictOptions('toolCalls',allValues('toolCalls').filter(x=>x!=='No tool calls'),'State-changing business actions','Code Agent requires governed execution/tool capability.');
+        restrictOptions('containmentModel',allValues('containmentModel').filter(x=>x!=='Stop workflow and alert'),'Revoke credentials, disable tool, terminate sandbox','Code Agent requires active containment beyond alert-only response.');
+        if(v('agentNecessity')===det)lockValue('agentNecessity',oneAgent,'Code Agent requires an agent runtime.');
+      }
+      if(at==='Web-Browsing Agent'){
+        lockValue('protocolBoundary','Browser / computer-use interface','Web-Browsing Agent requires a governed browser/web execution boundary.');
+        restrictOptions('toolCalls',allValues('toolCalls').filter(x=>x!=='No tool calls'),'Read-only plus workflow lookups','Web-Browsing Agent requires browser/network tool capability.');
+        if(v('agentNecessity')===det)lockValue('agentNecessity',oneAgent,'Web-Browsing Agent requires an agent runtime.');
+      }
+      if(at==='Computer-Use Agent'){
+        lockValue('protocolBoundary','Browser / computer-use interface','Computer-Use Agent requires an explicit browser/computer-use boundary.');
+        restrictOptions('toolCalls',['State-changing business actions','Privileged cloud, security, or admin actions'],'State-changing business actions','Computer-Use Agent performs stateful external actions and requires state-changing or privileged tool authority.');
+        restrictOptions('containmentModel',allValues('containmentModel').filter(x=>x!=='Stop workflow and alert'),'Revoke credentials, disable tool, terminate sandbox','Computer-Use Agent requires active containment and termination capability.');
+        if(v('agentNecessity')===det)lockValue('agentNecessity',oneAgent,'Computer-Use Agent requires an agent runtime.');
+      }
+      if(at==='Autonomous Agent'){
+        restrictOptions('autonomy',['Execute low-risk actions','Execute high-risk actions with approval gates'],'Execute low-risk actions','Autonomous Agent requires bounded execution authority rather than suggest-only or no-autonomy modes.');
+        restrictOptions('aarmTarget',['AARM Core R1–R6','AARM Extended R1–R9'],'AARM Core R1–R6','Autonomous Agent requires pre-execution runtime authorization, not logging-only controls.');
+        restrictOptions('humanOversight',['HOTL — autonomous operation with monitoring and override','Human-over-the-loop — supervisory control across one or more agent loops','HATL — governance / policy oversight','Risk-adaptive oversight by action criticality','Bounded autonomy — no routine human involvement'],'Risk-adaptive oversight by action criticality','Autonomous Agent requires supervisory, governance, or risk-adaptive oversight rather than approval before every action.');
+        if(v('agentNecessity')===det)lockValue('agentNecessity',oneAgent,'Autonomous Agent requires an agent runtime.');
+      }
+      if(at==='Multi-Agent System'){
+        lockValue('systemType','Multi-Agent System','Agent Type Multi-Agent System requires the Multi-Agent System workload type.');
+        lockValue('agentNecessity',multiReq,'Multi-Agent System agent type requires multi-agent coordination.');
+        restrictOptions('agentTopology',allValues('agentTopology').filter(x=>x!=='Single agent'),'Supervisor-worker','Multi-Agent System requires a multi-agent topology.');
+      }
+      if(at==='Hierarchical / Supervisor Agent'){
+        lockValue('systemType','Multi-Agent System','Hierarchical / Supervisor Agent requires a Multi-Agent System workload.');
+        lockValue('agentNecessity',multiReq,'Hierarchical / Supervisor Agent requires multi-agent coordination.');
+        restrictOptions('agentTopology',['Supervisor-worker','Hierarchical delegation'],'Supervisor-worker','Hierarchical / Supervisor Agent requires supervisor-worker or hierarchical delegation topology.');
+        restrictOptions('reasoningStrategy',['Supervisor-worker decomposition','Hierarchical / delegated planning'],'Supervisor-worker decomposition','Hierarchical / Supervisor Agent requires supervisor or hierarchical planning.');
+      }
+      if(at==='Adaptive / Learning Agent'){
+        restrictOptions('evaluationStrategy',['Continuous online evaluation','Regulated audit-grade evaluation'],'Continuous online evaluation','Adaptive / Learning Agent requires continuous or audit-grade evaluation of behavior changes.');
+        restrictOptions('memoryTaxonomy',['Working + episodic + semantic + procedural memory','Enterprise shared memory with governed write policy'],'Working + episodic + semantic + procedural memory','Adaptive / Learning Agent requires governed procedural or enterprise memory for behavior-changing feedback.');
+        restrictOptions('instructionGovernance',allValues('instructionGovernance').filter(x=>!x.includes('Ad hoc')),'Versioned rules with approval and rollback','Adaptive / Learning Agent cannot use ad hoc instruction governance for behavior-changing updates.');
+        if(v('agentNecessity')===det)lockValue('agentNecessity',oneAgent,'Adaptive / Learning Agent requires an agent runtime.');
+      }
+      // System-type and topology coherence for agent type.
+      if(st==='AI Agent')restrictOptions('agentType',allValues('agentType').filter(x=>!['Multi-Agent System','Hierarchical / Supervisor Agent','Deterministic / Reflex Agent'].includes(x)),'General LLM Agent','AI Agent is a single dynamic agent; multi-agent, hierarchical, and deterministic/reflex operational types require a different System Type.');
+      if(st==='Multi-Agent System' && !['Multi-Agent System','Hierarchical / Supervisor Agent','Not yet determined'].includes(v('agentType')))
+        restrictOptions('agentType',['Multi-Agent System','Hierarchical / Supervisor Agent','Not yet determined'],'Multi-Agent System','Multi-Agent System workload requires a multi-agent operational type.');
+    }
+
     // RAG invariants.
     const ragOn=v('rag')!=='No';
     if(!ragOn){
@@ -953,7 +1085,7 @@ function applyCompatibilityRules(triggerId=''){
       restrictOptions('contextStrategy',allValues('contextStrategy').filter(x=>x!=='Simple prompt only'),'Progressive disclosure with retrieval','A RAG-enabled design must include retrieved context in the context strategy.');
       const ra=v('ragArchitecture');
       if(ra.startsWith('Agentic RAG')&&!isMultiAgentSystem())lockValue('agentNecessity',oneAgent,'Agentic RAG requires an agent runtime.');
-      if(ra.startsWith('Multimodal RAG'))restrictOptions('multimodal',allValues('multimodal').filter(x=>x!=='Text only'),'Text, image, and document understanding','Multimodal RAG requires a non-text-only modality.');
+      if(ra.startsWith('Multimodal RAG'))restrictOptions('multimodal',allValues('multimodal').filter(x=>x!=='Text'),'Multimodal','Multimodal RAG requires a non-Text modality.');
       if(ra.startsWith('Hybrid RAG')){
         restrictOptions('ragRanking',['Rank fusion + reranker'],'Rank fusion + reranker','Hybrid RAG requires fusion of dense and sparse results; use rank fusion/reranking.');
         restrictOptions('ragIteration',['Single-pass retrieval','One retrieval pass plus reranking'],'One retrieval pass plus reranking','Hybrid RAG is a fused retrieval path; use a bounded single retrieval stage or reranking pass.');
@@ -1106,6 +1238,29 @@ function applyCompatibilityRules(triggerId=''){
 function validateCompatibility(){
   const issues=[];const st=v('systemType');const agentic=isAgenticDesign();const multi=isMultiAgentSystem();const ragOn=v('rag')!=='No';
   if(st==='AI Agent'&&v('agentTopology')!=='Single agent')issues.push('AI Agent must use Single agent topology.');
+  const mr=v('modelRole'),mc=v('modelComposition'),mm=v('multimodal');
+  const at=v('agentType');
+  if(v('agentNecessity')==='LLM response only — no agent needed'&&at!==COMPAT_NA)issues.push('Agent Type must be not applicable when no agent runtime is selected.');
+  if(at==='Tool-Using Agent'&&v('toolCalls')==='No tool calls')issues.push('Tool-Using Agent requires tool capability.');
+  if(at==='Planning Agent'&&v('reasoningStrategy')==='Direct response')issues.push('Planning Agent requires a planning strategy.');
+  if(at==='Memory-Enabled Agent'&&(v('memory')==='No memory'||v('memoryTaxonomy')==='No persistent memory'))issues.push('Memory-Enabled Agent requires explicit memory.');
+  if(at==='RAG / Knowledge Agent'&&(v('rag')==='No'||v('ragArchitecture')==='No RAG'))issues.push('RAG / Knowledge Agent requires RAG.');
+  if(at==='Code Agent'&&!['Code','Multimodal'].includes(mm))issues.push('Code Agent requires Code or Multimodal modality.');
+  if(at==='Code Agent'&&v('protocolBoundary')!=='Code execution interface')issues.push('Code Agent requires Code execution interface.');
+  if(at==='Web-Browsing Agent'&&v('protocolBoundary')!=='Browser / computer-use interface')issues.push('Web-Browsing Agent requires browser/computer-use interface.');
+  if(at==='Computer-Use Agent'&&v('protocolBoundary')!=='Browser / computer-use interface')issues.push('Computer-Use Agent requires browser/computer-use interface.');
+  if(at==='Autonomous Agent'&&!['Execute low-risk actions','Execute high-risk actions with approval gates'].includes(v('autonomy')))issues.push('Autonomous Agent requires bounded execution authority.');
+  if(at==='Multi-Agent System'&&(st!=='Multi-Agent System'||v('agentTopology')==='Single agent'))issues.push('Multi-Agent System agent type requires Multi-Agent System workload and multi-agent topology.');
+  if(at==='Hierarchical / Supervisor Agent'&&(st!=='Multi-Agent System'||!['Supervisor-worker','Hierarchical delegation'].includes(v('agentTopology'))))issues.push('Hierarchical / Supervisor Agent requires Multi-Agent System with supervisor-worker or hierarchical topology.');
+  if(at==='Adaptive / Learning Agent'&&!['Continuous online evaluation','Regulated audit-grade evaluation'].includes(v('evaluationStrategy')))issues.push('Adaptive / Learning Agent requires continuous or audit-grade evaluation.');
+  if(mr==='Code-specialized model'&&!['Code','Multimodal'].includes(mm))issues.push('Code-specialized model requires Code or Multimodal modality.');
+  if(mr==='Audio / speech-specialized model'&&!['Audio / Speech','Multimodal'].includes(mm))issues.push('Audio/speech-specialized model requires Audio / Speech or Multimodal modality.');
+  if(mr==='Segmentation / perception model'&&!['Image','Video','Multimodal'].includes(mm))issues.push('Segmentation/perception model requires Image, Video, or Multimodal modality.');
+  if(mr==='Multiple specialized model roles'&&['Single primary model','Primary + fallback model'].includes(mc))issues.push('Multiple specialized model roles require a multi-model composition strategy.');
+  if(mc==='Single primary model'&&['Fallback model in same provider','Multi-provider routing','Self-hosted fallback'].includes(v('providerFallback')))issues.push('Single primary model cannot declare an AI-model fallback.');
+  if(mc==='Primary + fallback model'&&['No fallback','Degraded non-AI workflow'].includes(v('providerFallback')))issues.push('Primary + fallback model requires an AI-model fallback strategy.');
+  if(['General-purpose generative LLM','Action-oriented model / LAM'].includes(mr)&&v('modelTopology')==='Encoder-only / masked-language-model style')issues.push('Generative/action-oriented primary models cannot use encoder-only masked-language topology as the sole generation architecture.');
+  if(mr==='Action-oriented model / LAM'&&st==='Basic LLM Application')issues.push('Action-oriented model / LAM requires an agent/action runtime rather than Basic LLM Application.');
   if(multi&&v('agentTopology')==='Single agent')issues.push('Multi-Agent System cannot use Single agent topology.');
   if(!ragOn&&v('ragArchitecture')!=='No RAG')issues.push('RAG architecture must be No RAG when RAG is disabled.');
   if(ragOn&&v('ragArchitecture')==='No RAG')issues.push('An enabled RAG design must select a RAG architecture.');
@@ -1246,13 +1401,27 @@ function promptSecurityPosture(){
   if(p.includes('Deny-by-default'))return 'Deny high-risk actions by default; require explicit policy authorization, runtime interception, and STEP_UP approval.';
   return 'Use regulated evidence, explicit approval workflow, immutable audit evidence, exception governance, and continuous control testing.';
 }
+
+function modelArchitecturePosture(){
+  const role=v('modelRole'),topology=v('modelTopology'),rep=v('modelRepresentation'),composition=v('modelComposition'),modality=v('multimodal');
+  let note='Model architecture is defined independently across capability, topology, modality, representation, and composition.';
+  if(role.includes('Action-oriented'))note+=' Treat model output as a proposed action only; require independent policy/authorization and completion verification before external effects.';
+  if(role.includes('Reasoning-optimized'))note+=' Apply explicit reasoning budgets, latency/cost thresholds, verification, and fallback for low-confidence or high-consequence tasks.';
+  if(topology.includes('Mixture-of-Experts'))note+=' Monitor expert routing behavior, capacity imbalance, latency variance, and model-version consistency.';
+  if(rep.includes('Concept / semantic'))note+=' Treat concept-level/LCM-style representation as emerging and validate quality, observability, provenance, and provider maturity.';
+  if(composition.includes('Router'))note+=' Enforce routing policy by data class, risk, region, cost, model capability, and provider health.';
+  if(composition.includes('Ensemble')||composition.includes('Multiple'))note+=' Define disagreement handling, synthesis, evidence, and model-specific authorization boundaries.';
+  return role+' · '+topology+' · '+modality+' · '+rep+' · '+composition+'. '+note;
+}
 function multimodalPosture(){
   const m=v('multimodal');
-  if(m==='Text only')return 'Text-only pipeline; standard prompt, retrieval, output, and injection controls apply.';
-  if(m.includes('tables'))return 'Use parser isolation, layout-aware extraction, document provenance, embedded-object controls, OCR validation, and table-aware evaluation.';
-  if(m.includes('image'))return 'Add image-content classification, metadata/EXIF handling, OCR/document injection defenses, provenance, and modality-specific evaluation.';
-  if(m.includes('Audio'))return 'Add audio content safety, spoof/deepfake considerations, transcription security, provenance, and speaker verification where the use case requires it.';
-  if(m.includes('Video'))return 'Add media provenance, frame/audio moderation, metadata controls, temporal evaluation, and storage/processing governance.';
+  if(m==='Text')return 'Text modality: apply prompt/content validation, provenance, data-loss controls, output validation, and language-specific evaluation.';
+  if(m==='Image')return 'Image modality: add image-content classification, metadata/EXIF handling, OCR and visual prompt-injection defenses, provenance, adversarial-image testing, and image-specific evaluation.';
+  if(m==='Code')return 'Code modality: add repository/context authorization, secrets scanning, dependency and supply-chain controls, sandboxed execution, command-injection defenses, secure-code evaluation, and least-privilege tool access.';
+  if(m==='Vision-Language')return 'Vision-Language modality: secure both image and text channels, defend against visual/indirect prompt injection, preserve image provenance, and evaluate cross-modal grounding and reasoning.';
+  if(m==='Audio / Speech')return 'Audio / Speech modality: add transcription and synthesis security, spoof/deepfake considerations, provenance, content safety, speaker verification where required, and audio-specific evaluation.';
+  if(m==='Video')return 'Video modality: add media provenance, frame/audio moderation, metadata controls, temporal consistency evaluation, storage governance, and defenses against embedded multimodal instructions.';
+  if(m==='Multimodal')return 'Multimodal design: apply modality-specific ingestion, provenance, authorization, safety, and evaluation across text, image, code, audio/speech, and/or video, with cross-modal prompt-injection controls.';
   return m;
 }
 function inferencePosture(){
@@ -1339,6 +1508,27 @@ function orchestrationFrameworkPosture(){
 function orchestrationSecurityPosture(){
   if(!agenticApplicable())return 'Standard application controls apply; no agent orchestration runtime is active.';
   return 'Pin framework/runtime versions; inventory dependencies; isolate workflow/session state; enforce per-agent identity and least privilege; validate handoff/delegation boundaries; protect checkpoints and memory; bound retries/loops; authorize tool calls outside model discretion; preserve trace provenance; and regression-test framework upgrades.';
+}
+
+function agentTypePosture(){
+  const t=v('agentType');
+  const map={
+    'Deterministic / Reflex Agent':'Use fixed rules/event-response logic with no open-ended planning. Keep behavior deterministic, testable, and outside autonomous agent loops.',
+    'General LLM Agent':'Use a governed single-agent runtime for open-ended language reasoning; constrain tools, memory, and external effects independently.',
+    'Tool-Using Agent':'Require explicit tool registry, per-call authorization, schema validation, least privilege, receipts, and containment for every external effect.',
+    'Planning Agent':'Require bounded plan-and-execute state, step budgets, dependency tracking, independent verification, and escalation when the plan exceeds policy or confidence limits.',
+    'Memory-Enabled Agent':'Require governed memory writes, provenance, retention/deletion, integrity checks, tenant isolation, and poisoning defenses.',
+    'RAG / Knowledge Agent':'Require an enabled RAG architecture with retrieval authorization, source provenance, evidence grading, freshness controls, and grounded completion checks.',
+    'Code Agent':'Require Code or Multimodal model handling, code-execution isolation, repository/secret boundaries, dependency controls, sandboxing, and approval for consequential changes.',
+    'Web-Browsing Agent':'Require a browser/web execution boundary, destination/content controls, prompt-injection defenses, credential isolation, download handling, and audit telemetry.',
+    'Computer-Use Agent':'Require browser/computer-use containment, strong identity, step-up for sensitive actions, screen/input provenance, credential isolation, kill switch, and complete action receipts.',
+    'Autonomous Agent':'Require bounded execution authority, runtime policy interception, risk-adaptive or supervisory human control, budgets, kill switch, rollback/compensation, and continuous monitoring.',
+    'Multi-Agent System':'Require explicit multi-agent topology, per-agent identity, scoped delegation, message provenance, resource isolation, coordination policy, and result verification.',
+    'Hierarchical / Supervisor Agent':'Require supervisor/worker or hierarchical topology, bounded delegation chains, authority attenuation, revocation, result synthesis, and escalation boundaries.',
+    'Adaptive / Learning Agent':'Treat feedback-driven behavior changes as governed changes: require continuous evaluation, change provenance, bounded learning scope, regression gates, rollback, and human governance.',
+    'Not yet determined':'Resolve the operational agent type before finalizing topology, tools, autonomy, containment, and assurance requirements.'
+  };
+  return map[t]||t;
 }
 
 function harnessPosture(){
@@ -1500,6 +1690,7 @@ function renderAssessment(){
     ['Availability & Resilience',availabilityPosture()],
     ['AI Risk Governance',v('riskGovernance')+' applied with primary emphasis on '+v('genaiRiskEmphasis')+'. Map through Govern, Map, Measure, and Manage; trace high-risk behaviors to controls, tests, evidence, and monitoring.'],
     ['Model Design',modelPosture()],
+    ['Model Architecture & Inference Strategy',modelArchitecturePosture()],
     ['Provider / Model Fallback',fallbackPosture()],
     ['Residency & Sovereignty',residencyPosture()],
     ['Retrieval Design',retrievalPosture()],
@@ -1507,9 +1698,10 @@ function renderAssessment(){
     ['Decision Plane',decisionPosture()],
     ['Decision Observability',decisionObservabilityPosture()],
     ['Prompt / Tool Security',promptSecurityPosture()],
-    ['Multimodal Posture',multimodalPosture()],
+    ['Modality & Content Security',multimodalPosture()],
     ['Agent Authority',agentPosture()],
     ['Agent Necessity / Harness',harnessPosture()],
+    ['Agent Type / Operational Pattern',agentTypePosture()],
     ['Direct vs Agent Routing',routingPosture()],
     ['Reasoning / Planning',reasoningPosture()],
     ['Completion Verification',completionPosture()],
@@ -1772,17 +1964,20 @@ function renderTradeoffs(){
   const rows=[
     ['Model hosting',v('modelHosting'),'Uncontrolled direct model usage','Governed model access improves policy, logging, routing, and cost control.','Extra platform component and potential latency.'],
     ['Model optimization priority',v('modelPriority'),'One model for every workload','Explicit quality/cost/latency/residency priority makes routing and evaluation decisions reviewable.','Optimization for one dimension may degrade another.'],
+    ['Model architecture strategy',v('modelRole')+' · '+v('modelTopology')+' · '+v('multimodal'),'Treat all model types as interchangeable','Explicit role, topology, modality, representation, and composition choices improve deployment fit, evaluation, and security controls.','More model variants increase routing, testing, observability, and governance complexity.'],
+    ['Model composition',v('modelComposition'),'Uncontrolled ad hoc model switching','Defined composition makes fallback, specialist routing, ensembles, and hierarchy reviewable and policy-bound.','Requires model-specific data policy, evaluation, and failure handling.'],
     ['Retrieval design',v('rag'),'Pure model-only answer generation','Grounding improves accuracy and auditability when private or current knowledge is needed.','Index freshness, authorization, and retrieval latency.'],
     ['Retrieval authorization','At query time (before context assembly)','Post-generation filtering','Authorizing before context insertion prevents sensitive data from entering model context.','Strict filters may reduce recall; requires ACL metadata at index time.'],
     ['Prompt data protection',v('promptData'),'Treat all prompt data as equivalent','Prompt-data class drives minimization, retention, provider, and logging controls.','Stronger controls may reduce context richness and provider flexibility.'],
     ['Availability target',v('availability'),'Best-effort default for all workloads',availabilityPosture(),'Higher availability increases cost and operational complexity.'],
     ['Residency / sovereignty',v('residency'),'Route to any available region/provider',residencyPosture(),'May restrict model/provider choice and failover options.'],
     ['Prompt / tool security',v('promptSecurity'),'Model self-policing or input validation only',promptSecurityPosture(),'More controls add latency, false positives, and policy maintenance.'],
-    ['Multimodal scope',v('multimodal'),'Apply text-only controls to all media',multimodalPosture(),'Modality-specific parsers, safety checks, and evaluation increase complexity.'],
+    ['Model modality',v('multimodal'),'Apply text-only controls to all media',multimodalPosture(),'Modality-specific parsers, safety checks, and evaluation increase complexity.'],
     ['Inference optimization',v('inferenceOptimization'),'Optimize only after saturation without design planning',inferencePosture(),'Optimization adds operational complexity and can affect quality or isolation.'],
     ['Fallback strategy',v('providerFallback'),'Single provider/model dependency',fallbackPosture(),'Additional evaluation, routing, and policy complexity.'],
     ['Agent authority',v('autonomy'),'Fully autonomous execution by default','Human approval and policy checks limit blast radius.','Slower completion for high-risk workflows.'],
     ['Agent necessity',v('agentNecessity'),'Use an agent for every AI request',harnessPosture(),'Simpler non-agent paths may provide less flexibility but reduce cost and attack surface.'],
+    ['Agent type / operational pattern',nv('agentType'),'Treat every agent as the same runtime pattern',agentTypePosture(),'More specialized agent types require tighter capability-specific controls and assurance.'],
     ['Direct vs agent routing',v('routingMode'),'Always invoke the most complex runtime',routingPosture(),'Routing logic requires testing but avoids unnecessary agent execution.'],
     ['Reasoning / planning strategy',v('reasoningStrategy'),'Unbounded free-form loops',reasoningPosture(),'Explicit planning state adds orchestration complexity.'],
     ['Completion verification',v('completionVerification'),'Trust the agent completion claim',completionPosture(),'Independent checks add latency and test maintenance.'],
@@ -1831,6 +2026,7 @@ function renderBlueprint(){
   if(agentic){
     flow.push('  -> Agentic Escalation Router: '+routingPosture());
     flow.push('  -> Agent Runtime Harness: '+harnessPosture());
+    flow.push('     -> Agent Type / Operational Pattern: '+agentTypePosture());
     flow.push('  -> Agent Topology: '+agentTopologyPosture());
     flow.push('  -> Orchestration Style: '+orchestrationStylePosture());
     flow.push('     -> Framework Mapping: '+orchestrationFrameworkPosture());
@@ -1847,7 +2043,7 @@ function renderBlueprint(){
     flow.push('  -> Retrieval Layer: ACL filtering before context assembly; apply the selected dense/sparse/graph/agentic/adaptive/multimodal retrieval path');
     flow.push('  -> Context Builder: citations, context minimization, prompt assembly, freshness validation');
   }
-  if(v('multimodal')!=='Text only')flow.push('  -> Multimodal Processing: '+multimodalPosture());
+  if(v('multimodal')!=='Text')flow.push('  -> Modality Processing: '+multimodalPosture());
   flow.push('  -> Model Router: '+modelPosture());
   flow.push('  -> Residency Gate: '+residencyPosture());
   flow.push('  -> Inference Optimization: '+inferencePosture());
@@ -1874,6 +2070,7 @@ function renderBlueprint(){
   $('blueprintFlow').textContent=flow.join('\n');
   const cards=[
     ['Primary Flow','Synchronous path for prompt intake, retrieval, inference, validation, and response.'],
+    ['Model Plane',modelArchitecturePosture()],
     ['Decision Plane',decisionPosture()],
     ['Retrieval Plane',ragArchitecturePosture()],
     ['Data Plane','Prompts, context, documents, embeddings, memory, outputs, audit logs, and generated artifacts, constrained by '+v('residency')+'.'],
@@ -1906,9 +2103,10 @@ function buildArchitectureGraph(){
   if(v('rag')!=='No' && v('ragArchitecture')!=='No RAG'){
     const rag=add('rag','RAG / Evidence',v('ragArchitecture')+' · '+v('ragRanking'),'data'); edge(last,rag); last=rag;
   }
+  const model=add('model','Model Plane',v('modelRole')+' · '+v('modelTopology')+' · '+v('multimodal')+' · '+v('modelComposition'),'agent'); edge(last,model); last=model;
   const agentic=agenticApplicable();
   if(agentic){
-    const harness=add('harness','Agent Runtime Harness',v('reasoningStrategy')+' · '+v('memoryTaxonomy'),'agent'); edge(last,harness); last=harness;
+    const harness=add('harness','Agent Runtime Harness',v('agentType')+' · '+v('reasoningStrategy')+' · '+v('memoryTaxonomy'),'agent'); edge(last,harness); last=harness;
     const orchestration=add('orchestration','Orchestration Layer',v('orchestrationStyle')+' · '+v('orchestrationFramework'),'decision'); edge(last,orchestration); last=orchestration;
   const topology=v('agentTopology');
   const topoNodes=[];
@@ -1936,7 +2134,7 @@ function buildArchitectureGraph(){
   }
   }
   else{
-    const model=add('model','Model / Inference','Non-agentic model execution','agent');edge(last,model);last=model;
+    /* Non-agentic path continues from the Model Plane added above. */
   }
   let execFrom=last;
   if(agentic&&v('toolCalls')!=='No tool calls'){
@@ -1968,8 +2166,8 @@ function topologyStaticDetail(){
   };return maps[t]||[t];
 }
 function renderArchitectureSummary(){
-  const items=[['System',v('systemType')],['RAG',v('ragArchitecture')],['Decision plane',v('decisionStrategy')]];
-  if(agenticApplicable())items.push(['Agent topology',v('agentTopology')],['Orchestration style',v('orchestrationStyle')],['Framework',v('orchestrationFramework')],['Resource sharing',v('resourceSharing')],['Result coordination',v('resultCoordination')],['Human oversight',v('humanOversight')],['Runtime control',v('aarmTarget')]);
+  const items=[['System',v('systemType')],['Model role',v('modelRole')],['Model topology',v('modelTopology')],['Modality',v('multimodal')],['Model composition',v('modelComposition')],['RAG',v('ragArchitecture')],['Decision plane',v('decisionStrategy')]];
+  if(agenticApplicable())items.push(['Agent type',v('agentType')],['Agent topology',v('agentTopology')],['Orchestration style',v('orchestrationStyle')],['Framework',v('orchestrationFramework')],['Resource sharing',v('resourceSharing')],['Result coordination',v('resultCoordination')],['Human oversight',v('humanOversight')],['Runtime control',v('aarmTarget')]);
   $('architectureSummary').innerHTML=items.map(x=>`<div class="summary-item"><strong>${escapeHtml(x[0])}</strong><span>${escapeHtml(x[1])}</span></div>`).join('');
 }
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
@@ -1977,8 +2175,9 @@ function escapeXml(s){return escapeHtml(s);}
 function renderStaticArchitecture(){
   const stages=[['Input / Perception','Authenticated request, normalization, provenance','data'],['Decision Plane',v('decisionStrategy')+' · '+v('decisionUseCase'),'decision']];
   if(v('rag')!=='No'&&v('ragArchitecture')!=='No RAG')stages.push(['RAG / Evidence',v('ragArchitecture')+' · '+v('ragRanking'),'data']);
+  stages.push(['Model Plane',v('modelRole')+' · '+v('modelTopology')+' · '+v('multimodal')+' · '+v('modelComposition'),'agent']);
   if(agenticApplicable()){
-    stages.push(['Agent Runtime Harness',v('reasoningStrategy')+' · '+v('memoryTaxonomy'),'agent']);
+    stages.push(['Agent Runtime Harness',v('agentType')+' · '+v('reasoningStrategy')+' · '+v('memoryTaxonomy'),'agent']);
     stages.push(['Orchestration Layer',v('orchestrationStyle')+' · '+v('orchestrationFramework'),'decision']);
     stages.push(['Agent Topology',v('agentTopology')+'<div class="static-topology">'+topologyStaticDetail().map(x=>'<span>'+escapeHtml(x)+'</span>').join('')+'</div>','agent']);
     if(v('toolCalls')!=='No tool calls'){
@@ -1988,7 +2187,6 @@ function renderStaticArchitecture(){
       if(h.startsWith('HOTL')||h.startsWith('Human-over')||h.startsWith('HATL'))stages.push(['Human Supervisory Control',h,'human']);
     }
   }else{
-    stages.push(['Model / Inference','Non-agentic model execution','agent']);
     if(v('toolCalls')!=='No tool calls')stages.push(['Deterministic Tool / Workflow Execution','Policy-authorized integration','security']);
   }
   stages.push(['Completion Verification',v('completionVerification'),'decision']);stages.push(['Verified Output','Evidence, citations, status, audit metadata','data']);
@@ -2054,13 +2252,18 @@ NOTE: Peak estimate uses active session window — validate against actual sessi
 2. MODEL AND INFERENCE
 Model hosting: ${v('modelHosting')}
 Model selection priority: ${v('modelPriority')}
+Primary model role / capability: ${v('modelRole')}
+Internal architecture / topology: ${v('modelTopology')}
+Model modality: ${v('multimodal')}
+Representation architecture: ${v('modelRepresentation')}
+Model composition strategy: ${v('modelComposition')}
+Architecture recommendation: ${modelArchitecturePosture()}
 Recommendation: ${modelPosture()}
 Fallback: ${v('providerFallback')}
 Fallback recommendation: ${fallbackPosture()}
 Residency / retention: ${v('residency')}
 Residency recommendation: ${residencyPosture()}
-Multimodal scope: ${v('multimodal')}
-Multimodal recommendation: ${multimodalPosture()}
+Modality security recommendation: ${multimodalPosture()}
 
 3. MODEL ADAPTATION
 Selected: ${v('adaptationStrategy')}${adaptationNote()}
@@ -2104,6 +2307,8 @@ Recommendation: ${agentPosture()}
 
 8. AGENT RUNTIME HARNESS
 Agent necessity: ${v('agentNecessity')}
+Agent type / operational pattern: ${nv('agentType')}
+Agent type recommendation: ${agentTypePosture()}
 Harness recommendation: ${harnessPosture()}
 Routing: ${nv('routingMode')}
 Routing recommendation: ${routingPosture()}
@@ -2202,7 +2407,7 @@ function downloadNotes(){
 }
 
 function downloadJSON(){
-  const ids=['systemName','systemType','criticality','users','dau','reqPerUser','peak','latency','promptTokens','outputTokens','modelHosting','modelPriority','rag','knowledgeFreq','retrievalAuth','sensitivity','promptData','outputRisk','toolCalls','autonomy','memory','compliance','availability','residency','contextStrategy','adaptationStrategy','evaluationStrategy','promptSecurity','aiFramework','riskGovernance','genaiRiskEmphasis','multimodal','inferenceOptimization','providerFallback','atfTarget','agentIdentity','actionCriticality','agentInteraction','agentTopology','resourceSharing','resultCoordination','humanOversight','orchestrationStyle','orchestrationFramework','protocolBoundary','aarmTarget','containmentModel','maestroMode','agentNecessity','routingMode','reasoningStrategy','completionVerification','memoryTaxonomy','workQueue','handoffModel','successMetric','instructionGovernance','decisionStrategy','decisionUseCase','decisionConfidence','ragArchitecture','ragRanking','ragIteration','constraints'];
+  const ids=['systemName','systemType','criticality','users','dau','reqPerUser','peak','latency','promptTokens','outputTokens','modelHosting','modelPriority','modelRole','modelTopology','modelRepresentation','modelComposition','rag','knowledgeFreq','retrievalAuth','sensitivity','promptData','outputRisk','toolCalls','autonomy','memory','compliance','availability','residency','contextStrategy','adaptationStrategy','evaluationStrategy','promptSecurity','aiFramework','riskGovernance','genaiRiskEmphasis','multimodal','inferenceOptimization','providerFallback','atfTarget','agentIdentity','actionCriticality','agentInteraction','agentTopology','resourceSharing','resultCoordination','humanOversight','orchestrationStyle','orchestrationFramework','protocolBoundary','aarmTarget','containmentModel','maestroMode','agentNecessity','agentType','routingMode','reasoningStrategy','completionVerification','memoryTaxonomy','workQueue','handoffModel','successMetric','instructionGovernance','decisionStrategy','decisionUseCase','decisionConfidence','ragArchitecture','ragRanking','ragIteration','constraints'];
   const data={};ids.forEach(id=>{const el=$(id);data[id]=el&&el.disabled?COMPAT_NA:v(id);});
   downloadBlob(JSON.stringify(data,null,2),'application/json;charset=utf-8',safeFilename(v('systemName'))+'_inputs.json');
 }
@@ -2264,7 +2469,7 @@ renderDistributed();
 generateDesign();
 
 (function(){
-  const QUESTIONNAIRE_HELP = {"systemName": "A descriptive name used to identify this workload in assessments, architecture notes, exports, and governance evidence.", "systemType": "The dominant AI workload pattern. This choice affects recommended architecture, threat modeling, agentic controls, and operating practices.", "criticality": "The business impact if the AI system is unavailable, incorrect, compromised, or misused. Higher criticality drives stronger resilience, review, and assurance controls.", "users": "The total number of users expected to be provisioned or eligible to use the production system; it is not the same as concurrent users.", "dau": "The estimated percentage of provisioned users who actively use the system on a typical day. It is used to estimate daily demand.", "reqPerUser": "The average number of AI interactions generated by each active user per day, including chat requests, automated calls, or workflow invocations.", "peak": "A factor applied to average traffic to estimate short-duration peak demand during active usage windows. Validate this against real concurrency and session data.", "latency": "The target response-time experience for users or downstream systems. It influences model choice, streaming, caching, routing, and capacity design.", "promptTokens": "The estimated average number of input tokens sent to the model per request, including system instructions, conversation context, and retrieved content.", "outputTokens": "The estimated average number of tokens generated by the model per request. It affects latency, throughput, and cost.", "modelHosting": "The preferred location and operating model for inference, such as a managed provider, private endpoint, self-hosted model, or hybrid routing.", "modelPriority": "The primary optimization objective used when selecting models and routing policies, such as quality, cost, latency, or residency.", "rag": "Whether the system retrieves external or enterprise knowledge to ground model responses. RAG adds ingestion, indexing, authorization, and provenance requirements.", "knowledgeFreq": "How often source content must be ingested, re-indexed, or made available to retrieval. Faster updates increase pipeline and consistency complexity.", "retrievalAuth": "The granularity at which access must be enforced when retrieving documents or records. Authorization should occur before content enters model context.", "sensitivity": "The highest classification of data processed in prompts, retrieval, memory, embeddings, outputs, logs, or tool calls.", "promptData": "The main categories of information users or systems submit to the model. This helps determine privacy, filtering, retention, and provider restrictions.", "outputRisk": "The potential business, safety, legal, financial, security, or customer impact if generated output is wrong, unsafe, or acted upon.", "toolCalls": "The highest level of external capability the AI can invoke. State-changing or privileged tools materially increase agency and runtime-control requirements.", "autonomy": "How independently the agent may plan or execute actions. This selection helps map the workload to human oversight and ATF maturity levels.", "memory": "The persistence and sharing scope of information retained beyond the current prompt. Longer-lived memory requires consent, isolation, integrity, deletion, and poisoning controls.", "compliance": "The level of regulatory, audit, model-risk, or evidence obligations that the design must support.", "availability": "The target percentage of time the service should be operational. Higher targets generally require redundancy, failover, monitoring, and tested recovery.", "residency": "Geographic, sovereignty, or provider-retention constraints governing where data, models, logs, and backups may be processed or stored.", "contextStrategy": "How the system assembles and manages information supplied to the model, balancing relevance, token usage, latency, privacy, and context-window limits.", "adaptationStrategy": "How model behavior or domain capability will be tailored: prompts/RAG, parameter-efficient tuning, full fine-tuning, or distillation.", "evaluationStrategy": "The method and rigor used to verify quality, safety, security, retrieval, and regression performance before and during production.", "promptSecurity": "The required strength of controls against prompt injection, unsafe outputs, unauthorized tool use, excessive agency, and adversarial inputs.", "aiFramework": "The security and threat frameworks used to structure control design, testing, terminology, and traceability.", "riskGovernance": "The governance and legal framework combination used to classify risk, assign accountability, define evidence, and operate lifecycle decision gates.", "genaiRiskEmphasis": "The GenAI risk cluster that deserves the greatest design and testing attention for this use case.", "multimodal": "The types of media the system processes or generates. Images, audio, video, and complex documents add modality-specific security and evaluation needs.", "inferenceOptimization": "The expected need for performance and cost optimization through streaming, caching, batching, model routing, quantization, or specialized serving.", "providerFallback": "The failover strategy used when the primary model or provider is unavailable, rate-limited, degraded, or disallowed by policy.", "atfTarget": "The maximum Agentic Trust Framework autonomy level the organization is prepared to authorize, subject to earned trust and governance approval.", "agentIdentity": "How the agent is uniquely identified, authenticated, delegated authority, and revoked. Dedicated workload identity is preferred over shared human credentials.", "actionCriticality": "The most consequential action the system can perform. This drives approval thresholds, AARM decisions, containment, and audit requirements.", "agentInteraction": "The trust and interaction boundary for agents: one trust domain, internal multi-agent across one or several trust domains, cross-cloud/federated agents, or external third parties. Use Agent Topology separately to describe process coordination.", "protocolBoundary": "The interfaces through which the agent accesses tools, systems, or other agents, including APIs, MCP, browser/computer use, or code execution.", "aarmTarget": "The desired runtime action-control posture, ranging from basic logging to AARM Core or Extended controls for interception, policy, receipts, telemetry, and least privilege.", "containmentModel": "The primary response used to stop or limit unsafe execution, such as pausing the workflow, revoking credentials, isolating memory, terminating a sandbox, or rolling back a transaction.", "maestroMode": "The depth of MAESTRO threat modeling applied across the seven agentic AI architecture layers, including cross-layer threat propagation.", "agentNecessity": "Whether dynamic autonomous planning is actually required. Prefer a simpler LLM, RAG, or deterministic workflow when an agent does not add material value.", "routingMode": "How the system decides between a direct model response and a full agent workflow. Selective routing can reduce latency, cost, and unnecessary tool exposure.", "reasoningStrategy": "The orchestration strategy used to decompose and execute work. This describes observable planning behavior and task state, not private chain-of-thought disclosure.", "completionVerification": "How the system determines that a task is truly complete. Stronger options use independent deterministic checks, business rules, evidence, or human approval.", "memoryTaxonomy": "The kinds of memory the agent may retain: working, episodic, semantic, procedural, or shared enterprise state. Each requires different governance and integrity controls.", "workQueue": "Whether long-running agent work is durably queued, checkpointed, interruptible, resumable, prioritized, or distributed across workers.", "handoffModel": "How tasks and authority are delegated between agents. Handoffs must constrain identity, context, tool scope, data, budget, expiration, and provenance.", "successMetric": "The primary production measure used to judge agent effectiveness. Verified task success is stronger than the agent merely declaring completion.", "instructionGovernance": "How persistent system rules and agent operating instructions are versioned, approved, integrity-protected, rolled back, and separated from untrusted content.", "decisionStrategy": "The mechanism used for bounded routing, classification, prioritization, tool/agent selection, or escalation. Probabilistic decision models must not replace authorization or mandatory policy rules.", "decisionUseCase": "The primary bounded decision problem delegated to the Decision Plane, such as routing, risk classification, tool/agent selection, or human escalation.", "decisionConfidence": "The policy that converts decision-model confidence into automation, LLM fallback, human escalation, or mandatory approval.", "ragArchitecture": "The retrieval architecture used to ground answers. Hybrid, graph, agentic, adaptive, multimodal, and composite RAG solve different retrieval problems and can be combined.", "ragRanking": "How retrieved evidence is ranked or graded before it enters model context, including rank fusion, reranking, graph scoring, evidence grading, or multimodal page ranking.", "ragIteration": "The number and control policy for retrieval rounds. Bounded iteration prevents runaway latency, cost, and agentic loops while allowing evidence-driven retries.", "agentTopology": "The agent execution topology and coordination flow: single, sequential, parallel, supervisor-worker, hierarchical, router, aggregator, peer network, loop, or hybrid. Topology changes trust propagation, failure modes, and process flow.", "resourceSharing": "How agents share tools, memory, databases, retrieval, or registries. Shared resources require per-agent identity, authorization, provenance, concurrency controls, and isolation.", "resultCoordination": "How outputs from multiple agents are handed off, synthesized, merged, voted, verified, selected by a decision model, or adjudicated by a human.", "humanOversight": "Where humans sit relative to autonomous execution: in the loop for approvals, on the loop for operational monitoring, over multiple loops for supervisory control, at the loop for governance, or risk-adaptive by action criticality.", "orchestrationStyle": "The implementation style used to realize the selected agent topology and coordination model. Choose the architecture style first; do not infer architecture solely from a vendor framework.", "orchestrationFramework": "An optional implementation mapping to a concrete agent framework or SDK. Framework choice should satisfy the selected topology, state, handoff, oversight, tool, and security requirements rather than determine them.", "constraints": "Free-form requirements, assumptions, exclusions, dependencies, deadlines, technical limitations, and governance decisions that affect the design."};
+  const QUESTIONNAIRE_HELP = {"systemName": "A descriptive name used to identify this workload in assessments, architecture notes, exports, and governance evidence.", "systemType": "The dominant AI workload pattern. This choice affects recommended architecture, threat modeling, agentic controls, and operating practices.", "criticality": "The business impact if the AI system is unavailable, incorrect, compromised, or misused. Higher criticality drives stronger resilience, review, and assurance controls.", "users": "The total number of users expected to be provisioned or eligible to use the production system; it is not the same as concurrent users.", "dau": "The estimated percentage of provisioned users who actively use the system on a typical day. It is used to estimate daily demand.", "reqPerUser": "The average number of AI interactions generated by each active user per day, including chat requests, automated calls, or workflow invocations.", "peak": "A factor applied to average traffic to estimate short-duration peak demand during active usage windows. Validate this against real concurrency and session data.", "latency": "The target response-time experience for users or downstream systems. It influences model choice, streaming, caching, routing, and capacity design.", "promptTokens": "The estimated average number of input tokens sent to the model per request, including system instructions, conversation context, and retrieved content.", "outputTokens": "The estimated average number of tokens generated by the model per request. It affects latency, throughput, and cost.", "modelHosting": "The preferred location and operating model for inference, such as a managed provider, private endpoint, self-hosted model, or hybrid routing.", "modelPriority": "The primary optimization objective used when selecting models and routing policies, such as quality, cost, latency, or residency.", "rag": "Whether the system retrieves external or enterprise knowledge to ground model responses. RAG adds ingestion, indexing, authorization, and provenance requirements.", "knowledgeFreq": "How often source content must be ingested, re-indexed, or made available to retrieval. Faster updates increase pipeline and consistency complexity.", "retrievalAuth": "The granularity at which access must be enforced when retrieving documents or records. Authorization should occur before content enters model context.", "sensitivity": "The highest classification of data processed in prompts, retrieval, memory, embeddings, outputs, logs, or tool calls.", "promptData": "The main categories of information users or systems submit to the model. This helps determine privacy, filtering, retention, and provider restrictions.", "outputRisk": "The potential business, safety, legal, financial, security, or customer impact if generated output is wrong, unsafe, or acted upon.", "toolCalls": "The highest level of external capability the AI can invoke. State-changing or privileged tools materially increase agency and runtime-control requirements.", "autonomy": "How independently the agent may plan or execute actions. This selection helps map the workload to human oversight and ATF maturity levels.", "memory": "The persistence and sharing scope of information retained beyond the current prompt. Longer-lived memory requires consent, isolation, integrity, deletion, and poisoning controls.", "compliance": "The level of regulatory, audit, model-risk, or evidence obligations that the design must support.", "availability": "The target percentage of time the service should be operational. Higher targets generally require redundancy, failover, monitoring, and tested recovery.", "residency": "Geographic, sovereignty, or provider-retention constraints governing where data, models, logs, and backups may be processed or stored.", "contextStrategy": "How the system assembles and manages information supplied to the model, balancing relevance, token usage, latency, privacy, and context-window limits.", "adaptationStrategy": "How model behavior or domain capability will be tailored: prompts/RAG, parameter-efficient tuning, full fine-tuning, or distillation.", "evaluationStrategy": "The method and rigor used to verify quality, safety, security, retrieval, and regression performance before and during production.", "promptSecurity": "The required strength of controls against prompt injection, unsafe outputs, unauthorized tool use, excessive agency, and adversarial inputs.", "aiFramework": "The security and threat frameworks used to structure control design, testing, terminology, and traceability.", "riskGovernance": "The governance and legal framework combination used to classify risk, assign accountability, define evidence, and operate lifecycle decision gates.", "genaiRiskEmphasis": "The GenAI risk cluster that deserves the greatest design and testing attention for this use case.", "multimodal": "The primary model modality: Text, Image, Code, Vision-Language, Audio / Speech, Video, or Multimodal. Each modality creates different ingestion, provenance, prompt-injection, safety, and evaluation requirements.", "inferenceOptimization": "The expected need for performance and cost optimization through streaming, caching, batching, model routing, quantization, or specialized serving.", "providerFallback": "The failover strategy used when the primary model or provider is unavailable, rate-limited, degraded, or disallowed by policy.", "atfTarget": "The maximum Agentic Trust Framework autonomy level the organization is prepared to authorize, subject to earned trust and governance approval.", "agentIdentity": "How the agent is uniquely identified, authenticated, delegated authority, and revoked. Dedicated workload identity is preferred over shared human credentials.", "actionCriticality": "The most consequential action the system can perform. This drives approval thresholds, AARM decisions, containment, and audit requirements.", "agentInteraction": "The trust and interaction boundary for agents: one trust domain, internal multi-agent across one or several trust domains, cross-cloud/federated agents, or external third parties. Use Agent Topology separately to describe process coordination.", "protocolBoundary": "The interfaces through which the agent accesses tools, systems, or other agents, including APIs, MCP, browser/computer use, or code execution.", "aarmTarget": "The desired runtime action-control posture, ranging from basic logging to AARM Core or Extended controls for interception, policy, receipts, telemetry, and least privilege.", "containmentModel": "The primary response used to stop or limit unsafe execution, such as pausing the workflow, revoking credentials, isolating memory, terminating a sandbox, or rolling back a transaction.", "maestroMode": "The depth of MAESTRO threat modeling applied across the seven agentic AI architecture layers, including cross-layer threat propagation.", "agentNecessity": "Whether dynamic autonomous planning is actually required. Prefer a simpler LLM, RAG, or deterministic workflow when an agent does not add material value.", "agentType": "The operational pattern of the agent at runtime. This is separate from topology and orchestration and drives capability-specific compatibility, containment, authorization, evaluation, and human-oversight controls.", "routingMode": "How the system decides between a direct model response and a full agent workflow. Selective routing can reduce latency, cost, and unnecessary tool exposure.", "reasoningStrategy": "The orchestration strategy used to decompose and execute work. This describes observable planning behavior and task state, not private chain-of-thought disclosure.", "completionVerification": "How the system determines that a task is truly complete. Stronger options use independent deterministic checks, business rules, evidence, or human approval.", "memoryTaxonomy": "The kinds of memory the agent may retain: working, episodic, semantic, procedural, or shared enterprise state. Each requires different governance and integrity controls.", "workQueue": "Whether long-running agent work is durably queued, checkpointed, interruptible, resumable, prioritized, or distributed across workers.", "handoffModel": "How tasks and authority are delegated between agents. Handoffs must constrain identity, context, tool scope, data, budget, expiration, and provenance.", "successMetric": "The primary production measure used to judge agent effectiveness. Verified task success is stronger than the agent merely declaring completion.", "instructionGovernance": "How persistent system rules and agent operating instructions are versioned, approved, integrity-protected, rolled back, and separated from untrusted content.", "decisionStrategy": "The mechanism used for bounded routing, classification, prioritization, tool/agent selection, or escalation. Probabilistic decision models must not replace authorization or mandatory policy rules.", "decisionUseCase": "The primary bounded decision problem delegated to the Decision Plane, such as routing, risk classification, tool/agent selection, or human escalation.", "decisionConfidence": "The policy that converts decision-model confidence into automation, LLM fallback, human escalation, or mandatory approval.", "ragArchitecture": "The retrieval architecture used to ground answers. Hybrid, graph, agentic, adaptive, multimodal, and composite RAG solve different retrieval problems and can be combined.", "ragRanking": "How retrieved evidence is ranked or graded before it enters model context, including rank fusion, reranking, graph scoring, evidence grading, or multimodal page ranking.", "ragIteration": "The number and control policy for retrieval rounds. Bounded iteration prevents runaway latency, cost, and agentic loops while allowing evidence-driven retries.", "agentTopology": "The agent execution topology and coordination flow: single, sequential, parallel, supervisor-worker, hierarchical, router, aggregator, peer network, loop, or hybrid. Topology changes trust propagation, failure modes, and process flow.", "resourceSharing": "How agents share tools, memory, databases, retrieval, or registries. Shared resources require per-agent identity, authorization, provenance, concurrency controls, and isolation.", "resultCoordination": "How outputs from multiple agents are handed off, synthesized, merged, voted, verified, selected by a decision model, or adjudicated by a human.", "humanOversight": "Where humans sit relative to autonomous execution: in the loop for approvals, on the loop for operational monitoring, over multiple loops for supervisory control, at the loop for governance, or risk-adaptive by action criticality.", "orchestrationStyle": "The implementation style used to realize the selected agent topology and coordination model. Choose the architecture style first; do not infer architecture solely from a vendor framework.", "orchestrationFramework": "An optional implementation mapping to a concrete agent framework or SDK. Framework choice should satisfy the selected topology, state, handoff, oversight, tool, and security requirements rather than determine them.", "constraints": "Free-form requirements, assumptions, exclusions, dependencies, deadlines, technical limitations, and governance decisions that affect the design.", "modelRole": "The primary capability the model provides in this design. A system may use multiple roles; choose the dominant role here and use Model Composition Strategy to represent multi-model designs. Reasoning-optimized, action-oriented, embedding, reranking, perception, code, and audio/speech roles have different evaluation and control requirements.", "modelTopology": "The model’s internal architectural form, such as dense transformer, Mixture-of-Experts, encoder-only, decoder-only, encoder-decoder, or diffusion/latent. This affects serving, cost, latency, routing, observability, and assurance.", "modelRepresentation": "The representational level used by the model. Token-level is conventional for language models; concept/semantic-level (LCM-style) is treated here as emerging and should be validated for maturity, observability, provenance, and implementation support.", "modelComposition": "How one or more models are assembled: single model, fallback pair, routed specialists, cascade, ensemble, hierarchical/composite system, edge+cloud combination, or independent specialists. Composition requires explicit routing, failure, policy, and evaluation rules."};
   function installQuestionnaireHelp(){
     const section=document.getElementById('questionnaire');
     if(!section) return;
@@ -2297,7 +2502,7 @@ generateDesign();
 })();
 </script>
 
-<footer class="version-footer" aria-label="Application version">Version 5c</footer>
+<footer class="version-footer" aria-label="Application version">Version 5d</footer>
 
 </body>
 </html>
